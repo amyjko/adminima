@@ -5,17 +5,22 @@
 
 	:root {
 		font-family: 'Rokkitt', sans-serif;
-		font-size: 18pt;
+		font-size: var(--normal-size);
 		line-height: 1;
 
 		--spacing: 1em;
+		--radius: 4px;
+		--normal-size: 18pt;
+		--small-size: 13pt;
 		--error: #e25f55;
 		--warning: #e28d1d;
 		--other: #b349cb;
 		--salient: #d35088;
 		--focus: #784ada;
 		--background: #ffffff;
+		--separator: #cccccc;
 		--foreground: #000000;
+		--border: #000000;
 		--thickness: 4px;
 	}
 
@@ -134,6 +139,6 @@
 		src: url(/fonts/Rokkitt.ttf) format('truetype');
 	}
 	:global(body) {
-		line-height: 1;
+		line-height: 0.7;
 	}
 </style>

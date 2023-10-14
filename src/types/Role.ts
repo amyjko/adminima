@@ -2,9 +2,11 @@ import type Markup from './Markup';
 import type { PersonID } from './Person';
 
 /** A scope of resopnsibilities, including zero or more activities. */
-type Scope = {
+type Role = {
 	id: string;
-	/** A descripition of what the scope of responsibilities are. */
+	/** A short title for the role */
+	title: string;
+	/** A descrption of what the scope of responsibilities are. */
 	what: Markup;
 	/** An emoji to represent the scope */
 	icon: string;
@@ -16,4 +18,4 @@ type Scope = {
 	public: boolean;
 };
 
-export default Scope;
+export default Role;
