@@ -1,19 +1,23 @@
 <script lang="ts">
-	import Header from '../../lib/Header.svelte';
-	import Paragraph from '../../lib/Paragraph.svelte';
-	import Time from '../../lib/Time.svelte';
+	import Header from '$lib/Header.svelte';
+	import Paragraph from '$lib/Paragraph.svelte';
+	import Time from '$lib/Time.svelte';
 
-	let name = 'Associate Dean for Academics';
-	let description =
-		'Annual tasks the associate dean is responsible for completing, with the help of assistants.';
+	import MockActivities from '$lib/mock/activities.json?raw';
+	import MockRole from '$lib/mock/role.json?raw';
+	import type Role from '../../types/Role';
+	import type Activity from '../../types/Activity';
+
+	const role = JSON.parse(MockRole) as Role;
+	const activities = JSON.parse(MockActivities) as Activity[];
 </script>
 
 <div class="scope">
 	<div class="meta">
-		<Header>Role</Header>
-		<Paragraph>{description}</Paragraph>
+		<Header>{role.title}</Header>
+		<Paragraph>{role.what}</Paragraph>
 	</div>
-	<Time />
+	<Time {activities} />
 </div>
 
 <style>

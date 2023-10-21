@@ -1,0 +1,9 @@
+{
+	"id": "test",
+	"title": "Associate Dean for Academics",
+	"what": "Annual tasks the associate dean is responsible for completing, with the help of assistants.",
+	"icon": "⛄️",
+	"managers": ["amy"],
+	"viewers": [],
+	"public": true
+}

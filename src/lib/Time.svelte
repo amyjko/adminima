@@ -4,32 +4,7 @@
 	import { addYears, compareAsc, differenceInWeeks } from 'date-fns';
 	import ActivityPill from './ActivityPill.svelte';
 
-	let activities: Activity[] = [
-		{
-			id: 'hi',
-			previous: null,
-			start: { date: 13, month: 10, year: 2023 },
-			repeat: null,
-			icon: '🧑🏻‍🏫',
-			what: 'Make sure faculty are doing their peer reviews',
-			why: 'Required by faculty code',
-			leader: 'Amy',
-			collaborators: ['Victor'],
-			how: []
-		},
-		{
-			id: 'hi',
-			previous: null,
-			start: { date: 1, month: 1, year: 2023 },
-			repeat: null,
-			icon: '🧑🏻‍🏫',
-			what: 'CAP',
-			why: 'Required by faculty code',
-			leader: 'Amy',
-			collaborators: ['Victor'],
-			how: []
-		}
-	];
+	export let activities: Activity[];
 
 	// How many pixels a week should be.
 	const PixelsPerWeek = 100;
