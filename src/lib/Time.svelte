@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type Activity from '../types/Activity';
 	import { toDate } from '../types/Day';
-	import { addYears, compareAsc, differenceInWeeks } from 'date-fns';
+	import { addWeeks, addYears, compareAsc, differenceInWeeks, format } from 'date-fns';
 	import ActivityPill from './ActivityPill.svelte';
 
 	export let activities: Activity[];
@@ -29,7 +29,9 @@
 
 <div class="time">
 	{#each weeks as num}
-		<div class="tick" style:left="{num * PixelsPerWeek}px" />
+		<div class="tick" style:left="{num * PixelsPerWeek}px">
+			<div class="date">{format(addWeeks(start, num), 'MM/dd/yy')}</div>
+		</div>
 	{/each}
 	<div class="activities">
 		{#each activities as activity}<ActivityPill
@@ -51,6 +53,7 @@
 		position: absolute;
 		top: 3px;
 		bottom: 0;
+		width: 0;
 		border: 1px solid var(--separator);
 	}
 
@@ -59,5 +62,13 @@
 		flex-direction: column;
 		gap: var(--spacing);
 		align-items: flex-start;
+		margin-block-start: var(--spacing);
+	}
+
+	.date {
+		font-size: small;
+		color: var(--separator);
+		margin-inline-start: var(--thickness);
+		margin-block-start: var(--thickness);
 	}
 </style>
