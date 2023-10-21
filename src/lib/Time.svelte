@@ -31,7 +31,12 @@
 	{#each weeks as num}
 		<div class="tick" style:left="{num * PixelsPerWeek}px" />
 	{/each}
-	{#each activities as activity}<ActivityPill {activity} />{/each}
+	<div class="activities">
+		{#each activities as activity}<ActivityPill
+				{activity}
+				left={differenceInWeeks(toDate(activity.start), start) * PixelsPerWeek}
+			/>{/each}
+	</div>
 </div>
 
 <style>
@@ -47,5 +52,12 @@
 		top: 3px;
 		bottom: 0;
 		border: 1px solid var(--separator);
+	}
+
+	.activities {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing);
+		align-items: flex-start;
 	}
 </style>

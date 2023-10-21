@@ -2,17 +2,19 @@
 	import type Activity from '../types/Activity';
 
 	export let activity: Activity;
+	export let left: number;
 </script>
 
-<div class="activity">{activity.what}</div>
+<div class="activity" style:left="{left}px">{activity.what}</div>
 
 <style>
 	.activity {
-		position: absolute;
+		position: relative;
 		background: var(--salient);
 		padding: var(--spacing);
 		border-radius: var(--radius);
 		color: var(--background);
 		font-size: var(--small-size);
+		width: fit-content;
 	}
 </style>
