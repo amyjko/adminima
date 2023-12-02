@@ -3,13 +3,24 @@ import type { Day } from './Day';
 import type { PersonID } from './Person';
 import type Task from './Task';
 import type Repeat from './Day';
+import type { RoleID } from './Role';
+import type { OrganizationID } from './Organization';
 
 /** A unique ID to represent an activity */
-type ActivityID = string;
+export type ActivityID = string;
 
 /** Something that must in a scope of responsibilities, possibly periodically. */
 type Activity = {
+	/** A unique identifier for this activity */
 	id: ActivityID;
+	/** The role responsibile for getting this task done */
+	role: RoleID;
+	/** The organization this activity is in */
+	organization: OrganizationID;
+	/** the person responsible for doing this activity **/
+	leader: PersonID[];
+	/** other people involved in the work **/
+	collaborators: PersonID[];
 	/** A Unix timestamp of when this activity was created */
 	created: number;
 	/** A Unix timestamp of when this activity was last modified */
@@ -33,10 +44,6 @@ type Activity = {
 	what: Markup;
 	/** what’s the rationale for the activity? how does it tie to organizational goals? */
 	why: Markup;
-	/** who is responsible for ensuring that it’s done */
-	leader: PersonID;
-	/** everyone who can edit the task **/
-	collaborators: PersonID[];
 	/** the tasks involved in completing the activity */
 	how: Task[];
 	/** Whether this activity is public. Overriden by private role. */
