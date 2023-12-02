@@ -6,6 +6,12 @@ export type TaskID = string;
 /** A part of completing an activity. */
 type Task = {
 	id: TaskID;
+	/** A Unix time stamp of when the task was created */
+	created: number;
+	/** A Unix time stamp of when the task was last modified */
+	modified: number;
+	/** A Unix timestamp of who last modified this task */
+	modifier: PersonID;
 	/** optional number of days after activity start date when the task is due */
 	due: number;
 	/** what the task is */
@@ -16,6 +22,8 @@ type Task = {
 	comments: Comment[];
 	/** whether the task is done */
 	complete: boolean;
+	/** Whether this task is public. Overriden by private activities. */
+	public: boolean;
 };
 
 /** A comment on a task */

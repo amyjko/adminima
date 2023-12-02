@@ -10,6 +10,12 @@ type ActivityID = string;
 /** Something that must in a scope of responsibilities, possibly periodically. */
 type Activity = {
 	id: ActivityID;
+	/** A Unix timestamp of when this activity was created */
+	created: number;
+	/** A Unix timestamp of when this activity was last modified */
+	modified: number;
+	/** A Unix timestamp of who last modified this activity */
+	modifier: PersonID;
 	/** Whether this is unfinished; if false, then it's a ground truth activity. */
 	draft: boolean;
 	/** The last version of the activity, forming a linked list of activity versions. */
@@ -33,6 +39,8 @@ type Activity = {
 	collaborators: PersonID[];
 	/** the tasks involved in completing the activity */
 	how: Task[];
+	/** Whether this activity is public. Overriden by private role. */
+	public: boolean;
 };
 
 export default Activity;

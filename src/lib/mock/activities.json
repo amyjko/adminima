@@ -1,6 +1,8 @@
 [
 	{
 		"id": "1",
+		"created": 0,
+		"modified": 0,
 		"draft": false,
 		"previous": null,
 		"time": {
@@ -16,6 +18,8 @@
 	},
 	{
 		"id": "2",
+		"created": 0,
+		"modified": 0,
 		"draft": true,
 		"previous": null,
 		"time": {
@@ -31,6 +35,8 @@
 	},
 	{
 		"id": "3",
+		"created": 0,
+		"modified": 0,
 		"draft": false,
 		"previous": null,
 		"time": {
@@ -46,6 +52,8 @@
 	},
 	{
 		"id": "4",
+		"created": 0,
+		"modified": 0,
 		"draft": false,
 		"previous": null,
 		"time": null,
