@@ -138,7 +138,8 @@
 		font-family: 'Rokkitt';
 		src: url(/fonts/Rokkitt.ttf) format('truetype');
 	}
+
 	:global(body) {
-		line-height: 0.7;
+		line-height: 1;
 	}
 </style>
