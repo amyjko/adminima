@@ -1,5 +1,6 @@
 import type { ActivityID } from './Activity';
 import type Markup from './Markup';
+import type Modification from './Modification';
 import type { OrganizationID } from './Organization';
 import type { PersonID } from './Person';
 import type { RoleID } from './Role';
@@ -17,14 +18,10 @@ type Idea = {
 type Change = {
 	/** Unique ID for this change request. */
 	id: string;
-	/** A unix timestamp of when it was created */
-	created: number;
-	/** The optional person who created this change, null if anonymous. */
-	creator: PersonID | null;
-	/** A unix timestamp of when it was modified */
-	modified: number;
-	/** Who last modified it */
-	modifier: PersonID;
+	/** Who submitted the change request */
+	requestor: PersonID | null;
+	/** The modifications to this change request */
+	modifications: Modification[];
 	/** The organization the change was requested for */
 	organization: OrganizationID;
 	/** Roles affected by this request */

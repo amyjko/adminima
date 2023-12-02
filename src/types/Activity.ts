@@ -5,6 +5,7 @@ import type Task from './Task';
 import type Repeat from './Day';
 import type { RoleID } from './Role';
 import type { OrganizationID } from './Organization';
+import type Modification from './Modification';
 
 /** A unique ID to represent an activity */
 export type ActivityID = string;
@@ -21,12 +22,8 @@ type Activity = {
 	leader: PersonID[];
 	/** other people involved in the work **/
 	collaborators: PersonID[];
-	/** A Unix timestamp of when this activity was created */
-	created: number;
-	/** A Unix timestamp of when this activity was last modified */
-	modified: number;
-	/** A Unix timestamp of who last modified this activity */
-	modifier: PersonID;
+	/** A list of modifications */
+	modifications: Modification[];
 	/** Whether this is unfinished; if false, then it's a ground truth activity. */
 	draft: boolean;
 	/** The last version of the activity, forming a linked list of activity versions. */
