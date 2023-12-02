@@ -1,4 +1,5 @@
 import type Markup from './Markup';
+import type Modification from './Modification';
 import type { OrganizationID } from './Organization';
 import type { PersonID } from './Person';
 
@@ -10,6 +11,8 @@ type Role = {
 	id: RoleID;
 	/** The organization the role is in */
 	organization: OrganizationID;
+	/** A list of modifications to the role */
+	modifications: Modification[];
 	/** A short title for the role */
 	title: string;
 	/** A descrption of what the scope of responsibilities are. */
