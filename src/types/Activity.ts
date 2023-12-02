@@ -7,15 +7,18 @@ import type Repeat from './Day';
 /** A unique ID to represent an activity */
 type ActivityID = string;
 
-/** Something that must be done periodically in the scope of responsibilities. */
+/** Something that must in a scope of responsibilities, possibly periodically. */
 type Activity = {
 	id: ActivityID;
 	/** The last version of the activity, forming a linked list of activity versions. */
 	previous: ActivityID | null;
-	/** The concrete day on which the activity starts */
-	start: Day;
-	/** An optional repetition schedule */
-	repeat: Repeat | null;
+	/** The optional period on which the activity repeats */
+	time: {
+		/** The concrete day on which the activity starts */
+		start: Day;
+		/** An optional repetition schedule */
+		repeat: Repeat | null;
+	};
 	/** An emoji representing the theme of the activity */
 	icon: string;
 	/** a short description of the activity without line breaks */

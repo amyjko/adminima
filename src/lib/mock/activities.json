@@ -1,9 +1,11 @@
 [
 	{
-		"id": "hi",
+		"id": "1",
 		"previous": null,
-		"start": { "date": 13, "month": 10, "year": 2023 },
-		"repeat": null,
+		"time": {
+			"start": { "date": 13, "month": 10, "year": 2023 },
+			"repeat": null
+		},
 		"icon": "🧑🏻‍🏫",
 		"what": "Faculty peer reviews",
 		"why": "Required by faculty code",
@@ -12,10 +14,12 @@
 		"how": []
 	},
 	{
-		"id": "hi",
+		"id": "2",
 		"previous": null,
-		"start": { "date": 30, "month": 9, "year": 2023 },
-		"repeat": null,
+		"time": {
+			"start": { "date": 30, "month": 9, "year": 2023 },
+			"repeat": null
+		},
 		"icon": "🧑🏻‍🏫",
 		"what": "Welcome",
 		"why": "Give students a sense of community",
@@ -24,15 +28,28 @@
 		"how": []
 	},
 	{
-		"id": "hi",
+		"id": "3",
 		"previous": null,
-		"start": { "date": 10, "month": 7, "year": 2023 },
-		"repeat": null,
+		"time": {
+			"start": { "date": 10, "month": 7, "year": 2023 },
+			"repeat": null
+		},
 		"icon": "🧑🏻‍🏫",
 		"what": "CAP",
 		"why": "Teachers gotta teach",
 		"leader": "Amy",
 		"collaborators": ["Victor"],
+		"how": []
+	},
+	{
+		"id": "4",
+		"previous": null,
+		"time": null,
+		"icon": "🧑🏻‍🏫",
+		"what": "Instructor is ill",
+		"why": "people get sick",
+		"leader": "Amy",
+		"collaborators": [],
 		"how": []
 	}
 ]
