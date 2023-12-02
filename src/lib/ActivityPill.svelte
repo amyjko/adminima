@@ -5,7 +5,7 @@
 	export let left: number | undefined = undefined;
 </script>
 
-<div class="activity" style:left="{left}px">{activity.what}</div>
+<div class="activity" style:left="{left}px" class:draft={activity.draft}>{activity.what}</div>
 
 <style>
 	.activity {
@@ -16,5 +16,9 @@
 		color: var(--background);
 		font-size: var(--small-size);
 		width: fit-content;
+	}
+
+	.draft {
+		background: var(--warning);
 	}
 </style>

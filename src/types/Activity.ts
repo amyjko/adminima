@@ -10,6 +10,8 @@ type ActivityID = string;
 /** Something that must in a scope of responsibilities, possibly periodically. */
 type Activity = {
 	id: ActivityID;
+	/** Whether this is unfinished; if false, then it's a ground truth activity. */
+	draft: boolean;
 	/** The last version of the activity, forming a linked list of activity versions. */
 	previous: ActivityID | null;
 	/** The optional period on which the activity repeats */

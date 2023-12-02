@@ -1,6 +1,7 @@
 [
 	{
 		"id": "1",
+		"draft": false,
 		"previous": null,
 		"time": {
 			"start": { "date": 13, "month": 10, "year": 2023 },
@@ -15,6 +16,7 @@
 	},
 	{
 		"id": "2",
+		"draft": true,
 		"previous": null,
 		"time": {
 			"start": { "date": 30, "month": 9, "year": 2023 },
@@ -29,6 +31,7 @@
 	},
 	{
 		"id": "3",
+		"draft": false,
 		"previous": null,
 		"time": {
 			"start": { "date": 10, "month": 7, "year": 2023 },
@@ -43,6 +46,7 @@
 	},
 	{
 		"id": "4",
+		"draft": false,
 		"previous": null,
 		"time": null,
 		"icon": "🧑🏻‍🏫",
