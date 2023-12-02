@@ -1,9 +1,13 @@
 import type Markup from './Markup';
+import type { OrganizationID } from './Organization';
 import type { PersonID } from './Person';
 
 /** A scope of resopnsibilities, including zero or more activities. */
 type Role = {
+	/** Unique ID for this role. */
 	id: string;
+	/** The organization the role is in */
+	organization: OrganizationID;
 	/** A short title for the role */
 	title: string;
 	/** A descrption of what the scope of responsibilities are. */
