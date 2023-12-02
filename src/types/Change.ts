@@ -20,6 +20,8 @@ type Change = {
 	id: string;
 	/** Who submitted the change request */
 	requestor: PersonID | null;
+	/** People who want to know about changes to this change request */
+	watchers: PersonID[];
 	/** The modifications to this change request */
 	modifications: Modification[];
 	/** The organization the change was requested for */
