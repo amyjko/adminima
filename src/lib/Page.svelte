@@ -12,7 +12,7 @@
 	}
 
 	.content {
-		max-width: 40em;
+		max-width: 32em;
 		margin-block-start: 10vh;
 	}
 </style>

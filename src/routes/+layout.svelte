@@ -6,7 +6,7 @@
 	:root {
 		font-family: 'Rokkitt', sans-serif;
 		font-size: var(--normal-size);
-		line-height: 1;
+		line-height: 1.1;
 
 		--spacing: 1em;
 		--radius: 4px;
@@ -137,9 +137,5 @@
 	@font-face {
 		font-family: 'Rokkitt';
 		src: url(/fonts/Rokkitt.ttf) format('truetype');
-	}
-
-	:global(body) {
-		line-height: 1;
 	}
 </style>

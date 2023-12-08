@@ -10,6 +10,10 @@ async function setLocale(name: string): Promise<Locale> {
 
 export type Locale = {
 	name: string;
+	landing: {
+		value: string;
+		description: string;
+	};
 };
 
 setLocale('en-US');

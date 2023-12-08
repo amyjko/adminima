@@ -5,11 +5,13 @@
 	import Link from '../lib/Link.svelte';
 	import { locale } from '../types/Locales';
 	import Text from '$lib/Text.svelte';
+	import Lead from '$lib/Lead.svelte';
 </script>
 
 <Page>
-	<Header><Text text={$locale?.name} /></Header>
-	<Paragraph>This will soon be a place to help you administer periodic work.</Paragraph>
+	<Header>⎋ <Text text={$locale?.name} /></Header>
+	<Lead><Text text={$locale?.landing.value} /></Lead>
+	<Paragraph><Text text={$locale?.landing.description} /></Paragraph>
 	<Paragraph
 		><Link external to="https://amyjko.phd">Amy</Link> is working on it. <Link
 			to="mailto:ajko@uw.edu">Write her</Link
