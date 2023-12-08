@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type Role from '../types/Role';
 	import Header from '$lib/Header.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
 	import Time from '$lib/ActivitiesView.svelte';
 	import type Activity from '../types/Activity';
+	import MarkupView from './MarkupView.svelte';
+	import { parse } from '../markup/parser';
 
 	export let role: Role;
 	export let activities: Activity[];
@@ -12,7 +13,7 @@
 <div class="scope">
 	<div class="meta">
 		<Header>{role.title}</Header>
-		<Paragraph>{role.what}</Paragraph>
+		<MarkupView markup={parse(role.what)} />
 	</div>
 	<Time {activities} />
 </div>

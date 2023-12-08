@@ -134,6 +134,14 @@
 		border-spacing: 0;
 	}
 
+	:global(strong) {
+		font-weight: bold;
+	}
+
+	:global(em) {
+		font-style: italic;
+	}
+
 	@font-face {
 		font-family: 'Rokkitt';
 		src: url(/fonts/Rokkitt.ttf) format('truetype');
