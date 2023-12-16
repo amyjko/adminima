@@ -27,4 +27,4 @@ type Role = {
 	public: boolean;
 };
 
-export default Role;
+export type { Role as default };

@@ -40,4 +40,4 @@ type Change = {
 	status: 'triage' | 'backlog' | 'active' | 'completed' | 'abandoned' | 'closed';
 };
 
-export default Change;
+export type { Change as default };

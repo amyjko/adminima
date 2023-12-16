@@ -1,3 +1,3 @@
 type Markup = string;
 
-export default Markup;
+export type { Markup as default };

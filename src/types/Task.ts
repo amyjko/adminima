@@ -36,4 +36,4 @@ type Comment = {
 	resolved: boolean;
 };
 
-export default Task;
+export type { Task as default };

@@ -45,6 +45,10 @@ type Activity = {
 	how: Task[];
 	/** Whether this activity is public. Overriden by private role. */
 	public: boolean;
+	/** When this was created */
+	created: number;
+	/** When this was last modified */
+	modified: number;
 };
 
-export default Activity;
+export type { Activity as default };

@@ -11,13 +11,19 @@ async function setLocale(name: string): Promise<Locale> {
 export type Locale = {
 	name: string;
 	term: {
+		/** The loading word to show when loading */
 		loading: string;
+		/** The word representing a set of activities a person is responsibile for */
+		role: string;
+		/** The word representing a specific activity */
+		activity: string;
 	};
 	landing: {
 		value: string;
 		description: string;
 	};
 	error: {
+		noActivity: string;
 		noRoleActivities: string;
 	};
 };

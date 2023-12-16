@@ -46,4 +46,4 @@ export type Weeks = number;
 
 type Repeat = MonthDate | Weekday | MonthWeek;
 
-export default Repeat;
+export type { Repeat as default };

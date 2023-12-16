@@ -9,6 +9,8 @@
 		line-height: 1.1;
 
 		--spacing: 1em;
+		--thickness: 3px;
+		--padding: 0.1em;
 		--radius: 4px;
 		--normal-size: 18pt;
 		--small-size: 13pt;
@@ -19,6 +21,7 @@
 		--focus: #784ada;
 		--background: #ffffff;
 		--separator: #cccccc;
+		--inactive: #555555;
 		--foreground: #000000;
 		--border: #000000;
 		--thickness: 4px;

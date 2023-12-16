@@ -14,4 +14,4 @@ type Organization = {
 	modifications: Modification[];
 };
 
-export default Organization;
+export type { Organization as default };

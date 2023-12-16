@@ -88,7 +88,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing);
-		padding: var(--spacing);
 		width: 10em;
 	}
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { locale } from '../types/Locales';
+	import Text from './Text.svelte';
 
 	let count = 1;
 
@@ -14,7 +15,7 @@
 	});
 </script>
 
-<div>{$locale?.term.loading ?? ''} <span class="dots">{'.'.repeat(count)}</span></div>
+<div><span class="dots"><Text text={$locale?.term.loading} /> {'⎋'.repeat(count)}</span></div>
 
 <style>
 	div {

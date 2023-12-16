@@ -15,4 +15,4 @@ type Person = {
 	organizations: OrganizationID[];
 };
 
-export default Person;
+export type { Person as default };

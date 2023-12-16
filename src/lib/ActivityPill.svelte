@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type Activity from '../types/Activity';
+	import Link from './Link.svelte';
 
 	export let activity: Activity;
 	export let left: number | undefined = undefined;
 </script>
 
-<div class="activity" style:left="{left}px" class:draft={activity.draft}>{activity.what}</div>
+<div class="activity" style:left="{left}px" class:draft={activity.draft}>
+	<Link bland to="/activity/{activity.id}">{activity.what}</Link>
+</div>
 
 <style>
 	.activity {

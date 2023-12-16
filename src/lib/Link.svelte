@@ -1,11 +1,16 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+
 	export let to: string;
 	export let external = false;
+	export let bland = false;
+
+	$: inactive = to === $page.url.pathname;
 </script>
 
-<a href={to} target={external ? '_blank' : ''}><slot /></a>{#if external}<sup class="external"
-		>↗</sup
-	>{/if}
+<a class:inactive class:bland href={inactive ? null : to} target={external ? '_blank' : ''}
+	><slot /></a
+>{#if external}<sup class="external">↗</sup>{/if}
 
 <style>
 	a {
@@ -16,10 +21,20 @@
 		transition: transform 200ms;
 	}
 
+	a.inactive {
+		color: var(--inactive);
+		text-decoration: none;
+	}
+
+	a.bland {
+		color: var(--background);
+	}
+
 	a:hover,
 	a:focus {
 		display: inline-block;
-		transform: rotate(2deg);
+		transform-origin: center;
+		transform: scale(1.1) rotate(-2deg);
 	}
 
 	a:focus {

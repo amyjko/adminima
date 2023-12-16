@@ -12,4 +12,4 @@ type Modification = {
 	why: Markup;
 };
 
-export default Modification;
+export type { Modification as default };
