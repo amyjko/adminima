@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Link from './Link.svelte';
+	import Logo from './Logo';
 	import Title from './Title.svelte';
 
 	export let title: string;
@@ -11,7 +12,7 @@
 </svelte:head>
 
 <div class="page">
-	<div class="header"><Link to="/">⎋</Link></div>
+	<div class="header"><Link to="/">{Logo}</Link></div>
 	<div class="content">
 		{#if kind}
 			<div class="kind">{kind}</div>
