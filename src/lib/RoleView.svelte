@@ -2,12 +2,13 @@
 	import type Role from '../types/Role';
 	import Header from '$lib/Header.svelte';
 	import Time from '$lib/ActivitiesView.svelte';
-	import type Activity from '../types/Activity';
 	import MarkupView from './MarkupView.svelte';
 	import { parse } from '../markup/parser';
+	import database from '../database/Database';
+	import Error from './Error.svelte';
+	import Loading from './Loading.svelte';
 
 	export let role: Role;
-	export let activities: Activity[];
 </script>
 
 <div class="scope">
@@ -15,7 +16,13 @@
 		<Header>{role.title}</Header>
 		<MarkupView markup={parse(role.what)} />
 	</div>
-	<Time {activities} />
+	{#await database.getRoleActivities(role.id)}
+		<Loading />
+	{:then activities}
+		<Time {activities} />
+	{:catch}
+		<Error text={(locale) => locale.error.noRoleActivities} />
+	{/await}
 </div>
 
 <style>

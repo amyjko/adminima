@@ -1,6 +1,7 @@
 [
 	{
 		"id": "1",
+		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": false,
@@ -18,6 +19,7 @@
 	},
 	{
 		"id": "2",
+		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": true,
@@ -35,6 +37,7 @@
 	},
 	{
 		"id": "3",
+		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": false,
@@ -52,6 +55,7 @@
 	},
 	{
 		"id": "4",
+		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": false,

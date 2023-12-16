@@ -10,9 +10,15 @@ async function setLocale(name: string): Promise<Locale> {
 
 export type Locale = {
 	name: string;
+	term: {
+		loading: string;
+	};
 	landing: {
 		value: string;
 		description: string;
+	};
+	error: {
+		noRoleActivities: string;
 	};
 };
 

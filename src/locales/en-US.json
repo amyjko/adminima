@@ -1,7 +1,13 @@
 {
 	"name": "Adminima",
+	"term": {
+		"loading": "loading"
+	},
 	"landing": {
 		"value": "Improve onboarding, agility, transparency, and awareness by defining work processes and managing change.",
 		"description": "Create step-by-step activities to scaffold work activities. Manage change requests from stakeholders. Offer notifications about progress on activities and change."
+	},
+	"error": {
+		"noRoleActivities": "Couldn't get this role's activities."
 	}
 }
