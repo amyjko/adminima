@@ -3,7 +3,8 @@
 	"term": {
 		"loading": "loading",
 		"role": "role",
-		"activity": "activity"
+		"activity": "activity",
+		"change": "change"
 	},
 	"landing": {
 		"value": "Improve onboarding, agility, transparency, and awareness by defining work processes and managing change.",

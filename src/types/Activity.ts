@@ -5,13 +5,13 @@ import type Task from './Task';
 import type Repeat from './Day';
 import type { RoleID } from './Role';
 import type { OrganizationID } from './Organization';
-import type Modification from './Modification';
+import type Tracked from './Tracked';
 
 /** A unique ID to represent an activity */
 export type ActivityID = string;
 
 /** Something that must in a scope of responsibilities, possibly periodically. */
-type Activity = {
+type Activity = Tracked & {
 	/** A unique identifier for this activity */
 	id: ActivityID;
 	/** The role responsibile for getting this task done */
@@ -22,8 +22,6 @@ type Activity = {
 	leader: PersonID[];
 	/** other people involved in the work **/
 	collaborators: PersonID[];
-	/** A list of modifications */
-	modifications: Modification[];
 	/** Whether this is unfinished; if false, then it's a ground truth activity. */
 	draft: boolean;
 	/** The last version of the activity, forming a linked list of activity versions. */
@@ -45,10 +43,6 @@ type Activity = {
 	how: Task[];
 	/** Whether this activity is public. Overriden by private role. */
 	public: boolean;
-	/** When this was created */
-	created: number;
-	/** When this was last modified */
-	modified: number;
 };
 
 export type { Activity as default };

@@ -5,5 +5,6 @@
 	"icon": "⛄️",
 	"managers": ["amy"],
 	"viewers": [],
-	"public": true
+	"public": true,
+	"modifications": []
 }

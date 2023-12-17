@@ -1,18 +1,16 @@
 import type Markup from './Markup';
-import type Modification from './Modification';
 import type { OrganizationID } from './Organization';
 import type { PersonID } from './Person';
+import type Tracked from './Tracked';
 
 export type RoleID = string;
 
 /** A scope of resopnsibilities, including zero or more activities. */
-type Role = {
+type Role = Tracked & {
 	/** Unique ID for this role. */
 	id: RoleID;
 	/** The organization the role is in */
 	organization: OrganizationID;
-	/** A list of modifications to the role */
-	modifications: Modification[];
 	/** A short title for the role */
 	title: string;
 	/** A descrption of what the scope of responsibilities are. */

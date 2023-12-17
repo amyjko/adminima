@@ -15,7 +15,8 @@
 		"why": "Required by faculty code",
 		"leader": "Amy",
 		"collaborators": ["Victor"],
-		"how": []
+		"how": [],
+		"changes": []
 	},
 	{
 		"id": "2",
@@ -33,7 +34,8 @@
 		"why": "Give students a sense of community",
 		"leader": "Amy",
 		"collaborators": ["Victor"],
-		"how": []
+		"how": [],
+		"changes": []
 	},
 	{
 		"id": "3",
@@ -47,11 +49,12 @@
 			"repeat": null
 		},
 		"icon": "🧑🏻‍🏫",
-		"what": "CAP",
+		"what": "Course Assignment Process (CAP)",
 		"why": "Teachers gotta teach",
 		"leader": "Amy",
 		"collaborators": ["Victor"],
-		"how": []
+		"how": [],
+		"changes": []
 	},
 	{
 		"id": "4",
@@ -66,6 +69,7 @@
 		"why": "people get sick",
 		"leader": "Amy",
 		"collaborators": [],
-		"how": []
+		"how": [],
+		"changes": []
 	}
 ]

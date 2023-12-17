@@ -17,6 +17,8 @@ export type Locale = {
 		role: string;
 		/** The word representing a specific activity */
 		activity: string;
+		/** What to call changes to a document */
+		change: string;
 	};
 	landing: {
 		value: string;

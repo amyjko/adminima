@@ -2,9 +2,12 @@
 	import Link from './Link.svelte';
 	import Logo from './Logo';
 	import Title from './Title.svelte';
+	import type Change from '../types/Change';
+	import Modifications from './Changes.svelte';
 
 	export let title: string;
 	export let kind: string | undefined;
+	export let changes: Change[] | undefined;
 </script>
 
 <svelte:head>
@@ -18,7 +21,10 @@
 			<div class="kind">{kind}</div>
 		{/if}
 		<Title>{title}</Title>
-		<slot />
+		{#if changes}<Modifications modifications={changes} />{/if}
+		<div class="body">
+			<slot />
+		</div>
 	</div>
 </div>
 
@@ -37,12 +43,15 @@
 	}
 
 	.header {
-		width: 100%;
 		height: fit-content;
 	}
 
 	.content {
 		max-width: 32em;
 		margin-block-start: 10vh;
+	}
+
+	.body {
+		margin-block-start: 2em;
 	}
 </style>

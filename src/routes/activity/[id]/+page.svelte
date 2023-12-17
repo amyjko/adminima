@@ -11,7 +11,7 @@
 {#await database.getActivity($page.params.id)}
 	<Loading />
 {:then activity}
-	<Page title={activity.what} kind={$locale?.term.activity}>
+	<Page title={activity.what} kind={$locale?.term.activity} changes={activity.changes}>
 		<ActivityView {activity} />
 	</Page>
 {:catch}

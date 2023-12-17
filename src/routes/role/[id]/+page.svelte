@@ -11,7 +11,7 @@
 {#await database.getRole($page.params.id)}
 	<Loading />
 {:then role}
-	<Page title={role.title} kind={$locale?.term.role}>
+	<Page title={role.title} kind={$locale?.term.role} changes={role.changes}>
 		<RoleView {role} />
 	</Page>
 {:catch}

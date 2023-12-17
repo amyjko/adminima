@@ -6,7 +6,6 @@
 
 <style>
 	h1 {
-		margin-block-end: var(--spacing);
 		font-size: 42pt;
 		font-weight: bold;
 		text-transform: uppercase;
