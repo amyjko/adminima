@@ -17,6 +17,6 @@
 		> if you're curious.</Paragraph
 	>
 	<Paragraph>
-		See an example role: <Link to="/role/ada">Associate Dean for Academics</Link>
+		See an example organization: <Link to="/organization/ischool">The Information School</Link>
 	</Paragraph>
 </Page>
