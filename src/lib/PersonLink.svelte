@@ -13,7 +13,11 @@
 	let person: Person | null | undefined = null;
 
 	onMount(async () => {
-		person = await database.getPerson(personID);
+		try {
+			person = await database.getPerson(personID);
+		} catch (_) {
+			person = undefined;
+		}
 	});
 </script>
 

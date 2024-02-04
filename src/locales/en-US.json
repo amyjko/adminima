@@ -17,6 +17,8 @@
 		"noRoleActivities": "Couldn't get this role's activities.",
 		"noPerson": "Unknown person",
 		"noOrganization": "Unknown organization.",
-		"noRole": "Unknown role"
+		"noRole": "Unknown role",
+		"noRequest": "Unknown request",
+		"noActivityRequests": "Couldn't get this activity's requests."
 	}
 }

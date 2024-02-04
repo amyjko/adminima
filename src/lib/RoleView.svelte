@@ -9,39 +9,37 @@
 	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
+	import RequestList from './RequestList.svelte';
 
 	export let role: Role;
 </script>
 
-<div class="scope">
-	<Header>Organization</Header>
-	<Paragraph><OrganizationLink organizationID={role.organization} /></Paragraph>
+{#each role.people as personID}<PersonLink {personID} />{/each}
 
-	<Header>Purpose</Header>
-	<div class="meta">
-		<MarkupView markup={role.what} />
-	</div>
+<Header>Organization</Header>
+<Paragraph><OrganizationLink organizationID={role.organization} /></Paragraph>
 
-	<Header>People with this role</Header>
-	<ul>
-		{#each role.people as personID}<li><PersonLink {personID} /></li>{/each}
-	</ul>
-
-	<Header>Activities</Header>
-
-	{#await database.getRoleActivities(role.id)}
-		<Loading />
-	{:then activities}
-		<Timeline {activities} />
-	{:catch}
-		<Error text={(locale) => locale.error.noRoleActivities} />
-	{/await}
+<Header>Purpose</Header>
+<div class="meta">
+	<MarkupView markup={role.what} />
 </div>
 
-<style>
-	.scope {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing);
-	}
-</style>
+<Header>Activities</Header>
+
+{#await database.getRoleActivities(role.id)}
+	<Loading />
+{:then activities}
+	<Timeline {activities} />
+{:catch}
+	<Error text={(locale) => locale.error.noRoleActivities} />
+{/await}
+
+<Header>Related Requests</Header>
+
+{#await database.getRoleRequests(role.id)}
+	<Loading />
+{:then requests}
+	<RequestList {requests} />
+{:catch}
+	<Error text={(locale) => locale.error.noRoleActivities} />
+{/await}

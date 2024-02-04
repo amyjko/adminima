@@ -1,0 +1,20 @@
+[
+	{
+		"id": "faster CAP",
+		"who": "victor",
+		"watchers": [],
+		"organization": "ischool",
+		"roles": ["ada"],
+		"activities": ["3"],
+		"title": "faster CAP",
+		"problem": "CAP is slow and opaque",
+		"comments": [
+			{
+				"when": 0,
+				"who": "amy",
+				"what": "Hmmm..."
+			}
+		],
+		"status": "triage"
+	}
+]

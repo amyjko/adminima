@@ -34,6 +34,8 @@ export type Locale = {
 		noPerson: string;
 		noOrganization: string;
 		noRole: string;
+		noRequest: string;
+		noActivityRequests: string;
 	};
 };
 

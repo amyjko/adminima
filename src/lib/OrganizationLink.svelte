@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { PersonID } from '../types/Person';
 	import Link from './Link.svelte';
 	import database from '../database/Database';
-	import type Person from '../types/Person';
 	import Loading from './Loading.svelte';
 	import Oops from './Oops.svelte';
 	import type { OrganizationID } from '../types/Organization';
@@ -14,7 +12,11 @@
 	let organization: Organization | null | undefined = null;
 
 	onMount(async () => {
-		organization = await database.getOrganization(organizationID);
+		try {
+			organization = await database.getOrganization(organizationID);
+		} catch (_) {
+			organization = undefined;
+		}
 	});
 </script>
 

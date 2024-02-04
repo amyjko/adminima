@@ -5,6 +5,7 @@
 	import Loading from './Loading.svelte';
 	import database from '../database/Database';
 	import RoleLink from './RoleLink.svelte';
+	import RequestList from './RequestList.svelte';
 
 	export let organization: Organization;
 </script>
@@ -29,7 +30,7 @@
 {/await}
 
 <Header>People</Header>
-{#await database.getOrganziationPeople(organization.id)}
+{#await database.getOrganizationPeople(organization.id)}
 	<Loading />
 {:then people}
 	<ul>
@@ -37,4 +38,11 @@
 			<li><PersonLink personID={person.id} /></li>
 		{/each}
 	</ul>
+{/await}
+
+<Header>Requests</Header>
+{#await database.getOrganizationRequests(organization.id)}
+	<Loading />
+{:then requests}
+	<RequestList {requests} />
 {/await}

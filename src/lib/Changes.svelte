@@ -20,5 +20,7 @@
 			<MarkupView markup={change.what} />
 			<em><MarkupView markup={change.why} /></em>
 		</Row>
+	{:else}
+		&mdash;
 	{/each}
 </Rows>

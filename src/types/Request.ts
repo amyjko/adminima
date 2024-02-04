@@ -5,13 +5,13 @@ import type { PersonID } from './Person';
 import type { RoleID } from './Role';
 import type Tracked from './Tracked';
 
-type Idea = {
+type Comment = {
 	/** Unix time of when it was created */
-	created: number;
+	when: number;
 	/** Optional creator of the idea */
-	creator: PersonID | null;
+	who: PersonID;
 	/** A description of the idea and its tradeoffs */
-	description: Markup;
+	what: Markup;
 };
 
 export type RequestID = string;
@@ -21,7 +21,7 @@ type Request = Tracked & {
 	/** Unique ID for this change request. */
 	id: RequestID;
 	/** Who submitted the change request */
-	requestor: PersonID | null;
+	who: PersonID;
 	/** People who want to know about changes to this change request */
 	watchers: PersonID[];
 	/** The organization the change was requested for */
@@ -35,7 +35,7 @@ type Request = Tracked & {
 	/** A description of the problem */
 	problem: Markup;
 	/** Descriptions of ideas for addressing the problem */
-	ideas: Idea[];
+	comments: Comment[];
 	/** Status of the change request */
 	status: 'triage' | 'backlog' | 'active' | 'completed' | 'abandoned' | 'closed';
 };

@@ -15,7 +15,7 @@
 
 	.inline {
 		display: inline;
-		padding-inline-start: var(--spacing);
-		padding-inline-end: var(--spacing);
+		padding-inline-start: calc(var(--spacing) / 2);
+		padding-inline-end: calc(var(--spacing) / 2);
 	}
 </style>

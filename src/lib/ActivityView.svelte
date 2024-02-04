@@ -9,6 +9,10 @@
 	import Notice from './Notice.svelte';
 	import { format } from 'date-fns';
 	import { toDate } from '../types/Day';
+	import database from '../database/Database';
+	import Loading from './Loading.svelte';
+	import RequestList from './RequestList.svelte';
+	import Oops from './Oops.svelte';
 
 	export let activity: Activity;
 </script>
@@ -61,3 +65,12 @@
 		</ul>
 	</Row>
 </Rows>
+
+<Header>Related Requests</Header>
+{#await database.getActivityRequests(activity.id)}
+	<Loading />
+{:then requests}
+	<RequestList {requests} />
+{:catch}
+	<Oops text={(locale) => locale.error.noActivityRequests} />
+{/await}

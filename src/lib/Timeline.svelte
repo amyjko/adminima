@@ -33,24 +33,28 @@
 	}
 </script>
 
-<div class="activities">
-	<div class="time">
-		{#each weeks as num}
-			<div class="tick" style:left="{num * PixelsPerWeek}px">
-				<div class="date">{format(addWeeks(start, num), 'MM/dd/yy')}</div>
+{#if activities.length === 0}
+	No activities.
+{:else}
+	<div class="activities">
+		<div class="time">
+			{#each weeks as num}
+				<div class="tick" style:left="{num * PixelsPerWeek}px">
+					<div class="date">{format(addWeeks(start, num), 'MM/dd/yy')}</div>
+				</div>
+			{/each}
+			<div class="timed">
+				{#each timed as activity}{#if activity.start}<ActivityPill
+							{activity}
+							left={differenceInWeeks(toDate(activity.start), start) * PixelsPerWeek}
+						/>{/if}{/each}
 			</div>
-		{/each}
-		<div class="timed">
-			{#each timed as activity}{#if activity.start}<ActivityPill
-						{activity}
-						left={differenceInWeeks(toDate(activity.start), start) * PixelsPerWeek}
-					/>{/if}{/each}
+		</div>
+		<div class="untimed">
+			{#each activities as activity}<ActivityPill {activity} />{:else}No untimed activities.{/each}
 		</div>
 	</div>
-	<div class="untimed">
-		{#each activities as activity}<ActivityPill {activity} />{:else}No untimed activities.{/each}
-	</div>
-</div>
+{/if}
 
 <style>
 	.activities {
