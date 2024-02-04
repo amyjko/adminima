@@ -16,6 +16,7 @@
 			title={organization.name}
 			kind={$locale?.term.organization}
 			changes={organization.changes}
+			organizationID={undefined}
 		>
 			<OrganizationView {organization} />
 		</Page>

@@ -12,7 +12,12 @@
 	<Loading />
 {:then request}
 	{#if request}
-		<Page title={request.title} kind={$locale?.term.role} changes={request.changes}>
+		<Page
+			title={request.title}
+			kind={$locale?.term.role}
+			changes={request.changes}
+			organizationID={request.organization}
+		>
 			<RequestView {request} />
 		</Page>
 	{:else}

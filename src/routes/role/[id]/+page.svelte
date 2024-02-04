@@ -12,7 +12,12 @@
 	<Loading />
 {:then role}
 	{#if role}
-		<Page title={role.title} kind={$locale?.term.role} changes={role.changes}>
+		<Page
+			title={role.title}
+			kind={$locale?.term.role}
+			changes={role.changes}
+			organizationID={role.organization}
+		>
 			<RoleView {role} />
 		</Page>
 	{:else}

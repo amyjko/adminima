@@ -12,7 +12,12 @@
 	<Loading />
 {:then person}
 	{#if person}
-		<Page title={person.name} kind={$locale?.term.person} changes={undefined}>
+		<Page
+			title={person.name}
+			kind={$locale?.term.person}
+			changes={undefined}
+			organizationID={undefined}
+		>
 			<PersonView {person} />
 		</Page>
 	{:else}

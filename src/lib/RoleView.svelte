@@ -14,6 +14,7 @@
 	export let role: Role;
 </script>
 
+<Header>Who</Header>
 {#each role.people as personID}<PersonLink {personID} />{/each}
 
 <Header>Organization</Header>

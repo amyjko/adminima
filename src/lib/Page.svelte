@@ -4,10 +4,12 @@
 	import Title from './Title.svelte';
 	import type Change from '../types/Change';
 	import Changes from './Changes.svelte';
+	import OrganizationLink from './OrganizationLink.svelte';
 
 	export let title: string;
 	export let kind: string | undefined;
 	export let changes: Change[] | undefined;
+	export let organizationID: string | undefined;
 </script>
 
 <svelte:head>
@@ -18,9 +20,14 @@
 	<div class="header"><Link to="/">{Logo}</Link></div>
 	<div class="content">
 		{#if kind}
-			<div class="kind">{kind}</div>
+			<div class="kind">
+				{kind}
+			</div>
 		{/if}
 		<Title>{title}</Title>
+		{#if organizationID}
+			<OrganizationLink {organizationID} />
+		{/if}
 		<div class="body">
 			<slot />
 		</div>

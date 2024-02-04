@@ -8,7 +8,7 @@
 	import Logo from '$lib/Logo';
 </script>
 
-<Page title={Logo + ' Adminima'} kind="" changes={undefined}>
+<Page title={Logo + ' Adminima'} kind="" changes={undefined} organizationID={undefined}>
 	<Lead><Text text={$locale?.landing.value} /></Lead>
 	<Paragraph><Text text={$locale?.landing.description} /></Paragraph>
 	<Paragraph
