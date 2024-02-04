@@ -19,6 +19,7 @@
 		text-decoration-thickness: var(--thickness);
 		text-decoration-skip-ink: none;
 		transition: transform 200ms;
+		display: inline-block;
 	}
 
 	a.inactive {
@@ -32,9 +33,8 @@
 
 	a:hover,
 	a:focus {
-		display: inline-block;
 		transform-origin: center;
-		transform: scale(1.1) rotate(-2deg);
+		transform: scaleY(1.1);
 	}
 
 	a:focus {

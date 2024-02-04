@@ -1,74 +1,103 @@
 [
 	{
 		"id": "1",
+		"template": null,
 		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": false,
 		"previous": null,
-		"time": {
-			"start": { "date": 13, "month": 10, "year": 2023 },
-			"repeat": null
-		},
+		"start": { "date": 13, "month": 10, "year": 2023 },
+		"repeat": null,
 		"icon": "🧑🏻‍🏫",
 		"what": "Faculty peer reviews",
 		"why": "Required by faculty code",
-		"leader": "Amy",
-		"collaborators": ["Victor"],
+		"leader": "amy",
+		"collaborators": ["victor"],
 		"how": [],
 		"changes": []
 	},
 	{
 		"id": "2",
+		"template": null,
 		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": true,
 		"previous": null,
-		"time": {
-			"start": { "date": 30, "month": 9, "year": 2023 },
-			"repeat": null
-		},
+		"start": { "date": 30, "month": 9, "year": 2023 },
+		"repeat": null,
 		"icon": "🧑🏻‍🏫",
 		"what": "Welcome",
 		"why": "Give students a sense of community",
-		"leader": "Amy",
-		"collaborators": ["Victor"],
+		"leader": "amy",
+		"collaborators": ["victor"],
 		"how": [],
 		"changes": []
 	},
 	{
 		"id": "3",
+		"template": null,
 		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": false,
 		"previous": null,
-		"time": {
-			"start": { "date": 10, "month": 7, "year": 2023 },
-			"repeat": null
-		},
+		"start": null,
+		"repeat": { "type": "annually", "month": 7, "day": 5 },
 		"icon": "🧑🏻‍🏫",
 		"what": "Course Assignment Process (CAP)",
 		"why": "Teachers gotta teach",
-		"leader": "Amy",
-		"collaborators": ["Victor"],
-		"how": [],
-		"changes": []
+		"leader": "amy",
+		"collaborators": ["victor"],
+		"how": [
+			{
+				"who": "amy",
+				"what": "Ask everyone what they want to teach",
+				"how": [
+					{
+						"who": "amy",
+						"what": "Send spreadsheets with previous year's assignments",
+						"how": [],
+						"complete": false,
+						"public": true
+					},
+					{
+						"who": "amy",
+						"what": "Merge into list of requests",
+						"how": [],
+						"complete": false,
+						"public": true
+					}
+				],
+				"complete": false,
+				"public": true
+			}
+		],
+		"changes": [
+			{
+				"time": 0,
+				"person": "amy",
+				"what": "Created",
+				"why": "Didn't exist"
+			}
+		]
 	},
 	{
 		"id": "4",
+		"template": null,
 		"role": "ada",
 		"created": 0,
 		"modified": 0,
 		"draft": false,
 		"previous": null,
-		"time": null,
+		"start": null,
+		"repeat": null,
 		"icon": "🧑🏻‍🏫",
 		"what": "Instructor is ill",
 		"why": "people get sick",
-		"leader": "Amy",
-		"collaborators": [],
+		"leader": "amy",
+		"collaborators": ["victor"],
 		"how": [],
 		"changes": []
 	}

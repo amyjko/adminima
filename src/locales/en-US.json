@@ -4,7 +4,9 @@
 		"loading": "loading",
 		"role": "role",
 		"activity": "activity",
-		"change": "change"
+		"change": "change",
+		"person": "person",
+		"organization": "organization"
 	},
 	"landing": {
 		"value": "Improve your organization's onboarding, transparency, and agility by defining work processes and managing requests for change.",
@@ -12,6 +14,9 @@
 	},
 	"error": {
 		"noActivity": "Couldn't find this activity",
-		"noRoleActivities": "Couldn't get this role's activities."
+		"noRoleActivities": "Couldn't get this role's activities.",
+		"noPerson": "Unknown person",
+		"noOrganization": "Unknown organization.",
+		"noRole": "Unknown role"
 	}
 }

@@ -7,34 +7,36 @@
  */
 
 /** Every nth day of the month */
-export type MonthDate = {
-	type: 'month-date';
+export type Monthly = {
+	type: 'monthly';
 	/** 1-31 */
 	date: number;
 };
 
 /** Every nth weekday of every week */
-export type Weekday = {
-	type: 'weekday';
+export type Weekly = {
+	type: 'weekly';
 	/** 1-7, Monday through Sunday */
 	weekday: number;
 };
 
 /** Every nth weekday of every week */
-export type MonthWeek = {
-	type: 'month-week';
-	/** 1-5 */
-	week: number;
+export type Annually = {
+	type: 'annually';
+	/** 1-12 */
+	month: number;
 	/** 1-7, Monday through Sunday */
-	weekday: number | null;
+	day: number;
 };
 
 /** A concrete date */
 export type Day = {
+	type: 'date';
 	/** 1-31 */
 	date: number;
 	/** 1-12 */
 	month: number;
+	/** 2000+ */
 	year: number;
 };
 
@@ -44,6 +46,6 @@ export function toDate(day: Day) {
 
 export type Weeks = number;
 
-type Repeat = MonthDate | Weekday | MonthWeek;
+type Repeat = Monthly | Weekly | Annually;
 
 export type { Repeat as default };

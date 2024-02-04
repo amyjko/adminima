@@ -4,6 +4,8 @@
 	import SegmentsView from '$lib/SegmentsView.svelte';
 
 	export let block: ParagraphMarkup;
+	export let inline = false;
 </script>
 
-<Paragraph><SegmentsView segments={block.segments} /></Paragraph>
+{#if inline}<SegmentsView segments={block.segments} />{:else}
+	<Paragraph><SegmentsView segments={block.segments} /></Paragraph>{/if}

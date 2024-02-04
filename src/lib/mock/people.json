@@ -1,0 +1,16 @@
+[
+	{
+		"id": "victor",
+		"name": "Victor Aque",
+		"email": "test@uw.edu",
+		"icon": "🥐",
+		"organizations": ["ischool"]
+	},
+	{
+		"id": "amy",
+		"name": "Amy J. Ko",
+		"email": "ajko@uw.edu",
+		"icon": "🐱",
+		"organizations": ["ischool"]
+	}
+]

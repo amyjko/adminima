@@ -5,14 +5,15 @@
 	import ParagraphView from '$lib/ParagraphView.svelte';
 	import BulletsView from '$lib/BulletsView.svelte';
 	import NumberedView from '$lib/NumberedView.svelte';
-	import type Markup from '../markup/Markup';
+	import { parse } from '../markup/parser';
 
-	export let markup: Markup;
+	export let markup: string;
+	export let inline = false;
 </script>
 
-{#each markup.blocks as block}
+{#each parse(markup).blocks as block}
 	{#if block instanceof Paragraph}
-		<ParagraphView {block} />
+		<ParagraphView {block} {inline} />
 	{:else if block instanceof Bullets}
 		<BulletsView {block} />
 	{:else if block instanceof Numbered}

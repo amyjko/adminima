@@ -1,10 +1,22 @@
-{
-	"id": "ada",
-	"title": "Associate Dean for Academics",
-	"what": "Annual tasks the *Associate Dean* is responsible for completing, with the help of assistants.",
-	"icon": "⛄️",
-	"managers": ["amy"],
-	"viewers": [],
-	"public": true,
-	"modifications": []
-}
+[
+	{
+		"id": "ada",
+		"organization": "ischool",
+		"title": "Associate Dean for Academics",
+		"what": "Annual tasks the *Associate Dean* is responsible for completing, with the help of assistants.",
+		"viewers": [],
+		"people": ["amy"],
+		"public": true,
+		"modifications": []
+	},
+	{
+		"id": "changepm",
+		"organization": "ischool",
+		"title": "Program Manager for Change",
+		"what": "Helps the Associate Dean manage change and track success.",
+		"viewers": [],
+		"people": ["victor"],
+		"public": true,
+		"modifications": []
+	}
+]

@@ -19,6 +19,10 @@ export type Locale = {
 		activity: string;
 		/** What to call changes to a document */
 		change: string;
+		/** What to call people */
+		person: string;
+		/** What to call organizations */
+		organization: string;
 	};
 	landing: {
 		value: string;
@@ -27,6 +31,9 @@ export type Locale = {
 	error: {
 		noActivity: string;
 		noRoleActivities: string;
+		noPerson: string;
+		noOrganization: string;
+		noRole: string;
 	};
 };
 

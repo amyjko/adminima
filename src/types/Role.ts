@@ -15,8 +15,6 @@ type Role = Tracked & {
 	title: string;
 	/** A descrption of what the scope of responsibilities are. */
 	what: Markup;
-	/** An emoji to represent the scope */
-	icon: string;
 	/** People who have this role */
 	people: PersonID[];
 	/** Who can view this scope of responsibilities (and comment on it) */

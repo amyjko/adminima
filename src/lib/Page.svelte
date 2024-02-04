@@ -3,7 +3,7 @@
 	import Logo from './Logo';
 	import Title from './Title.svelte';
 	import type Change from '../types/Change';
-	import Modifications from './Changes.svelte';
+	import Changes from './Changes.svelte';
 
 	export let title: string;
 	export let kind: string | undefined;
@@ -21,10 +21,10 @@
 			<div class="kind">{kind}</div>
 		{/if}
 		<Title>{title}</Title>
-		{#if changes}<Modifications modifications={changes} />{/if}
 		<div class="body">
 			<slot />
 		</div>
+		{#if changes}<Changes {changes} />{/if}
 	</div>
 </div>
 
@@ -47,7 +47,7 @@
 	}
 
 	.content {
-		max-width: 32em;
+		width: 32em;
 		margin-block-start: 10vh;
 	}
 

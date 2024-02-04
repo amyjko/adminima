@@ -14,10 +14,12 @@ type Idea = {
 	description: Markup;
 };
 
+export type RequestID = string;
+
 /** A change request. */
 type Request = Tracked & {
 	/** Unique ID for this change request. */
-	id: string;
+	id: RequestID;
 	/** Who submitted the change request */
 	requestor: PersonID | null;
 	/** People who want to know about changes to this change request */

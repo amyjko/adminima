@@ -10,16 +10,15 @@
 	const PixelsPerWeek = 100;
 
 	// Get the
-	$: timed = activities.filter((a) => a.time !== null);
-	$: untimed = activities.filter((a) => a.time === null);
+	$: timed = activities.filter((a) => a.start !== null);
 
 	$: sorted = timed.sort((a, b) =>
-		a.time !== null && b.time !== null ? compareAsc(toDate(a.time.start), toDate(b.time.start)) : 0
+		a.start !== null && b.start !== null ? compareAsc(toDate(a.start), toDate(b.start)) : 0
 	);
 
 	// Start week is the earliest activity based on start day
 	$: first = sorted[0];
-	$: start = first?.time ? toDate(first.time.start) : new Date();
+	$: start = first?.start ? toDate(first.start) : new Date();
 
 	// End week is now plus 3 years
 	const end = addYears(new Date(), 3);
@@ -35,9 +34,6 @@
 </script>
 
 <div class="activities">
-	<div class="untimed">
-		{#each untimed as activity}<ActivityPill {activity} />{:else}No untimed activities.{/each}
-	</div>
 	<div class="time">
 		{#each weeks as num}
 			<div class="tick" style:left="{num * PixelsPerWeek}px">
@@ -45,11 +41,14 @@
 			</div>
 		{/each}
 		<div class="timed">
-			{#each timed as activity}<ActivityPill
-					{activity}
-					left={differenceInWeeks(toDate(activity?.time.start), start) * PixelsPerWeek}
-				/>{/each}
+			{#each timed as activity}{#if activity.start}<ActivityPill
+						{activity}
+						left={differenceInWeeks(toDate(activity.start), start) * PixelsPerWeek}
+					/>{/if}{/each}
 		</div>
+	</div>
+	<div class="untimed">
+		{#each activities as activity}<ActivityPill {activity} />{:else}No untimed activities.{/each}
 	</div>
 </div>
 
@@ -57,7 +56,7 @@
 	.activities {
 		flex-grow: 1;
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 		gap: var(--spacing);
 	}
 

@@ -11,9 +11,13 @@
 {#await database.getRole($page.params.id)}
 	<Loading />
 {:then role}
-	<Page title={role.title} kind={$locale?.term.role} changes={role.changes}>
-		<RoleView {role} />
-	</Page>
+	{#if role}
+		<Page title={role.title} kind={$locale?.term.role} changes={role.changes}>
+			<RoleView {role} />
+		</Page>
+	{:else}
+		<Error text={(locale) => locale.error.noRoleActivities} />
+	{/if}
 {:catch}
 	<Error text={(locale) => locale.error.noRoleActivities} />
 {/await}

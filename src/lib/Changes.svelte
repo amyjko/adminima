@@ -1,19 +1,24 @@
 <script lang="ts">
-	import { locale } from '../types/Locales';
 	import type Change from '../types/Change';
-	import Text from './Text.svelte';
+	import PersonLink from './PersonLink.svelte';
+	import MarkupView from './MarkupView.svelte';
+	import Row from './Row.svelte';
+	import Rows from './Rows.svelte';
+	import Header from './Header.svelte';
+	import { format } from 'date-fns';
+	import Paragraph from './Paragraph.svelte';
 
-	export let modifications: Change[];
+	export let changes: Change[];
 </script>
 
-<div>
-	{modifications.length}
-	<Text text={$locale?.term.change} />s
-</div>
+<Header>Changes</Header>
 
-<style>
-	div {
-		color: var(--inactive);
-		font-size: medium;
-	}
-</style>
+<Rows>
+	{#each changes as change}
+		<Row name={format(change.time, 'MM/dd/yyyy')}>
+			<Paragraph><PersonLink personID={change.person} /></Paragraph>
+			<MarkupView markup={change.what} />
+			<em><MarkupView markup={change.why} /></em>
+		</Row>
+	{/each}
+</Rows>

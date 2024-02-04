@@ -14,25 +14,24 @@ export type ActivityID = string;
 type Activity = Tracked & {
 	/** A unique identifier for this activity */
 	id: ActivityID;
+	/** The template this is based on, if this is a concrete instance of an activity */
+	template: ActivityID | null;
 	/** The role responsibile for getting this task done */
 	role: RoleID;
 	/** The organization this activity is in */
 	organization: OrganizationID;
 	/** the person responsible for doing this activity **/
-	leader: PersonID[];
+	leader: PersonID;
 	/** other people involved in the work **/
 	collaborators: PersonID[];
 	/** Whether this is unfinished; if false, then it's a ground truth activity. */
 	draft: boolean;
 	/** The last version of the activity, forming a linked list of activity versions. */
 	previous: ActivityID | null;
-	/** The optional period on which the activity repeats */
-	time: {
-		/** The concrete day on which the activity starts */
-		start: Day;
-		/** An optional repetition schedule */
-		repeat: Repeat | null;
-	};
+	/** The date on which this activity started, or the frequency on which it occurs, or none of it has neither. */
+	start: Day | null;
+	/** Frequency */
+	repeat: Repeat | null;
 	/** An emoji representing the theme of the activity */
 	icon: string;
 	/** a short description of the activity without line breaks */

@@ -123,8 +123,16 @@
 	}
 
 	:global(ol, ul) {
-		list-style: none;
+		list-style: square;
+		list-style-position: outside;
+		margin-inline-start: var(--spacing);
 	}
+
+	:global(li) {
+		margin-block-start: calc(var(--spacing) / 2);
+		margin-block-end: calc(var(--spacing) / 2);
+	}
+
 	:global(blockquote, q) {
 		quotes: none;
 	}
