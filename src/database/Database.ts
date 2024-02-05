@@ -70,6 +70,10 @@ class Database {
 		return this.roles.getStore(id);
 	}
 
+	async deleteRole(id: RoleID) {
+		this.activities.delete(id);
+	}
+
 	async getRoleActivities(id: RoleID): Promise<Activity[]> {
 		return this.activities.values().filter((activity) => activity.role === id);
 	}

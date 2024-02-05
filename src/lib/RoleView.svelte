@@ -11,8 +11,13 @@
 	import Paragraph from './Paragraph.svelte';
 	import RequestList from './RequestList.svelte';
 	import RequestForm from './RequestForm.svelte';
+	import Button from './Button.svelte';
+	import Oops from './Oops.svelte';
+	import { goto } from '$app/navigation';
 
 	export let role: Role;
+
+	let deleteError: string | undefined = undefined;
 </script>
 
 <Header>Who</Header>
@@ -47,3 +52,21 @@
 {:catch}
 	<Error text={(locale) => locale.error.noRoleActivities} />
 {/await}
+
+<Paragraph
+	>Is this role obsolete? You can delete it, but it is permanent. All of the activities for this
+	role will remain, in case you want to assign them to a different role.</Paragraph
+>
+<Button
+	action={async () => {
+		try {
+			const org = role.organization;
+			await database.deleteRole(role.id);
+			goto(`/organization/${org}`);
+		} catch (_) {
+			deleteError = "We couldn't delete this";
+		}
+	}}
+	warning>Delete this role</Button
+>
+{#if deleteError}<Oops text={deleteError} />{/if}
