@@ -105,6 +105,10 @@ class Database {
 		return this.activities.getStore(id);
 	}
 
+	async deleteActivity(id: ActivityID) {
+		this.activities.delete(id);
+	}
+
 	async getActivityRequests(id: ActivityID): Promise<Request[]> {
 		return this.requests.values().filter((request) => request.activities.includes(id));
 	}

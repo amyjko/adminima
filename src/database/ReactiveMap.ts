@@ -20,6 +20,10 @@ export default class ReactiveMap<IDType, DataType> {
 		return get(this.getStore(id));
 	}
 
+	delete(id: IDType) {
+		this.getStore(id).set(null);
+	}
+
 	values() {
 		return Array.from(this.map.values())
 			.map((role) => get(role))
