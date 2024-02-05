@@ -13,6 +13,8 @@
 		color: var(--background);
 		padding: var(--spacing);
 		border-spacing: var(--radius);
+		margin-block-start: var(--spacing);
+		margin-block-end: var(--spacing);
 	}
 
 	.inline {

@@ -14,8 +14,12 @@
 	import Button from './Button.svelte';
 	import Oops from './Oops.svelte';
 	import { goto } from '$app/navigation';
+	import { user } from '../database/Auth';
 
 	export let role: Role;
+
+	$: organization = database.getOrganization(role.organization);
+	$: isAdmin = $organization?.admins.includes($user.id);
 
 	let deleteError: string | undefined = undefined;
 </script>
@@ -53,20 +57,24 @@
 	<Error text={(locale) => locale.error.noRoleActivities} />
 {/await}
 
-<Paragraph
-	>Is this role obsolete? You can delete it, but it is permanent. All of the activities for this
-	role will remain, in case you want to assign them to a different role.</Paragraph
->
-<Button
-	action={async () => {
-		try {
-			const org = role.organization;
-			await database.deleteRole(role.id);
-			goto(`/organization/${org}`);
-		} catch (_) {
-			deleteError = "We couldn't delete this";
-		}
-	}}
-	warning>Delete this role</Button
->
-{#if deleteError}<Oops text={deleteError} />{/if}
+{#if isAdmin}
+	<Header>delete</Header>
+	<Oops text="Admins only" />
+	<Paragraph
+		>Is this role obsolete? You can delete it, but it is permanent. All of the activities for this
+		role will remain, in case you want to assign them to a different role.</Paragraph
+	>
+	<Button
+		action={async () => {
+			try {
+				const org = role.organization;
+				await database.deleteRole(role.id);
+				goto(`/organization/${org}`);
+			} catch (_) {
+				deleteError = "We couldn't delete this";
+			}
+		}}
+		warning>Delete this role</Button
+	>
+	{#if deleteError}<Oops text={deleteError} />{/if}
+{/if}

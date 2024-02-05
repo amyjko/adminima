@@ -17,8 +17,12 @@
 	import Button from './Button.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import { goto } from '$app/navigation';
+	import { user } from '../database/Auth';
 
 	export let activity: Activity;
+
+	$: organization = database.getOrganization(activity.organization);
+	$: isAdmin = $organization?.admins.includes($user.id);
 
 	let deleteError: string | undefined = undefined;
 </script>
@@ -84,19 +88,22 @@
 	<Oops text={(locale) => locale.error.noActivityRequests} />
 {/await}
 
-<Header>Delete</Header>
+{#if isAdmin}
+	<Header>Delete</Header>
+	<Oops text="Admins only" />
 
-<Paragraph>Is this activity obsolete? You can delete it, but it is permanent.</Paragraph>
-<Button
-	action={async () => {
-		try {
-			const org = activity.organization;
-			await database.deleteActivity(activity.id);
-			goto(`/organization/${org}`);
-		} catch (_) {
-			deleteError = "We couldn't delete this";
-		}
-	}}
-	warning>Delete this activity</Button
->
-{#if deleteError}<Oops text={deleteError} />{/if}
+	<Paragraph>Is this activity obsolete? You can delete it, but it is permanent.</Paragraph>
+	<Button
+		action={async () => {
+			try {
+				const org = activity.organization;
+				await database.deleteActivity(activity.id);
+				goto(`/organization/${org}`);
+			} catch (_) {
+				deleteError = "We couldn't delete this";
+			}
+		}}
+		warning>Delete this activity</Button
+	>
+	{#if deleteError}<Oops text={deleteError} />{/if}
+{/if}
