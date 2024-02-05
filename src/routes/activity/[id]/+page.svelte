@@ -6,19 +6,21 @@
 	import ActivityView from '$lib/ActivityView.svelte';
 	import Page from '$lib/Page.svelte';
 	import { locale } from '../../../types/Locales';
+
+	$: activity = database.getActivity($page.params.id);
 </script>
 
-{#await database.getActivity($page.params.id)}
-	<Loading inline={false} />
-{:then activity}
-	<Page
-		title={activity.what}
-		kind={$locale?.term.activity}
-		changes={activity.changes}
-		organizationID={activity.organization}
-	>
-		<ActivityView {activity} />
-	</Page>
-{:catch}
-	<Oops text={(locale) => locale.error.noActivity} />
-{/await}
+<Page
+	title={$activity?.what ?? 'Oops'}
+	kind={$locale?.term.activity}
+	changes={$activity?.changes}
+	organizationID={$activity?.organization}
+>
+	{#if $activity === undefined}
+		<Loading inline={false} />
+	{:else if $activity}
+		<ActivityView activity={$activity} />
+	{:else}
+		<Oops text={(locale) => locale.error.noActivity} />
+	{/if}
+</Page>

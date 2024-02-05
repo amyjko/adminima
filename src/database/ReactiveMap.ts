@@ -10,7 +10,7 @@ export default class ReactiveMap<IDType, DataType> {
 	getStore(id: IDType) {
 		let match = this.map.get(id);
 		if (match === undefined) {
-			match = writable(undefined);
+			match = writable(null);
 			this.map.set(id, match);
 		}
 		return match;

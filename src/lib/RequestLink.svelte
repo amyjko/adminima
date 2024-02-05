@@ -9,14 +9,10 @@
 
 	export let requestID: RequestID;
 
-	let request: Request | null | undefined = null;
-
-	onMount(async () => {
-		request = await database.getRequest(requestID);
-	});
+	$: request = database.getRequest(requestID);
 </script>
 
-{#if request === null}<Loading />{:else if request === undefined}<Oops
+{#if $request === null}<Loading />{:else if $request === undefined}<Oops
 		inline
 		text={(locale) => locale.error.noPerson}
-	/>{:else}<Link to="/request/{requestID}">{request.title}</Link>{/if}
+	/>{:else}<Link to="/request/{requestID}">{$request.title}</Link>{/if}

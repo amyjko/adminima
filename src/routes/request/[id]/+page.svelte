@@ -6,23 +6,23 @@
 	import Page from '$lib/Page.svelte';
 	import { locale } from '../../../types/Locales';
 	import RequestView from '$lib/RequestView.svelte';
+
+	$: request = database.getRequest($page.params.id);
 </script>
 
-{#await database.getRequest($page.params.id)}
+{#if $request === undefined}
 	<Loading inline={false} />
-{:then request}
-	{#if request}
-		<Page
-			title={request.title}
-			kind={$locale?.term.request}
-			changes={request.changes}
-			organizationID={request.organization}
-		>
-			<RequestView {request} />
-		</Page>
-	{:else}
+{:else if $request === null}
+	<Page title={'Oops'} kind={$locale?.term.error} changes={undefined} organizationID={undefined}>
 		<Error text={(locale) => locale.error.noRequest} />
-	{/if}
-{:catch}
-	<Error text={(locale) => locale.error.noRequest} />
-{/await}
+	</Page>
+{:else}
+	<Page
+		title={$request.title}
+		kind={$locale?.term.request}
+		changes={$request.changes}
+		organizationID={$request.organization}
+	>
+		<RequestView request={$request} />
+	</Page>
+{/if}

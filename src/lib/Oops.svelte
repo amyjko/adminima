@@ -11,6 +11,8 @@
 	div {
 		background: var(--error);
 		color: var(--background);
+		padding: var(--spacing);
+		border-spacing: var(--radius);
 	}
 
 	.inline {

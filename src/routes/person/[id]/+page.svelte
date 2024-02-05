@@ -13,7 +13,9 @@
 {#if $person === undefined}
 	<Loading inline={false} />
 {:else if $person === null}
-	<Oops text={(locale) => locale.error.noPerson} />
+	<Page title="Oops" kind={$locale?.term.error} changes={undefined} organizationID={undefined}>
+		<Oops text={(locale) => locale.error.noPerson} />
+	</Page>
 {:else}
 	<Page
 		title={$person.name}

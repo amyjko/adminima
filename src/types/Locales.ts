@@ -25,6 +25,8 @@ export type Locale = {
 		organization: string;
 		/** What to call a request */
 		request: string;
+		/** What to call a page load error */
+		error: string;
 	};
 	landing: {
 		value: string;

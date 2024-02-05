@@ -20,13 +20,16 @@ import ReactiveMap from './ReactiveMap';
 
 /** Represents an interface to a database, and CRUD operations for modifying the database. */
 class Database {
-	readonly activities = JSON.parse(MockActivities) as Activity[];
+	readonly activities = new ReactiveMap<ActivityID, Activity>();
 	readonly organizations = new ReactiveMap<OrganizationID, Organization>();
 	readonly people = new ReactiveMap<PersonID, Person>();
 	readonly roles = new ReactiveMap<RoleID, Role>();
 	readonly requests = new ReactiveMap<RequestID, Request>();
 
 	constructor() {
+		for (const activity of JSON.parse(MockActivities) as Activity[])
+			this.activities.set(activity.id, activity);
+
 		for (const org of JSON.parse(MockOrganizations) as Organization[])
 			this.organizations.set(org.id, org);
 
@@ -68,7 +71,7 @@ class Database {
 	}
 
 	async getRoleActivities(id: RoleID): Promise<Activity[]> {
-		return this.activities.filter((activity) => activity.role === id);
+		return this.activities.values().filter((activity) => activity.role === id);
 	}
 
 	async getRoleRequests(id: RoleID): Promise<Request[]> {
@@ -98,10 +101,8 @@ class Database {
 		return this.requests.values().filter((request) => request.organization === id);
 	}
 
-	async getActivity(id: ActivityID): Promise<Activity> {
-		const activity = this.activities.find((activity) => activity.id === id);
-		if (activity === undefined) throw Error();
-		else return activity;
+	getActivity(id: ActivityID): Writable<Activity | undefined | null> {
+		return this.activities.getStore(id);
 	}
 
 	async getActivityRequests(id: ActivityID): Promise<Request[]> {
@@ -157,8 +158,8 @@ class Database {
 		return newRequest;
 	}
 
-	async getRequest(id: RequestID): Promise<Request | undefined | null> {
-		return this.requests.get(id);
+	getRequest(id: RequestID): Writable<Request | undefined | null> {
+		return this.requests.getStore(id);
 	}
 }
 
