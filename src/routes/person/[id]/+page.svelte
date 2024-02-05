@@ -11,7 +11,7 @@
 </script>
 
 {#if $person === undefined}
-	<Loading />
+	<Loading inline={false} />
 {:else if $person === null}
 	<Oops text={(locale) => locale.error.noPerson} />
 {:else}

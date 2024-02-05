@@ -11,7 +11,7 @@
 </script>
 
 {#if organization === undefined}
-	<Loading />
+	<Loading inline={false} />
 {:else if $organization}
 	<Page
 		title={$organization.name}

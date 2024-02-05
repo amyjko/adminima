@@ -6,23 +6,21 @@
 	import { page } from '$app/stores';
 	import Page from '$lib/Page.svelte';
 	import { locale } from '../../../types/Locales';
+
+	$: role = database.getRole($page.params.id);
 </script>
 
-{#await database.getRole($page.params.id)}
-	<Loading />
-{:then role}
-	{#if role}
-		<Page
-			title={role.title}
-			kind={$locale?.term.role}
-			changes={role.changes}
-			organizationID={role.organization}
-		>
-			<RoleView {role} />
-		</Page>
-	{:else}
-		<Error text={(locale) => locale.error.noRoleActivities} />
-	{/if}
-{:catch}
+{#if $role === undefined}
+	<Loading inline={false} />
+{:else if $role === null}
 	<Error text={(locale) => locale.error.noRoleActivities} />
-{/await}
+{:else}
+	<Page
+		title={$role.title}
+		kind={$locale?.term.role}
+		changes={$role.changes}
+		organizationID={$role.organization}
+	>
+		<RoleView role={$role} />
+	</Page>
+{/if}

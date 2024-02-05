@@ -1,9 +1,10 @@
 <script lang="ts">
 	export let action: () => void;
 	export let active = true;
+	export let submit = false;
 </script>
 
-<button disabled={!active} on:click={action}><slot /></button>
+<button type={submit ? 'submit' : null} disabled={!active} on:click={action}><slot /></button>
 
 <style>
 	button {

@@ -12,10 +12,19 @@
 	import Form from './Form.svelte';
 	import Field from './Field.svelte';
 	import Paragraph from './Paragraph.svelte';
+	import { goto } from '$app/navigation';
 
 	export let organization: Organization;
 
 	let newPerson: string = '';
+	let newRole: string = '';
+
+	$: isAdmin = organization.admins.includes($user.id);
+
+	async function createRole() {
+		const role = await database.createRole(organization.id, newRole);
+		goto(`/role/${role.id}`);
+	}
 </script>
 
 <Header>Admins</Header>
@@ -24,7 +33,7 @@
 	{#each organization.admins as admin (admin)}
 		<li>
 			<PersonLink personID={admin} />
-			{#if organization.admins.includes($user.id) && organization.admins.length > 1}
+			{#if isAdmin && organization.admins.length > 1}
 				<Button action={() => database.updateOrganization(withoutAdmin(organization, admin))}
 					>remove</Button
 				>{/if}
@@ -33,6 +42,15 @@
 </ul>
 
 <Header>Roles</Header>
+
+{#if isAdmin}
+	<Form action={createRole}>
+		<Paragraph>Create a new role for this organization.</Paragraph>
+		<Field label="title" bind:text={newRole} />
+		<Button submit active={newRole.length > 3} action={() => {}}>create</Button>
+	</Form>
+{/if}
+
 {#await database.getOrganizationRoles(organization.id)}
 	<Loading />
 {:then roles}
@@ -45,27 +63,32 @@
 
 <Header>Staff</Header>
 
-<Form>
-	<Paragraph>Search for people by their name. They must already have an account.</Paragraph>
-	<Field label="name" bind:text={newPerson} />
-	{#if newPerson.length > 0}
-		{#await database.getPeople(newPerson)}
-			<Loading />
-		{:then people}
-			<ul>
-				{#each people as person}
-					<li>
-						<PersonLink personID={person.id} email />
-						{#if !organization.staff.includes(person.id)}
-							<Button action={() => database.updateOrganization(withStaff(organization, person.id))}
-								>+</Button
-							>{/if}
-					</li>
-				{/each}
-			</ul>
-		{/await}
-	{/if}
-</Form>
+{#if isAdmin}
+	<Form>
+		<Paragraph
+			>Search for staff by name to add them to this organization. They must already have an account.</Paragraph
+		>
+		<Field label="name" bind:text={newPerson} />
+		{#if newPerson.length > 0}
+			{#await database.getPeople(newPerson)}
+				<Loading />
+			{:then people}
+				<ul>
+					{#each people as person}
+						<li>
+							<PersonLink personID={person.id} email />
+							{#if !organization.staff.includes(person.id)}
+								<Button
+									action={() => database.updateOrganization(withStaff(organization, person.id))}
+									>+</Button
+								>{/if}
+						</li>
+					{/each}
+				</ul>
+			{/await}
+		{/if}
+	</Form>
+{/if}
 
 {#await database.getOrganizationPeople(organization.id)}
 	<Loading />
@@ -75,7 +98,7 @@
 			{#if !organization.admins.includes(person)}
 				<li>
 					<PersonLink personID={person} />
-					{#if organization.admins.includes($user.id) && !organization.admins.includes(person)}
+					{#if isAdmin && !organization.admins.includes(person)}
 						<Button action={() => database.updateOrganization(withAdmin(organization, person))}
 							>make admin</Button
 						>

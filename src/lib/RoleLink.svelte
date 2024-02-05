@@ -9,18 +9,10 @@
 
 	export let roleID: RoleID;
 
-	let role: Role | null | undefined = null;
-
-	onMount(async () => {
-		try {
-			role = await database.getRole(roleID);
-		} catch (_) {
-			role = undefined;
-		}
-	});
+	$: role = database.getRole(roleID);
 </script>
 
-{#if role === null}<Loading />{:else if role === undefined}<Oops
+{#if $role === null}<Loading />{:else if $role === undefined}<Oops
 		inline
 		text={(locale) => locale.error.noRole}
-	/>{:else}<Link to="/role/{roleID}">{role.title}</Link>{/if}
+	/>{:else}<Link to="/role/{roleID}">{$role.title}</Link>{/if}

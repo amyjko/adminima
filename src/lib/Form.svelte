@@ -1,8 +1,9 @@
 <script lang="ts">
 	export let inline = false;
+	export let action: (() => void) | undefined = undefined;
 </script>
 
-<div class="form" class:inline><slot /></div>
+<form on:submit|preventDefault={action} class="form" class:inline><slot /></form>
 
 <style>
 	.form {

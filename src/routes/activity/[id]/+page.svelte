@@ -9,7 +9,7 @@
 </script>
 
 {#await database.getActivity($page.params.id)}
-	<Loading />
+	<Loading inline={false} />
 {:then activity}
 	<Page
 		title={activity.what}

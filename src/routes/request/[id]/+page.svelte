@@ -9,7 +9,7 @@
 </script>
 
 {#await database.getRequest($page.params.id)}
-	<Loading />
+	<Loading inline={false} />
 {:then request}
 	{#if request}
 		<Page

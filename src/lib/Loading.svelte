@@ -3,11 +3,13 @@
 	import { locale } from '../types/Locales';
 	import Text from './Text.svelte';
 
+	export let inline = true;
+
 	let count = 1;
 
 	onMount(() => {
 		const timer = setInterval(() => {
-			count++;
+			count = (count + 1) % 5;
 		}, 1000);
 		return () => {
 			clearInterval(timer);
@@ -15,7 +17,9 @@
 	});
 </script>
 
-<div><span class="dots"><Text text={$locale?.term.loading} /> {'⎋'.repeat(count)}</span></div>
+<div class:inline>
+	<span class="dots"><Text text={$locale?.term.loading} /> {'⎋'.repeat(count)}</span>
+</div>
 
 <style>
 	div {
@@ -25,5 +29,10 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.inline {
+		display: inline;
+		width: auto;
 	}
 </style>
