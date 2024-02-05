@@ -95,6 +95,10 @@ class Database {
 		return this.roles.values().filter((role) => role.organization === id);
 	}
 
+	async getOrganizationActivities(id: OrganizationID): Promise<Activity[]> {
+		return this.activities.values().filter((activity) => activity.organization === id);
+	}
+
 	async getOrganizationPeople(id: OrganizationID): Promise<PersonID[]> {
 		const org = get(this.getOrganization(id));
 		if (org) return org.staff;

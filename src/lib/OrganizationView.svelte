@@ -15,6 +15,8 @@
 	import { goto } from '$app/navigation';
 	import Oops from './Oops.svelte';
 	import RequestForm from './RequestForm.svelte';
+	import ActivityLink from './ActivityLink.svelte';
+	import ParagraphView from './ParagraphView.svelte';
 
 	export let organization: Organization;
 
@@ -51,9 +53,11 @@
 
 <Header>Roles</Header>
 
+<Paragraph>All roles in this organization.</Paragraph>
+
 {#if isAdmin}
 	<Form action={createRole}>
-		<Paragraph>Create a new role for this organization.</Paragraph>
+		<Paragraph>What should the title of the role be?</Paragraph>
 		<Field label="title" bind:text={newRole} />
 		<Button submit active={newRole.length > 3} action={() => {}}>create</Button>
 		{#if newRoleError}
@@ -68,6 +72,20 @@
 	<ul>
 		{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
 			<li><RoleLink roleID={role.id} /></li>
+		{/each}
+	</ul>
+{/await}
+
+<Header>Activities</Header>
+
+<Paragraph>All activities in this organization, independent of role.</Paragraph>
+
+{#await database.getOrganizationActivities(organization.id)}
+	<Loading />
+{:then activities}
+	<ul>
+		{#each activities.sort((a, b) => a.what.localeCompare(b.what)) as activity}
+			<li><ActivityLink activityID={activity.id} /></li>
 		{/each}
 	</ul>
 {/await}
