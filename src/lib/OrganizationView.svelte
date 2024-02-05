@@ -13,8 +13,8 @@
 	import Field from './Field.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import { goto } from '$app/navigation';
-	import ParagraphView from './ParagraphView.svelte';
 	import Oops from './Oops.svelte';
+	import RequestForm from './RequestForm.svelte';
 
 	export let organization: Organization;
 
@@ -31,26 +31,6 @@
 			goto(`/role/${role.id}`);
 		} catch (_) {
 			newRoleError = "We couldn't create the new role.";
-		}
-	}
-
-	let newRequestTitle = '';
-	let newRequestProblem = '';
-	let newRequestError: string | undefined = undefined;
-
-	async function createRequest() {
-		try {
-			const request = await database.createRequest(
-				$user.id,
-				organization.id,
-				newRequestTitle,
-				newRequestProblem,
-				[],
-				[]
-			);
-			goto(`/request/${request.id}`);
-		} catch (_) {
-			newRequestError = "We couldn't create the request.";
 		}
 	}
 </script>
@@ -147,20 +127,7 @@
 
 <Header>Requests</Header>
 
-<Form action={createRequest}>
-	<Paragraph>Is there something you'd like to change about this organization?</Paragraph>
-	<Field label="title" bind:text={newRequestTitle} />
-	<Field label="description" bind:text={newRequestProblem} />
-	<Button
-		submit
-		active={newRequestTitle.length > 0 && newRequestProblem.length > 0}
-		action={() => {}}>create</Button
-	>
-
-	{#if newRoleError}
-		<Oops text={newRoleError} />
-	{/if}
-</Form>
+<RequestForm organization={organization.id} />
 
 {#await database.getOrganizationRequests(organization.id)}
 	<Loading />

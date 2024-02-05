@@ -10,6 +10,7 @@
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import RequestList from './RequestList.svelte';
+	import RequestForm from './RequestForm.svelte';
 
 	export let role: Role;
 </script>
@@ -35,7 +36,9 @@
 	<Error text={(locale) => locale.error.noRoleActivities} />
 {/await}
 
-<Header>Related Requests</Header>
+<Header>Requests</Header>
+
+<RequestForm organization={role.organization} role={role.id} />
 
 {#await database.getRoleRequests(role.id)}
 	<Loading />

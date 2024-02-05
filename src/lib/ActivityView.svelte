@@ -13,6 +13,7 @@
 	import Loading from './Loading.svelte';
 	import RequestList from './RequestList.svelte';
 	import Oops from './Oops.svelte';
+	import RequestForm from './RequestForm.svelte';
 
 	export let activity: Activity;
 </script>
@@ -66,7 +67,10 @@
 	</Row>
 </Rows>
 
-<Header>Related Requests</Header>
+<Header>Requests</Header>
+
+<RequestForm organization={activity.organization} activity={activity.id} />
+
 {#await database.getActivityRequests(activity.id)}
 	<Loading />
 {:then requests}
