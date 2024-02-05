@@ -54,7 +54,8 @@
 	}
 
 	.content {
-		width: 32em;
+		width: 100%;
+		max-width: 32em;
 		margin-block-start: 10vh;
 	}
 
