@@ -6,7 +6,8 @@
 		"activity": "activity",
 		"change": "change",
 		"person": "person",
-		"organization": "organization"
+		"organization": "organization",
+		"request": "request"
 	},
 	"landing": {
 		"value": "Improve your organization's onboarding, transparency, and agility by defining work processes and managing requests for change.",

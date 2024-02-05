@@ -13,17 +13,45 @@
 	import Field from './Field.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import { goto } from '$app/navigation';
+	import ParagraphView from './ParagraphView.svelte';
+	import Oops from './Oops.svelte';
 
 	export let organization: Organization;
 
 	let newPerson: string = '';
-	let newRole: string = '';
 
 	$: isAdmin = organization.admins.includes($user.id);
 
+	let newRole: string = '';
+	let newRoleError: string | undefined = undefined;
+
 	async function createRole() {
-		const role = await database.createRole(organization.id, newRole);
-		goto(`/role/${role.id}`);
+		try {
+			const role = await database.createRole($user.id, organization.id, newRole);
+			goto(`/role/${role.id}`);
+		} catch (_) {
+			newRoleError = "We couldn't create the new role.";
+		}
+	}
+
+	let newRequestTitle = '';
+	let newRequestProblem = '';
+	let newRequestError: string | undefined = undefined;
+
+	async function createRequest() {
+		try {
+			const request = await database.createRequest(
+				$user.id,
+				organization.id,
+				newRequestTitle,
+				newRequestProblem,
+				[],
+				[]
+			);
+			goto(`/request/${request.id}`);
+		} catch (_) {
+			newRequestError = "We couldn't create the request.";
+		}
 	}
 </script>
 
@@ -48,6 +76,9 @@
 		<Paragraph>Create a new role for this organization.</Paragraph>
 		<Field label="title" bind:text={newRole} />
 		<Button submit active={newRole.length > 3} action={() => {}}>create</Button>
+		{#if newRoleError}
+			<Oops text={newRoleError} />
+		{/if}
 	</Form>
 {/if}
 
@@ -115,6 +146,22 @@
 {/await}
 
 <Header>Requests</Header>
+
+<Form action={createRequest}>
+	<Paragraph>Is there something you'd like to change about this organization?</Paragraph>
+	<Field label="title" bind:text={newRequestTitle} />
+	<Field label="description" bind:text={newRequestProblem} />
+	<Button
+		submit
+		active={newRequestTitle.length > 0 && newRequestProblem.length > 0}
+		action={() => {}}>create</Button
+	>
+
+	{#if newRoleError}
+		<Oops text={newRoleError} />
+	{/if}
+</Form>
+
 {#await database.getOrganizationRequests(organization.id)}
 	<Loading />
 {:then requests}

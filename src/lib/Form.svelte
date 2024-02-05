@@ -10,6 +10,7 @@
 		border-radius: var(--radius);
 		border: var(--border) dotted 1px;
 		padding: var(--spacing);
+		gap: var(--spacing);
 		display: flex;
 		flex-direction: column;
 	}

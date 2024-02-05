@@ -14,7 +14,7 @@
 	{#if request}
 		<Page
 			title={request.title}
-			kind={$locale?.term.role}
+			kind={$locale?.term.request}
 			changes={request.changes}
 			organizationID={request.organization}
 		>

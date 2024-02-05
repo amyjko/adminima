@@ -23,6 +23,8 @@
 	<ul>
 		{#each request.roles as role}
 			<li><RoleLink roleID={role} /></li>
+		{:else}
+			&mdash;
 		{/each}
 	</ul>
 
@@ -30,6 +32,8 @@
 	<ul>
 		{#each request.activities as activity}
 			<li><ActivityLink activityID={activity} /></li>
+		{:else}
+			&mdash;
 		{/each}
 	</ul>
 

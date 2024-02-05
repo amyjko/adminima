@@ -13,28 +13,32 @@ import type { OrganizationID } from '../types/Organization';
 import type Organization from '../types/Organization';
 import type Request from '../types/Request';
 import type { RequestID } from '../types/Request';
-import { get, writable, type Writable } from 'svelte/store';
+import { get, type Writable } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
+import type Markup from '../types/Markup';
+import ReactiveMap from './ReactiveMap';
 
 /** Represents an interface to a database, and CRUD operations for modifying the database. */
 class Database {
 	readonly activities = JSON.parse(MockActivities) as Activity[];
-	readonly organizations = new Map<OrganizationID, Writable<Organization | null | undefined>>();
-	readonly people = new Map<PersonID, Writable<Person | null | undefined>>();
-	readonly roles = new Map<RoleID, Writable<Role | null | undefined>>();
-	readonly requests = JSON.parse(MockRequests) as Request[];
+	readonly organizations = new ReactiveMap<OrganizationID, Organization>();
+	readonly people = new ReactiveMap<PersonID, Person>();
+	readonly roles = new ReactiveMap<RoleID, Role>();
+	readonly requests = new ReactiveMap<RequestID, Request>();
 
 	constructor() {
 		for (const org of JSON.parse(MockOrganizations) as Organization[])
-			this.organizations.set(org.id, writable(org));
+			this.organizations.set(org.id, org);
 
-		for (const person of JSON.parse(MockPeople) as Person[])
-			this.people.set(person.id, writable(person));
+		for (const person of JSON.parse(MockPeople) as Person[]) this.people.set(person.id, person);
 
-		for (const role of JSON.parse(MockRole) as Role[]) this.roles.set(role.id, writable(role));
+		for (const role of JSON.parse(MockRole) as Role[]) this.roles.set(role.id, role);
+
+		for (const request of JSON.parse(MockRequests) as Request[])
+			this.requests.set(request.id, request);
 	}
 
-	async createRole(organization: OrganizationID, title: string): Promise<Role> {
+	async createRole(who: PersonID, organization: OrganizationID, title: string): Promise<Role> {
 		const newRole: Role = {
 			id: uuidv4(),
 			organization,
@@ -43,21 +47,24 @@ class Database {
 			people: [],
 			viewers: [],
 			public: false,
-			changes: []
+			changes: [
+				{
+					time: Date.now(),
+					person: who,
+					what: 'Created role',
+					why: '',
+					request: null
+				}
+			]
 		};
 
-		this.roles.set(newRole.id, writable(newRole));
+		this.roles.set(newRole.id, newRole);
 
 		return newRole;
 	}
 
 	getRole(id: RoleID): Writable<Role | undefined | null> {
-		let match = this.roles.get(id);
-		if (match === undefined) {
-			match = writable(undefined);
-			this.roles.set(id, match);
-		}
-		return match;
+		return this.roles.getStore(id);
 	}
 
 	async getRoleActivities(id: RoleID): Promise<Activity[]> {
@@ -65,29 +72,20 @@ class Database {
 	}
 
 	async getRoleRequests(id: RoleID): Promise<Request[]> {
-		return this.requests.filter((request) => request.roles.includes(id));
+		return this.requests.values().filter((request) => request.roles.includes(id));
 	}
 
 	getOrganization(id: OrganizationID): Writable<Organization | null | undefined> {
-		let match = this.organizations.get(id);
-		if (match === undefined) {
-			match = writable(undefined);
-			this.organizations.set(id, match);
-		}
-		return match;
+		return this.organizations.getStore(id);
 	}
 
 	async updateOrganization(organization: Organization) {
-		const org = this.organizations.get(organization.id);
+		const org = this.organizations.getStore(organization.id);
 		if (org) org.set(organization);
 	}
 
 	async getOrganizationRoles(id: OrganizationID): Promise<Role[]> {
-		return Array.from(this.roles.values())
-			.map((role) => get(role))
-			.filter(
-				(role): role is Role => role !== null && role !== undefined && role.organization === id
-			);
+		return this.roles.values().filter((role) => role.organization === id);
 	}
 
 	async getOrganizationPeople(id: OrganizationID): Promise<PersonID[]> {
@@ -97,7 +95,7 @@ class Database {
 	}
 
 	async getOrganizationRequests(id: OrganizationID): Promise<Request[]> {
-		return this.requests.filter((request) => request.organization === id);
+		return this.requests.values().filter((request) => request.organization === id);
 	}
 
 	async getActivity(id: ActivityID): Promise<Activity> {
@@ -107,39 +105,60 @@ class Database {
 	}
 
 	async getActivityRequests(id: ActivityID): Promise<Request[]> {
-		return this.requests.filter((request) => request.activities.includes(id));
+		return this.requests.values().filter((request) => request.activities.includes(id));
 	}
 
 	getPerson(id: PersonID): Writable<Person | undefined | null> {
-		let match = this.people.get(id);
-		if (match === undefined) {
-			match = writable(undefined);
-			this.people.set(id, match);
-		}
-		return match;
+		return this.people.getStore(id);
 	}
 
 	async getPeople(name: string): Promise<Person[]> {
-		return Array.from(this.people.values())
-			.map((person) => get(person))
-			.filter(
-				(person): person is Person =>
-					person !== undefined &&
-					person !== null &&
-					person.name.toLocaleLowerCase().includes(name.toLocaleLowerCase())
-			);
+		return this.people
+			.values()
+			.filter((person) => person.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()));
 	}
 
 	async getPersonRoles(id: PersonID): Promise<Role[]> {
-		return Array.from(this.roles.values())
-			.map((role) => get(role))
-			.filter(
-				(role): role is Role => role !== null && role !== undefined && role.people.includes(id)
-			);
+		return this.roles.values().filter((role) => role.people.includes(id));
 	}
 
-	async getRequest(id: RequestID): Promise<Request | undefined> {
-		return this.requests.find((request) => request.id === id);
+	async createRequest(
+		who: PersonID,
+		organization: OrganizationID,
+		title: string,
+		problem: Markup,
+		activities: ActivityID[],
+		roles: RoleID[]
+	): Promise<Request> {
+		const newRequest: Request = {
+			id: uuidv4(),
+			who,
+			title,
+			problem,
+			watchers: [],
+			organization,
+			roles,
+			activities,
+			comments: [],
+			status: 'triage',
+			changes: [
+				{
+					time: Date.now(),
+					person: who,
+					what: 'Created request',
+					why: '',
+					request: null
+				}
+			]
+		};
+
+		this.requests.set(newRequest.id, newRequest);
+
+		return newRequest;
+	}
+
+	async getRequest(id: RequestID): Promise<Request | undefined | null> {
+		return this.requests.get(id);
 	}
 }
 

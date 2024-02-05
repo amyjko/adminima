@@ -23,6 +23,8 @@ export type Locale = {
 		person: string;
 		/** What to call organizations */
 		organization: string;
+		/** What to call a request */
+		request: string;
 	};
 	landing: {
 		value: string;
