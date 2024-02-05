@@ -1,5 +1,5 @@
 import MockActivities from '$lib/mock/activities.json?raw';
-import MockRole from '$lib/mock/role.json?raw';
+import MockRoles from '$lib/mock/roles.json?raw';
 import MockPeople from '$lib/mock/people.json?raw';
 import MockOrganizations from '$lib/mock/organizations.json?raw';
 import MockRequests from '$lib/mock/requests.json?raw';
@@ -35,7 +35,7 @@ class Database {
 
 		for (const person of JSON.parse(MockPeople) as Person[]) this.people.set(person.id, person);
 
-		for (const role of JSON.parse(MockRole) as Role[]) this.roles.set(role.id, role);
+		for (const role of JSON.parse(MockRoles) as Role[]) this.roles.set(role.id, role);
 
 		for (const request of JSON.parse(MockRequests) as Request[])
 			this.requests.set(request.id, request);

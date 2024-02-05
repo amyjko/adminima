@@ -16,7 +16,7 @@
 		"what": "Helps the Associate Dean manage change and track success.",
 		"viewers": [],
 		"people": ["victor"],
-		"public": true,
+		"public": false,
 		"modifications": []
 	}
 ]

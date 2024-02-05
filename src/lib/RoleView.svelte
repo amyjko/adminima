@@ -24,57 +24,63 @@
 	let deleteError: string | undefined = undefined;
 </script>
 
-<Header>Who</Header>
-{#each role.people as personID}<PersonLink {personID} />{/each}
+{#if role.public || isAdmin}
+	{#if role.public}public{:else}private{/if}
 
-<Header>Organization</Header>
-<Paragraph><OrganizationLink organizationID={role.organization} /></Paragraph>
+	<Header>Who</Header>
+	{#each role.people as personID}<PersonLink {personID} />{/each}
 
-<Header>Purpose</Header>
-<div class="meta">
-	<MarkupView markup={role.what} />
-</div>
+	<Header>Organization</Header>
+	<Paragraph><OrganizationLink organizationID={role.organization} /></Paragraph>
 
-<Header>Activities</Header>
+	<Header>Purpose</Header>
+	<div class="meta">
+		<MarkupView markup={role.what} />
+	</div>
 
-{#await database.getRoleActivities(role.id)}
-	<Loading />
-{:then activities}
-	<Timeline {activities} />
-{:catch}
-	<Error text={(locale) => locale.error.noRoleActivities} />
-{/await}
+	<Header>Activities</Header>
 
-<Header>Requests</Header>
+	{#await database.getRoleActivities(role.id)}
+		<Loading />
+	{:then activities}
+		<Timeline {activities} />
+	{:catch}
+		<Error text={(locale) => locale.error.noRoleActivities} />
+	{/await}
 
-<RequestForm organization={role.organization} role={role.id} />
+	<Header>Requests</Header>
 
-{#await database.getRoleRequests(role.id)}
-	<Loading />
-{:then requests}
-	<RequestList {requests} />
-{:catch}
-	<Error text={(locale) => locale.error.noRoleActivities} />
-{/await}
+	<RequestForm organization={role.organization} role={role.id} />
 
-{#if isAdmin}
-	<Header>delete</Header>
-	<Oops text="Admins only" />
-	<Paragraph
-		>Is this role obsolete? You can delete it, but it is permanent. All of the activities for this
-		role will remain, in case you want to assign them to a different role.</Paragraph
-	>
-	<Button
-		action={async () => {
-			try {
-				const org = role.organization;
-				await database.deleteRole(role.id);
-				goto(`/organization/${org}`);
-			} catch (_) {
-				deleteError = "We couldn't delete this";
-			}
-		}}
-		warning>Delete this role</Button
-	>
-	{#if deleteError}<Oops text={deleteError} />{/if}
+	{#await database.getRoleRequests(role.id)}
+		<Loading />
+	{:then requests}
+		<RequestList {requests} />
+	{:catch}
+		<Error text={(locale) => locale.error.noRoleActivities} />
+	{/await}
+
+	{#if isAdmin}
+		<Header>delete</Header>
+		<Oops text="Admins only" />
+		<Paragraph
+			>Is this role obsolete? You can delete it, but it is permanent. All of the activities for this
+			role will remain, in case you want to assign them to a different role.</Paragraph
+		>
+		<Button
+			action={async () => {
+				try {
+					const org = role.organization;
+					await database.deleteRole(role.id);
+					goto(`/organization/${org}`);
+				} catch (_) {
+					deleteError = "We couldn't delete this";
+				}
+			}}
+			warning>Delete this role</Button
+		>
+		{#if deleteError}<Oops text={deleteError} />{/if}
+	{/if}
+{:else}
+	<Oops text="This role is not public." />
 {/if}
