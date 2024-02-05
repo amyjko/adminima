@@ -3,14 +3,18 @@
 		"id": "victor",
 		"name": "Victor Aque",
 		"email": "test@uw.edu",
-		"icon": "🥐",
-		"organizations": ["ischool"]
+		"icon": "🥐"
 	},
 	{
 		"id": "amy",
 		"name": "Amy J. Ko",
 		"email": "ajko@uw.edu",
-		"icon": "🐱",
-		"organizations": ["ischool"]
+		"icon": "🐱"
+	},
+	{
+		"id": "cris",
+		"name": "Cris Fowler",
+		"email": "crism@uw.edu",
+		"icon": "🦄"
 	}
 ]

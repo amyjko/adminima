@@ -6,23 +6,21 @@
 	import Page from '$lib/Page.svelte';
 	import { locale } from '../../../types/Locales';
 	import PersonView from '$lib/PersonView.svelte';
+
+	$: person = database.getPerson($page.params.id);
 </script>
 
-{#await database.getPerson($page.params.id)}
+{#if $person === undefined}
 	<Loading />
-{:then person}
-	{#if person}
-		<Page
-			title={person.name}
-			kind={$locale?.term.person}
-			changes={undefined}
-			organizationID={undefined}
-		>
-			<PersonView {person} />
-		</Page>
-	{:else}
-		<Oops text={(locale) => locale.error.noPerson} />
-	{/if}
-{:catch}
+{:else if $person === null}
 	<Oops text={(locale) => locale.error.noPerson} />
-{/await}
+{:else}
+	<Page
+		title={$person.name}
+		kind={$locale?.term.person}
+		changes={undefined}
+		organizationID={undefined}
+	>
+		<PersonView person={$person} />
+	</Page>
+{/if}

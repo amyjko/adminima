@@ -6,15 +6,29 @@
 	import database from '../database/Database';
 	import RoleLink from './RoleLink.svelte';
 	import RequestList from './RequestList.svelte';
+	import Button from './Button.svelte';
+	import { withAdmin, withStaff, withoutAdmin, withoutStaff } from '../types/Organization';
+	import { user } from '../database/Auth';
+	import Form from './Form.svelte';
+	import Field from './Field.svelte';
+	import Paragraph from './Paragraph.svelte';
 
 	export let organization: Organization;
+
+	let newPerson: string = '';
 </script>
 
-<Header>Administrators</Header>
+<Header>Admins</Header>
 <p>Who has permissions to change this organization's roles.</p>
 <ul>
-	{#each organization.admins as admin}
-		<li><PersonLink personID={admin} /></li>
+	{#each organization.admins as admin (admin)}
+		<li>
+			<PersonLink personID={admin} />
+			{#if organization.admins.includes($user.id) && organization.admins.length > 1}
+				<Button action={() => database.updateOrganization(withoutAdmin(organization, admin))}
+					>remove</Button
+				>{/if}
+		</li>
 	{/each}
 </ul>
 
@@ -29,13 +43,50 @@
 	</ul>
 {/await}
 
-<Header>People</Header>
+<Header>Staff</Header>
+
+<Form>
+	<Paragraph>Search for people by their name. They must already have an account.</Paragraph>
+	<Field label="name" bind:text={newPerson} />
+	{#if newPerson.length > 0}
+		{#await database.getPeople(newPerson)}
+			<Loading />
+		{:then people}
+			<ul>
+				{#each people as person}
+					<li>
+						<PersonLink personID={person.id} email />
+						{#if !organization.staff.includes(person.id)}
+							<Button action={() => database.updateOrganization(withStaff(organization, person.id))}
+								>+</Button
+							>{/if}
+					</li>
+				{/each}
+			</ul>
+		{/await}
+	{/if}
+</Form>
+
 {#await database.getOrganizationPeople(organization.id)}
 	<Loading />
 {:then people}
 	<ul>
-		{#each people.sort((a, b) => a.name.localeCompare(b.name)) as person}
-			<li><PersonLink personID={person.id} /></li>
+		{#each people as person}
+			{#if !organization.admins.includes(person)}
+				<li>
+					<PersonLink personID={person} />
+					{#if organization.admins.includes($user.id) && !organization.admins.includes(person)}
+						<Button action={() => database.updateOrganization(withAdmin(organization, person))}
+							>make admin</Button
+						>
+					{/if}
+					{#if !organization.admins.includes(person)}
+						<Button action={() => database.updateOrganization(withoutStaff(organization, person))}
+							>remove</Button
+						>
+					{/if}
+				</li>
+			{/if}
 		{/each}
 	</ul>
 {/await}

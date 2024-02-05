@@ -6,23 +6,21 @@
 	import OrganizationView from '$lib/OrganizationView.svelte';
 	import Page from '$lib/Page.svelte';
 	import { locale } from '../../../types/Locales';
+
+	const organization = database.getOrganization($page.params.id);
 </script>
 
-{#await database.getOrganization($page.params.id)}
+{#if organization === undefined}
 	<Loading />
-{:then organization}
-	{#if organization}
-		<Page
-			title={organization.name}
-			kind={$locale?.term.organization}
-			changes={organization.changes}
-			organizationID={undefined}
-		>
-			<OrganizationView {organization} />
-		</Page>
-	{:else}
-		<Oops text={(locale) => locale.error.noOrganization} />
-	{/if}
-{:catch}
+{:else if $organization}
+	<Page
+		title={$organization.name}
+		kind={$locale?.term.organization}
+		changes={$organization.changes}
+		organizationID={undefined}
+	>
+		<OrganizationView organization={$organization} />
+	</Page>
+{:else}
 	<Oops text={(locale) => locale.error.noOrganization} />
-{/await}
+{/if}

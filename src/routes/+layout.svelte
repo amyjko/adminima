@@ -4,10 +4,11 @@
 	/** CSS reset */
 
 	:root {
-		font-family: 'Rokkitt', sans-serif;
+		font-family: var(--font);
 		font-size: var(--normal-size);
 		line-height: 1.1;
 
+		--font: 'Rokkitt', sans-serif;
 		--spacing: 1em;
 		--thickness: 3px;
 		--padding: 0.1em;

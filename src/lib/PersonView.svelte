@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type Person from '../types/Person';
-	import OrganizationLink from './OrganizationLink.svelte';
 	import Header from './Header.svelte';
 	import database from '../database/Database';
 	import Loading from './Loading.svelte';
@@ -19,13 +18,6 @@
 		<RoleLink roleID={role.id} />
 	{/each}
 {/await}
-
-<Header>Organizations</Header>
-{#each person.organizations as organizationID}
-	<OrganizationLink {organizationID} />
-{:else}
-	Not part of any organizations.
-{/each}
 
 <style>
 	.scope {

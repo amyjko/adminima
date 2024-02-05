@@ -2,6 +2,7 @@
 	{
 		"id": "ischool",
 		"name": "The Information School",
-		"admins": ["amy"]
+		"admins": ["amy"],
+		"staff": ["victor", "amy"]
 	}
 ]
