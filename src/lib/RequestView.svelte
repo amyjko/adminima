@@ -7,9 +7,18 @@
 	import RoleLink from './RoleLink.svelte';
 	import ActivityLink from './ActivityLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import Markup from '../markup/Markup';
+	import database from '../database/Database';
+	import { user } from '../database/Auth';
+	import Oops from './Oops.svelte';
+	import Button from './Button.svelte';
+	import { goto } from '$app/navigation';
 
 	export let request: Request;
+
+	$: organization = database.getOrganization(request.organization);
+	$: isAdmin = $organization?.admins.includes($user.id);
+
+	let deleteError: string | undefined = undefined;
 </script>
 
 <div class="scope">
@@ -50,6 +59,26 @@
 	{:else}
 		No comments yet.
 	{/each}
+
+	{#if isAdmin}
+		<Header>Delete</Header>
+		<Oops text="Admins only" />
+
+		<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
+		<Button
+			action={async () => {
+				try {
+					const org = request.organization;
+					await database.deleteRequest(request.id);
+					goto(`/organization/${org}`);
+				} catch (_) {
+					deleteError = "We couldn't delete this";
+				}
+			}}
+			warning>Delete this activity</Button
+		>
+		{#if deleteError}<Oops text={deleteError} />{/if}
+	{/if}
 </div>
 
 <style>

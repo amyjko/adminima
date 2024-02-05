@@ -173,6 +173,10 @@ class Database {
 	getRequest(id: RequestID): Writable<Request | undefined | null> {
 		return this.requests.getStore(id);
 	}
+
+	deleteRequest(id: RequestID) {
+		this.requests.delete(id);
+	}
 }
 
 const database = new Database();
