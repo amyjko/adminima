@@ -13,7 +13,7 @@
 	import Loading from './Loading.svelte';
 	import ChangeList from './ChangeList.svelte';
 	import Oops from './Oops.svelte';
-	import RequestForm from './ChangeForm.svelte';
+	import ChangeForm from './ChangeForm.svelte';
 	import Button from './Button.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import { goto } from '$app/navigation';
@@ -74,9 +74,7 @@
 	</Row>
 </Rows>
 
-<Header>Requests</Header>
-
-<RequestForm organization={process.organization} process={process.id} />
+<ChangeForm organization={process.organization} process={process.id} />
 
 {#await database.getProcessChanges(process.id)}
 	<Loading />

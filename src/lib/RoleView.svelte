@@ -44,8 +44,6 @@ These are the processes that this role is responsible for.
 	<Error text={(locale) => locale.error.noRoleProcesses} />
 {/await}
 
-<Header>request a change</Header>
-
 <ChangeForm organization={role.organization} role={role.id} />
 
 <Modifications mods={role.modifications} />

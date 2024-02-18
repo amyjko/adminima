@@ -10,6 +10,7 @@
 	import { user } from '../database/Auth';
 	import type { ProcessID } from '../types/Process';
 	import type { RoleID } from '../types/Role';
+	import Header from './Header.svelte';
 
 	export let organization: OrganizationID;
 	export let process: ProcessID | undefined = undefined;
@@ -35,6 +36,8 @@
 		}
 	}
 </script>
+
+<Header>Suggest a Change</Header>
 
 <Form action={createRequest}>
 	<Paragraph
