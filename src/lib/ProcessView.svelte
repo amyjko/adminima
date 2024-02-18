@@ -22,6 +22,7 @@
 	import { locale } from '$types/Locales';
 	import Modifications from './Modifications.svelte';
 	import RoleLink from './RoleLink.svelte';
+	import Checkbox from './Checkbox.svelte';
 
 	export let process: Process;
 
@@ -31,6 +32,8 @@
 <Title title={process.what} kind={$locale?.term.process ?? ''} />
 
 <MarkupView markup={process.why} />
+
+<Header>Who</Header>
 
 <Paragraph
 	>The <RoleLink roleID={process.roles[0]} /> leads this process with support from {#each process.roles.slice(1) as role}
@@ -54,40 +57,22 @@
 	This process doesn't happen at a particular time.
 {/if}
 
-<Notice>
-	{#if process.template}
-		This process is a based on a template
-	{:else}
-		This is a template. Start this process to track your progress.
-	{/if}
-</Notice>
+<Header>How</Header>
 
-<Header>Details</Header>
-<Rows>
-	<Row name="draft">{process.draft}</Row>
-	<Row name="how">
-		<ul>
-			{#each process.how as how}
-				<li><TaskView task={how} /></li>
-			{/each}
-		</ul>
-	</Row>
-</Rows>
+{#if process.template}
+	<Notice>This is a template. Start this process to track your progress.</Notice>
+{/if}
+
+<ul>
+	{#each process.how as how}
+		<li><TaskView task={how} /></li>
+	{/each}
+</ul>
 
 <ChangeForm organization={process.organization} process={process.id} />
 
-{#await database.getProcessChanges(process.id)}
-	<Loading />
-{:then changes}
-	<ChangeList {changes} />
-{:catch}
-	<Oops text={(locale) => locale.error.noProcessChanges} />
-{/await}
-
 <Admin>
-	<Header>Delete</Header>
-
-	<Paragraph>Is this process obsolete? You can delete it, but it is permanent.</Paragraph>
+	<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
 	<Button
 		action={async () => {
 			try {

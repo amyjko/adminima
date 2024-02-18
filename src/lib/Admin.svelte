@@ -16,7 +16,8 @@
 
 <style>
 	.admin {
-		padding-left: var(--spacing);
+		background: var(--warning-background);
+		padding: var(--spacing);
 		margin-top: var(--spacing);
 		margin-bottom: var(--spacing);
 		border-left: var(--thickness) solid var(--warning);

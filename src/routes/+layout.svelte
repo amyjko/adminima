@@ -23,7 +23,7 @@
 		--small-size: 13pt;
 		--error: #e25f55;
 		--warning: #e28d1d;
-		--warning-background: #e6d3ba;
+		--warning-background: #faecdc;
 		--other: #b349cb;
 		--salient: #d35088;
 		--focus: #784ada;
