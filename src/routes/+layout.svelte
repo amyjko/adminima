@@ -1,4 +1,10 @@
-<slot />
+<script>
+	import Page from '$lib/Page.svelte';
+</script>
+
+<Page>
+	<slot />
+</Page>
 
 <style>
 	/** CSS reset */
@@ -6,7 +12,7 @@
 	:root {
 		font-family: var(--font);
 		font-size: var(--normal-size);
-		line-height: 1.1;
+		line-height: 1.2;
 
 		--font: 'Rokkitt', sans-serif;
 		--spacing: 1em;
@@ -17,6 +23,7 @@
 		--small-size: 13pt;
 		--error: #e25f55;
 		--warning: #e28d1d;
+		--warning-background: #e6d3ba;
 		--other: #b349cb;
 		--salient: #d35088;
 		--focus: #784ada;
@@ -118,6 +125,13 @@
 		font: inherit;
 		vertical-align: baseline;
 	}
+	:global(body) {
+		padding: 0;
+		margin: 0;
+		background: var(--background);
+		color: var(--foreground);
+	}
+
 	/* HTML5 display-role reset for older browsers */
 	:global(article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section) {
 		display: block;

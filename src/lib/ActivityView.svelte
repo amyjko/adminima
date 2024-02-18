@@ -4,7 +4,7 @@
 	import Row from './Row.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import Header from './Header.svelte';
+	import Header from '$lib/Header.svelte';
 	import TaskView from './TaskView.svelte';
 	import Notice from './Notice.svelte';
 	import { format } from 'date-fns';
@@ -17,15 +17,16 @@
 	import Button from './Button.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import { goto } from '$app/navigation';
-	import { user } from '../database/Auth';
+	import Admin from './Admin.svelte';
+	import Title from './Title.svelte';
+	import { locale } from '$types/Locales';
 
 	export let activity: Activity;
 
-	$: organization = database.getOrganization(activity.organization);
-	$: isAdmin = $organization?.admins.includes($user.id);
-
 	let deleteError: string | undefined = undefined;
 </script>
+
+<Title title={activity.what} kind={$locale?.term.activity ?? ''} />
 
 <Notice>
 	{#if activity.template}
@@ -35,11 +36,11 @@
 	{/if}
 </Notice>
 
-<Header>Purpose</Header>
+<h2>Purpose</h2>
 
 <MarkupView markup={activity.why} />
 
-<Header>Who</Header>
+<h2>Who</h2>
 <ul>
 	<li><PersonLink personID={activity.leader} /> (lead)</li>
 
@@ -88,9 +89,8 @@
 	<Oops text={(locale) => locale.error.noActivityRequests} />
 {/await}
 
-{#if isAdmin}
+<Admin>
 	<Header>Delete</Header>
-	<Oops text="Admins only" />
 
 	<Paragraph>Is this activity obsolete? You can delete it, but it is permanent.</Paragraph>
 	<Button
@@ -106,4 +106,4 @@
 		warning>Delete this activity</Button
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
-{/if}
+</Admin>

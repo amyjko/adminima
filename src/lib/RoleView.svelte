@@ -15,6 +15,9 @@
 	import Oops from './Oops.svelte';
 	import { goto } from '$app/navigation';
 	import { user } from '../database/Auth';
+	import Admin from './Admin.svelte';
+	import Title from './Title.svelte';
+	import { locale } from '$types/Locales';
 
 	export let role: Role;
 
@@ -23,6 +26,8 @@
 
 	let deleteError: string | undefined = undefined;
 </script>
+
+<Title title={role.title} kind={$locale?.term.role} />
 
 {#if role.public || isAdmin}
 	{#if role.public}public{:else}private{/if}
@@ -60,9 +65,8 @@
 		<Error text={(locale) => locale.error.noRoleActivities} />
 	{/await}
 
-	{#if isAdmin}
+	<Admin>
 		<Header>delete</Header>
-		<Oops text="Admins only" />
 		<Paragraph
 			>Is this role obsolete? You can delete it, but it is permanent. All of the activities for this
 			role will remain, in case you want to assign them to a different role.</Paragraph
@@ -80,7 +84,7 @@
 			warning>Delete this role</Button
 		>
 		{#if deleteError}<Oops text={deleteError} />{/if}
-	{/if}
+	</Admin>
 {:else}
 	<Oops text="This role is not public." />
 {/if}

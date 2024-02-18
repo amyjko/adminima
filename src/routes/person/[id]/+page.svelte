@@ -3,26 +3,19 @@
 	import Loading from '$lib/Loading.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import database from '../../../database/Database';
-	import Page from '$lib/Page.svelte';
-	import { locale } from '../../../types/Locales';
 	import PersonView from '$lib/PersonView.svelte';
+	import Title from '$lib/Title.svelte';
+	import { locale } from '$types/Locales';
 
 	$: person = database.getPerson($page.params.id);
 </script>
 
+<!-- Not yet loaded? Show loading feedback. -->
 {#if $person === undefined}
 	<Loading inline={false} />
 {:else if $person === null}
-	<Page title="Oops" kind={$locale?.term.error} changes={undefined} organizationID={undefined}>
-		<Oops text={(locale) => locale.error.noPerson} />
-	</Page>
+	<Title title="oops" kind={$locale?.term.error} />
+	<Oops text={(locale) => locale.error.noPerson} />
 {:else}
-	<Page
-		title={$person.name}
-		kind={$locale?.term.person}
-		changes={undefined}
-		organizationID={undefined}
-	>
-		<PersonView person={$person} />
-	</Page>
+	<PersonView person={$person} />
 {/if}

@@ -6,8 +6,9 @@
 	import BulletsView from '$lib/BulletsView.svelte';
 	import NumberedView from '$lib/NumberedView.svelte';
 	import { parse } from '../markup/parser';
+	import type Markup from '../types/Markup';
 
-	export let markup: string;
+	export let markup: Markup;
 	export let inline = false;
 </script>
 

@@ -1,7 +1,8 @@
 [
 	{
 		"id": "ischool",
-		"name": "The Information School",
+		"name": "iSchool Academics",
+		"description": "Welcome to iSchool's internal academics administration page!\n\nHere you can learn about all of the roles in academics, the people who hold them, the processes they follow, and the policies that govern how we work. You can also propose changes to any of the above, and Amy and the leadership team will triage them.",
 		"admins": ["amy"],
 		"staff": ["victor", "amy"]
 	}

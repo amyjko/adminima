@@ -4,11 +4,13 @@
 	import database from '../database/Database';
 	import Loading from './Loading.svelte';
 	import RoleLink from './RoleLink.svelte';
+	import Title from './Title.svelte';
+	import { locale } from '$types/Locales';
 
 	export let person: Person;
 </script>
 
-<div class="scope" />
+<Title title={person.name} kind={$locale?.term.person} />
 
 <Header>Roles</Header>
 {#await database.getPersonRoles(person.id)}
@@ -18,10 +20,3 @@
 		<RoleLink roleID={role.id} />
 	{/each}
 {/await}
-
-<style>
-	.scope {
-		display: flex;
-		flex-direction: column;
-	}
-</style>

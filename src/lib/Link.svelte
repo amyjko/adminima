@@ -15,9 +15,7 @@
 <style>
 	a {
 		color: var(--salient);
-		text-decoration: underline;
-		text-decoration-thickness: var(--thickness);
-		text-decoration-skip-ink: none;
+		text-decoration: none;
 		transition: transform 200ms;
 		display: inline-block;
 	}
@@ -33,6 +31,9 @@
 
 	a:hover,
 	a:focus {
+		text-decoration: underline;
+		text-decoration-thickness: var(--thickness);
+		text-decoration-skip-ink: none;
 		transform-origin: center;
 		transform: scaleY(1.1);
 	}

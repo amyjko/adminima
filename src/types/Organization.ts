@@ -1,3 +1,4 @@
+import type Markup from './Markup';
 import type { PersonID } from './Person';
 import type Tracked from './Tracked';
 
@@ -8,6 +9,8 @@ type Organization = Tracked & {
 	id: OrganizationID;
 	/** The organization's name */
 	name: string;
+	/** The organization's description */
+	description: Markup;
 	/** Administrators who can create new roles in the organization, change admins, and modify the organization's name. */
 	admins: PersonID[];
 	/** People in this organization */

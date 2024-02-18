@@ -15,4 +15,6 @@
 {#if $request === null}<Loading />{:else if $request === undefined}<Oops
 		inline
 		text={(locale) => locale.error.noPerson}
-	/>{:else}<Link to="/request/{requestID}">{$request.title}</Link>{/if}
+	/>{:else}<Link to="/organization/{$request.organization}/request/{requestID}"
+		>{$request.title}</Link
+	>{/if}
