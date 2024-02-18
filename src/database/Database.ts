@@ -96,7 +96,7 @@ class Database {
 		return this.processes.values().filter((process) => process.organization === id);
 	}
 
-	async getOrganizationPeople(id: OrganizationID): Promise<PersonID[]> {
+	async getOrganizationStaff(id: OrganizationID): Promise<PersonID[]> {
 		const org = get(this.getOrganization(id));
 		if (org) return org.staff;
 		else return [];

@@ -14,6 +14,7 @@
 	import { locale } from '$types/Locales';
 	import type { PersonID } from '$types/Person';
 	import Checkbox from '$lib/Checkbox.svelte';
+	import RoleLink from '$lib/RoleLink.svelte';
 
 	const organization = getOrganizationContext();
 	$: isAdmin = $organization.admins.includes($user.id);
@@ -35,7 +36,7 @@
 	roles. Select a person to see the roles they have.</Paragraph
 >
 
-{#await database.getOrganizationPeople($organization.id)}
+{#await database.getOrganizationStaff($organization.id)}
 	<Loading />
 {:then people}
 	<table>
@@ -51,7 +52,15 @@
 					<td>
 						<PersonLink personID={person} />
 					</td>
-					<td />
+					<td>
+						{#await database.getPersonRoles(person)}
+							<Loading />
+						{:then roles}
+							{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+								<span class="role"><RoleLink roleID={role.id} /></span>
+							{/each}
+						{/await}
+					</td>
 					<td>
 						<Checkbox
 							on={$organization.admins.includes(person)}
@@ -126,5 +135,9 @@
 		flex-direction: column;
 		gap: var(--padding);
 		align-items: left;
+	}
+
+	.role {
+		font-size: var(--small-size);
 	}
 </style>
