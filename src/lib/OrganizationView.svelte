@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type Organization from '../types/Organization';
-	import { user } from '../database/Auth';
 	import MarkupView from './MarkupView.svelte';
 	import Link from './Link.svelte';
 	import Title from './Title.svelte';
