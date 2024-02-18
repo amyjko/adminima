@@ -35,10 +35,9 @@
 	><OrganizationLink organizationID={$organization.id} /></Title
 >
 <Paragraph
-	>Roles can be held by one or more people and are associated with processes and change requests.</Paragraph
+	>These are the positions held in this organization. Each one is responsible for particular
+	processes in this organization.</Paragraph
 >
-
-<Paragraph>These are the roles defined for this organization.</Paragraph>
 
 {#await database.getOrganizationRoles($organization.id)}
 	<Loading />
