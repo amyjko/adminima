@@ -13,8 +13,7 @@
 		"organization": "ischool",
 		"what": "Faculty peer reviews",
 		"why": "Required by faculty code",
-		"leader": "amy",
-		"collaborators": ["victor"],
+		"roles": ["amy", "victor"],
 		"how": [],
 		"modifications": []
 	},
@@ -32,8 +31,7 @@
 		"organization": "ischool",
 		"what": "Welcome",
 		"why": "Give students a sense of community",
-		"leader": "amy",
-		"collaborators": ["victor"],
+		"roles": ["ada", "changepm"],
 		"how": [],
 		"modifications": []
 	},
@@ -50,9 +48,8 @@
 		"icon": "🧑🏻‍🏫",
 		"what": "Course Assignment Process (CAP)",
 		"organization": "ischool",
-		"why": "Teachers gotta teach",
-		"leader": "amy",
-		"collaborators": ["victor"],
+		"why": "CAP is the process by which we make annual teaching assignments (with the exception of summer course assignments). We run it annually with the goal of having teaching assignments largely finalized one year in advance of instruction, since UW requires classroom requests to be submitted one year in advance for large lecture halls.\n\nIn general, CAP is overconstrained by faculty teaching requests, program needs, student demand, and classroom availabilty, making it a contentions process. We prioritize junior faculty and the sustainability of school revenue over other concerns.",
+		"roles": ["ada", "changepm"],
 		"how": [
 			{
 				"who": "amy",
@@ -100,8 +97,7 @@
 		"organization": "ischool",
 		"what": "Instructor is ill",
 		"why": "people get sick",
-		"leader": "amy",
-		"collaborators": ["victor"],
+		"roles": ["ada", "changepm"],
 		"how": [],
 		"modifications": []
 	}

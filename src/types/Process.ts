@@ -1,6 +1,5 @@
 import type Markup from './Markup';
 import type { Day } from './Day';
-import type { PersonID } from './Person';
 import type Task from './Task';
 import type Repeat from './Day';
 import type { RoleID } from './Role';
@@ -20,10 +19,8 @@ type Process = Tracked & {
 	role: RoleID;
 	/** The organization this process is in */
 	organization: OrganizationID;
-	/** the person responsible for doing this process **/
-	leader: PersonID;
 	/** other people involved in the work **/
-	collaborators: PersonID[];
+	roles: [RoleID, ...RoleID[]];
 	/** Whether this is unfinished; if false, then it's a ground truth process. */
 	draft: boolean;
 	/** The last version of the process, forming a linked list of process versions. */

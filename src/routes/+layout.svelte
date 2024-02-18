@@ -12,7 +12,7 @@
 	:root {
 		font-family: var(--font);
 		font-size: var(--normal-size);
-		line-height: 1.3;
+		line-height: 1.4;
 
 		--font: 'Rokkitt', sans-serif;
 		--spacing: 1.25em;

@@ -16,5 +16,11 @@
 		"name": "Cris Fowler",
 		"email": "crism@uw.edu",
 		"icon": "🦄"
+	},
+	{
+		"id": "marie",
+		"name": "Marie West",
+		"email": "westmar@uw.edu",
+		"icon": "🐴"
 	}
 ]

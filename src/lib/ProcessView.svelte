@@ -21,6 +21,7 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Modifications from './Modifications.svelte';
+	import RoleLink from './RoleLink.svelte';
 
 	export let process: Process;
 
@@ -29,26 +30,13 @@
 
 <Title title={process.what} kind={$locale?.term.process ?? ''} />
 
-<Notice>
-	{#if process.template}
-		This process is a based on a template
-	{:else}
-		This is a template. Start this process to track your progress.
-	{/if}
-</Notice>
-
-<h2>Purpose</h2>
-
 <MarkupView markup={process.why} />
 
-<h2>Who</h2>
-<ul>
-	<li><PersonLink personID={process.leader} /> (lead)</li>
-
-	{#each process.collaborators as collaborator}
-		<li><PersonLink personID={collaborator} /></li>
-	{/each}
-</ul>
+<Paragraph
+	>The <RoleLink roleID={process.roles[0]} /> leads this process with support from {#each process.roles.slice(1) as role}
+		<RoleLink roleID={role} />
+	{/each}.
+</Paragraph>
 
 <Header>When</Header>
 
@@ -65,6 +53,14 @@
 {:else}
 	This process doesn't happen at a particular time.
 {/if}
+
+<Notice>
+	{#if process.template}
+		This process is a based on a template
+	{:else}
+		This is a template. Start this process to track your progress.
+	{/if}
+</Notice>
 
 <Header>Details</Header>
 <Rows>

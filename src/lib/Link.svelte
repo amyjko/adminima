@@ -16,7 +16,8 @@
 	a {
 		background: var(--salient);
 		color: var(--background);
-		padding: calc(var(--padding));
+		padding-left: var(--padding);
+		padding-right: var(--padding);
 		text-decoration: none;
 		transition: transform 200ms;
 		display: inline-block;
