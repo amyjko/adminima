@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Loading from '$lib/Loading.svelte';
 	import database from '$database/Database';
-	import Header from '$lib/Header.svelte';
 	import { getOrganizationContext } from '$lib/contexts';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Admin from '$lib/Admin.svelte';
@@ -13,11 +12,19 @@
 	import Form from '$lib/Form.svelte';
 	import Title from '$lib/Title.svelte';
 	import { locale } from '$types/Locales';
+	import type { PersonID } from '$types/Person';
+	import Checkbox from '$lib/Checkbox.svelte';
 
 	const organization = getOrganizationContext();
 	$: isAdmin = $organization.admins.includes($user.id);
 
 	let newPerson: string = '';
+
+	function toggleAdmin(admin: boolean, person: PersonID) {
+		database.updateOrganization(
+			admin ? withAdmin($organization, person) : withoutAdmin($organization, person)
+		);
+	}
 </script>
 
 <Title title="people" kind={$locale?.term.organization} />
@@ -31,31 +38,38 @@
 {#await database.getOrganizationPeople($organization.id)}
 	<Loading />
 {:then people}
-	<ul>
-		{#each people as person}
-			<li>
-				<PersonLink personID={person} />
-				{#if $organization.admins.includes(person)}
-					<em>admin</em>
-				{/if}
-				{#if isAdmin}
-					{#if $organization.admins.length > 1 && $organization.admins.includes(person)}
-						<Button action={() => database.updateOrganization(withoutAdmin($organization, person))}
-							>make non-admin</Button
+	<table>
+		<tbody>
+			<tr>
+				<th>person</th>
+				<th>roles</th>
+				<th>admin</th>
+				<th>remove</th>
+			</tr>
+			{#each people as person}
+				<tr>
+					<td>
+						<PersonLink personID={person} />
+					</td>
+					<td />
+					<td>
+						<Checkbox
+							on={$organization.admins.includes(person)}
+							enabled={isAdmin &&
+								($organization.admins.length > 1 || !$organization.admins.includes(person))}
+							change={(on) => toggleAdmin(on, person)}
+						/>
+					</td>
+					<td class="actions">
+						<Button
+							action={() => database.updateOrganization(withoutStaff($organization, person))}
+							active={!$organization.admins.includes(person)}>&times;</Button
 						>
-					{:else if !$organization.admins.includes(person)}<Button
-							action={() => database.updateOrganization(withAdmin($organization, person))}
-							>make admin</Button
-						>{/if}
-				{/if}
-				{#if !$organization.admins.includes(person)}
-					<Button action={() => database.updateOrganization(withoutStaff($organization, person))}
-						>remove</Button
-					>
-				{/if}
-			</li>
-		{/each}
-	</ul>
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
 {/await}
 
 <Admin>
@@ -85,3 +99,32 @@
 		{/if}
 	</Form>
 </Admin>
+
+<style>
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	th,
+	td {
+		text-align: left;
+		padding: var(--padding);
+	}
+
+	th {
+		font-style: italic;
+		border-bottom: var(--thickness) solid var(--border);
+	}
+
+	tr:last-child {
+		border-bottom: var(--thickness) solid var(--border);
+	}
+
+	.actions {
+		display: flex;
+		flex-direction: column;
+		gap: var(--padding);
+		align-items: left;
+	}
+</style>

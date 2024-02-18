@@ -29,6 +29,7 @@
 		border: 2px solid var(--border);
 		cursor: pointer;
 		align-self: flex-end;
+		white-space: nowrap;
 	}
 
 	.warning {
