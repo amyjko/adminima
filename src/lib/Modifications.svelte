@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type Change from '../types/Modification';
+	import type Modification from '../types/Modification';
 	import PersonLink from './PersonLink.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Row from './Row.svelte';
@@ -8,13 +8,13 @@
 	import { format } from 'date-fns';
 	import Paragraph from './Paragraph.svelte';
 
-	export let changes: Change[];
+	export let mods: Modification[];
 </script>
 
-<Header>Changes</Header>
+<Header>Modifications</Header>
 
 <Rows>
-	{#each changes as change}
+	{#each mods as change}
 		<Row name={format(change.time, 'MM/dd/yyyy')}>
 			<Paragraph><PersonLink personID={change.person} /></Paragraph>
 			<MarkupView markup={change.what} />

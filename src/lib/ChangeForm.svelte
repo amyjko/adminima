@@ -29,7 +29,7 @@
 				process ? [process] : [],
 				role ? [role] : []
 			);
-			goto(`/request/${request.id}`);
+			goto(`/organization/${organization}/request/${request.id}`);
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}

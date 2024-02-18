@@ -14,6 +14,7 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
+	import Modifications from './Modifications.svelte';
 
 	export let change: change;
 
@@ -78,6 +79,8 @@
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
+
+<Modifications mods={change.modifications} />
 
 <style>
 	.comment {

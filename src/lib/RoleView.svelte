@@ -18,6 +18,7 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
+	import Modifications from '$lib/Modifications.svelte';
 
 	export let role: Role;
 
@@ -88,3 +89,5 @@
 {:else}
 	<Oops text="This role is not public." />
 {/if}
+
+<Modifications mods={role.modifications} />

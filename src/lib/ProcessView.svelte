@@ -20,6 +20,7 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
+	import Modifications from './Modifications.svelte';
 
 	export let process: Process;
 
@@ -107,3 +108,5 @@
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
+
+<Modifications mods={process.modifications} />

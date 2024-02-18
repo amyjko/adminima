@@ -16,7 +16,7 @@
 		"leader": "amy",
 		"collaborators": ["victor"],
 		"how": [],
-		"changes": []
+		"modifications": []
 	},
 	{
 		"id": "2",
@@ -35,7 +35,7 @@
 		"leader": "amy",
 		"collaborators": ["victor"],
 		"how": [],
-		"changes": []
+		"modifications": []
 	},
 	{
 		"id": "3",
@@ -77,7 +77,7 @@
 				"public": true
 			}
 		],
-		"changes": [
+		"modifications": [
 			{
 				"time": 0,
 				"person": "amy",
@@ -103,6 +103,6 @@
 		"leader": "amy",
 		"collaborators": ["victor"],
 		"how": [],
-		"changes": []
+		"modifications": []
 	}
 ]

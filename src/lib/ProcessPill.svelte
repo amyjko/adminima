@@ -7,16 +7,13 @@
 </script>
 
 <div class="process" style:left="{left}px" class:draft={process.draft}>
-	<Link bland to="/process/{process.id}">{process.what}</Link>
+	<Link bland to="/organization/{process.organization}/process/{process.id}">{process.what}</Link>
 </div>
 
 <style>
 	.process {
 		position: relative;
-		background: var(--salient);
-		padding: var(--spacing);
 		border-radius: var(--radius);
-		color: var(--background);
 		font-size: var(--small-size);
 		width: fit-content;
 	}

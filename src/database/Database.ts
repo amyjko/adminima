@@ -49,7 +49,7 @@ class Database {
 			people: [],
 			viewers: [],
 			public: false,
-			mods: [
+			modifications: [
 				{
 					time: Date.now(),
 					person: who,
@@ -153,7 +153,7 @@ class Database {
 			processes: processes,
 			comments: [],
 			status: 'triage',
-			mods: [
+			modifications: [
 				{
 					time: Date.now(),
 					person: who,
