@@ -12,12 +12,12 @@
 	:root {
 		font-family: var(--font);
 		font-size: var(--normal-size);
-		line-height: 1.2;
+		line-height: 1.3;
 
 		--font: 'Rokkitt', sans-serif;
-		--spacing: 1em;
+		--spacing: 1.25em;
 		--thickness: 3px;
-		--padding: 0.1em;
+		--padding: 0.2em;
 		--radius: 4px;
 		--normal-size: 18pt;
 		--small-size: 13pt;

@@ -5,7 +5,7 @@
 		"watchers": [],
 		"organization": "ischool",
 		"roles": ["ada"],
-		"activities": ["3"],
+		"processes": ["3"],
 		"title": "faster CAP",
 		"problem": "CAP is slow and opaque",
 		"comments": [

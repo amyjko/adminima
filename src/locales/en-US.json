@@ -3,7 +3,7 @@
 	"term": {
 		"loading": "loading",
 		"role": "role",
-		"activity": "activity",
+		"process": "process",
 		"change": "change",
 		"person": "person",
 		"organization": "organization",
@@ -12,15 +12,15 @@
 	},
 	"landing": {
 		"value": "Improve your organization's onboarding, transparency, and agility by defining work processes and managing requests for change.",
-		"description": "Create step-by-step activities to scaffold work activities. Manage change requests from stakeholders. Offer notifications about progress on activities and change."
+		"description": "Create step-by-step processes to scaffold work processes. Manage change requests from stakeholders. Offer notifications about progress on processes and change."
 	},
 	"error": {
-		"noActivity": "We couldn't find this activity",
-		"noRoleActivities": "We couldn't get this role's activities.",
+		"noProcess": "We couldn't find this process",
+		"noRoleProcesses": "We couldn't get this role's processes.",
 		"noPerson": "We couldn't find this person",
 		"noOrganization": "We couldn't find this organization.",
 		"noRole": "We couldn't find this role.",
 		"noRequest": "We couldn't find this request.",
-		"noActivityRequests": "Couldn't get this activity's requests."
+		"noProcessRequests": "Couldn't get this process's requests."
 	}
 }

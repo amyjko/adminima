@@ -14,6 +14,7 @@
 	import Title from '$lib/Title.svelte';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import { locale } from '$types/Locales';
+	import Flow from '$lib/Flow.svelte';
 
 	const organization = getOrganizationContext();
 
@@ -34,7 +35,7 @@
 	><OrganizationLink organizationID={$organization.id} /></Title
 >
 <Paragraph
-	>Roles can be held by one or more people and are associated with activities and change requests.</Paragraph
+	>Roles can be held by one or more people and are associated with processes and change requests.</Paragraph
 >
 
 <Paragraph>These are the roles defined for this organization.</Paragraph>
@@ -42,11 +43,11 @@
 {#await database.getOrganizationRoles($organization.id)}
 	<Loading />
 {:then roles}
-	<ul>
+	<Flow>
 		{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-			<li><RoleLink roleID={role.id} /></li>
+			<RoleLink roleID={role.id} />
 		{/each}
-	</ul>
+	</Flow>
 {/await}
 
 <Admin>

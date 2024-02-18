@@ -8,11 +8,11 @@
 	import Paragraph from './Paragraph.svelte';
 	import { type OrganizationID } from '../types/Organization';
 	import { user } from '../database/Auth';
-	import type { ActivityID } from '../types/Activity';
+	import type { ProcessID } from '../types/Process';
 	import type { RoleID } from '../types/Role';
 
 	export let organization: OrganizationID;
-	export let activity: ActivityID | undefined = undefined;
+	export let process: ProcessID | undefined = undefined;
 	export let role: RoleID | undefined = undefined;
 
 	let newRequestTitle = '';
@@ -21,12 +21,12 @@
 
 	async function createRequest() {
 		try {
-			const request = await database.createRequest(
+			const request = await database.createChange(
 				$user.id,
 				organization,
 				newRequestTitle,
 				newRequestProblem,
-				activity ? [activity] : [],
+				process ? [process] : [],
 				role ? [role] : []
 			);
 			goto(`/request/${request.id}`);

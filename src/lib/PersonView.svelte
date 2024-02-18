@@ -6,6 +6,8 @@
 	import RoleLink from './RoleLink.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
+	import Paragraph from './Paragraph.svelte';
+	import Flow from './Flow.svelte';
 
 	export let person: Person;
 </script>
@@ -16,7 +18,10 @@
 {#await database.getPersonRoles(person.id)}
 	<Loading />
 {:then roles}
-	{#each roles as role}
-		<RoleLink roleID={role.id} />
-	{/each}
+	<Paragraph>Here are the roles this person has.</Paragraph>
+	<Flow>
+		{#each roles as role}
+			<RoleLink roleID={role.id} />
+		{/each}
+	</Flow>
 {/await}

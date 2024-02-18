@@ -1,5 +1,5 @@
 /**
- * A specification of when to repeat an activity
+ * A specification of when to repeat a process
  * - date n, no week = nth day of every month
  * - weekday n, no date = every nth day of the week
  * - date n and weekday m = every mth weekday of every month

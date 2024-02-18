@@ -9,8 +9,8 @@
 	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import RequestList from './RequestList.svelte';
-	import RequestForm from './RequestForm.svelte';
+	import ChangeList from './ChangeList.svelte';
+	import RequestForm from './ChangeForm.svelte';
 	import Button from './Button.svelte';
 	import Oops from './Oops.svelte';
 	import { goto } from '$app/navigation';
@@ -43,32 +43,32 @@
 		<MarkupView markup={role.what} />
 	</div>
 
-	<Header>Activities</Header>
+	<Header>Processes</Header>
 
-	{#await database.getRoleActivities(role.id)}
+	{#await database.getRoleProcesses(role.id)}
 		<Loading />
-	{:then activities}
-		<Timeline {activities} />
+	{:then processes}
+		<Timeline {processes} />
 	{:catch}
-		<Error text={(locale) => locale.error.noRoleActivities} />
+		<Error text={(locale) => locale.error.noRoleProcesses} />
 	{/await}
 
 	<Header>Requests</Header>
 
 	<RequestForm organization={role.organization} role={role.id} />
 
-	{#await database.getRoleRequests(role.id)}
+	{#await database.getRoleChanges(role.id)}
 		<Loading />
-	{:then requests}
-		<RequestList {requests} />
+	{:then changes}
+		<ChangeList {changes} />
 	{:catch}
-		<Error text={(locale) => locale.error.noRoleActivities} />
+		<Error text={(locale) => locale.error.noRoleProcesses} />
 	{/await}
 
 	<Admin>
 		<Header>delete</Header>
 		<Paragraph
-			>Is this role obsolete? You can delete it, but it is permanent. All of the activities for this
+			>Is this role obsolete? You can delete it, but it is permanent. All of the processes for this
 			role will remain, in case you want to assign them to a different role.</Paragraph
 		>
 		<Button

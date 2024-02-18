@@ -1,7 +1,7 @@
 import type Markup from './Markup';
 import type { PersonID } from './Person';
 
-/** A part of completing an activity. */
+/** A part of completing an process. */
 type Task = {
 	/** A Unix timestamp of who last modified this task */
 	who: PersonID;
@@ -11,7 +11,7 @@ type Task = {
 	how: Task[];
 	/** whether the task is done */
 	complete: boolean;
-	/** Whether this task is public. Overriden by private activities. */
+	/** Whether this task is public. Overriden by private processes. */
 	public: boolean;
 };
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type Change from '../types/Change';
+	import type Change from '../types/Modification';
 	import PersonLink from './PersonLink.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Row from './Row.svelte';

@@ -5,7 +5,7 @@ import type Tracked from './Tracked';
 
 export type RoleID = string;
 
-/** A scope of resopnsibilities, including zero or more activities. */
+/** A scope of resopnsibilities, including zero or more processes. */
 type Role = Tracked & {
 	/** Unique ID for this role. */
 	id: RoleID;

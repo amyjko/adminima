@@ -13,10 +13,10 @@ export type Locale = {
 	term: {
 		/** The loading word to show when loading */
 		loading: string;
-		/** The word representing a set of activities a person is responsibile for */
+		/** The word representing a set of processes a person is responsibile for */
 		role: string;
-		/** The word representing a specific activity */
-		activity: string;
+		/** The word representing a specific process */
+		process: string;
 		/** What to call changes to a document */
 		change: string;
 		/** What to call people */
@@ -33,13 +33,13 @@ export type Locale = {
 		description: string;
 	};
 	error: {
-		noActivity: string;
-		noRoleActivities: string;
+		noProcess: string;
+		noRoleProcesses: string;
 		noPerson: string;
 		noOrganization: string;
 		noRole: string;
-		noRequest: string;
-		noActivityRequests: string;
+		noChange: string;
+		noProcessChanges: string;
 	};
 };
 

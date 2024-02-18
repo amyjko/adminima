@@ -2,10 +2,10 @@
 	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import type Request from '../types/Request';
+	import type change from '../types/Change';
 	import MarkupView from './MarkupView.svelte';
 	import RoleLink from './RoleLink.svelte';
-	import ActivityLink from './ActivityLink.svelte';
+	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
 	import database from '../database/Database';
 	import Oops from './Oops.svelte';
@@ -15,32 +15,32 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 
-	export let request: Request;
+	export let change: change;
 
 	let deleteError: string | undefined = undefined;
 </script>
 
-<Title title={request.title} kind={$locale?.term.request} />
+<Title title={change.title} kind={$locale?.term.request} />
 
 <Header>Requestor</Header>
-<Paragraph><PersonLink personID={request.who} /></Paragraph>
+<Paragraph><PersonLink personID={change.who} /></Paragraph>
 
 <Header>The Problem</Header>
-<MarkupView markup={request.problem} />
+<MarkupView markup={change.problem} />
 
 <Header>Affected Roles</Header>
 <ul>
-	{#each request.roles as role}
+	{#each change.roles as role}
 		<li><RoleLink roleID={role} /></li>
 	{:else}
 		&mdash;
 	{/each}
 </ul>
 
-<Header>Affected Activities</Header>
+<Header>Affected Processes</Header>
 <ul>
-	{#each request.activities as activity}
-		<li><ActivityLink activityID={activity} /></li>
+	{#each change.processes as process}
+		<li><ProcessLink processID={process} /></li>
 	{:else}
 		&mdash;
 	{/each}
@@ -48,7 +48,7 @@
 
 <Header>Comments</Header>
 
-{#each request.comments as comment}
+{#each change.comments as comment}
 	<div class="comment">
 		<div class="meta">
 			<TimeView time={comment.when} />
@@ -67,14 +67,14 @@
 	<Button
 		action={async () => {
 			try {
-				const org = request.organization;
-				await database.deleteRequest(request.id);
+				const org = change.organization;
+				await database.deleteRequest(change.id);
 				goto(`/organization/${org}`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";
 			}
 		}}
-		warning>Delete this activity</Button
+		warning>Delete this process</Button
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>

@@ -14,7 +14,9 @@
 
 <style>
 	a {
-		color: var(--salient);
+		background: var(--salient);
+		color: var(--background);
+		padding: calc(var(--padding));
 		text-decoration: none;
 		transition: transform 200ms;
 		display: inline-block;
@@ -23,14 +25,15 @@
 	a.inactive {
 		color: var(--inactive);
 		text-decoration: none;
+		background: none;
 	}
 
 	a.bland {
 		color: var(--background);
 	}
 
-	a:hover,
-	a:focus {
+	a:hover:not(.inactive),
+	a:focus:not(.inactive) {
 		text-decoration: underline;
 		text-decoration-thickness: var(--thickness);
 		text-decoration-skip-ink: none;

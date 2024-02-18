@@ -1,22 +1,22 @@
 <script lang="ts">
-	import type Activity from '../types/Activity';
+	import type Process from '../types/Process';
 	import { toDate } from '../types/Day';
 	import { addWeeks, addYears, compareAsc, differenceInWeeks, format } from 'date-fns';
-	import ActivityPill from './ActivityPill.svelte';
+	import ProcessPill from './ProcessPill.svelte';
 
-	export let activities: Activity[];
+	export let processes: Process[];
 
 	// How many pixels a week should be.
 	const PixelsPerWeek = 100;
 
 	// Get the
-	$: timed = activities.filter((a) => a.start !== null);
+	$: timed = processes.filter((a) => a.start !== null);
 
 	$: sorted = timed.sort((a, b) =>
 		a.start !== null && b.start !== null ? compareAsc(toDate(a.start), toDate(b.start)) : 0
 	);
 
-	// Start week is the earliest activity based on start day
+	// Start week is the earliest process based on start day
 	$: first = sorted[0];
 	$: start = first?.start ? toDate(first.start) : new Date();
 
@@ -33,10 +33,10 @@
 	}
 </script>
 
-{#if activities.length === 0}
-	No activities.
+{#if processes.length === 0}
+	No processes.
 {:else}
-	<div class="activities">
+	<div class="processes">
 		<div class="time">
 			{#each weeks as num}
 				<div class="tick" style:left="{num * PixelsPerWeek}px">
@@ -44,20 +44,20 @@
 				</div>
 			{/each}
 			<div class="timed">
-				{#each timed as activity}{#if activity.start}<ActivityPill
-							{activity}
-							left={differenceInWeeks(toDate(activity.start), start) * PixelsPerWeek}
+				{#each timed as process}{#if process.start}<ProcessPill
+							{process}
+							left={differenceInWeeks(toDate(process.start), start) * PixelsPerWeek}
 						/>{/if}{/each}
 			</div>
 		</div>
 		<div class="untimed">
-			{#each activities as activity}<ActivityPill {activity} />{:else}No untimed activities.{/each}
+			{#each processes as process}<ProcessPill {process} />{:else}No untimed processes.{/each}
 		</div>
 	</div>
 {/if}
 
 <style>
-	.activities {
+	.processes {
 		flex-grow: 1;
 		display: flex;
 		flex-direction: column;

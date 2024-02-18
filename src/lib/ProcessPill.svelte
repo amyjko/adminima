@@ -1,17 +1,17 @@
 <script lang="ts">
-	import type Activity from '../types/Activity';
+	import type Process from '../types/Process';
 	import Link from './Link.svelte';
 
-	export let activity: Activity;
+	export let process: Process;
 	export let left: number | undefined = undefined;
 </script>
 
-<div class="activity" style:left="{left}px" class:draft={activity.draft}>
-	<Link bland to="/activity/{activity.id}">{activity.what}</Link>
+<div class="process" style:left="{left}px" class:draft={process.draft}>
+	<Link bland to="/process/{process.id}">{process.what}</Link>
 </div>
 
 <style>
-	.activity {
+	.process {
 		position: relative;
 		background: var(--salient);
 		padding: var(--spacing);

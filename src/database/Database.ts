@@ -1,18 +1,18 @@
-import MockActivities from '$lib/mock/activities.json?raw';
+import MockProcesses from '$lib/mock/processes.json?raw';
 import MockRoles from '$lib/mock/roles.json?raw';
 import MockPeople from '$lib/mock/people.json?raw';
 import MockOrganizations from '$lib/mock/organizations.json?raw';
-import MockRequests from '$lib/mock/requests.json?raw';
-import type { ActivityID } from '../types/Activity';
-import type Activity from '../types/Activity';
+import MockChanges from '$lib/mock/changes.json?raw';
+import type { ProcessID } from '../types/Process';
+import type Process from '../types/Process';
 import type { PersonID } from '../types/Person';
 import type Person from '../types/Person';
 import type { RoleID } from '../types/Role';
 import type Role from '../types/Role';
 import type { OrganizationID } from '../types/Organization';
 import type Organization from '../types/Organization';
-import type Request from '../types/Request';
-import type { RequestID } from '../types/Request';
+import type Change from '../types/Change';
+import type { ChangeID } from '../types/Change';
 import { get, type Writable } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
 import type Markup from '../types/Markup';
@@ -20,15 +20,15 @@ import ReactiveMap from './ReactiveMap';
 
 /** Represents an interface to a database, and CRUD operations for modifying the database. */
 class Database {
-	readonly activities = new ReactiveMap<ActivityID, Activity>();
+	readonly processes = new ReactiveMap<ProcessID, Process>();
 	readonly organizations = new ReactiveMap<OrganizationID, Organization>();
 	readonly people = new ReactiveMap<PersonID, Person>();
 	readonly roles = new ReactiveMap<RoleID, Role>();
-	readonly requests = new ReactiveMap<RequestID, Request>();
+	readonly changes = new ReactiveMap<ChangeID, Change>();
 
 	constructor() {
-		for (const activity of JSON.parse(MockActivities) as Activity[])
-			this.activities.set(activity.id, activity);
+		for (const process of JSON.parse(MockProcesses) as Process[])
+			this.processes.set(process.id, process);
 
 		for (const org of JSON.parse(MockOrganizations) as Organization[])
 			this.organizations.set(org.id, org);
@@ -37,8 +37,7 @@ class Database {
 
 		for (const role of JSON.parse(MockRoles) as Role[]) this.roles.set(role.id, role);
 
-		for (const request of JSON.parse(MockRequests) as Request[])
-			this.requests.set(request.id, request);
+		for (const change of JSON.parse(MockChanges) as Change[]) this.changes.set(change.id, change);
 	}
 
 	async createRole(who: PersonID, organization: OrganizationID, title: string): Promise<Role> {
@@ -50,13 +49,13 @@ class Database {
 			people: [],
 			viewers: [],
 			public: false,
-			changes: [
+			mods: [
 				{
 					time: Date.now(),
 					person: who,
 					what: 'Created role',
 					why: '',
-					request: null
+					change: null
 				}
 			]
 		};
@@ -71,15 +70,15 @@ class Database {
 	}
 
 	async deleteRole(id: RoleID) {
-		this.activities.delete(id);
+		this.processes.delete(id);
 	}
 
-	async getRoleActivities(id: RoleID): Promise<Activity[]> {
-		return this.activities.values().filter((activity) => activity.role === id);
+	async getRoleProcesses(id: RoleID): Promise<Process[]> {
+		return this.processes.values().filter((process) => process.role === id);
 	}
 
-	async getRoleRequests(id: RoleID): Promise<Request[]> {
-		return this.requests.values().filter((request) => request.roles.includes(id));
+	async getRoleChanges(id: RoleID): Promise<Change[]> {
+		return this.changes.values().filter((request) => request.roles.includes(id));
 	}
 
 	getOrganization(id: OrganizationID): Writable<Organization | null | undefined> {
@@ -95,8 +94,8 @@ class Database {
 		return this.roles.values().filter((role) => role.organization === id);
 	}
 
-	async getOrganizationActivities(id: OrganizationID): Promise<Activity[]> {
-		return this.activities.values().filter((activity) => activity.organization === id);
+	async getOrganizationProcesses(id: OrganizationID): Promise<Process[]> {
+		return this.processes.values().filter((process) => process.organization === id);
 	}
 
 	async getOrganizationPeople(id: OrganizationID): Promise<PersonID[]> {
@@ -105,20 +104,20 @@ class Database {
 		else return [];
 	}
 
-	async getOrganizationRequests(id: OrganizationID): Promise<Request[]> {
-		return this.requests.values().filter((request) => request.organization === id);
+	async getOrganizationChanges(id: OrganizationID): Promise<Change[]> {
+		return this.changes.values().filter((change) => change.organization === id);
 	}
 
-	getActivity(id: ActivityID): Writable<Activity | undefined | null> {
-		return this.activities.getStore(id);
+	getProcess(id: ProcessID): Writable<Process | undefined | null> {
+		return this.processes.getStore(id);
 	}
 
-	async deleteActivity(id: ActivityID) {
-		this.activities.delete(id);
+	async deleteProcess(id: ProcessID) {
+		this.processes.delete(id);
 	}
 
-	async getActivityRequests(id: ActivityID): Promise<Request[]> {
-		return this.requests.values().filter((request) => request.activities.includes(id));
+	async getProcessChanges(id: ProcessID): Promise<Change[]> {
+		return this.changes.values().filter((change) => change.processes.includes(id));
 	}
 
 	getPerson(id: PersonID): Writable<Person | undefined | null> {
@@ -135,15 +134,15 @@ class Database {
 		return this.roles.values().filter((role) => role.people.includes(id));
 	}
 
-	async createRequest(
+	async createChange(
 		who: PersonID,
 		organization: OrganizationID,
 		title: string,
 		problem: Markup,
-		activities: ActivityID[],
+		processes: ProcessID[],
 		roles: RoleID[]
-	): Promise<Request> {
-		const newRequest: Request = {
+	): Promise<Change> {
+		const newRequest: Change = {
 			id: uuidv4(),
 			who,
 			title,
@@ -151,31 +150,31 @@ class Database {
 			watchers: [],
 			organization,
 			roles,
-			activities,
+			processes: processes,
 			comments: [],
 			status: 'triage',
-			changes: [
+			mods: [
 				{
 					time: Date.now(),
 					person: who,
 					what: 'Created request',
 					why: '',
-					request: null
+					change: null
 				}
 			]
 		};
 
-		this.requests.set(newRequest.id, newRequest);
+		this.changes.set(newRequest.id, newRequest);
 
 		return newRequest;
 	}
 
-	getRequest(id: RequestID): Writable<Request | undefined | null> {
-		return this.requests.getStore(id);
+	getRequest(id: ChangeID): Writable<Change | undefined | null> {
+		return this.changes.getStore(id);
 	}
 
-	deleteRequest(id: RequestID) {
-		this.requests.delete(id);
+	deleteRequest(id: ChangeID) {
+		this.changes.delete(id);
 	}
 }
 

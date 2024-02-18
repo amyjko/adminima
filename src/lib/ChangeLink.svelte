@@ -4,10 +4,10 @@
 	import database from '../database/Database';
 	import Loading from './Loading.svelte';
 	import Oops from './Oops.svelte';
-	import { type RequestID } from '../types/Request';
-	import type Request from '../types/Request';
+	import { type ChangeID } from '../types/Change';
+	import type Request from '../types/Change';
 
-	export let requestID: RequestID;
+	export let requestID: ChangeID;
 
 	$: request = database.getRequest(requestID);
 </script>
