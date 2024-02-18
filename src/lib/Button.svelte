@@ -43,6 +43,7 @@
 
 	button:disabled {
 		border-color: transparent;
+		cursor: default;
 	}
 
 	button:focus {

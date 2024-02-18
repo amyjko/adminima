@@ -47,8 +47,6 @@ class Database {
 			title,
 			what: '',
 			people: [],
-			viewers: [],
-			public: false,
 			modifications: [
 				{
 					time: Date.now(),

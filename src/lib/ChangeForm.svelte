@@ -38,8 +38,9 @@
 
 <Form action={createRequest}>
 	<Paragraph
-		>Is there something you'd like to change about this? Give your request a title and describe the
-		problem you'd like to address.</Paragraph
+		>Is there something you'd like to change about this {#if role}
+			role{:else if process}process{/if}? Give your request a title and describe the problem you'd
+		like to address.</Paragraph
 	>
 	<Field label="title" bind:text={newRequestTitle} />
 	<Field label="description" bind:text={newRequestProblem} />

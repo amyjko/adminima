@@ -4,6 +4,7 @@
 	h2 {
 		font-size: 24pt;
 		font-weight: bold;
-		text-transform: lowercase;
+		text-transform: uppercase;
+		margin-top: var(--spacing);
 	}
 </style>

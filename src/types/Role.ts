@@ -17,10 +17,6 @@ type Role = Tracked & {
 	what: Markup;
 	/** People who have this role */
 	people: PersonID[];
-	/** Who can view this scope of responsibilities (and comment on it) */
-	viewers: PersonID[];
-	/** Whether this scope is public to everyone. */
-	public: boolean;
 };
 
 export type { Role as default };

@@ -2,11 +2,9 @@
 	{
 		"id": "ada",
 		"organization": "ischool",
-		"title": "Associate Dean for Academics",
-		"what": "Annual tasks the *Associate Dean* is responsible for completing, with the help of assistants.",
-		"viewers": [],
+		"title": "Associate Dean for Academics (ADA)",
+		"what": "The Associate Dean for Academics (ADA) sets the vision, policies, and priorities of academics in the Information School, collaborating closely with the Assistant Dean for Academics to align staff operations with these decisions. The ADA also supports the faculty program chairs for each program, and helps triage requests for change from stakeholders in our education community. ",
 		"people": ["amy"],
-		"public": true,
 		"modifications": []
 	},
 	{
@@ -14,9 +12,7 @@
 		"organization": "ischool",
 		"title": "Program Manager for Change",
 		"what": "Helps the Associate Dean manage change and track success.",
-		"viewers": [],
 		"people": ["victor"],
-		"public": false,
 		"modifications": []
 	}
 ]

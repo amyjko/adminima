@@ -3,6 +3,8 @@
 	import { toDate } from '../types/Day';
 	import { addWeeks, addYears, compareAsc, differenceInWeeks, format } from 'date-fns';
 	import ProcessPill from './ProcessPill.svelte';
+	import Flow from './Flow.svelte';
+	import ProcessLink from './ProcessLink.svelte';
 
 	export let processes: Process[];
 
@@ -50,9 +52,10 @@
 						/>{/if}{/each}
 			</div>
 		</div>
-		<div class="untimed">
-			{#each processes as process}<ProcessPill {process} />{:else}No untimed processes.{/each}
-		</div>
+		<Flow
+			>{#each processes as process}<ProcessLink processID={process.id} />{:else}No untimed
+				processes.{/each}</Flow
+		>
 	</div>
 {/if}
 
@@ -85,13 +88,6 @@
 		gap: var(--spacing);
 		align-items: flex-start;
 		margin-block-start: var(--spacing);
-	}
-
-	.untimed {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing);
-		width: 10em;
 	}
 
 	.date {
