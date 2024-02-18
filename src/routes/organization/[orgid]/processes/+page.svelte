@@ -14,7 +14,8 @@
 <Title title="processes" kind={$locale?.term.organization} />
 
 <Paragraph
-	>These are the processes in this organization, independent of role. Select one to see how the
+	>These are all of the processes in this organization. Select one to see how it works, who's
+	responsible for it, or to suggest a change.
 </Paragraph>
 
 {#await database.getOrganizationProcesses($organization.id)}
