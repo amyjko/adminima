@@ -14,18 +14,19 @@
 <MarkupView markup={organization.description} />
 
 <Paragraph>
-	Learn what <Link to="{organization.id}/roles">Roles</Link> people have here.</Paragraph
+	Learn what <Link to="/organization/{organization.id}/roles">Roles</Link> people have here.</Paragraph
 >
 
 <Paragraph
-	>Find all of the <Link to="{organization.id}/people">People</Link> in this organization.</Paragraph
+	>Find all of the <Link to="/organization/{organization.id}/people">People</Link> in this organization.</Paragraph
 >
 
 <Paragraph
-	>See all of the <Link to="{organization.id}/processes">Processes</Link> that make this organization
-	work.</Paragraph
+	>See all of the <Link to="/organization/{organization.id}/processes">Processes</Link> that make this
+	organization work.</Paragraph
 >
 
 <Paragraph
-	>Suggest a <Link to="{organization.id}/changes">Change</Link> to make this organization work better.</Paragraph
+	>Suggest a <Link to="/organization/{organization.id}/changes">Change</Link> to make this organization
+	work better.</Paragraph
 >
