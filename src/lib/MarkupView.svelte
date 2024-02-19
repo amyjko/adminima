@@ -40,7 +40,8 @@
 					if (edit) edit(markup);
 					editing = false;
 				} else editing = true;
-			}}>✎</Button
+			}}
+			>{#if editing}&checkmark;{:else}✎{/if}</Button
 		>
 	{/if}
 </div>

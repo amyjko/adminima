@@ -38,3 +38,7 @@ export function withoutStaff(organization: Organization, person: PersonID): Orga
 export function withDescription(organization: Organization, description: Markup): Organization {
 	return { ...organization, description };
 }
+
+export function withName(organization: Organization, name: string): Organization {
+	return { ...organization, name };
+}

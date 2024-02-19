@@ -9,13 +9,6 @@
 >
 
 <style>
-	input {
-		border-radius: var(--radius);
-		border: 2px solid var(--border);
-		font-size: var(--normal-size);
-		font-family: var(--font);
-	}
-
 	label {
 		font-size: var(--small-size);
 		color: var(--inactive);

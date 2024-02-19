@@ -6,13 +6,17 @@
 	import { locale } from '$types/Locales';
 	import Paragraph from './Paragraph.svelte';
 	import { user } from '$database/Auth';
-	import { withDescription } from '../types/Organization';
+	import { withDescription, withName } from '../types/Organization';
 	import database from '$database/Database';
 
 	export let organization: Organization;
 </script>
 
-<Title title={organization.name} kind={$locale?.term.organization} />
+<Title
+	title={organization.name}
+	kind={$locale?.term.organization}
+	edit={(text) => database.updateOrganization(withName(organization, text))}
+/>
 
 <MarkupView
 	markup={organization.description}

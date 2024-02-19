@@ -187,6 +187,13 @@
 		border-bottom: var(--thickness) solid var(--border);
 	}
 
+	:global(input[type='text']) {
+		border-radius: var(--radius);
+		border: 2px solid var(--border);
+		font-size: var(--normal-size);
+		font-family: var(--font);
+	}
+
 	@font-face {
 		font-family: 'Rokkitt';
 		src: url(/fonts/Rokkitt.ttf) format('truetype');
