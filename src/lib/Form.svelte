@@ -8,6 +8,7 @@
 <style>
 	.form {
 		border: var(--border) solid var(--thickness);
+		background: var(--background);
 		padding: var(--spacing);
 		gap: var(--spacing);
 		display: flex;
