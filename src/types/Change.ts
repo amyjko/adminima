@@ -37,7 +37,7 @@ type Change = Tracked & {
 	/** Descriptions of ideas for addressing the problem */
 	comments: Comment[];
 	/** Status of the change request */
-	status: 'triage' | 'backlog' | 'active' | 'completed' | 'abandoned' | 'closed';
+	status: 'triage' | 'backlog' | 'active' | 'completed' | 'closed';
 };
 
 export type { Change as default };

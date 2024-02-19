@@ -168,6 +168,25 @@
 		font-style: italic;
 	}
 
+	:global(table) {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	:global(th, td) {
+		text-align: left;
+		padding: var(--padding);
+	}
+
+	:global(th) {
+		font-style: italic;
+		border-bottom: var(--thickness) solid var(--border);
+	}
+
+	:global(tr:last-child) {
+		border-bottom: var(--thickness) solid var(--border);
+	}
+
 	@font-face {
 		font-family: 'Rokkitt';
 		src: url(/fonts/Rokkitt.ttf) format('truetype');

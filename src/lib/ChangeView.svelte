@@ -15,6 +15,8 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Modifications from './Modifications.svelte';
+	import Quote from './Quote.svelte';
+	import Status from './Status.svelte';
 
 	export let change: change;
 
@@ -23,27 +25,23 @@
 
 <Title title={change.title} kind={$locale?.term.request} />
 
-<Header>Requestor</Header>
-<Paragraph><PersonLink personID={change.who} /></Paragraph>
+<Status {change} />
 
-<Header>The Problem</Header>
-<MarkupView markup={change.problem} />
+<Paragraph
+	>On <TimeView time={change.modifications[0].when} />
+	<PersonLink personID={change.who} /> reported:</Paragraph
+>
 
-<Header>Affected Roles</Header>
+<Quote><MarkupView markup={change.problem} /></Quote>
+
+<Paragraph>This affects ...</Paragraph>
+
 <ul>
 	{#each change.roles as role}
 		<li><RoleLink roleID={role} /></li>
-	{:else}
-		&mdash;
 	{/each}
-</ul>
-
-<Header>Affected Processes</Header>
-<ul>
 	{#each change.processes as process}
 		<li><ProcessLink processID={process} /></li>
-	{:else}
-		&mdash;
 	{/each}
 </ul>
 
@@ -55,15 +53,15 @@
 			<TimeView time={comment.when} />
 			<PersonLink personID={comment.who} />
 		</div>
-		<MarkupView markup={comment.what} />
+		<Quote>
+			<MarkupView markup={comment.what} />
+		</Quote>
 	</div>
 {:else}
 	No comments yet.
 {/each}
 
 <Admin>
-	<Header>Delete</Header>
-
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
 	<Button
 		action={async () => {

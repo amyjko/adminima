@@ -7,7 +7,7 @@
 
 	export let requestID: ChangeID;
 
-	$: request = database.getRequest(requestID);
+	$: request = database.getChange(requestID);
 </script>
 
 {#if $request === null}<Loading />{:else if $request === undefined}<Oops

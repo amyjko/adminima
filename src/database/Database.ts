@@ -49,7 +49,7 @@ class Database {
 			people: [],
 			modifications: [
 				{
-					time: Date.now(),
+					when: Date.now(),
 					person: who,
 					what: 'Created role',
 					why: '',
@@ -153,7 +153,7 @@ class Database {
 			status: 'triage',
 			modifications: [
 				{
-					time: Date.now(),
+					when: Date.now(),
 					person: who,
 					what: 'Created request',
 					why: '',
@@ -167,11 +167,11 @@ class Database {
 		return newRequest;
 	}
 
-	getRequest(id: ChangeID): Writable<Change | undefined | null> {
+	getChange(id: ChangeID): Writable<Change | undefined | null> {
 		return this.changes.getStore(id);
 	}
 
-	deleteRequest(id: ChangeID) {
+	async deleteRequest(id: ChangeID) {
 		this.changes.delete(id);
 	}
 }

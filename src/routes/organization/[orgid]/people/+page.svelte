@@ -40,13 +40,15 @@
 	<Loading />
 {:then people}
 	<table>
-		<tbody>
+		<thead>
 			<tr>
 				<th>person</th>
 				<th>roles</th>
 				<th>admin</th>
 				<th>remove</th>
 			</tr>
+		</thead>
+		<tbody>
 			{#each people as person}
 				<tr>
 					<td>
@@ -110,26 +112,6 @@
 </Admin>
 
 <style>
-	table {
-		width: 100%;
-		border-collapse: collapse;
-	}
-
-	th,
-	td {
-		text-align: left;
-		padding: var(--padding);
-	}
-
-	th {
-		font-style: italic;
-		border-bottom: var(--thickness) solid var(--border);
-	}
-
-	tr:last-child {
-		border-bottom: var(--thickness) solid var(--border);
-	}
-
 	.actions {
 		display: flex;
 		flex-direction: column;

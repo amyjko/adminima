@@ -2,7 +2,7 @@
 	import Loading from '$lib/Loading.svelte';
 	import database from '../../../../database/Database';
 	import ChangeForm from '$lib/ChangeForm.svelte';
-	import RequestList from '$lib/ChangeList.svelte';
+	import ChangeList from '$lib/ChangeList.svelte';
 	import { getOrganizationContext } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
 	import { locale } from '$types/Locales';
@@ -17,5 +17,5 @@
 {#await database.getOrganizationChanges($organization.id)}
 	<Loading />
 {:then requests}
-	<RequestList changes={requests} />
+	<ChangeList changes={requests} />
 {/await}

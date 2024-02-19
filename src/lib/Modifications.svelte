@@ -15,7 +15,7 @@
 
 <Rows>
 	{#each mods as change}
-		<Row name={format(change.time, 'MM/dd/yyyy')}>
+		<Row name={format(change.when, 'MM/dd/yyyy')}>
 			<Paragraph><PersonLink personID={change.person} /></Paragraph>
 			<MarkupView markup={change.what} />
 			<em><MarkupView markup={change.why} /></em>

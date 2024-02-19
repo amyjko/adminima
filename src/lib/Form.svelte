@@ -7,7 +7,7 @@
 
 <style>
 	.form {
-		border: var(--border) solid 1px;
+		border: var(--border) solid var(--thickness);
 		padding: var(--spacing);
 		gap: var(--spacing);
 		display: flex;

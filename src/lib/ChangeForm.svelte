@@ -37,9 +37,8 @@
 	}
 </script>
 
-<Header>Suggest a Change</Header>
-
 <Form action={createRequest}>
+	<Header>Suggest a Change</Header>
 	<Paragraph
 		>Is there something you'd like to change about this {#if role}
 			role{:else if process}process{/if}? Give your request a title and describe the problem you'd

@@ -4,17 +4,17 @@
 	import Error from '$lib/Oops.svelte';
 	import { page } from '$app/stores';
 	import { locale } from '../../../../../types/Locales';
-	import RequestView from '$lib/ChangeView.svelte';
+	import ChangeView from '$lib/ChangeView.svelte';
 	import Title from '$lib/Title.svelte';
 
-	$: request = database.getRequest($page.params.changeid);
+	$: change = database.getChange($page.params.changeid);
 </script>
 
-{#if $request === undefined}
+{#if $change === undefined}
 	<Loading inline={false} />
-{:else if $request === null}
+{:else if $change === null}
 	<Title title="Oops" kind={$locale?.term.error} />
 	<Error text={(locale) => locale.error.noChange} />
 {:else}
-	<RequestView change={$request} />
+	<ChangeView change={$change} />
 {/if}

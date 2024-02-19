@@ -4,7 +4,7 @@ import type { ChangeID } from './Change';
 
 type Modification = {
 	/** A unix time stamp of when the modification occurred */
-	time: number;
+	when: number;
 	/** Who made the modification */
 	person: PersonID;
 	/** A description of what changed */

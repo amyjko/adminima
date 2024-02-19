@@ -1,21 +1,29 @@
 [
 	{
 		"id": "faster CAP",
-		"who": "victor",
+		"who": "amy",
 		"watchers": [],
 		"organization": "ischool",
 		"roles": ["ada"],
 		"processes": ["3"],
-		"title": "faster CAP",
-		"problem": "CAP is slow and opaque",
+		"title": "CAP transparency",
+		"problem": "CAP is too opaque. Faculty are often confused about what courses are, why they are scheduled the way they are, what constraints we have on teaching assignments, and how we use the information that they submit.",
 		"comments": [
 			{
 				"when": 0,
-				"who": "amy",
-				"what": "Hmmm..."
+				"who": "victor",
+				"what": "This is also true from the staff side. Many staff do not understand the process that we follow, aside from those who help run it."
 			}
 		],
 		"status": "triage",
-		"modifications": []
+		"modifications": [
+			{
+				"when": 0,
+				"person": "amy",
+				"what": "created",
+				"why": "initialization",
+				"change": null
+			}
+		]
 	}
 ]

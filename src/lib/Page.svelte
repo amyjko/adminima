@@ -16,9 +16,9 @@
 		align-items: block-start;
 		margin: auto;
 		gap: var(--spacing);
-		width: 100%;
-		max-width: 32em;
-		margin-block-start: 10vh;
+		width: calc(100% - (2 * var(--spacing)));
+		max-width: 36em;
+		margin-block-start: 6vh;
 	}
 
 	.header {
