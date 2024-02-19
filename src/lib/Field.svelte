@@ -5,7 +5,7 @@
 
 <label
 	>{label}
-	<input type="text" bind:value={text} /></label
+	<br /><input type="text" bind:value={text} /></label
 >
 
 <style>
@@ -17,7 +17,8 @@
 	}
 
 	label {
-		font-style: italic;
+		font-size: var(--small-size);
+		color: var(--inactive);
 	}
 
 	input:focus {

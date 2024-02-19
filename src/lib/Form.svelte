@@ -7,12 +7,12 @@
 
 <style>
 	.form {
-		border-radius: var(--radius);
-		border: var(--border) dotted 1px;
+		border: var(--border) solid 1px;
 		padding: var(--spacing);
 		gap: var(--spacing);
 		display: flex;
 		flex-direction: column;
+		box-shadow: inset var(--thickness) var(--thickness) rgba(0, 0, 0, 0.25);
 	}
 
 	.form.inline {
