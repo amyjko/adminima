@@ -5,6 +5,7 @@
 	import ProcessPill from './ProcessPill.svelte';
 	import Flow from './Flow.svelte';
 	import ProcessLink from './ProcessLink.svelte';
+	import Paragraph from './Paragraph.svelte';
 
 	export let processes: Process[];
 
@@ -36,8 +37,9 @@
 </script>
 
 {#if processes.length === 0}
-	No processes.
+	This role is not responsible for any processes.
 {:else}
+	<Paragraph>These are the processes that this role is responsible for.</Paragraph>
 	<div class="processes">
 		<div class="time">
 			{#each weeks as num}

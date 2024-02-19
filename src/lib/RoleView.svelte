@@ -34,8 +34,6 @@
 
 <Header>Processes</Header>
 
-These are the processes that this role is responsible for.
-
 {#await database.getRoleProcesses(role.id)}
 	<Loading />
 {:then processes}
