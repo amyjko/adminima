@@ -51,6 +51,7 @@
 	/>
 	<Button
 		submit
+		end
 		active={newRequestTitle.length > 0 && newRequestProblem.length > 0}
 		action={() => {}}>create</Button
 	>

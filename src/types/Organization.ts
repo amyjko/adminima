@@ -34,3 +34,7 @@ export function withStaff(organization: Organization, person: PersonID): Organiz
 export function withoutStaff(organization: Organization, person: PersonID): Organization {
 	return { ...organization, staff: organization.staff.filter((staff) => staff !== person) };
 }
+
+export function withDescription(organization: Organization, description: Markup): Organization {
+	return { ...organization, description };
+}

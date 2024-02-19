@@ -53,7 +53,7 @@
 	<Form action={createRole}>
 		<Paragraph>Want to add a new role to this organization?</Paragraph>
 		<Field label="title of new role" bind:text={newRole} />
-		<Button submit active={newRole.length > 3} action={() => {}}>create</Button>
+		<Button end submit active={newRole.length > 3} action={() => {}}>create</Button>
 		{#if newRoleError}
 			<Oops text={newRoleError} />
 		{/if}

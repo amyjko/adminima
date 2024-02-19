@@ -5,13 +5,21 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Paragraph from './Paragraph.svelte';
+	import { user } from '$database/Auth';
+	import { withDescription } from '../types/Organization';
+	import database from '$database/Database';
 
 	export let organization: Organization;
 </script>
 
 <Title title={organization.name} kind={$locale?.term.organization} />
 
-<MarkupView markup={organization.description} />
+<MarkupView
+	markup={organization.description}
+	edit={organization.admins.includes($user.id)
+		? (text) => database.updateOrganization(withDescription(organization, text))
+		: undefined}
+/>
 
 <Paragraph>
 	Learn what <Link to="/organization/{organization.id}/roles">Roles</Link> people have here.</Paragraph

@@ -3,6 +3,7 @@
 	export let active = true;
 	export let submit = false;
 	export let warning = false;
+	export let end = false;
 
 	let confirm = false;
 </script>
@@ -12,6 +13,7 @@
 {:else}
 	<button
 		class:warning
+		class:end
 		type={submit ? 'submit' : null}
 		disabled={!active}
 		on:click={() => {
@@ -28,8 +30,12 @@
 		font-size: var(--normal-size);
 		border: 2px solid var(--border);
 		cursor: pointer;
-		align-self: flex-end;
 		white-space: nowrap;
+		align-self: flex-start;
+	}
+
+	.end {
+		align-self: flex-end;
 	}
 
 	.warning {
