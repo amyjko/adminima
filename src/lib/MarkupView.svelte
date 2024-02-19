@@ -51,7 +51,7 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: nowrap;
-		gap: var(--spacing);
+		gap: var(--padding);
 		align-items: stretch;
 	}
 	.blocks {

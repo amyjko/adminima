@@ -3,7 +3,6 @@
 	import { getOrganizationContext } from './contexts';
 	import { page } from '$app/stores';
 	import Button from './Button.svelte';
-	import Field from './Field.svelte';
 
 	// The title to show in the header
 	export let title: string;
@@ -26,18 +25,18 @@
 	<div class="kind">{kind}</div>
 
 	<h1>
-		<Button
-			action={() => {
-				if (editing) {
-					if (edit) edit(revision);
-					editing = false;
-				} else {
-					editing = true;
-					revision = title;
-				}
-			}}
-			>{#if editing}&checkmark;{:else}✎{/if}</Button
-		>
+		{#if edit}<Button
+				action={() => {
+					if (editing) {
+						if (edit) edit(revision);
+						editing = false;
+					} else {
+						editing = true;
+						revision = title;
+					}
+				}}
+				>{#if editing}&checkmark;{:else}✎{/if}</Button
+			>{/if}
 		{#if editing}<input type="text" bind:value={revision} />{:else}<span class="text">{title}</span
 			>{/if}
 	</h1>
@@ -56,7 +55,7 @@
 		text-transform: uppercase;
 		line-height: 1;
 		flex-direction: row;
-		gap: var(--spacing);
+		gap: var(--padding);
 	}
 
 	.kind {
