@@ -73,7 +73,7 @@
 		flex-grow: 1;
 		overflow: auto;
 		position: relative;
-		box-shadow: inset 3px 3px var(--border);
+		border: var(--border) solid var(--thickness);
 	}
 
 	.tick {
