@@ -24,24 +24,25 @@
 
 <div class="title">
 	<div class="kind">{kind}</div>
+
 	<h1>
-		{#if editing}<input type="text" bind:value={revision} />{:else}{title}{/if}
+		<Button
+			action={() => {
+				if (editing) {
+					if (edit) edit(revision);
+					editing = false;
+				} else {
+					editing = true;
+					revision = title;
+				}
+			}}
+			>{#if editing}&checkmark;{:else}✎{/if}</Button
+		>
+		{#if editing}<input type="text" bind:value={revision} />{:else}<span class="text">{title}</span
+			>{/if}
 	</h1>
 	{#if edit}
-		<div>
-			<Button
-				action={() => {
-					if (editing) {
-						if (edit) edit(revision);
-						editing = false;
-					} else {
-						editing = true;
-						revision = title;
-					}
-				}}
-				>{#if editing}&checkmark;{:else}✎{/if}</Button
-			>
-		</div>{/if}
+		<div />{/if}
 	{#if $organization && $page.url.pathname !== `/organization/${$organization.id}`}
 		<div class="breadcrumbs"><OrganizationLink organizationID={$organization.id} /></div>
 	{/if}
@@ -49,13 +50,15 @@
 
 <style>
 	h1 {
-		display: inline-block;
+		display: flex;
 		font-size: 42pt;
 		font-weight: bold;
 		text-transform: uppercase;
 		line-height: 1;
-		vertical-align: top;
+		flex-direction: row;
+		gap: var(--spacing);
 	}
+
 	.kind {
 		color: var(--inactive);
 		text-transform: uppercase;
@@ -73,10 +76,16 @@
 		line-height: inherit;
 		padding: 0;
 		border: 0;
+		border-radius: 0;
+		height: 1em;
 		outline: var(--thickness) solid var(--border);
 	}
 
 	input:focus {
 		outline: var(--thickness) solid var(--focus);
+	}
+
+	.text {
+		display: inline-block;
 	}
 </style>

@@ -19,6 +19,16 @@
 </script>
 
 <div class="markup">
+	{#if edit}<Button
+			action={() => {
+				if (editing) {
+					if (edit) edit(markup);
+					editing = false;
+				} else editing = true;
+			}}
+			>{#if editing}&checkmark;{:else}✎{/if}</Button
+		>
+	{/if}
 	{#if editing}
 		<textarea bind:value={markup} style:height="{height}px" />
 	{:else}
@@ -33,16 +43,6 @@
 				{/if}
 			{/each}
 		</div>
-	{/if}
-	{#if edit}<Button
-			action={() => {
-				if (editing) {
-					if (edit) edit(markup);
-					editing = false;
-				} else editing = true;
-			}}
-			>{#if editing}&checkmark;{:else}✎{/if}</Button
-		>
 	{/if}
 </div>
 

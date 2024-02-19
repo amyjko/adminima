@@ -15,7 +15,9 @@
 <Title
 	title={organization.name}
 	kind={$locale?.term.organization}
-	edit={(text) => database.updateOrganization(withName(organization, text))}
+	edit={organization.admins.includes($user.id)
+		? (text) => database.updateOrganization(withName(organization, text))
+		: undefined}
 />
 
 <MarkupView

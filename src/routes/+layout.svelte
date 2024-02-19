@@ -15,7 +15,7 @@
 		line-height: 1.4;
 
 		--font: 'Rokkitt', sans-serif;
-		--spacing: 1.25em;
+		--spacing: 1.25rem;
 		--thickness: 3px;
 		--padding: 0.2em;
 		--radius: 4px;
