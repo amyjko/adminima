@@ -19,7 +19,7 @@
 		"noRoleProcesses": "We couldn't get this role's processes.",
 		"noPerson": "We couldn't find this person",
 		"noOrganization": "We couldn't find this organization.",
-		"noRole": "We couldn't find this role.",
+		"noRole": "unknown role",
 		"noRequest": "We couldn't find this request.",
 		"noProcessRequests": "Couldn't get this process's requests."
 	}

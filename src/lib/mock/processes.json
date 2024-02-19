@@ -13,7 +13,7 @@
 		"organization": "ischool",
 		"what": "Faculty peer reviews",
 		"why": "Required by faculty code",
-		"roles": ["amy", "victor"],
+		"roles": ["ada", "changepm"],
 		"how": [],
 		"modifications": []
 	},

@@ -11,7 +11,7 @@
 	div {
 		background: var(--error);
 		color: var(--background);
-		padding: var(--spacing);
+		padding: var(--padding);
 		border-spacing: var(--radius);
 		margin-block-start: var(--spacing);
 		margin-block-end: var(--spacing);

@@ -10,7 +10,7 @@
 	$: role = database.getRole(roleID);
 </script>
 
-{#if $role === null}<Loading />{:else if $role === undefined}<Oops
+{#if $role === undefined}<Loading />{:else if $role === null}<Oops
 		inline
 		text={(locale) => locale.error.noRole}
 	/>{:else}<Link to="/organization/{$role.organization}/role/{roleID}">{$role.title}</Link>{/if}

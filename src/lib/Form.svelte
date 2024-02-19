@@ -13,7 +13,6 @@
 		gap: var(--spacing);
 		display: flex;
 		flex-direction: column;
-		box-shadow: inset var(--thickness) var(--thickness) rgba(0, 0, 0, 0.25);
 	}
 
 	.form.inline {
