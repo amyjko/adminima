@@ -76,7 +76,7 @@
 		],
 		"modifications": [
 			{
-				"time": 0,
+				"when": 0,
 				"person": "amy",
 				"what": "Created",
 				"why": "Didn't exist"

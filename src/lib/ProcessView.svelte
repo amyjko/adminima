@@ -10,8 +10,6 @@
 	import { format } from 'date-fns';
 	import { toDate } from '../types/Day';
 	import database from '../database/Database';
-	import Loading from './Loading.svelte';
-	import ChangeList from './ChangeList.svelte';
 	import Oops from './Oops.svelte';
 	import ChangeForm from './ChangeForm.svelte';
 	import Button from './Button.svelte';
@@ -37,8 +35,7 @@
 
 <Paragraph
 	>The <RoleLink roleID={process.roles[0]} /> leads this process with support from {#each process.roles.slice(1) as role}
-		<RoleLink roleID={role} />
-	{/each}.
+		<RoleLink roleID={role} />{/each}.
 </Paragraph>
 
 <Header>When</Header>
