@@ -7,7 +7,7 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Flow from './Flow.svelte';
-	import ProcessLink from './ProcessLink.svelte';
+	import RoleProcesses from './RoleProcesses.svelte';
 
 	export let person: Person;
 </script>
@@ -27,37 +27,6 @@
 	{#await database.getOrganizationProcesses(roles[0].organization)}
 		<Loading />
 	{:then processes}
-		<Header>Accountable</Header>
-		<Flow>
-			{#each processes.filter( (process) => roles.some((role) => role.id === process.accountable) ) as process}
-				<ProcessLink processID={process.id} />
-			{:else}
-				Not accountable for any process outcomes.
-			{/each}
-		</Flow>
-		<Header>Responsible</Header>
-		<Flow>
-			{#each processes.filter( (process) => roles.some( (role) => process.responsible.includes(role.id) ) ) as process}
-				<ProcessLink processID={process.id} />
-			{:else}
-				Not responsible for completing any processes.
-			{/each}
-		</Flow>
-		<Header>Consulted</Header>
-		<Flow>
-			{#each processes.filter( (process) => roles.some( (role) => process.consulted.includes(role.id) ) ) as process}
-				<ProcessLink processID={process.id} />
-			{:else}
-				Not consulted on any processes.
-			{/each}
-		</Flow>
-		<Header>Informed</Header>
-		<Flow>
-			{#each processes.filter( (process) => roles.some( (role) => process.informed.includes(role.id) ) ) as process}
-				<ProcessLink processID={process.id} />
-			{:else}
-				Not informed about any processes.
-			{/each}
-		</Flow>
+		<RoleProcesses role={roles[0]} {processes} />
 	{/await}
 {/await}
