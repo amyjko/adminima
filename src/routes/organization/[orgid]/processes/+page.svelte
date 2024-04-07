@@ -6,7 +6,8 @@
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
 	import { locale } from '$types/Locales';
-	import Flow from '$lib/Flow.svelte';
+	import RoleLink from '$lib/RoleLink.svelte';
+	import Level from '$lib/Level.svelte';
 
 	const organization = getOrganizationContext();
 </script>
@@ -18,12 +19,36 @@
 	responsible for it, or to suggest a change.
 </Paragraph>
 
-{#await database.getOrganizationProcesses($organization.id)}
-	<Loading />
-{:then processes}
-	<Flow>
-		{#each processes.sort((a, b) => a.what.localeCompare(b.what)) as process}
-			<ProcessLink processID={process.id} />
-		{/each}
-	</Flow>
+{#await database.getOrganizationRoles($organization.id) then roles}
+	{#await database.getOrganizationProcesses($organization.id)}
+		<Loading />
+	{:then processes}
+		<table>
+			<thead>
+				<th>Process</th>{#each roles as role}<th class="role"><RoleLink roleID={role.id} /></th
+					>{/each}
+			</thead>
+			<tbody>
+				{#each processes.sort((a, b) => a.what.localeCompare(b.what)) as process}
+					<tr>
+						<td><ProcessLink processID={process.id} /></td>
+						{#each roles as role}<td
+								>{#if process.accountable === role.id}<Level
+										level="accountable"
+									/>{:else if process.responsible.includes(role.id)}<Level
+										level="responsible"
+									/>{/if}</td
+							>{/each}
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	{/await}
 {/await}
+
+<style>
+	td,
+	th {
+		vertical-align: top;
+	}
+</style>
