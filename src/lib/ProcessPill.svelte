@@ -6,7 +6,7 @@
 	export let left: number | undefined = undefined;
 </script>
 
-<div class="process" style:left="{left}px" class:draft={process.draft}>
+<div class="process" style:left="{left}px">
 	<Link bland to="/organization/{process.organization}/process/{process.id}">{process.what}</Link>
 </div>
 
@@ -16,9 +16,5 @@
 		border-radius: var(--radius);
 		font-size: var(--small-size);
 		width: fit-content;
-	}
-
-	.draft {
-		background: var(--warning);
 	}
 </style>

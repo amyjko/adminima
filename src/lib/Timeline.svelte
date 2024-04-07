@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type Process from '../types/Process';
-	import { toDate } from '../types/Day';
+	import { toDate } from '../types/Repeat';
 	import { addWeeks, addYears, compareAsc, differenceInWeeks, format } from 'date-fns';
 	import ProcessPill from './ProcessPill.svelte';
 	import Flow from './Flow.svelte';
@@ -12,7 +12,7 @@
 	// How many pixels a week should be.
 	const PixelsPerWeek = 100;
 
-	// Get the
+	// Get the timed processes
 	$: timed = processes.filter((a) => a.start !== null);
 
 	$: sorted = timed.sort((a, b) =>

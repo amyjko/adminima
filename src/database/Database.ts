@@ -1,10 +1,10 @@
-import MockProcesses from '$lib/mock/processes.json?raw';
+import MockTasks from '$lib/mock/tasks';
 import MockRoles from '$lib/mock/roles.json?raw';
 import MockPeople from '$lib/mock/people.json?raw';
 import MockOrganizations from '$lib/mock/organizations.json?raw';
 import MockChanges from '$lib/mock/changes.json?raw';
 import type { ProcessID } from '../types/Process';
-import type Process from '../types/Process';
+import type Task from '../types/Process';
 import type { PersonID } from '../types/Person';
 import type Person from '../types/Person';
 import type { RoleID } from '../types/Role';
@@ -20,15 +20,14 @@ import ReactiveMap from './ReactiveMap';
 
 /** Represents an interface to a database, and CRUD operations for modifying the database. */
 class Database {
-	readonly processes = new ReactiveMap<ProcessID, Process>();
+	readonly processes = new ReactiveMap<ProcessID, Task>();
 	readonly organizations = new ReactiveMap<OrganizationID, Organization>();
 	readonly people = new ReactiveMap<PersonID, Person>();
 	readonly roles = new ReactiveMap<RoleID, Role>();
 	readonly changes = new ReactiveMap<ChangeID, Change>();
 
 	constructor() {
-		for (const process of JSON.parse(MockProcesses) as Process[])
-			this.processes.set(process.id, process);
+		for (const task of MockTasks) this.processes.set(task.id, task);
 
 		for (const org of JSON.parse(MockOrganizations) as Organization[])
 			this.organizations.set(org.id, org);
@@ -71,8 +70,8 @@ class Database {
 		this.processes.delete(id);
 	}
 
-	async getRoleProcesses(id: RoleID): Promise<Process[]> {
-		return this.processes.values().filter((process) => process.role === id);
+	async getRoleTasks(id: RoleID): Promise<Task[]> {
+		return this.processes.values().filter((task) => task.accountable === id);
 	}
 
 	async getRoleChanges(id: RoleID): Promise<Change[]> {
@@ -92,11 +91,11 @@ class Database {
 		return this.roles.values().filter((role) => role.organization === id);
 	}
 
-	async getOrganizationProcesses(id: OrganizationID): Promise<Process[]> {
-		return this.processes.values().filter((process) => process.organization === id);
+	async getOrganizationProcesses(id: OrganizationID): Promise<Task[]> {
+		return this.processes.values().filter((task) => task.organization === id);
 	}
 
-	async getOrganizationStaff(id: OrganizationID): Promise<PersonID[]> {
+	async getOrganizationPeople(id: OrganizationID): Promise<PersonID[]> {
 		const org = get(this.getOrganization(id));
 		if (org) return org.staff;
 		else return [];
@@ -106,7 +105,7 @@ class Database {
 		return this.changes.values().filter((change) => change.organization === id);
 	}
 
-	getProcess(id: ProcessID): Writable<Process | undefined | null> {
+	getProcess(id: ProcessID): Writable<Task | undefined | null> {
 		return this.processes.getStore(id);
 	}
 

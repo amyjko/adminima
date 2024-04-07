@@ -1,14 +1,7 @@
 <script lang="ts">
-	import type Process from '../types/Process';
-	import Rows from './Rows.svelte';
-	import Row from './Row.svelte';
-	import PersonLink from './PersonLink.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
 	import TaskView from './TaskView.svelte';
-	import Notice from './Notice.svelte';
-	import { format } from 'date-fns';
-	import { toDate } from '../types/Day';
 	import database from '../database/Database';
 	import Oops from './Oops.svelte';
 	import ChangeForm from './ChangeForm.svelte';
@@ -20,29 +13,54 @@
 	import { locale } from '$types/Locales';
 	import Modifications from './Modifications.svelte';
 	import RoleLink from './RoleLink.svelte';
-	import Checkbox from './Checkbox.svelte';
+	import RoleContribution from './RoleContribution.svelte';
+	import type Process from '../types/Process';
 
 	export let process: Process;
 
 	let deleteError: string | undefined = undefined;
 </script>
 
-<Title title={process.what} kind={$locale?.term.process ?? ''} />
+<Title title={process.title} kind={$locale?.term.process ?? ''} />
 
-<MarkupView markup={process.why} />
+<MarkupView markup={process.what} />
 
 <Header>Who</Header>
 
-<Paragraph
-	>The <RoleLink roleID={process.roles[0]} /> leads this process with support from {#each process.roles.slice(1) as role}
-		<RoleLink roleID={role} />{/each}.
-</Paragraph>
+<ul>
+	<li>
+		<RoleContribution roles={[process.accountable]}
+			><strong>accountable</strong>{#if process.responsible.length === 0}and <strong
+					>responsible</strong
+				>{/if} for this task's outcome.</RoleContribution
+		>
+	</li>
+	{#if process.responsible.length > 0}
+		<li>
+			<RoleContribution roles={process.responsible}
+				><strong>responsible</strong> for completing this task.</RoleContribution
+			>
+		</li>
+	{/if}
+	{#if process.consulted.length > 0}
+		<li>
+			<RoleContribution roles={process.consulted}
+				><strong>consulted</strong> to ensure this task is done well.</RoleContribution
+			>
+		</li>
+	{/if}
+	{#if process.informed.length > 0}
+		<li>
+			<RoleContribution roles={process.informed}
+				><strong>informed</strong> that this is happening and when it is complete.</RoleContribution
+			>
+		</li>
+	{/if}
+</ul>
 
 <Header>When</Header>
 
-{#if process.template && process.start}
-	This process started on {format(toDate(process.start), 'MM/dd/yyyy')}
-{:else if process.repeat}
+{#if process.repeat}
 	{#if process.repeat.type === 'monthly'}
 		This happens on the {process.repeat.date}st day of each month.
 	{:else if process.repeat.type === 'weekly'}
@@ -55,10 +73,6 @@
 {/if}
 
 <Header>How</Header>
-
-{#if process.template}
-	<Notice>This is a template. Start this process to track your progress.</Notice>
-{/if}
 
 <ul>
 	{#each process.how as how}

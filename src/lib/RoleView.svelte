@@ -34,7 +34,7 @@
 
 <Header>Processes</Header>
 
-{#await database.getRoleProcesses(role.id)}
+{#await database.getRoleTasks(role.id)}
 	<Loading />
 {:then processes}
 	<Timeline {processes} />

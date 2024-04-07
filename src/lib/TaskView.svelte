@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type Task from '../types/Task';
 	import MarkupView from './MarkupView.svelte';
-	import PersonLink from './PersonLink.svelte';
+	import type { Task } from '../types/Process';
+	import RoleLink from './RoleLink.svelte';
 
 	export let task: Task;
 </script>
 
-<span style:text-decoration={task.complete ? 'line-through' : ''}>
-	<MarkupView inline markup={task.what} /></span
+<span
+	><MarkupView inline markup={task.what} />
+	<RoleLink roleID={task.accountable} /></span
 >
-(<PersonLink personID={task.who} short />)
 <ul>
 	{#each task.how as how}
 		<li><svelte:self task={how} /></li>

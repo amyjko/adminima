@@ -36,7 +36,7 @@
 	roles. Select a person to see the roles they have.</Paragraph
 >
 
-{#await database.getOrganizationStaff($organization.id)}
+{#await database.getOrganizationPeople($organization.id)}
 	<Loading />
 {:then people}
 	<table>

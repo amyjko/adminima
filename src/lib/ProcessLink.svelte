@@ -16,5 +16,6 @@
 {#if $process === null}<Loading />{:else if $process === undefined}<Oops
 		inline
 		text={(locale) => locale.error.noProcess}
-	/>{:else}<Link to="/organization/{$organization.id}/process/{processID}">{$process.what}</Link
+	/>{:else}<Link to="/organization/{$process.organization}/process/{processID}"
+		>{$process.title}</Link
 	>{/if}
