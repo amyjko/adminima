@@ -32,12 +32,12 @@
 		{/if}{#if index < role.people.length - 1} and {/if}{/each}.</Paragraph
 >
 
-<Header>Processes</Header>
+<Header>Timeline</Header>
 
-{#await database.getRoleTasks(role.id)}
+{#await database.getRoleProcesses(role.id)}
 	<Loading />
 {:then processes}
-	<Timeline {processes} />
+	<Timeline {role} {processes} />
 {:catch}
 	<Error text={(locale) => locale.error.noRoleProcesses} />
 {/await}

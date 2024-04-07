@@ -3,10 +3,11 @@
 	import { toDate } from '../types/Repeat';
 	import { addWeeks, addYears, compareAsc, differenceInWeeks, format } from 'date-fns';
 	import ProcessPill from './ProcessPill.svelte';
-	import Flow from './Flow.svelte';
-	import ProcessLink from './ProcessLink.svelte';
 	import Paragraph from './Paragraph.svelte';
+	import type Role from '$types/Role';
+	import RoleProcesses from './RoleProcesses.svelte';
 
+	export let role: Role;
 	export let processes: Process[];
 
 	// How many pixels a week should be.
@@ -54,10 +55,8 @@
 						/>{/if}{/each}
 			</div>
 		</div>
-		<Flow
-			>{#each processes as process}<ProcessLink processID={process.id} />{:else}No untimed
-				processes.{/each}</Flow
-		>
+
+		<RoleProcesses {role} {processes} />
 	</div>
 {/if}
 

@@ -70,8 +70,16 @@ class Database {
 		this.processes.delete(id);
 	}
 
-	async getRoleTasks(id: RoleID): Promise<Task[]> {
-		return this.processes.values().filter((task) => task.accountable === id);
+	async getRoleProcesses(id: RoleID): Promise<Task[]> {
+		return this.processes
+			.values()
+			.filter(
+				(task) =>
+					task.accountable === id ||
+					task.responsible.includes(id) ||
+					task.consulted.includes(id) ||
+					task.informed.includes(id)
+			);
 	}
 
 	async getRoleChanges(id: RoleID): Promise<Change[]> {
