@@ -34,8 +34,8 @@
 	><OrganizationLink org={$org} /></Title
 >
 <Paragraph
-	>These are the positions held in this organization. Each one is responsible for particular
-	processes in this organization.</Paragraph
+	>These are the roles held in this organization. Each one is responsible for particular processes
+	in this organization.</Paragraph
 >
 
 <Flow>

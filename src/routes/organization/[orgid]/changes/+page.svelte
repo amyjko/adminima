@@ -17,8 +17,4 @@
 
 <ChangeForm />
 
-{#await $organization.getChanges()}
-	<Loading />
-{:then requests}
-	<ChangeList changes={requests} />
-{/await}
+<ChangeList changes={$organization.getChanges()} />
