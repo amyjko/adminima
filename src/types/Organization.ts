@@ -1,6 +1,7 @@
 import type Markup from './Markup';
 import type { PersonID } from './Person';
 import type Tracked from './Tracked';
+import type Visibility from './Visibility';
 
 export type OrganizationID = string;
 
@@ -50,6 +51,8 @@ type Organization = Tracked & {
 	concerns: Concern[];
 	/** Statuses indicate different metadata on processes and roles (e.g., pending, discussed, active) */
 	statuses: Status[];
+	/** Who this organization is visible to */
+	visibility: Visibility;
 };
 
 export type { Organization as default };

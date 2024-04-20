@@ -4,6 +4,7 @@ import type { ConcernID, OrganizationID, StatusID } from './Organization';
 import type Tracked from './Tracked';
 import type Repeat from './Repeat';
 import type { Day } from './Repeat';
+import type Visibility from './Visibility';
 
 /** A unique ID to represent an process */
 export type ProcessID = string;
@@ -25,8 +26,6 @@ type Process = Tracked &
 		repeat: Repeat | null;
 		/** A short description of the process */
 		title: string;
-		/** Whether this process is visible to anyone. Overriden by private role. */
-		public: boolean;
 		/** Optional status of this process */
 		status: StatusID | null;
 	};
@@ -44,6 +43,8 @@ export type Task = {
 	what: Markup;
 	/** the tasks involved in completing the process */
 	how: Task[];
+	/** Who this process is visible to */
+	visibility: Visibility;
 };
 
 export type { Process as default };

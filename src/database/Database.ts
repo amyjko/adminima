@@ -55,7 +55,8 @@ class Database {
 					change: null
 				}
 			],
-			status: null
+			status: null,
+			visibility: 'public'
 		};
 
 		this.roles.set(newRole.id, newRole);

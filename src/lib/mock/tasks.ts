@@ -27,7 +27,7 @@ const MockTasks: Process[] = [
 		informed: [],
 		how: [],
 		modifications: DefaultModification,
-		public: true,
+		visibility: 'public',
 		status: null
 	},
 	{
@@ -45,7 +45,7 @@ const MockTasks: Process[] = [
 		informed: [],
 		how: [],
 		modifications: DefaultModification,
-		public: true,
+		visibility: 'public',
 		status: null
 	},
 	{
@@ -68,6 +68,7 @@ const MockTasks: Process[] = [
 				consulted: [],
 				informed: [],
 				what: 'Ask everyone what they want to teach',
+				visibility: 'public',
 				how: [
 					{
 						accountable: 'ada',
@@ -75,7 +76,8 @@ const MockTasks: Process[] = [
 						consulted: [],
 						informed: [],
 						what: "Send spreadsheets with previous year's assignments",
-						how: []
+						how: [],
+						visibility: 'public'
 					},
 					{
 						accountable: 'ada',
@@ -83,13 +85,14 @@ const MockTasks: Process[] = [
 						consulted: [],
 						informed: [],
 						what: 'Merge into list of requests',
-						how: []
+						how: [],
+						visibility: 'public'
 					}
 				]
 			}
 		],
 		modifications: DefaultModification,
-		public: true,
+		visibility: 'public',
 		status: null
 	},
 	{
@@ -107,7 +110,7 @@ const MockTasks: Process[] = [
 		informed: [],
 		how: [],
 		modifications: DefaultModification,
-		public: true,
+		visibility: 'public',
 		status: null
 	}
 ];

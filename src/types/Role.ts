@@ -2,6 +2,7 @@ import type Markup from './Markup';
 import type { OrganizationID, StatusID } from './Organization';
 import type { PersonID } from './Person';
 import type Tracked from './Tracked';
+import type Visibility from './Visibility';
 
 export type RoleID = string;
 
@@ -19,6 +20,8 @@ type Role = Tracked & {
 	people: PersonID[];
 	/** Optional status of this role */
 	status: StatusID | null;
+	/** Who this is visible to */
+	visibility: Visibility;
 };
 
 export type { Role as default };
