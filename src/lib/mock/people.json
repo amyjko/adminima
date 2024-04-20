@@ -2,6 +2,7 @@
 	{
 		"id": "victor",
 		"name": "Victor Aque",
+		"bio": "",
 		"email": "test@uw.edu",
 		"icon": "🥐",
 		"team": "admin"
@@ -9,6 +10,7 @@
 	{
 		"id": "amy",
 		"name": "Amy J. Ko",
+		"bio": "",
 		"email": "ajko@uw.edu",
 		"icon": "🐱",
 		"team": "admin"
@@ -16,6 +18,7 @@
 	{
 		"id": "cris",
 		"name": "Cris Fowler",
+		"bio": "",
 		"email": "crism@uw.edu",
 		"icon": "🦄",
 		"team": "admin"
@@ -23,6 +26,7 @@
 	{
 		"id": "marie",
 		"name": "Marie West",
+		"bio": "",
 		"email": "westmar@uw.edu",
 		"icon": "🐴",
 		"team": "teachinglearning"
