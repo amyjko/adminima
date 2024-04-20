@@ -7,6 +7,8 @@ type Person = {
 	id: PersonID;
 	/** The person's name */
 	name: string;
+	/** The person's self-introduction to everyone in the org */
+	bio: string;
 	/** Their email */
 	email: string;
 	/** An emoji to represent them */
