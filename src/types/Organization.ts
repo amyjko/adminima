@@ -3,6 +3,16 @@ import type { PersonID } from './Person';
 import type Tracked from './Tracked';
 
 export type OrganizationID = string;
+export type ConcernID = string;
+
+type Concern = {
+	/** An ID for the concern */
+	concern: ConcernID;
+	/** The concern's name */
+	name: string;
+	/** The concern's description */
+	description: Markup;
+};
 
 type Organization = Tracked & {
 	/** A unique organization identifier */
@@ -15,6 +25,8 @@ type Organization = Tracked & {
 	admins: PersonID[];
 	/** People in this organization */
 	staff: PersonID[];
+	/** Areas of concern, used to tag processes for organization */
+	concern: Concern[];
 };
 
 export type { Organization as default };

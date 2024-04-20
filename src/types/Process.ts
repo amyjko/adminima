@@ -1,6 +1,6 @@
 import type Markup from './Markup';
 import type { RoleID } from './Role';
-import type { OrganizationID } from './Organization';
+import type { ConcernID, OrganizationID } from './Organization';
 import type Tracked from './Tracked';
 import type Repeat from './Repeat';
 import type { Day } from './Repeat';
@@ -17,6 +17,8 @@ type Process = Tracked &
 		icon: string;
 		/** The organization this process is in */
 		organization: OrganizationID;
+		/** The concern this process is related to */
+		concern: ConcernID;
 		/** The date on which this process started, or the frequency on which it occurs, or none of it has neither. */
 		start: Day | null;
 		/** Frequency */
