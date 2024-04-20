@@ -1,22 +1,21 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import type { PersonID } from '../types/Person';
 	import Link from './Link.svelte';
-	import database from '../database/Database';
-	import Loading from './Loading.svelte';
+	import type Person from '../types/Person';
 	import Oops from './Oops.svelte';
+	import { getOrg } from './contexts';
 
-	export let personID: PersonID;
+	export let person: Person | null;
 	export let short = false;
 	export let email = false;
 
-	$: person = database.getPerson(personID);
+	const org = getOrg();
 </script>
 
-{#if $person === null}<Loading />{:else if $person === undefined}<Oops
-		inline
-		text={(locale) => locale.error.noPerson}
-	/>{:else}<Link to="/person/{personID}"
-		>{short ? $person.name.split(' ')[0] : $person.name}{#if email}
-			&nbsp;&lt;{$person.email}&gt;{/if}</Link
-	>{/if}
+{#if person}
+	<Link to="/organization/{$org.getID()}/person/{person.id}"
+		>{short ? person.name.split(' ')[0] : person.name}{#if email}
+			&nbsp;&lt;{person.email}&gt;{/if}</Link
+	>
+{:else}
+	<Oops inline text={(locale) => locale.error.noPerson} />
+{/if}

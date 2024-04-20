@@ -1,21 +1,16 @@
 <script lang="ts">
 	import Link from './Link.svelte';
-	import database from '../database/Database';
-	import Loading from './Loading.svelte';
 	import Oops from './Oops.svelte';
 	import type { ProcessID } from '../types/Process';
-	import { getOrganizationContext } from './contexts';
+	import { getOrg } from './contexts';
 
 	export let processID: ProcessID;
 
-	const organization = getOrganizationContext();
+	const organization = getOrg();
 
-	$: process = database.getProcess(processID);
+	$: process = $organization.getProcess(processID);
 </script>
 
-{#if $process === null}<Loading />{:else if $process === undefined}<Oops
-		inline
-		text={(locale) => locale.error.noProcess}
-	/>{:else}<Link to="/organization/{$process.organization}/process/{processID}"
-		>{$process.title}</Link
+{#if process === null}<Oops inline text={(locale) => locale.error.noProcess} />{:else}<Link
+		to="/organization/{$organization.getID()}/process/{processID}">{process.title}</Link
 	>{/if}

@@ -6,41 +6,41 @@
 	import { locale } from '$types/Locales';
 	import Paragraph from './Paragraph.svelte';
 	import { user } from '$database/Auth';
-	import { withDescription, withName } from '../types/Organization';
-	import database from '$database/Database';
+	import Database from '$database/Database';
+	import type Org from '$types/Org';
 
-	export let organization: Organization;
+	export let organization: Org;
 </script>
 
 <Title
-	title={organization.name}
+	title={organization.getName()}
 	kind={$locale?.term.organization}
-	edit={organization.admins.includes($user.id)
-		? (text) => database.updateOrganization(withName(organization, text))
+	edit={organization.hasAdmin($user.id)
+		? (text) => Database.updateOrganization(organization.withName(text))
 		: undefined}
 />
 
 <MarkupView
-	markup={organization.description}
-	edit={organization.admins.includes($user.id)
-		? (text) => database.updateOrganization(withDescription(organization, text))
+	markup={organization.getDescription()}
+	edit={organization.hasAdmin($user.id)
+		? (text) => Database.updateOrganization(organization.withDescription(text))
 		: undefined}
 />
 
 <Paragraph>
-	Learn what <Link to="/organization/{organization.id}/roles">Roles</Link> people have here.</Paragraph
+	Learn what <Link to="/organization/{organization.getID()}/roles">Roles</Link> people have here.</Paragraph
 >
 
 <Paragraph
-	>Find all of the <Link to="/organization/{organization.id}/people">People</Link> in this organization.</Paragraph
+	>Find all of the <Link to="/organization/{organization.getID()}/people">People</Link> in this organization.</Paragraph
 >
 
 <Paragraph
-	>See all of the <Link to="/organization/{organization.id}/processes">Processes</Link> that make this
-	organization work.</Paragraph
+	>See all of the <Link to="/organization/{organization.getID()}/processes">Processes</Link> that make
+	this organization work.</Paragraph
 >
 
 <Paragraph
-	>Suggest a <Link to="/organization/{organization.id}/changes">Change</Link> to make this organization
+	>Suggest a <Link to="/organization/{organization.getID()}/changes">Change</Link> to make this organization
 	work better.</Paragraph
 >

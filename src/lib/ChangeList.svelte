@@ -3,8 +3,11 @@
 	import ChangeLink from './ChangeLink.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Status from './Status.svelte';
+	import { getOrg } from './contexts';
 
 	export let changes: Change[];
+
+	const org = getOrg();
 </script>
 
 {#if changes.length > 0}
@@ -20,8 +23,8 @@
 			{#each changes.sort((a, b) => a.modifications[0]?.when ?? 0 - b.modifications[0]?.when ?? 0) as change}
 				<tr>
 					<td><Status {change} /></td>
-					<td><PersonLink personID={change.who} /></td>
-					<td><ChangeLink requestID={change.id} /></td></tr
+					<td><PersonLink person={$org.getPerson(change.who)} /></td>
+					<td><ChangeLink changeID={change.id} /></td></tr
 				>
 			{/each}
 		</tbody>

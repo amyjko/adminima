@@ -1,10 +1,12 @@
 import type Markup from './Markup';
 import type { RoleID } from './Role';
-import type { ConcernID, OrganizationID, StatusID } from './Organization';
+import type { OrganizationID } from './Organization';
 import type Tracked from './Tracked';
 import type Repeat from './Repeat';
 import type { Day } from './Repeat';
 import type Visibility from './Visibility';
+import type { ConcernID } from './Concern';
+import type { StatusID } from './Status';
 
 /** A unique ID to represent an process */
 export type ProcessID = string;

@@ -2,7 +2,7 @@
 	import MarkupView from './MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
 	import TaskView from './TaskView.svelte';
-	import database from '../database/Database';
+	import Database from '../database/Database';
 	import Oops from './Oops.svelte';
 	import ChangeForm from './ChangeForm.svelte';
 	import Button from './Button.svelte';
@@ -12,7 +12,6 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Modifications from './Modifications.svelte';
-	import RoleLink from './RoleLink.svelte';
 	import RoleContribution from './RoleContribution.svelte';
 	import type Process from '../types/Process';
 
@@ -80,7 +79,7 @@
 	{/each}
 </ul>
 
-<ChangeForm organization={process.organization} process={process.id} />
+<ChangeForm process={process.id} />
 
 <Admin>
 	<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
@@ -88,7 +87,7 @@
 		action={async () => {
 			try {
 				const org = process.organization;
-				await database.deleteProcess(process.id);
+				await Database.deleteProcess(process.id);
 				goto(`/organization/${org}`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";

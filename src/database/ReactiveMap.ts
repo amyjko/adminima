@@ -3,8 +3,11 @@ import { get, writable, type Writable } from 'svelte/store';
 export default class ReactiveMap<IDType, DataType> {
 	readonly map = new Map<IDType, Writable<DataType | null | undefined>>();
 
-	set(id: IDType, value: DataType): void {
-		this.map.set(id, writable(value));
+	set(id: IDType, value: DataType): Writable<DataType | null | undefined> {
+		const store = this.getStore(id);
+		store.set(value);
+		this.map.set(id, store);
+		return store;
 	}
 
 	getStore(id: IDType) {

@@ -1,12 +1,13 @@
 import type { Writable } from 'svelte/store';
-import type Organization from '../types/Organization';
 import { getContext, setContext } from 'svelte';
+import type Org from '$types/Org';
 
-export const OrganizationSymbol = Symbol('organization');
-export type OrganizationContext = Writable<Organization>;
-export function setOrganizationContext(context: OrganizationContext) {
-	setContext(OrganizationSymbol, context);
+export const OrgSymbol = Symbol('organization');
+export type OrgContext = Writable<Org>;
+export function setOrg(context: OrgContext | null) {
+	setContext(OrgSymbol, context);
 }
-export function getOrganizationContext(): OrganizationContext {
-	return getContext<OrganizationContext>(OrganizationSymbol);
+
+export function getOrg(): OrgContext {
+	return getContext<OrgContext>(OrgSymbol);
 }

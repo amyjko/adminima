@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Loading from '$lib/Loading.svelte';
-	import database from '../../../../database/Database';
+	import Database from '$database/Database';
 	import { goto } from '$app/navigation';
 	import Oops from '$lib/Oops.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
@@ -10,44 +9,38 @@
 	import Button from '$lib/Button.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import { user } from '$database/Auth';
-	import { getOrganizationContext } from '$lib/contexts';
+	import { getOrg } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import { locale } from '$types/Locales';
 	import Flow from '$lib/Flow.svelte';
 
-	const organization = getOrganizationContext();
+	const org = getOrg();
 
 	let newRole: string = '';
 	let newRoleError: string | undefined = undefined;
 
 	async function createRole() {
 		try {
-			const role = await database.createRole($user.id, $organization.id, newRole);
-			goto(`/role/${role.id}`);
+			const role = await Database.createRole($user.id, $org.getID(), newRole);
+			goto(`/organization/${$org.getID()}/role/${role.id}`);
 		} catch (_) {
 			newRoleError = "We couldn't create the new role.";
 		}
 	}
 </script>
 
-<Title title="roles" kind={$locale?.term.organization}
-	><OrganizationLink organizationID={$organization.id} /></Title
->
+<Title title="roles" kind={$locale?.term.organization}><OrganizationLink org={$org} /></Title>
 <Paragraph
 	>These are the positions held in this organization. Each one is responsible for particular
 	processes in this organization.</Paragraph
 >
 
-{#await database.getOrganizationRoles($organization.id)}
-	<Loading />
-{:then roles}
-	<Flow>
-		{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-			<RoleLink roleID={role.id} />
-		{/each}
-	</Flow>
-{/await}
+<Flow>
+	{#each $org.getRoles().sort((a, b) => a.title.localeCompare(b.title)) as role}
+		<RoleLink roleID={role.id} />
+	{/each}
+</Flow>
 
 <Admin>
 	<Form action={createRole}>

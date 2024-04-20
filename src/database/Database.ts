@@ -1,10 +1,4 @@
-import MockTasks from '$lib/mock/tasks';
-import MockRoles from '$lib/mock/roles.json?raw';
-import MockPeople from '$lib/mock/people.json?raw';
-import MockOrganizations from '$lib/mock/organizations.json?raw';
-import MockChanges from '$lib/mock/changes.json?raw';
 import type { ProcessID } from '../types/Process';
-import type Task from '../types/Process';
 import type { PersonID } from '../types/Person';
 import type Person from '../types/Person';
 import type { RoleID } from '../types/Role';
@@ -13,33 +7,33 @@ import type { OrganizationID } from '../types/Organization';
 import type Organization from '../types/Organization';
 import type Change from '../types/Change';
 import type { ChangeID } from '../types/Change';
-import { get, type Writable } from 'svelte/store';
 import { v4 as uuidv4 } from 'uuid';
 import type Markup from '../types/Markup';
 import ReactiveMap from './ReactiveMap';
+import type Process from '../types/Process';
+import Org from '$types/Org';
 
-/** Represents an interface to a database, and CRUD operations for modifying the database. */
+export type OrgPayload = {
+	organization: Organization;
+	roles: Role[];
+	people: Person[];
+	processes: Process[];
+	changes: Change[];
+};
+
+/** A front end interface to the backing store, caching data loaded from the database and offering operations for modifying the database. */
 class Database {
-	readonly processes = new ReactiveMap<ProcessID, Task>();
-	readonly organizations = new ReactiveMap<OrganizationID, Organization>();
-	readonly people = new ReactiveMap<PersonID, Person>();
-	readonly roles = new ReactiveMap<RoleID, Role>();
-	readonly changes = new ReactiveMap<ChangeID, Change>();
+	static readonly organizations = new ReactiveMap<OrganizationID, Org>();
 
-	constructor() {
-		for (const task of MockTasks) this.processes.set(task.id, task);
-
-		for (const org of JSON.parse(MockOrganizations) as Organization[])
-			this.organizations.set(org.id, org);
-
-		for (const person of JSON.parse(MockPeople) as Person[]) this.people.set(person.id, person);
-
-		for (const role of JSON.parse(MockRoles) as Role[]) this.roles.set(role.id, role);
-
-		for (const change of JSON.parse(MockChanges) as Change[]) this.changes.set(change.id, change);
+	static updateOrg(org: OrgPayload) {
+		return Database.organizations.set(org.organization.id, new Org(org));
 	}
 
-	async createRole(who: PersonID, organization: OrganizationID, title: string): Promise<Role> {
+	static async createRole(
+		who: PersonID,
+		organization: OrganizationID,
+		title: string
+	): Promise<Role> {
 		const newRole: Role = {
 			id: uuidv4(),
 			organization,
@@ -59,89 +53,26 @@ class Database {
 			visibility: 'public'
 		};
 
-		this.roles.set(newRole.id, newRole);
+		// TODO Update database with new role.
 
 		return newRole;
 	}
 
-	getRole(id: RoleID): Writable<Role | undefined | null> {
-		return this.roles.getStore(id);
+	static async deleteRole(id: RoleID) {
+		// TODO Delete process from database
 	}
 
-	async deleteRole(id: RoleID) {
-		this.processes.delete(id);
+	/** Cache the organization here for later access, updating the store for reactive output */
+	static async updateOrganization(organization: Organization) {
+		// TODO Update database with new organization.
 	}
 
-	async getRoleProcesses(id: RoleID): Promise<Task[]> {
-		return this.processes
-			.values()
-			.filter(
-				(task) =>
-					task.accountable === id ||
-					task.responsible.includes(id) ||
-					task.consulted.includes(id) ||
-					task.informed.includes(id)
-			);
+	static async deleteProcess(id: ProcessID) {
+		// TODO Delete process from database.
+		// Database.processes.delete(id);
 	}
 
-	async getRoleChanges(id: RoleID): Promise<Change[]> {
-		return this.changes.values().filter((request) => request.roles.includes(id));
-	}
-
-	getOrganization(id: OrganizationID): Writable<Organization | null | undefined> {
-		return this.organizations.getStore(id);
-	}
-
-	async updateOrganization(organization: Organization) {
-		const org = this.organizations.getStore(organization.id);
-		if (org) org.set(organization);
-	}
-
-	async getOrganizationRoles(id: OrganizationID): Promise<Role[]> {
-		return this.roles.values().filter((role) => role.organization === id);
-	}
-
-	async getOrganizationProcesses(id: OrganizationID): Promise<Task[]> {
-		return this.processes.values().filter((task) => task.organization === id);
-	}
-
-	async getOrganizationPeople(id: OrganizationID): Promise<PersonID[]> {
-		const org = get(this.getOrganization(id));
-		if (org) return org.staff;
-		else return [];
-	}
-
-	async getOrganizationChanges(id: OrganizationID): Promise<Change[]> {
-		return this.changes.values().filter((change) => change.organization === id);
-	}
-
-	getProcess(id: ProcessID): Writable<Task | undefined | null> {
-		return this.processes.getStore(id);
-	}
-
-	async deleteProcess(id: ProcessID) {
-		this.processes.delete(id);
-	}
-
-	async getProcessChanges(id: ProcessID): Promise<Change[]> {
-		return this.changes.values().filter((change) => change.processes.includes(id));
-	}
-
-	getPerson(id: PersonID): Writable<Person | undefined | null> {
-		return this.people.getStore(id);
-	}
-
-	async getPeople(name: string): Promise<Person[]> {
-		return this.people
-			.values()
-			.filter((person) => person.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()));
-	}
-
-	async getPersonRoles(id: PersonID): Promise<Role[]> {
-		return this.roles.values().filter((role) => role.people.includes(id));
-	}
-
-	async createChange(
+	static async createChange(
 		who: PersonID,
 		organization: OrganizationID,
 		title: string,
@@ -171,20 +102,16 @@ class Database {
 			]
 		};
 
-		this.changes.set(newRequest.id, newRequest);
+		// TODO Update change in database
+		// Database.changes.set(newRequest.id, newRequest);
 
 		return newRequest;
 	}
 
-	getChange(id: ChangeID): Writable<Change | undefined | null> {
-		return this.changes.getStore(id);
-	}
-
-	async deleteRequest(id: ChangeID) {
-		this.changes.delete(id);
+	static async deleteChange(id: ChangeID) {
+		// TODO Delete change in database
+		// Database.changes.delete(id);
 	}
 }
 
-const database = new Database();
-
-export default database;
+export default Database;

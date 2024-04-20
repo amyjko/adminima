@@ -1,13 +1,11 @@
 <script lang="ts">
 	import Loading from '$lib/Loading.svelte';
-	import database from '$database/Database';
-	import { getOrganizationContext } from '$lib/contexts';
+	import { getOrg } from '$lib/contexts';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button from '$lib/Button.svelte';
 	import PersonLink from '$lib/PersonLink.svelte';
-	import { withAdmin, withStaff, withoutAdmin, withoutStaff } from '$types/Organization';
 	import { user } from '$database/Auth';
 	import Form from '$lib/Form.svelte';
 	import Title from '$lib/Title.svelte';
@@ -15,15 +13,16 @@
 	import type { PersonID } from '$types/Person';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
+	import Database from '$database/Database';
 
-	const organization = getOrganizationContext();
-	$: isAdmin = $organization.admins.includes($user.id);
+	const organization = getOrg();
+	$: isAdmin = $organization.hasAdmin($user.id);
 
 	let newPerson: string = '';
 
 	function toggleAdmin(admin: boolean, person: PersonID) {
-		database.updateOrganization(
-			admin ? withAdmin($organization, person) : withoutAdmin($organization, person)
+		Database.updateOrganization(
+			admin ? $organization.withAdmin(person) : $organization.withoutAdmin(person)
 		);
 	}
 </script>
@@ -36,52 +35,48 @@
 	roles. Select a person to see the roles they have.</Paragraph
 >
 
-{#await database.getOrganizationPeople($organization.id)}
-	<Loading />
-{:then people}
-	<table>
-		<thead>
+<table>
+	<thead>
+		<tr>
+			<th>person</th>
+			<th>roles</th>
+			<th>admin</th>
+			<th>remove</th>
+		</tr>
+	</thead>
+	<tbody>
+		{#each $organization.getPeople() as person}
 			<tr>
-				<th>person</th>
-				<th>roles</th>
-				<th>admin</th>
-				<th>remove</th>
+				<td>
+					<PersonLink {person} />
+				</td>
+				<td>
+					{#await $organization.getPersonRoles(person.id)}
+						<Loading />
+					{:then roles}
+						{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+							<span class="role"><RoleLink roleID={role.id} /></span>
+						{/each}
+					{/await}
+				</td>
+				<td>
+					<Checkbox
+						on={$organization.hasAdmin(person.id)}
+						enabled={isAdmin &&
+							($organization.getAdminCount() > 1 || !$organization.hasAdmin(person.id))}
+						change={(on) => toggleAdmin(on, person.id)}
+					/>
+				</td>
+				<td class="actions">
+					<Button
+						action={() => Database.updateOrganization($organization.withoutStaff(person))}
+						active={!$organization.hasAdmin(person)}>&times;</Button
+					>
+				</td>
 			</tr>
-		</thead>
-		<tbody>
-			{#each people as person}
-				<tr>
-					<td>
-						<PersonLink personID={person} />
-					</td>
-					<td>
-						{#await database.getPersonRoles(person)}
-							<Loading />
-						{:then roles}
-							{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-								<span class="role"><RoleLink roleID={role.id} /></span>
-							{/each}
-						{/await}
-					</td>
-					<td>
-						<Checkbox
-							on={$organization.admins.includes(person)}
-							enabled={isAdmin &&
-								($organization.admins.length > 1 || !$organization.admins.includes(person))}
-							change={(on) => toggleAdmin(on, person)}
-						/>
-					</td>
-					<td class="actions">
-						<Button
-							action={() => database.updateOrganization(withoutStaff($organization, person))}
-							active={!$organization.admins.includes(person)}>&times;</Button
-						>
-					</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-{/await}
+		{/each}
+	</tbody>
+</table>
 
 <Admin>
 	<Form>
@@ -91,16 +86,15 @@
 		>
 		<Field label="name" bind:text={newPerson} />
 		{#if newPerson.length > 0}
-			{#await database.getPeople(newPerson)}
+			{#await $organization.getPersonNamed(newPerson)}
 				<Loading />
 			{:then people}
 				<ul>
 					{#each people as person}
 						<li>
-							<PersonLink personID={person.id} email />
-							{#if !$organization.staff.includes(person.id)}
-								<Button
-									action={() => database.updateOrganization(withStaff($organization, person.id))}
+							<PersonLink {person} email />
+							{#if !$organization.hasStaff(person.id)}
+								<Button action={() => Database.updateOrganization($organization.withStaff(person))}
 									>+</Button
 								>{/if}
 						</li>

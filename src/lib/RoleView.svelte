@@ -2,9 +2,7 @@
 	import type Role from '../types/Role';
 	import Timeline from '$lib/Timeline.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import database from '../database/Database';
-	import Error from './Oops.svelte';
-	import Loading from './Loading.svelte';
+	import Database from '../database/Database';
 	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
@@ -16,10 +14,13 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Modifications from '$lib/Modifications.svelte';
+	import { getOrg } from './contexts';
 
 	export let role: Role;
 
 	let deleteError: string | undefined = undefined;
+
+	const org = getOrg();
 </script>
 
 <Title title={role.title} kind={$locale?.term.role} />
@@ -28,21 +29,15 @@
 
 <Paragraph
 	>This role is held by
-	{#each role.people as personID, index}<PersonLink {personID} />{#if index > 0},
+	{#each role.people as person, index}<PersonLink person={$org.getPerson(person)} />{#if index > 0},
 		{/if}{#if index < role.people.length - 1} and {/if}{/each}.</Paragraph
 >
 
 <Header>Timeline</Header>
 
-{#await database.getRoleProcesses(role.id)}
-	<Loading />
-{:then processes}
-	<Timeline {role} {processes} />
-{:catch}
-	<Error text={(locale) => locale.error.noRoleProcesses} />
-{/await}
+<Timeline {role} processes={$org.getRoleProcesses(role)} />
 
-<ChangeForm organization={role.organization} role={role.id} />
+<ChangeForm role={role.id} />
 
 <Modifications mods={role.modifications} />
 
@@ -55,7 +50,7 @@
 		action={async () => {
 			try {
 				const org = role.organization;
-				await database.deleteRole(role.id);
+				await Database.deleteRole(role.id);
 				goto(`/organization/${org}`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";

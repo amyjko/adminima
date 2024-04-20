@@ -7,8 +7,11 @@
 	import Header from './Header.svelte';
 	import { format } from 'date-fns';
 	import Paragraph from './Paragraph.svelte';
+	import { getOrg } from './contexts';
 
 	export let mods: Modification[];
+
+	const org = getOrg();
 </script>
 
 <Header>Modifications</Header>
@@ -16,7 +19,7 @@
 <Rows>
 	{#each mods as change}
 		<Row name={format(change.when, 'MM/dd/yyyy')}>
-			<Paragraph><PersonLink personID={change.person} /></Paragraph>
+			<Paragraph><PersonLink person={$org.getPerson(change.person)} /></Paragraph>
 			<MarkupView markup={change.what} />
 			<em><MarkupView markup={change.why} /></em>
 		</Row>

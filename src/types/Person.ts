@@ -1,10 +1,13 @@
-import type { TeamID } from './Organization';
+import type { OrganizationID } from './Organization';
+import type { TeamID } from './Team';
 
 export type PersonID = string;
 
 type Person = {
 	/** A unique person identifier */
 	id: PersonID;
+	/** The organization this person is in */
+	organization: OrganizationID;
 	/** The person's name */
 	name: string;
 	/** The person's self-introduction to everyone in the org */

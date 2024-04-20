@@ -7,7 +7,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import database from '../database/Database';
+	import Database from '../database/Database';
 	import Oops from './Oops.svelte';
 	import Button from './Button.svelte';
 	import { goto } from '$app/navigation';
@@ -17,10 +17,13 @@
 	import Modifications from './Modifications.svelte';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
+	import { getOrg } from './contexts';
 
 	export let change: change;
 
 	let deleteError: string | undefined = undefined;
+
+	const org = getOrg();
 </script>
 
 <Title title={change.title} kind={$locale?.term.request} />
@@ -29,7 +32,7 @@
 
 <Paragraph
 	>On <TimeView time={change.modifications[0].when} />
-	<PersonLink personID={change.who} /> reported:</Paragraph
+	<PersonLink person={$org.getPerson(change.who)} /> reported:</Paragraph
 >
 
 <Quote><MarkupView markup={change.problem} /></Quote>
@@ -51,7 +54,7 @@
 	<div class="comment">
 		<div class="meta">
 			<TimeView time={comment.when} />
-			<PersonLink personID={comment.who} />
+			<PersonLink person={$org.getPerson(comment.who)} />
 		</div>
 		<Quote>
 			<MarkupView markup={comment.what} />
@@ -67,7 +70,7 @@
 		action={async () => {
 			try {
 				const org = change.organization;
-				await database.deleteRequest(change.id);
+				await Database.deleteChange(change.id);
 				goto(`/organization/${org}`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";

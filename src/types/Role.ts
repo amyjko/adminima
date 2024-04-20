@@ -1,5 +1,6 @@
 import type Markup from './Markup';
-import type { OrganizationID, StatusID } from './Organization';
+import type { OrganizationID } from './Organization';
+import type { StatusID } from './Status';
 import type { PersonID } from './Person';
 import type Tracked from './Tracked';
 import type Visibility from './Visibility';

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { user } from '$database/Auth';
 	import Header from './Header.svelte';
-	import { getOrganizationContext } from './contexts';
+	import { getOrg } from './contexts';
 
-	const organization = getOrganizationContext();
+	const organization = getOrg();
 </script>
 
 <!-- Demarcates a view that is admin only, to clarify to users who has the ability to do this. -->
-{#if $organization.admins.includes($user.id)}
+{#if $organization.hasAdmin($user.id)}
 	<section class="admin">
 		<Header>admins only</Header>
 		<slot />

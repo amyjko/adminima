@@ -1,22 +1,18 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import Loading from '$lib/Loading.svelte';
+	import type { OrgPayload } from '$database/Database';
+	import Database from '$database/Database';
 	import Oops from '$lib/Oops.svelte';
-	import { setOrganizationContext } from '$lib/contexts';
-	import type { Writable } from 'svelte/store';
-	import database from '../../../database/Database';
-	import type Organization from '$types/Organization';
+	import { OrgSymbol } from '$lib/contexts';
+	import { setContext } from 'svelte';
 
-	// Get a store representing the organization
-	const organization = database.getOrganization($page.params.orgid);
-	// Store it in a context for child components to acccess.
-	$: if ($organization) setOrganizationContext(organization as Writable<Organization>);
+	export let data: { payload: OrgPayload | null };
+
+	// Save the payload in the database cache.
+	$: if (data.payload) setContext(OrgSymbol, Database.updateOrg(data.payload));
 </script>
 
-{#if $organization === undefined}
-	<Loading inline={false} />
-{:else if $organization === null}
-	<Oops text={(locale) => locale.error.noOrganization} />
-{:else}
+{#if data.payload !== null}
 	<slot />
+{:else}
+	<Oops text="Organization not found." />
 {/if}

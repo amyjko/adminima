@@ -1,6 +1,6 @@
 <script lang="ts">
 	import OrganizationLink from './OrganizationLink.svelte';
-	import { getOrganizationContext } from './contexts';
+	import { getOrg } from './contexts';
 	import { page } from '$app/stores';
 	import Button from './Button.svelte';
 
@@ -11,7 +11,7 @@
 	// An optional function for editing the title
 	export let edit: undefined | ((text: string) => void) = undefined;
 
-	const organization = getOrganizationContext();
+	const org = getOrg();
 
 	let editing = false;
 	let revision = '';
@@ -42,8 +42,8 @@
 	</h1>
 	{#if edit}
 		<div />{/if}
-	{#if $organization && $page.url.pathname !== `/organization/${$organization.id}`}
-		<div class="breadcrumbs"><OrganizationLink organizationID={$organization.id} /></div>
+	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
+		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
 	{/if}
 </div>
 

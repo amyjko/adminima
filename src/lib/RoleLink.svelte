@@ -1,16 +1,16 @@
 <script lang="ts">
 	import Link from './Link.svelte';
-	import database from '../database/Database';
-	import Loading from './Loading.svelte';
 	import Oops from './Oops.svelte';
 	import type { RoleID } from '../types/Role';
+	import { getOrg } from './contexts';
 
 	export let roleID: RoleID;
 
-	$: role = database.getRole(roleID);
+	const org = getOrg();
+
+	$: role = $org.getRole(roleID);
 </script>
 
-{#if $role === undefined}<Loading />{:else if $role === null}<Oops
-		inline
-		text={(locale) => locale.error.noRole}
-	/>{:else}<Link to="/organization/{$role.organization}/role/{roleID}">{$role.title}</Link>{/if}
+{#if role === null}<Oops inline text={(locale) => locale.error.noRole} />{:else}<Link
+		to="/organization/{$org.getID()}/role/{roleID}">{role.title}</Link
+	>{/if}
