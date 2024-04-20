@@ -98,7 +98,8 @@ function convert(rows) {
 			{
 				id: 'ischool',
 				name: orgName,
-				description: '',
+				description:
+					'The *academics enterprise* encompasses every aspect of teaching, learning, and student experience in the school, with the broad goal of equitable, inclusive, and justice-centered information education.',
 				admins: [],
 				staff: [],
 				teams: [],
