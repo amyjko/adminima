@@ -10,9 +10,10 @@
 </script>
 
 <a
+	class={kind}
 	class:inactive
 	class:bland
-	class={kind}
+	class:kinded={kind !== null}
 	href={inactive ? null : to}
 	target={external ? '_blank' : ''}
 	><span class="emoji"
@@ -23,8 +24,7 @@
 
 <style>
 	a {
-		background: var(--salient);
-		color: var(--background);
+		color: var(--foreground);
 		padding-left: var(--padding);
 		padding-right: var(--padding);
 		text-decoration: none;
@@ -61,6 +61,9 @@
 		font-size: small;
 	}
 
+	.kinded {
+		color: var(--background);
+	}
 	.person {
 		background-color: var(--person);
 	}
@@ -72,7 +75,6 @@
 	}
 	.org {
 		background-color: var(--foreground);
-		color: var(--background);
 	}
 	.change {
 		background-color: var(--salient);
