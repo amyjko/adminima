@@ -5,8 +5,10 @@
 	export let roles: RoleID[];
 </script>
 
-{#each roles as role, index}<RoleLink roleID={role} />{#if index > 1},
-	{/if}{#if roles.length > 1 && index === roles.length - 1} and{/if}
+{#each roles as role, index}<RoleLink
+		roleID={role}
+	/>{#if roles.length > 1 && index < roles.length - 1}{#if roles.length > 2},{/if} and&nbsp;
+	{/if}
 {/each}
 {#if roles.length > 1}are{:else}is{/if}
-<slot />.
+<slot />
