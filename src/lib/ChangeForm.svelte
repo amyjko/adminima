@@ -45,7 +45,7 @@
 			role{:else if process}process{/if}? Give your request a title and describe the problem you'd
 		like to address.</Paragraph
 	>
-	<Oops text="Suggestions are disabled." />
+	<Oops text="Suggestions are not available yet." />
 	<!-- <Field label="Title" bind:text={newRequestTitle} />
 	<Field
 		label="Describe the problem you're experiencing and any ideas you have for addressing it."

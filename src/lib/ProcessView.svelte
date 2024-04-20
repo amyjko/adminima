@@ -15,6 +15,7 @@
 	import RoleContribution from './RoleContribution.svelte';
 	import type Process from '../types/Process';
 	import Level from './Level.svelte';
+	import Subheader from './Subheader.svelte';
 
 	export let process: Process;
 
@@ -29,6 +30,8 @@
 />
 
 <MarkupView markup={process.what} />
+
+<Paragraph><em>Area of concern</em>: <strong>{process.concern}</strong></Paragraph>
 
 <Header>Who</Header>
 
