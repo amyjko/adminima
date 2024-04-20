@@ -10,7 +10,7 @@
 	const organization = getOrg();
 </script>
 
-<Title title="processes" kind={$locale?.term.organization} />
+<Title title="processes" kind={$locale?.term.organization} visibility="org" />
 
 <Paragraph
 	>These are all of the processes in this organization. Select one to see how it works, who's

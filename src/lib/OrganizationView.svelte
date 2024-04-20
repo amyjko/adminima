@@ -17,6 +17,7 @@
 	edit={organization.hasAdmin($user.id)
 		? (text) => Database.updateOrganization(organization.withName(text))
 		: undefined}
+	visibility={organization.getOrganization().visibility}
 />
 
 <MarkupView

@@ -1,22 +1,24 @@
 <script lang="ts">
-	import { type StatusID } from '$types/Status';
+	import type Visibility from '$types/Visibility';
 	import { getOrg } from './contexts';
 
-	export let status: StatusID | null;
+	export let visibility: Visibility;
 
 	const org = getOrg();
 </script>
 
-<span class="status" title={status ? $org.getStatus(status)?.description : null}>{status}</span>
+<span class:visibility class={visibility}>{visibility}</span>
 
 <style>
-	.status {
+	.visibility {
 		text-transform: none;
 		display: inline-block;
 		align-self: flex-start;
+		font-size: var(--small-size);
 		padding-left: var(--padding);
 		padding-right: var(--padding);
-		background: var(--warning);
 		color: var(--background);
+		background-color: var(--focus);
+		vertical-align: middle;
 	}
 </style>

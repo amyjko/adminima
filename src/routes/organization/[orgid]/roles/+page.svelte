@@ -30,7 +30,9 @@
 	}
 </script>
 
-<Title title="roles" kind={$locale?.term.organization}><OrganizationLink org={$org} /></Title>
+<Title title="roles" kind={$locale?.term.organization} visibility="org"
+	><OrganizationLink org={$org} /></Title
+>
 <Paragraph
 	>These are the positions held in this organization. Each one is responsible for particular
 	processes in this organization.</Paragraph

@@ -15,7 +15,7 @@
 	$: roles = $org.getPersonRoles(person);
 </script>
 
-<Title title={person.name} kind={$locale?.term.person} />
+<Title title={person.name} kind={$locale?.term.person} visibility="org" />
 
 <Header>Roles</Header>
 <Flow>

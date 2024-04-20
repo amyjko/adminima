@@ -20,7 +20,12 @@
 	let deleteError: string | undefined = undefined;
 </script>
 
-<Title title={process.title} kind={$locale?.term.process ?? ''} status={process.status} />
+<Title
+	title={process.title}
+	kind={$locale?.term.process ?? ''}
+	status={process.status}
+	visibility={process.visibility}
+/>
 
 <MarkupView markup={process.what} />
 

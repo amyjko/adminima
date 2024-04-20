@@ -8,7 +8,7 @@
 	import Title from '$lib/Title.svelte';
 </script>
 
-<Title title={Logo + ' Adminima'} />
+<Title title={Logo + ' Adminima'} visibility="public" />
 <Lead><Text text={$locale?.landing.value} /></Lead>
 <Paragraph><Text text={$locale?.landing.description} /></Paragraph>
 <Paragraph

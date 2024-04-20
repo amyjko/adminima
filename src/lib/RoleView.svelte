@@ -22,7 +22,12 @@
 	const org = getOrg();
 </script>
 
-<Title title={role.title} kind={$locale?.term.role} status={role.status} />
+<Title
+	title={role.title}
+	kind={$locale?.term.role}
+	status={role.status}
+	visibility={role.visibility}
+/>
 
 <MarkupView markup={role.what} />
 

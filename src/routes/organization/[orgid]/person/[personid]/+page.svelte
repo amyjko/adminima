@@ -12,7 +12,7 @@
 </script>
 
 {#if person === null}
-	<Title title="oops" kind={$locale?.term.error} />
+	<Title title="oops" kind={$locale?.term.error} visibility="org" />
 	<Oops text={(locale) => locale.error.noPerson} />
 {:else}
 	<PersonView {person} />
