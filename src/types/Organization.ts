@@ -22,6 +22,17 @@ export type Status = {
 	id: StatusID;
 };
 
+/** A group of people with a shared goal. Team membership is set on the person, as people can only be part of one team. */
+export type TeamID = string;
+export type Team = {
+	/** The team's ID */
+	id: TeamID;
+	/** The team's name */
+	name: string;
+	/** A description of the team's goals */
+	description: Markup;
+};
+
 type Organization = Tracked & {
 	/** A unique organization identifier */
 	id: OrganizationID;
@@ -33,6 +44,8 @@ type Organization = Tracked & {
 	admins: PersonID[];
 	/** People in this organization */
 	staff: PersonID[];
+	/** Teams in this organization */
+	teams: Team[];
 	/** Areas of concern, used to tag processes, to help organize and explain them */
 	concerns: Concern[];
 	/** Statuses indicate different metadata on processes and roles (e.g., pending, discussed, active) */

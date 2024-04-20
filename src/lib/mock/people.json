@@ -3,24 +3,28 @@
 		"id": "victor",
 		"name": "Victor Aque",
 		"email": "test@uw.edu",
-		"icon": "🥐"
+		"icon": "🥐",
+		"team": "admin"
 	},
 	{
 		"id": "amy",
 		"name": "Amy J. Ko",
 		"email": "ajko@uw.edu",
-		"icon": "🐱"
+		"icon": "🐱",
+		"team": "admin"
 	},
 	{
 		"id": "cris",
 		"name": "Cris Fowler",
 		"email": "crism@uw.edu",
-		"icon": "🦄"
+		"icon": "🦄",
+		"team": "admin"
 	},
 	{
 		"id": "marie",
 		"name": "Marie West",
 		"email": "westmar@uw.edu",
-		"icon": "🐴"
+		"icon": "🐴",
+		"team": "teachinglearning"
 	}
 ]
