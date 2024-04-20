@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type Organization from '../types/Organization';
 	import MarkupView from './MarkupView.svelte';
 	import Link from './Link.svelte';
 	import Title from './Title.svelte';
