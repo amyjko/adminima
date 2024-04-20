@@ -7,8 +7,8 @@
 
 {#each roles as role, index}<RoleLink
 		roleID={role}
-	/>{#if roles.length > 1 && index < roles.length - 1}{#if roles.length > 2},{/if} and&nbsp;
+	/>{#if roles.length > 2},{/if}{#if roles.length > 1 && index === roles.length - 2}
+		&nbsp;and&nbsp;
 	{/if}
 {/each}
-{#if roles.length > 1}are{:else}is{/if}
 <slot />

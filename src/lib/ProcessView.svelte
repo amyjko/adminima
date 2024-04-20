@@ -33,31 +33,27 @@
 
 <ul>
 	<li>
-		<RoleContribution roles={[process.accountable]}
-			><strong>accountable</strong>{#if process.responsible.length === 0}and <strong
-					>responsible</strong
-				>{/if} for this task's outcome.</RoleContribution
-		>
+		<strong>accountable</strong>{#if process.responsible.length === 0}and <strong
+				>responsible</strong
+			>{/if} for this task's outcomes: <RoleContribution roles={[process.accountable]} />
 	</li>
 	{#if process.responsible.length > 0}
 		<li>
-			<RoleContribution roles={process.responsible}
-				><strong>responsible</strong> for completing this task.</RoleContribution
-			>
+			<strong>responsible</strong> for completing this process: <RoleContribution
+				roles={process.responsible}
+			/>
 		</li>
 	{/if}
 	{#if process.consulted.length > 0}
 		<li>
-			<RoleContribution roles={process.consulted}
-				><strong>consulted</strong> to ensure this task is done well.</RoleContribution
-			>
+			<strong>consulted</strong> in this process: <RoleContribution roles={process.consulted} />
 		</li>
 	{/if}
 	{#if process.informed.length > 0}
 		<li>
-			<RoleContribution roles={process.informed}
-				><strong>informed</strong> that this is happening and when it is complete.</RoleContribution
-			>
+			<strong>informed</strong> that this process is happening and of its outcome: <RoleContribution
+				roles={process.informed}
+			/>
 		</li>
 	{/if}
 </ul>
