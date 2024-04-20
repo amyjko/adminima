@@ -73,11 +73,15 @@
 
 <Header>How</Header>
 
-<ul>
-	{#each process.how as how}
-		<li><TaskView task={how} /></li>
-	{/each}
-</ul>
+{#if process.how.length === 0}
+	<p>This process doesn't have any tasks listed yet.</p>
+{:else}
+	<ul>
+		{#each process.how as how}
+			<li><TaskView task={how} /></li>
+		{/each}
+	</ul>
+{/if}
 
 <ChangeForm process={process.id} />
 
