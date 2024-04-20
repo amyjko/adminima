@@ -1,35 +1,22 @@
 <script lang="ts">
-	import type Change from '$types/Change';
+	import { type StatusID } from '$types/Status';
+	import { getOrg } from './contexts';
 
-	export let change: Change;
+	export let status: StatusID | null;
+
+	const org = getOrg();
 </script>
 
-<div class="status {change.status}">{change.status}</div>
+<div class="status" title={status ? $org.getStatus(status)?.description : null}>{status}</div>
 
 <style>
 	.status {
-		padding: calc(var(--spacing) / 2);
+		text-transform: none;
 		display: inline-block;
 		align-self: flex-start;
-	}
-
-	.triage {
-		background: var(--error);
-		color: var(--background);
-	}
-
-	.backlog {
-		background: var(--inactive);
-		color: var(--foreground);
-	}
-
-	.active {
+		padding-left: var(--padding);
+		padding-right: var(--padding);
 		background: var(--warning);
-		color: var(--background);
-	}
-
-	.closed {
-		background: var(--foreground);
 		color: var(--background);
 	}
 </style>

@@ -3,11 +3,15 @@
 	import { getOrg } from './contexts';
 	import { page } from '$app/stores';
 	import Button from './Button.svelte';
+	import Status from './Status.svelte';
+	import type { StatusID } from '$types/Status';
 
 	// The title to show in the header
 	export let title: string;
 	// A descriptive label for what kind of page this is
 	export let kind: string = '';
+	// The status of the thing
+	export let status: StatusID | null = null;
 	// An optional function for editing the title
 	export let edit: undefined | ((text: string) => void) = undefined;
 
@@ -23,7 +27,6 @@
 
 <div class="title">
 	<div class="kind">{kind}</div>
-
 	<h1>
 		{#if edit}<Button
 				action={() => {
@@ -45,6 +48,7 @@
 	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
 		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
 	{/if}
+	{#if status}<Status {status} />{/if}
 </div>
 
 <style>
@@ -65,6 +69,7 @@
 
 	.breadcrumbs {
 		font-size: 12pt;
+		margin-bottom: var(--padding);
 	}
 
 	input {

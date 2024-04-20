@@ -22,7 +22,7 @@
 		<tbody>
 			{#each changes.sort((a, b) => a.revisions[0]?.when ?? 0 - b.revisions[0]?.when ?? 0) as change}
 				<tr>
-					<td><Status {change} /></td>
+					<td><Status status={change.status} /></td>
 					<td><PersonLink person={$org.getPerson(change.who)} /></td>
 					<td><ChangeLink changeID={change.id} /></td></tr
 				>

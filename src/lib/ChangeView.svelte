@@ -2,7 +2,7 @@
 	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import type change from '../types/Change';
+	import type Change from '../types/Change';
 	import MarkupView from './MarkupView.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
@@ -19,16 +19,16 @@
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
 
-	export let change: change;
+	export let change: Change;
 
 	let deleteError: string | undefined = undefined;
 
 	const org = getOrg();
 </script>
 
-<Title title={change.title} kind={$locale?.term.request} />
+<Title title={change.title} kind={$locale?.term.request} status={change.status} />
 
-<Status {change} />
+<Status status={change.status} />
 
 <Paragraph
 	>On <TimeView time={change.revisions[0].when} />

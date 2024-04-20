@@ -8,6 +8,7 @@ import type { ProcessID } from './Process';
 import type Process from './Process';
 import type { RoleID } from './Role';
 import type Role from './Role';
+import type { StatusID } from './Status';
 
 /** A wrapper class to provide utility functions on an organization payload from the database. Simplifies the interface for accessing organization content. */
 export default class Org {
@@ -137,5 +138,9 @@ export default class Org {
 		return this.data.people.filter((person) =>
 			person.name.toLocaleLowerCase().includes(name.toLocaleLowerCase())
 		);
+	}
+
+	getStatus(id: StatusID) {
+		return this.data.organization.statuses.find((status) => status.id === id) ?? null;
 	}
 }

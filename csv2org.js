@@ -44,8 +44,10 @@ function convert(rows) {
 
 	const processes = [];
 	const concerns = [];
+	let statuses = [];
 	for (const row of withoutTallies) {
 		if (/Proposed|Discussed|Pending|Final/.test(row['Status'])) {
+			statuses = [...statuses, row];
 			processes.push({
 				id: '' + processes.length,
 				icon: '',
@@ -103,27 +105,27 @@ function convert(rows) {
 				concerns: concerns,
 				statuses: [
 					{
-						id: '1',
+						id: 'Draft',
 						name: 'Drafted',
 						description: 'Still working on it'
 					},
 					{
-						id: '2',
+						id: 'Discussed',
 						name: 'Discussed',
 						description: 'Discussed with stakeholders'
 					},
 					{
-						id: '3',
+						id: 'Proposed',
 						name: 'Proposed',
 						description: 'Ready for feedback'
 					},
 					{
-						id: '4',
+						id: 'Approved',
 						name: 'Approved',
 						description: 'Approved and ready to implement'
 					},
 					{
-						id: '4',
+						id: 'Implemented',
 						name: 'Implemented',
 						description: 'Implemented'
 					}
