@@ -5,6 +5,7 @@ import type Tracked from './Tracked';
 export type OrganizationID = string;
 
 export type ConcernID = string;
+/** Metadata for tagging what area of concern a process is related to. */
 export type Concern = {
 	/** An ID for the concern */
 	id: ConcernID;
@@ -15,6 +16,7 @@ export type Concern = {
 };
 
 export type StatusID = string;
+/** Metadata for tagging processes, roles, and changes to indicate where they are in change flows. */
 export type Status = {
 	/** An ID for the status */
 	id: StatusID;
