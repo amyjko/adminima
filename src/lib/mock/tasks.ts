@@ -27,7 +27,8 @@ const MockTasks: Process[] = [
 		informed: [],
 		how: [],
 		modifications: DefaultModification,
-		public: true
+		public: true,
+		status: null
 	},
 	{
 		id: '2',
@@ -44,7 +45,8 @@ const MockTasks: Process[] = [
 		informed: [],
 		how: [],
 		modifications: DefaultModification,
-		public: true
+		public: true,
+		status: null
 	},
 	{
 		id: '3',
@@ -87,7 +89,8 @@ const MockTasks: Process[] = [
 			}
 		],
 		modifications: DefaultModification,
-		public: true
+		public: true,
+		status: null
 	},
 	{
 		id: '4',
@@ -104,7 +107,8 @@ const MockTasks: Process[] = [
 		informed: [],
 		how: [],
 		modifications: DefaultModification,
-		public: true
+		public: true,
+		status: null
 	}
 ];
 

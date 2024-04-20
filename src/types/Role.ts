@@ -1,5 +1,5 @@
 import type Markup from './Markup';
-import type { OrganizationID } from './Organization';
+import type { OrganizationID, StatusID } from './Organization';
 import type { PersonID } from './Person';
 import type Tracked from './Tracked';
 
@@ -17,6 +17,8 @@ type Role = Tracked & {
 	what: Markup;
 	/** People who have this role */
 	people: PersonID[];
+	/** Optional status of this role */
+	status: StatusID | null;
 };
 
 export type { Role as default };

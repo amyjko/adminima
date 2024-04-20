@@ -1,6 +1,6 @@
 import type Markup from './Markup';
 import type { RoleID } from './Role';
-import type { ConcernID, OrganizationID } from './Organization';
+import type { ConcernID, OrganizationID, StatusID } from './Organization';
 import type Tracked from './Tracked';
 import type Repeat from './Repeat';
 import type { Day } from './Repeat';
@@ -27,6 +27,8 @@ type Process = Tracked &
 		title: string;
 		/** Whether this process is visible to anyone. Overriden by private role. */
 		public: boolean;
+		/** Optional status of this process */
+		status: StatusID | null;
 	};
 
 export type Task = {

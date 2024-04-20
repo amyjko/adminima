@@ -11,6 +11,18 @@
 				"name": "Careers",
 				"description": "Anything related to students' career identity, planning, and goals."
 			}
+		],
+		"statuses": [
+			{
+				"id": "1",
+				"name": "pending",
+				"description": "This is drafted, but not active yet."
+			},
+			{
+				"id": "2",
+				"name": "draft",
+				"description": "This is proposed, but we haven't approved it yet."
+			}
 		]
 	}
 ]

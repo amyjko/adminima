@@ -54,7 +54,8 @@ class Database {
 					why: '',
 					change: null
 				}
-			]
+			],
+			status: null
 		};
 
 		this.roles.set(newRole.id, newRole);

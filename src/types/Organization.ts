@@ -3,15 +3,21 @@ import type { PersonID } from './Person';
 import type Tracked from './Tracked';
 
 export type OrganizationID = string;
-export type ConcernID = string;
 
-type Concern = {
+export type ConcernID = string;
+export type Concern = {
 	/** An ID for the concern */
-	concern: ConcernID;
+	id: ConcernID;
 	/** The concern's name */
 	name: string;
 	/** The concern's description */
 	description: Markup;
+};
+
+export type StatusID = string;
+export type Status = {
+	/** An ID for the status */
+	id: StatusID;
 };
 
 type Organization = Tracked & {
@@ -25,8 +31,10 @@ type Organization = Tracked & {
 	admins: PersonID[];
 	/** People in this organization */
 	staff: PersonID[];
-	/** Areas of concern, used to tag processes for organization */
-	concern: Concern[];
+	/** Areas of concern, used to tag processes, to help organize and explain them */
+	concerns: Concern[];
+	/** Statuses indicate different metadata on processes and roles (e.g., pending, discussed, active) */
+	statuses: Status[];
 };
 
 export type { Organization as default };

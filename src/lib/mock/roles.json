@@ -5,7 +5,8 @@
 		"title": "Associate Dean for Academics (ADA)",
 		"what": "The Associate Dean for Academics (ADA) sets the vision, policies, and priorities of academics in the Information School, collaborating closely with the Assistant Dean for Academics to align staff operations with these decisions. The ADA also supports the faculty program chairs for each program, and helps triage requests for change from stakeholders in our education community. ",
 		"people": ["amy"],
-		"modifications": []
+		"modifications": [],
+		"status": null
 	},
 	{
 		"id": "changepm",
@@ -13,6 +14,7 @@
 		"title": "Program Manager for Change",
 		"what": "Helps the Associate Dean manage change and track success.",
 		"people": ["victor"],
-		"modifications": []
+		"modifications": [],
+		"status": null
 	}
 ]
