@@ -4,12 +4,21 @@
 	export let to: string;
 	export let external = false;
 	export let bland = false;
+	export let kind: 'person' | 'role' | 'process' | 'org' | 'team' | 'change' | null = null;
 
 	$: inactive = to === $page.url.pathname;
 </script>
 
-<a class:inactive class:bland href={inactive ? null : to} target={external ? '_blank' : ''}
-	><slot /></a
+<a
+	class:inactive
+	class:bland
+	class={kind}
+	href={inactive ? null : to}
+	target={external ? '_blank' : ''}
+	><span class="emoji"
+		>{#if kind === 'person'}👤{:else if kind === 'role'}🔨{:else if kind === 'process'}⚙️{:else if kind === 'org'}🏠{:else if kind === 'change'}✍️{/if}</span
+	>
+	<slot /></a
 >{#if external}<sup class="external">↗</sup>{/if}
 
 <style>
@@ -21,6 +30,8 @@
 		text-decoration: none;
 		transition: transform 200ms;
 		display: inline-block;
+		border-radius: var(--padding);
+		line-height: 1.2;
 	}
 
 	a.inactive {
@@ -48,5 +59,26 @@
 
 	.external {
 		font-size: small;
+	}
+
+	.person {
+		background-color: var(--person);
+	}
+	.role {
+		background-color: var(--warning);
+	}
+	.process {
+		background-color: var(--error);
+	}
+	.org {
+		background-color: var(--foreground);
+		color: var(--background);
+	}
+	.change {
+		background-color: var(--salient);
+	}
+
+	.emoji {
+		font-size: 80%;
 	}
 </style>

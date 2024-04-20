@@ -26,6 +26,7 @@
 		--warning-background: #faecdc;
 		--other: #b349cb;
 		--salient: #d35088;
+		--person: #238427;
 		--focus: #784ada;
 		--background: #ffffff;
 		--separator: #cccccc;

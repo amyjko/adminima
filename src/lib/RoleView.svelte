@@ -3,7 +3,6 @@
 	import Timeline from '$lib/Timeline.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Database from '../database/Database';
-	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import ChangeForm from './ChangeForm.svelte';

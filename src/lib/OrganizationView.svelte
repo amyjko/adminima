@@ -27,19 +27,21 @@
 />
 
 <Paragraph>
-	See what <Link to="/organization/{organization.getID()}/roles">Roles</Link> people have in this organization.</Paragraph
+	See what <Link kind="role" to="/organization/{organization.getID()}/roles">Roles</Link> people have
+	in this organization.</Paragraph
 >
 
 <Paragraph
-	>See the <Link to="/organization/{organization.getID()}/people">People</Link> in this organization.</Paragraph
+	>See the <Link kind="person" to="/organization/{organization.getID()}/people">People</Link> in this
+	organization.</Paragraph
 >
 
 <Paragraph
-	>See the <Link to="/organization/{organization.getID()}/processes">Processes</Link> that make this
-	organization work.</Paragraph
+	>See the <Link kind="process" to="/organization/{organization.getID()}/processes">Processes</Link>
+	that make this organization work.</Paragraph
 >
 
 <Paragraph
-	>Suggest a <Link to="/organization/{organization.getID()}/changes">Change</Link> to make this organization
-	work better.</Paragraph
+	>Suggest a <Link kind="change" to="/organization/{organization.getID()}/changes">Change</Link> to make
+	this organization work better.</Paragraph
 >

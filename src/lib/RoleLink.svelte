@@ -12,5 +12,6 @@
 </script>
 
 {#if role === null}<Oops inline text={(locale) => locale.error.noRole} />{:else}<Link
-		to="/organization/{$org.getID()}/role/{roleID}">{role.title}</Link
+		to="/organization/{$org.getID()}/role/{roleID}"
+		kind="role">{role.title}</Link
 	>{/if}

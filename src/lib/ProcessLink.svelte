@@ -12,5 +12,6 @@
 </script>
 
 {#if process === null}<Oops inline text={(locale) => locale.error.noProcess} />{:else}<Link
-		to="/organization/{$organization.getID()}/process/{processID}">{process.title}</Link
+		to="/organization/{$organization.getID()}/process/{processID}"
+		kind="process">{process.title}</Link
 	>{/if}

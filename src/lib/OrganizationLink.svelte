@@ -5,4 +5,4 @@
 	export let org: Org;
 </script>
 
-<Link to="/organization/{org.getID()}">{org.getName()}</Link>
+<Link to="/organization/{org.getID()}" kind="org">{org.getName()}</Link>
