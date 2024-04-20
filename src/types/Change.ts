@@ -1,6 +1,6 @@
 import type { ProcessID } from './Process';
 import type Markup from './Markup';
-import type { OrganizationID } from './Organization';
+import type { OrganizationID, StatusID } from './Organization';
 import type { PersonID } from './Person';
 import type { RoleID } from './Role';
 import type Tracked from './Tracked';
@@ -37,7 +37,7 @@ type Change = Tracked & {
 	/** Descriptions of ideas for addressing the problem */
 	comments: Comment[];
 	/** Status of the change request */
-	status: 'triage' | 'backlog' | 'active' | 'completed' | 'closed';
+	status: StatusID | null;
 };
 
 export type { Change as default };
