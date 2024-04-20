@@ -6,6 +6,7 @@
 	import Paragraph from './Paragraph.svelte';
 	import type Role from '$types/Role';
 	import RoleProcesses from './RoleProcesses.svelte';
+	import Header from './Header.svelte';
 
 	export let role: Role;
 	export let processes: Process[];
@@ -42,19 +43,22 @@
 {:else}
 	<Paragraph>These are the processes that this role is responsible for.</Paragraph>
 	<div class="processes">
-		<div class="time">
-			{#each weeks as num}
-				<div class="tick" style:left="{num * PixelsPerWeek}px">
-					<div class="date">{format(addWeeks(start, num), 'MM/dd/yy')}</div>
+		{#if timed.length > 0}
+			<Header>Timeline</Header>
+			<div class="time">
+				{#each weeks as num}
+					<div class="tick" style:left="{num * PixelsPerWeek}px">
+						<div class="date">{format(addWeeks(start, num), 'MM/dd/yy')}</div>
+					</div>
+				{/each}
+				<div class="timed">
+					{#each timed as process}{#if process.start}<ProcessPill
+								{process}
+								left={differenceInWeeks(toDate(process.start), start) * PixelsPerWeek}
+							/>{/if}{/each}
 				</div>
-			{/each}
-			<div class="timed">
-				{#each timed as process}{#if process.start}<ProcessPill
-							{process}
-							left={differenceInWeeks(toDate(process.start), start) * PixelsPerWeek}
-						/>{/if}{/each}
 			</div>
-		</div>
+		{/if}
 
 		<RoleProcesses {role} {processes} />
 	</div>

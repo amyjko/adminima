@@ -30,10 +30,8 @@
 <Paragraph
 	>This role is held by
 	{#each role.people as person, index}<PersonLink person={$org.getPerson(person)} />{#if index > 0},
-		{/if}{#if index < role.people.length - 1} and {/if}{/each}.</Paragraph
+		{/if}{#if index < role.people.length - 1} and {/if}{:else}no one yet{/each}.</Paragraph
 >
-
-<Header>Timeline</Header>
 
 <Timeline {role} processes={$org.getRoleProcesses(role)} />
 
