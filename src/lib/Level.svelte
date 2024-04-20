@@ -7,11 +7,8 @@
 <style>
 	.level {
 		display: inline-block;
-		min-width: 2em;
-		min-height: 2em;
 		font-weight: bold;
 		font-size: 200%;
-		padding: var(--padding);
 	}
 	.accountable {
 		color: var(--error);
