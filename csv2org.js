@@ -68,7 +68,7 @@ function convert(rows) {
 				what: row['Notes'],
 				how: [],
 				visibility: 'public',
-				modifications: []
+				revisions: []
 			});
 		} else {
 			const [name, description] = row['Status'].split('\n');
@@ -87,7 +87,7 @@ function convert(rows) {
 			people: [],
 			status: 'Proposed',
 			visibility: 'public',
-			modifications: []
+			revisions: []
 		});
 	}
 
@@ -129,7 +129,7 @@ function convert(rows) {
 					}
 				],
 				visibility: 'public',
-				modifications: []
+				revisions: []
 			}
 		],
 		processes,

@@ -2,7 +2,7 @@ import type Markup from './Markup';
 import type { PersonID } from './Person';
 import type { ChangeID } from './Change';
 
-type Modification = {
+type Revision = {
 	/** A unix time stamp of when the modification occurred */
 	when: number;
 	/** Who made the modification */
@@ -15,4 +15,4 @@ type Modification = {
 	change: ChangeID | null;
 };
 
-export type { Modification as default };
+export type { Revision as default };

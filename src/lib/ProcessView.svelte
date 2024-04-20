@@ -11,7 +11,7 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
-	import Modifications from './Modifications.svelte';
+	import Modifications from './Revisions.svelte';
 	import RoleContribution from './RoleContribution.svelte';
 	import type Process from '../types/Process';
 
@@ -102,4 +102,4 @@
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
 
-<Modifications mods={process.modifications} />
+<Modifications mods={process.revisions} />

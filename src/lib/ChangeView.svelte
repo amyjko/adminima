@@ -14,7 +14,7 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
-	import Modifications from './Modifications.svelte';
+	import Modifications from './Revisions.svelte';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
@@ -31,7 +31,7 @@
 <Status {change} />
 
 <Paragraph
-	>On <TimeView time={change.modifications[0].when} />
+	>On <TimeView time={change.revisions[0].when} />
 	<PersonLink person={$org.getPerson(change.who)} /> reported:</Paragraph
 >
 
@@ -81,7 +81,7 @@
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
 
-<Modifications mods={change.modifications} />
+<Modifications mods={change.revisions} />
 
 <style>
 	.comment {

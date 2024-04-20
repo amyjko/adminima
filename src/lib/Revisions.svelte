@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type Modification from '../types/Modification';
+	import type Revision from '../types/Revision';
 	import PersonLink from './PersonLink.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Row from './Row.svelte';
@@ -9,12 +9,12 @@
 	import Paragraph from './Paragraph.svelte';
 	import { getOrg } from './contexts';
 
-	export let mods: Modification[];
+	export let mods: Revision[];
 
 	const org = getOrg();
 </script>
 
-<Header>Modifications</Header>
+<Header>Revision history</Header>
 
 <Rows>
 	{#each mods as change}
@@ -24,6 +24,6 @@
 			<em><MarkupView markup={change.why} /></em>
 		</Row>
 	{:else}
-		&mdash;
+		No revision history.
 	{/each}
 </Rows>

@@ -1,7 +1,7 @@
-import type Modification from './Modification';
+import type Revision from './Revision';
 
 type Tracked = {
-	modifications: Modification[];
+	revisions: Revision[];
 };
 
 export type { Tracked as default };

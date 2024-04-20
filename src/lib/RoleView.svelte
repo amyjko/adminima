@@ -13,7 +13,7 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
-	import Modifications from '$lib/Modifications.svelte';
+	import Revisions from '$lib/Revisions.svelte';
 	import { getOrg } from './contexts';
 
 	export let role: Role;
@@ -39,7 +39,7 @@
 
 <ChangeForm role={role.id} />
 
-<Modifications mods={role.modifications} />
+<Revisions mods={role.revisions} />
 
 <Admin>
 	<Paragraph

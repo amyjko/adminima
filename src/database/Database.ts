@@ -40,7 +40,7 @@ class Database {
 			title,
 			what: '',
 			people: [],
-			modifications: [
+			revisions: [
 				{
 					when: Date.now(),
 					person: who,
@@ -91,7 +91,7 @@ class Database {
 			processes: processes,
 			comments: [],
 			status: 'triage',
-			modifications: [
+			revisions: [
 				{
 					when: Date.now(),
 					person: who,
