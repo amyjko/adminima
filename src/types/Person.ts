@@ -1,3 +1,4 @@
+import type Markup from './Markup';
 import type { OrganizationID } from './Organization';
 import type { TeamID } from './Team';
 
@@ -11,7 +12,7 @@ type Person = {
 	/** The person's name */
 	name: string;
 	/** The person's self-introduction to everyone in the org */
-	bio: string;
+	bio: Markup;
 	/** Their email */
 	email: string;
 	/** An emoji to represent them */

@@ -7,6 +7,7 @@
 	import Flow from './Flow.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
 	import { getOrg } from './contexts';
+	import MarkupView from './MarkupView.svelte';
 
 	export let person: Person;
 
@@ -16,6 +17,8 @@
 </script>
 
 <Title title={person.name} kind={$locale?.term.person} visibility="org" />
+
+<MarkupView markup={person.bio} />
 
 <Header>Roles</Header>
 <Flow>
