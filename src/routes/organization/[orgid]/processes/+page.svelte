@@ -132,4 +132,13 @@
 		text-align: center;
 		vertical-align: middle;
 	}
+
+	.role {
+		writing-mode: vertical-rl;
+		text-align: end;
+	}
+
+	tr:nth-child(odd) {
+		background-color: var(--separator);
+	}
 </style>

@@ -25,8 +25,8 @@
 <style>
 	a {
 		color: var(--foreground);
-		padding-left: var(--padding);
-		padding-right: var(--padding);
+		padding-inline-start: var(--padding);
+		padding-inline-end: var(--padding);
 		text-decoration: none;
 		transition: transform 200ms;
 		display: inline-block;

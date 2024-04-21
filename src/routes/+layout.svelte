@@ -29,7 +29,7 @@
 		--person: #238427;
 		--focus: #784ada;
 		--background: #ffffff;
-		--separator: #cccccc;
+		--separator: #eeeeee;
 		--inactive: #555555;
 		--foreground: #000000;
 		--border: #000000;
