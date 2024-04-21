@@ -60,7 +60,7 @@
 						<span class="role"><RoleLink roleID={role.id} /></span>
 					{/each}
 				</td>
-				<td>
+				<td class="team">
 					{#each roles as role}{#if role.team}<TeamLink id={role.team} />{/if}{/each}
 				</td>
 				{#if isAdmin}
@@ -119,7 +119,8 @@
 		align-items: left;
 	}
 
-	.role {
+	.role,
+	.team {
 		font-size: var(--small-size);
 	}
 </style>
