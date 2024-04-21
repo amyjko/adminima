@@ -14,7 +14,7 @@
 		color: var(--error);
 	}
 
-	.respnonsible {
+	.responsible {
 		color: var(--salient);
 	}
 

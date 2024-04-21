@@ -17,7 +17,7 @@
 	href={inactive ? null : to}
 	target={external ? '_blank' : ''}
 	><span class="emoji"
-		>{#if kind === 'person'}👤{:else if kind === 'role'}🔨{:else if kind === 'process'}⚙️{:else if kind === 'org'}🏠{:else if kind === 'change'}✍️{/if}</span
+		>{#if kind === 'person'}⍜{:else if kind === 'role'}☑{:else if kind === 'process'}⚙{:else if kind === 'org'}▦{:else if kind === 'change'}𝚫{:else if kind === 'team'}𑗕{/if}</span
 	>
 	<slot /></a
 >{#if external}<sup class="external">↗</sup>{/if}
@@ -66,7 +66,9 @@
 	}
 
 	.person {
-		background-color: var(--person);
+		background-color: none;
+		color: var(--salient);
+		font-weight: bold;
 	}
 	.role {
 		background-color: var(--warning);
@@ -86,6 +88,6 @@
 	}
 
 	.emoji {
-		font-size: 80%;
+		font-size: 100%;
 	}
 </style>
