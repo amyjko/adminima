@@ -27,11 +27,11 @@
 		color: var(--foreground);
 		padding-inline-start: var(--padding);
 		padding-inline-end: var(--padding);
-		text-decoration: none;
 		transition: transform 200ms;
 		display: inline-block;
 		border-radius: var(--padding);
 		line-height: 1.2;
+		text-decoration: underline var(--thickness) var(--salient);
 	}
 
 	a.inactive {
@@ -46,7 +46,6 @@
 
 	a:hover:not(.inactive),
 	a:focus:not(.inactive) {
-		text-decoration: underline;
 		text-decoration-thickness: var(--thickness);
 		text-decoration-skip-ink: none;
 		transform-origin: center;
@@ -63,6 +62,7 @@
 
 	.kinded {
 		color: var(--background);
+		text-decoration: none;
 	}
 
 	.person {
