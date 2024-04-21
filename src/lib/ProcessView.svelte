@@ -35,28 +35,28 @@
 <Header>Who</Header>
 
 <Paragraph>
-	<Level level="accountable" />
-	<strong>ccountable</strong>{#if process.responsible.length === 0}and <strong>responsible</strong
+	<Level level="accountable" /><strong>ccountable</strong>{#if process.responsible.length === 0}and <strong
+			>responsible</strong
 		>{/if} for this task's outcomes:
 	<RoleContribution roles={[process.accountable]} />
 </Paragraph>
 {#if process.responsible.length > 0}
 	<Paragraph>
-		<Level level="responsible" /> <strong>esponsible</strong> for completing this process: <RoleContribution
+		<Level level="responsible" /><strong>esponsible</strong> for completing this process: <RoleContribution
 			roles={process.responsible}
 		/>
 	</Paragraph>
 {/if}
 {#if process.consulted.length > 0}
 	<Paragraph>
-		<Level level="consulted" /> <strong>onsulted</strong> in this process: <RoleContribution
+		<Level level="consulted" /><strong>onsulted</strong> in this process: <RoleContribution
 			roles={process.consulted}
 		/>
 	</Paragraph>
 {/if}
 {#if process.informed.length > 0}
 	<Paragraph>
-		<Level level="informed" /> <strong>nformed</strong> that this process is happening and of its
+		<Level level="informed" /><strong>nformed</strong> that this process is happening and of its
 		outcome: <RoleContribution roles={process.informed} />
 	</Paragraph>
 {/if}
