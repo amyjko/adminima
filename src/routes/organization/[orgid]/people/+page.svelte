@@ -14,6 +14,7 @@
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Database from '$database/Database';
+	import TeamLink from '$lib/TeamLink.svelte';
 
 	const organization = getOrg();
 	$: isAdmin = $organization.hasAdmin($user.id);
@@ -40,6 +41,7 @@
 		<tr>
 			<th>person</th>
 			<th>roles</th>
+			<th>teams</th>
 			{#if isAdmin}
 				<th>admin</th>
 				<th>remove</th>
@@ -48,18 +50,18 @@
 	</thead>
 	<tbody>
 		{#each $organization.getPeople() as person}
+			{@const roles = $organization.getPersonRoles(person.id)}
 			<tr>
 				<td>
 					<PersonLink {person} />
 				</td>
 				<td>
-					{#await $organization.getPersonRoles(person.id)}
-						<Loading />
-					{:then roles}
-						{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-							<span class="role"><RoleLink roleID={role.id} /></span>
-						{/each}
-					{/await}
+					{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+						<span class="role"><RoleLink roleID={role.id} /></span>
+					{/each}
+				</td>
+				<td>
+					{#each roles as role}{#if role.team}<TeamLink id={role.team} />{/if}{/each}
 				</td>
 				{#if isAdmin}
 					<td>
