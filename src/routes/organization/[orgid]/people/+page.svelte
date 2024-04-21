@@ -40,8 +40,10 @@
 		<tr>
 			<th>person</th>
 			<th>roles</th>
-			<th>admin</th>
-			<th>remove</th>
+			{#if isAdmin}
+				<th>admin</th>
+				<th>remove</th>
+			{/if}
 		</tr>
 	</thead>
 	<tbody>
@@ -59,20 +61,22 @@
 						{/each}
 					{/await}
 				</td>
-				<td>
-					<Checkbox
-						on={$organization.hasAdmin(person.id)}
-						enabled={isAdmin &&
-							($organization.getAdminCount() > 1 || !$organization.hasAdmin(person.id))}
-						change={(on) => toggleAdmin(on, person.id)}
-					/>
-				</td>
-				<td class="actions">
-					<Button
-						action={() => Database.updateOrganization($organization.withoutStaff(person))}
-						active={!$organization.hasAdmin(person)}>&times;</Button
-					>
-				</td>
+				{#if isAdmin}
+					<td>
+						<Checkbox
+							on={$organization.hasAdmin(person.id)}
+							enabled={isAdmin &&
+								($organization.getAdminCount() > 1 || !$organization.hasAdmin(person.id))}
+							change={(on) => toggleAdmin(on, person.id)}
+						/>
+					</td>
+					<td class="actions">
+						<Button
+							action={() => Database.updateOrganization($organization.withoutStaff(person))}
+							active={!$organization.hasAdmin(person)}>&times;</Button
+						>
+					</td>
+				{/if}
 			</tr>
 		{/each}
 	</tbody>

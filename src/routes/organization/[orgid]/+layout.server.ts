@@ -27,7 +27,7 @@ export async function load({ params }) {
 				? {
 						organization: org,
 						roles: mock.roles.filter((role) => role.organization === orgid),
-						people: mock.people.filter((person) => org.staff.includes(person.id)),
+						people: mock.people,
 						processes: mock.processes.filter((task) => task.organization === orgid),
 						changes: mock.changes.filter((change) => change.organization === orgid)
 				  }

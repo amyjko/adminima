@@ -102,14 +102,37 @@ function convert(rows) {
 	}
 
 	const roles = [];
+	const orgPeople = [];
 	// Skip the first three columns
 	for (const header of headers.slice(3)) {
+		const title = header.split('|')[0].trim();
+		const people = (header.split('|')[1] ?? '')
+			.trim()
+			.split(',')
+			.map((name) => name.trim());
+		const rolePeople = [];
+		for (const name of people) {
+			if (name && name.length > 0) {
+				const person = {
+					id: name.toLowerCase(),
+					organization: 'ischool',
+					name: name,
+					bio: '',
+					email: '',
+					icon: '',
+					supervisor: null
+				};
+				orgPeople.push(person);
+				rolePeople.push(person.id);
+			}
+		}
+
 		roles.push({
 			id: roleNameToID(header),
 			organization: 'ischool',
-			title: header,
+			title: title,
 			description: roleDescriptionAndTeams[header].split('|')[0].trim(),
-			people: [],
+			people: rolePeople,
 			team: getTeamID(getTeamName(roleDescriptionAndTeams[header])),
 			status: 'Proposed',
 			visibility: 'public',
@@ -162,7 +185,7 @@ function convert(rows) {
 		processes,
 		roles,
 		changes: [],
-		people: []
+		people: orgPeople
 	};
 
 	const jsonData = JSON.stringify(data);
