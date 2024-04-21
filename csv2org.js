@@ -40,7 +40,30 @@ function roleNameToID(name) {
 stream.pipe(csv);
 
 function convert(rows) {
-	const withoutTallies = rows.slice(4);
+	const roleDescriptionAndTeams = rows[0];
+	const withoutTallies = rows.slice(5);
+
+	function getTeamName(content) {
+		return (content.split('|')[1] ?? '').trim();
+	}
+
+	function getTeamID(name) {
+		return name.replaceAll(' ', '').toLowerCase();
+	}
+
+	const teams = [];
+	for (const key in roleDescriptionAndTeams) {
+		const content = roleDescriptionAndTeams[key].trim();
+		if (content !== '') {
+			const name = getTeamName(content);
+			if (teams.find((team) => team.name === name) === undefined)
+				teams.push({
+					id: getTeamID(name),
+					name: name,
+					description: ''
+				});
+		}
+	}
 
 	const processes = [];
 	const concerns = [];
@@ -85,8 +108,9 @@ function convert(rows) {
 			id: roleNameToID(header),
 			organization: 'ischool',
 			title: header,
-			what: '',
+			description: roleDescriptionAndTeams[header].split('|')[0].trim(),
 			people: [],
+			team: getTeamID(getTeamName(roleDescriptionAndTeams[header])),
 			status: 'Proposed',
 			visibility: 'public',
 			revisions: []
@@ -102,7 +126,7 @@ function convert(rows) {
 					'The *academics enterprise* encompasses every aspect of teaching, learning, and student experience in the school, with the broad goal of equitable, inclusive, and justice-centered information education.',
 				admins: [],
 				staff: [],
-				teams: [],
+				teams: teams,
 				concerns: concerns,
 				statuses: [
 					{

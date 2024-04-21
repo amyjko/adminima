@@ -14,6 +14,8 @@
 	import { locale } from '$types/Locales';
 	import Revisions from '$lib/Revisions.svelte';
 	import { getOrg } from './contexts';
+	import Header from './Header.svelte';
+	import TeamLink from './TeamLink.svelte';
 
 	export let role: Role;
 
@@ -27,15 +29,18 @@
 	kind={$locale?.term.role}
 	status={role.status}
 	visibility={role.visibility}
-/>
+	>{#if role.team}&nbsp;&gt; <TeamLink id={role.team} />{/if}</Title
+>
 
-<MarkupView markup={role.what} />
+<MarkupView markup={role.description} />
 
 <Paragraph
 	>This role is held by
 	{#each role.people as person, index}<PersonLink person={$org.getPerson(person)} />{#if index > 0},
 		{/if}{#if index < role.people.length - 1} and {/if}{:else}no one yet{/each}.</Paragraph
 >
+
+<Header>Processes</Header>
 
 <Timeline {role} processes={$org.getRoleProcesses(role)} />
 

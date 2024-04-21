@@ -50,7 +50,7 @@
 	{#if edit}
 		<div />{/if}
 	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
-		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
+		<div class="breadcrumbs"><OrganizationLink org={$org} /><slot /></div>
 	{/if}
 	{#if status}<Status {status} />{/if}
 </div>

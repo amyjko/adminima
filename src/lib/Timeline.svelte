@@ -6,7 +6,7 @@
 	import Paragraph from './Paragraph.svelte';
 	import type Role from '$types/Role';
 	import RoleProcesses from './RoleProcesses.svelte';
-	import Header from './Header.svelte';
+	import Subheader from './Subheader.svelte';
 
 	export let role: Role;
 	export let processes: Process[];
@@ -44,7 +44,7 @@
 	<Paragraph>These are the processes that this role is responsible for.</Paragraph>
 	<div class="processes">
 		{#if timed.length > 0}
-			<Header>Timeline</Header>
+			<Subheader>Timeline</Subheader>
 			<div class="time">
 				{#each weeks as num}
 					<div class="tick" style:left="{num * PixelsPerWeek}px">

@@ -1,6 +1,5 @@
 import type Markup from './Markup';
 import type { OrganizationID } from './Organization';
-import type { TeamID } from './Team';
 
 export type PersonID = string;
 
@@ -17,8 +16,6 @@ type Person = {
 	email: string;
 	/** An emoji to represent them */
 	icon: string;
-	/** The team a person is on */
-	team: TeamID;
 	/** The person's supervisor. Optional because some leaders will have no supervisor. */
 	supervisor: PersonID | null;
 };

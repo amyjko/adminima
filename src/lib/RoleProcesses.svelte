@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Header from './Header.svelte';
+	import Subheader from './Subheader.svelte';
 	import Flow from './Flow.svelte';
 	import type Role from '$types/Role';
 	import type Process from '$types/Process';
@@ -9,7 +9,7 @@
 	export let processes: Process[];
 </script>
 
-<Header>Accountable</Header>
+<Subheader>Accountable</Subheader>
 <Flow>
 	{#each processes.filter((process) => role.id === process.accountable) as process}
 		<ProcessLink processID={process.id} />
@@ -17,7 +17,7 @@
 		Not accountable for any process outcomes.
 	{/each}
 </Flow>
-<Header>Responsible</Header>
+<Subheader>Responsible</Subheader>
 <Flow>
 	{#each processes.filter((process) => process.responsible.includes(role.id)) as process}
 		<ProcessLink processID={process.id} />
@@ -25,7 +25,7 @@
 		Not responsible for completing any processes.
 	{/each}
 </Flow>
-<Header>Consulted</Header>
+<Subheader>Consulted</Subheader>
 <Flow>
 	{#each processes.filter((process) => process.consulted.includes(role.id)) as process}
 		<ProcessLink processID={process.id} />
@@ -33,7 +33,7 @@
 		Not consulted on any processes.
 	{/each}
 </Flow>
-<Header>Informed</Header>
+<Subheader>Informed</Subheader>
 <Flow>
 	{#each processes.filter((process) => process.informed.includes(role.id)) as process}
 		<ProcessLink processID={process.id} />

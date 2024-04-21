@@ -27,6 +27,8 @@ export type Locale = {
 		request: string;
 		/** What to call a page load error */
 		error: string;
+		/** What we call a team */
+		team: string;
 	};
 	landing: {
 		value: string;
@@ -40,6 +42,7 @@ export type Locale = {
 		noRole: string;
 		noChange: string;
 		noProcessChanges: string;
+		noTeam: string;
 	};
 };
 

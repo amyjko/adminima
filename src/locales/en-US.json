@@ -8,7 +8,8 @@
 		"person": "person",
 		"organization": "organization",
 		"request": "request",
-		"error": "error"
+		"error": "error",
+		"team": "team"
 	},
 	"landing": {
 		"value": "Improve your organization's onboarding, transparency, and agility by defining work processes and managing requests for change.",
@@ -21,6 +22,7 @@
 		"noOrganization": "We couldn't find this organization.",
 		"noRole": "unknown role",
 		"noRequest": "We couldn't find this request.",
-		"noProcessRequests": "Couldn't get this process's requests."
+		"noProcessRequests": "Couldn't get this process's requests.",
+		"noTeam": "Unknown team"
 	}
 }

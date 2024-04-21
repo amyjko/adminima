@@ -14,6 +14,9 @@
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import { locale } from '$types/Locales';
 	import Flow from '$lib/Flow.svelte';
+	import MarkupView from '$lib/MarkupView.svelte';
+	import Header from '$lib/Header.svelte';
+	import TeamLink from '$lib/TeamLink.svelte';
 
 	const org = getOrg();
 
@@ -30,19 +33,23 @@
 	}
 </script>
 
-<Title title="roles" kind={$locale?.term.organization} visibility="org"
-	><OrganizationLink org={$org} /></Title
->
+<Title title="roles" kind={$locale?.term.organization} visibility="org" />
 <Paragraph
 	>These are the roles held in this organization. Each one is responsible for particular processes
 	in this organization.</Paragraph
 >
 
-<Flow>
-	{#each $org.getRoles().sort((a, b) => a.title.localeCompare(b.title)) as role}
-		<RoleLink roleID={role.id} />
-	{/each}
-</Flow>
+{#each $org
+	.getOrganization()
+	.teams.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
+	<Header><TeamLink id={team.id} /></Header>
+	<MarkupView markup={team.description} />
+	<Flow>
+		{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
+			<RoleLink roleID={role.id} />
+		{/each}
+	</Flow>
+{/each}
 
 <Admin>
 	<Form action={createRole}>

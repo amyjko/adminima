@@ -4,6 +4,7 @@ import type { StatusID } from './Status';
 import type { PersonID } from './Person';
 import type Tracked from './Tracked';
 import type Visibility from './Visibility';
+import type { TeamID } from './Team';
 
 export type RoleID = string;
 
@@ -16,9 +17,11 @@ type Role = Tracked & {
 	/** A short title for the role */
 	title: string;
 	/** A descrption of what the scope of responsibilities are. */
-	what: Markup;
+	description: Markup;
 	/** People who have this role */
 	people: PersonID[];
+	/** The team a person is on */
+	team: TeamID | null;
 	/** Optional status of this role */
 	status: StatusID | null;
 	/** Who this is visible to */

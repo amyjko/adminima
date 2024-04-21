@@ -15,7 +15,6 @@
 	import RoleContribution from './RoleContribution.svelte';
 	import type Process from '../types/Process';
 	import Level from './Level.svelte';
-	import Subheader from './Subheader.svelte';
 
 	export let process: Process;
 

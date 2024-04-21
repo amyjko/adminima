@@ -38,7 +38,7 @@ class Database {
 			id: uuidv4(),
 			organization,
 			title,
-			what: '',
+			description: '',
 			people: [],
 			revisions: [
 				{
@@ -49,6 +49,7 @@ class Database {
 					change: null
 				}
 			],
+			team: null,
 			status: null,
 			visibility: 'public'
 		};

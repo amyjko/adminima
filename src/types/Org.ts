@@ -9,6 +9,7 @@ import type Process from './Process';
 import type { RoleID } from './Role';
 import type Role from './Role';
 import type { StatusID } from './Status';
+import type { TeamID } from './Team';
 
 /** A wrapper class to provide utility functions on an organization payload from the database. Simplifies the interface for accessing organization content. */
 export default class Org {
@@ -142,5 +143,13 @@ export default class Org {
 
 	getStatus(id: StatusID) {
 		return this.data.organization.statuses.find((status) => status.id === id) ?? null;
+	}
+
+	getTeam(id: TeamID) {
+		return this.data.organization.teams.find((team) => team.id === id) ?? null;
+	}
+
+	getTeamRoles(teamID: TeamID): Role[] {
+		return this.data.roles.filter((role) => role.team === teamID);
 	}
 }

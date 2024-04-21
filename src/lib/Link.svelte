@@ -64,6 +64,7 @@
 	.kinded {
 		color: var(--background);
 	}
+
 	.person {
 		background-color: var(--person);
 	}
@@ -78,6 +79,10 @@
 	}
 	.change {
 		background-color: var(--salient);
+	}
+
+	.team {
+		background-color: var(--foreground);
 	}
 
 	.emoji {
