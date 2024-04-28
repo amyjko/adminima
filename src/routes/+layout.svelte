@@ -1,5 +1,11 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
+	import Lead from '$lib/Lead.svelte';
 	import Page from '$lib/Page.svelte';
+	import Paragraph from '$lib/Paragraph.svelte';
+	import Title from '$lib/Title.svelte';
+	import Text from '$lib/Text.svelte';
+	import Link from '$lib/Link.svelte';
 	import { locale, type Locale } from '$types/Locales';
 
 	export let data: { locale: Locale };
@@ -8,7 +14,18 @@
 </script>
 
 <Page>
-	<slot />
+	{#if dev}
+		<slot />
+	{:else}
+		<Title title="Adminima" visibility={null} />
+		<Lead><Text text={$locale?.landing.value} /></Lead>
+		<Paragraph><Text text={$locale?.landing.description} /></Paragraph>
+		<Paragraph
+			><Link external to="https://amyjko.phd">Amy</Link> is working on it. <Link
+				to="mailto:ajko@uw.edu">Write her</Link
+			> if you're curious. No launch date yet, but she aspires for Summer 2024.</Paragraph
+		>
+	{/if}
 </Page>
 
 <style>

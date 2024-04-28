@@ -4,11 +4,10 @@
 	import { locale } from '../types/Locales';
 	import Text from '$lib/Text.svelte';
 	import Lead from '$lib/Lead.svelte';
-	import Logo from '$lib/Logo';
 	import Title from '$lib/Title.svelte';
 </script>
 
-<Title title={Logo + ' Adminima'} visibility={null} />
+<Title title="Adminima" visibility={null} />
 <Lead><Text text={$locale?.landing.value} /></Lead>
 <Paragraph><Text text={$locale?.landing.description} /></Paragraph>
 <Paragraph
