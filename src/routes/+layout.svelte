@@ -1,5 +1,10 @@
-<script>
+<script lang="ts">
 	import Page from '$lib/Page.svelte';
+	import { locale, type Locale } from '$types/Locales';
+
+	export let data: { locale: Locale };
+
+	locale.set(data.locale);
 </script>
 
 <Page>
