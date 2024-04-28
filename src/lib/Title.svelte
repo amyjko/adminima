@@ -15,7 +15,7 @@
 	// The status of the thing
 	export let status: StatusID | null = null;
 	// The visibility of this content
-	export let visibility: Vis;
+	export let visibility: Vis | null;
 	// An optional function for editing the title
 	export let edit: undefined | ((text: string) => void) = undefined;
 
@@ -30,7 +30,10 @@
 </svelte:head>
 
 <div class="title">
-	<div class="kind">{kind} <Visibility {visibility} /></div>
+	<div class="kind">
+		{kind}
+		{#if visibility}<Visibility {visibility} />{/if}
+	</div>
 	<h1>
 		{#if edit}<Button
 				action={() => {
