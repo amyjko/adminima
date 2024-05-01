@@ -10,14 +10,14 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
-	import type { User } from '@supabase/supabase-js';
+	import { UserSymbol, type UserContext } from '$lib/contexts';
 
 	export let data: { locale: Locale };
 
 	locale.set(data.locale);
 
-	const user = writable<User | null>(null);
-	setContext('user', user);
+	const user: UserContext = writable(null);
+	setContext(UserSymbol, user);
 
 	const subscription = supabase.auth.onAuthStateChange((_, session) => {
 		// Update the user.

@@ -4,6 +4,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
+	import { getUser } from '$lib/contexts';
 	import { supabase } from '$lib/supabaseClient';
 	import type { User } from '@supabase/supabase-js';
 	import { getContext } from 'svelte';
@@ -15,7 +16,7 @@
 	/** True if waiting for a code */
 	let submitted = false;
 
-	let user = getContext<Writable<User | null>>('user');
+	let user = getUser();
 
 	async function sendCode() {
 		console.log('Email is ' + email);
@@ -30,7 +31,7 @@
 	}
 
 	async function login() {
-		const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
+		const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
 
 		if (error) message = error.message;
 	}
@@ -56,14 +57,13 @@
 	<Field
 		label="email"
 		bind:text={email}
-		placeholder="@uw.edu"
 		invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid URL')}
 	/>
-	<Button active={validEmail(email)} action={sendCode} submit>Email code</Button>
+	<Button active={validEmail(email)} action={sendCode} submit>Send code</Button>
 {:else}
 	<Paragraph>We emailed you a code. It might take a minute to arrive.</Paragraph>
 	<Field label="code" bind:text={code} placeholder="012345" />
-	<Button action={login} submit>Submit code</Button>
+	<Button action={login} submit>Login</Button>
 {/if}
 
 {#if message}

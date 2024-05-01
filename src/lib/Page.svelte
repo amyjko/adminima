@@ -1,14 +1,16 @@
 <script>
-	import { getContext } from 'svelte';
+	import { dev } from '$app/environment';
 	import Link from './Link.svelte';
 	import Logo from './Logo';
+	import { getUser } from './contexts';
 
-	const user = getContext('user');
+	const user = getUser();
 </script>
 
 <div class="header">
 	<Link to="/">{Logo}</Link><span class="account"
-		>{#if $user}{$user.email}{:else}<Link to="/login">login</Link>{/if}</span
+		>{#if $user}<Link to="/login">{$user.email}</Link>{:else if dev}<Link to="/login">Login</Link
+			>{/if}</span
 	>
 </div>
 <div class="page">
