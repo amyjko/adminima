@@ -1,9 +1,16 @@
 <script>
+	import { getContext } from 'svelte';
 	import Link from './Link.svelte';
 	import Logo from './Logo';
+
+	const user = getContext('user');
 </script>
 
-<div class="header"><Link to="/">{Logo}</Link></div>
+<div class="header">
+	<Link to="/">{Logo}</Link><span class="account"
+		>{#if $user}{$user.email}{:else}<Link to="/login">login</Link>{/if}</span
+	>
+</div>
 <div class="page">
 	<slot />
 </div>
@@ -23,6 +30,13 @@
 
 	.header {
 		padding-block-start: var(--spacing);
-		text-align: center;
+		display: flex;
+		flex-direction: row;
+		justify-items: center;
+		padding: var(--spacing);
+	}
+
+	.header .account {
+		margin-inline-start: auto;
 	}
 </style>

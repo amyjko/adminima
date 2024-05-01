@@ -11,3 +11,13 @@ The technology stack is:
 At the moment, the project is not intended as a profit-making venture, but rather free infrastructure for not-for-profit organizations.
 
 Amy maintains this. [Write her](mailto:ajko@uw.edu) if you'd like to learn more about her plans.
+
+## Setup
+
+To run locally,
+
+- [ ] Clone this repository
+- [ ] `npm install` inside the repository directory
+- [ ] Install [Docker](https://docs.docker.com/desktop/install/mac-install/) for local development, and start it
+- [ ] Run `npm run dev` to start the local vite dev server
+- [ ] Run `npm run emu` to start local Supabase docker image

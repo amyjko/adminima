@@ -12,10 +12,13 @@
 		"format": "prettier --plugin-search-dir . --write .",
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
-		"csv": "node csv2org.js"
+		"csv": "node csv2org.js",
+		"emu": "cp .env.local .env; supabase start",
+		"emustop": "cp .env.prod .env; supabase stop"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28",
+		"@supabase/supabase-js": "^2.42.7",
 		"@sveltejs/adapter-auto": "^3.2",
 		"@sveltejs/kit": "^2.5.7",
 		"@sveltejs/vite-plugin-svelte": "^3.1",
@@ -27,6 +30,7 @@
 		"eslint-plugin-svelte": "^2.30",
 		"prettier": "^2.8",
 		"prettier-plugin-svelte": "^2.10",
+		"supabase": "^1.164.1",
 		"svelte": "^4.2",
 		"svelte-check": "^3.4",
 		"tslib": "^2.6",

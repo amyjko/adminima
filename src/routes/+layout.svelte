@@ -7,10 +7,29 @@
 	import Text from '$lib/Text.svelte';
 	import Link from '$lib/Link.svelte';
 	import { locale, type Locale } from '$types/Locales';
+	import { supabase } from '$lib/supabaseClient';
+	import { onMount, setContext } from 'svelte';
+	import { writable } from 'svelte/store';
+	import type { User } from '@supabase/supabase-js';
 
 	export let data: { locale: Locale };
 
 	locale.set(data.locale);
+
+	const user = writable<User | null>(null);
+	setContext('user', user);
+
+	const subscription = supabase.auth.onAuthStateChange((_, session) => {
+		// Update the user.
+		user.set(session?.user ?? null);
+	});
+
+	onMount(() => {
+		// call unsubscribe to remove the callback
+		return () => {
+			subscription.data.subscription.unsubscribe();
+		};
+	});
 </script>
 
 <Page>
