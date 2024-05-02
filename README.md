@@ -4,9 +4,10 @@ An app for simple definition of administrative processes and change requests. Bu
 
 The technology stack is:
 
-- SvelteKit for front-end and interfacing with serverless infrastructure
-- Vercel for scalable hosting of the app and managed deployments
-- Supabase for database, file storage, and passwordless authentication
+- [SvelteKit](https://kit.svelte.dev) for front-end and interfacing with serverless infrastructure
+- [Vercel](https://vercel.com) for scalable hosting of the app and managed deployments
+- [Supabase](https://supabase.com) for database, file storage, and passwordless authentication
+- [Resend](https://resend.com) for emails
 
 At the moment, the project is not intended as a profit-making venture, but rather free infrastructure for not-for-profit organizations.
 

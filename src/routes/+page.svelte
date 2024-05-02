@@ -5,6 +5,7 @@
 	import Text from '$lib/Text.svelte';
 	import Lead from '$lib/Lead.svelte';
 	import Title from '$lib/Title.svelte';
+	import { dev } from '$app/environment';
 </script>
 
 <Title title="Adminima" visibility={null} />
@@ -16,6 +17,8 @@
 	> if you're curious.</Paragraph
 >
 
-<Paragraph>
-	See an example organization: <Link to="/organization/ischool">The Information School</Link>
-</Paragraph>
+{#if dev}
+	<Paragraph>
+		See an example organization: <Link to="/organization/ischool">The Information School</Link>
+	</Paragraph>
+{/if}

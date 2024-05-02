@@ -57,7 +57,7 @@
 	<Field
 		label="email"
 		bind:text={email}
-		invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid URL')}
+		invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid email')}
 	/>
 	<Button active={validEmail(email)} action={sendCode} submit>Send code</Button>
 {:else}
