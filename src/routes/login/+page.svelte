@@ -6,7 +6,6 @@
 	import Title from '$lib/Title.svelte';
 	import { getUser } from '$lib/contexts';
 	import { supabase } from '$lib/supabaseClient';
-	import { AuthError } from '@supabase/supabase-js';
 
 	let email = '';
 	let code = '';
@@ -61,7 +60,8 @@
 		label="code"
 		bind:text={code}
 		placeholder="012345"
-		invalid={(text) => (text.length === 6 ? undefined : 'Codes are 6 characters')}
+		invalid={(text) =>
+			text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
 	/>
 	<Button active={code.length === 6} action={login} submit>Login</Button>
 {/if}
