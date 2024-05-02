@@ -28,6 +28,7 @@
 		const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
 
 		if (error) message = error.code ?? error.message;
+		else submitted = false;
 	}
 
 	async function logout() {
