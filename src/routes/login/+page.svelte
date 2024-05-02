@@ -6,9 +6,7 @@
 	import Title from '$lib/Title.svelte';
 	import { getUser } from '$lib/contexts';
 	import { supabase } from '$lib/supabaseClient';
-	import type { User } from '@supabase/supabase-js';
-	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
+	import { AuthError } from '@supabase/supabase-js';
 
 	let email = '';
 	let code = '';
@@ -19,26 +17,22 @@
 	let user = getUser();
 
 	async function sendCode() {
-		console.log('Email is ' + email);
 		const { error } = await supabase.auth.signInWithOtp({
 			email
 		});
-		if (error) {
-			message = error.message;
-		} else {
-			submitted = true;
-		}
+		if (error) message = error.code ?? error.message;
+		else submitted = true;
 	}
 
 	async function login() {
 		const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
 
-		if (error) message = error.message;
+		if (error) message = error.code ?? error.message;
 	}
 
 	async function logout() {
 		const { error } = await supabase.auth.signOut();
-		if (error) message = error.message;
+		if (error) message = error.code ?? error.message;
 	}
 
 	function validEmail(text: string) {
