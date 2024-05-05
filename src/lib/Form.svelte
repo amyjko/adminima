@@ -7,9 +7,11 @@
 
 <style>
 	.form {
-		border: var(--border) solid var(--thickness);
+		border-top: var(--border) solid var(--thickness);
+		border-bottom: var(--border) solid var(--thickness);
 		background: var(--background);
-		padding: var(--spacing);
+		padding-top: var(--spacing);
+		padding-bottom: var(--spacing);
 		gap: var(--spacing);
 		display: flex;
 		flex-direction: column;

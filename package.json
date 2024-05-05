@@ -16,6 +16,7 @@
 		"start": "cp .env.local .env; supabase start",
 		"stop": "cp .env.prod .env; supabase stop",
 		"reset": "supabase db reset; npm run types",
+		"diff": "supabase db diff --local --use-migra -f rename_me",
 		"types": "supabase gen types typescript --local > src/database/database.types.ts"
 	},
 	"devDependencies": {

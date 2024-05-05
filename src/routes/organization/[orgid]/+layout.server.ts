@@ -18,8 +18,7 @@ import Database from '$database/Database';
 
 /** @type {import('./$types').LayoutServerLoad} */
 export async function load({ params }) {
-	const org = await Database.getOrgPayload(parseInt(params.orgid));
-
+	const org = await Database.getOrgPayload(params.orgid);
 	// const org = mock.organizations.find((org) => org.id === orgid);
 
 	return {

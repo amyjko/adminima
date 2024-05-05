@@ -13,6 +13,7 @@ import ReactiveMap from './ReactiveMap';
 import type Process from '../types/Process';
 import Org from '$types/Org';
 import { supabase } from '$lib/supabaseClient';
+import type { PostgrestError } from '@supabase/supabase-js';
 
 export type OrgPayload = {
 	organization: Organization;
@@ -30,38 +31,34 @@ class Database {
 		return Database.organizations.set(org.organization.id, new Org(org));
 	}
 
-	static async createRole(
-		who: PersonID,
-		organization: OrganizationID,
-		title: string
-	): Promise<Role> {
-		const newRole: Role = {
-			id: uuidv4(),
-			organization,
-			title,
-			description: '',
-			people: [],
-			revisions: [
-				{
-					when: Date.now(),
-					person: who,
-					what: 'Created role',
-					why: '',
-					change: null
-				}
-			],
-			team: null,
-			status: null,
-			visibility: 'public'
-		};
-
-		// TODO Update database with new role.
-
-		return newRole;
+	static async refresh(orgid: OrganizationID) {
+		const payload = await Database.getOrgPayload(orgid);
+		if (payload) Database.updateOrg(payload);
 	}
 
-	static async deleteRole(id: RoleID) {
-		// TODO Delete process from database
+	static async createRole(orgid: OrganizationID, title: string): Promise<RoleID | null> {
+		const { data } = await supabase
+			.from('roles')
+			.insert({
+				orgid: orgid,
+				title,
+				description: ''
+			})
+			.select()
+			.single();
+
+		await Database.refresh(orgid);
+
+		return data?.id ?? null;
+	}
+
+	static async deleteRole(orgid: OrganizationID, id: RoleID): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('roles').delete().eq('id', id);
+		if (error) return error;
+		else {
+			Database.refresh(orgid);
+			return null;
+		}
 	}
 
 	/** Cache the organization here for later access, updating the store for reactive output */
@@ -69,17 +66,17 @@ class Database {
 		// TODO Update database with new organization.
 	}
 
-	static async getOrgPayload(orgid: number): Promise<OrgPayload | null> {
+	static async getOrgPayload(orgid: string): Promise<OrgPayload | null> {
 		const organization = await Database.getOrganization(orgid);
 		const people = await Database.getOrganizationsPeople(orgid);
+		const roles = await Database.getOrganizationsRoles(orgid);
 
-		return organization === null || people === null
+		return organization === null || people === null || roles === null
 			? null
 			: {
 					organization,
 					people,
-					// TODO Update when roles are defined
-					roles: [],
+					roles,
 					// TODO Update when processes are defined
 					processes: [],
 					changes: []
@@ -105,7 +102,7 @@ class Database {
 
 	static async getPersonsOrganizations(
 		personid: PersonID
-	): Promise<{ id: number; name: string }[] | null> {
+	): Promise<{ id: string; name: string }[] | null> {
 		const { data } = await supabase
 			.from('orgs')
 			.select(`id, name, profiles!profiles_orgid_fkey(personid)`)
@@ -129,6 +126,23 @@ class Database {
 					supervisor: person.supervisor,
 					admin: person.admin
 			  }))
+			: null;
+	}
+
+	static async getOrganizationsRoles(orgid: OrganizationID): Promise<Role[] | null> {
+		const { data } = await supabase.from('roles').select(`*`).eq('orgid', orgid);
+		return data
+			? data.map((role) => {
+					return {
+						...role,
+						people: [],
+						team: null,
+						status: null,
+						visibility: 'public',
+						revisions: [],
+						organization: orgid
+					};
+			  })
 			: null;
 	}
 

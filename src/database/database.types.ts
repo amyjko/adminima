@@ -34,20 +34,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      assignments: {
+        Row: {
+          personid: string
+          roleid: string
+        }
+        Insert: {
+          personid: string
+          roleid: string
+        }
+        Update: {
+          personid?: string
+          roleid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_personid_fkey"
+            columns: ["personid"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_roleid_fkey"
+            columns: ["roleid"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orgs: {
         Row: {
           description: string
-          id: number
+          id: string
           name: string
         }
         Insert: {
           description?: string
-          id?: number
+          id?: string
           name?: string
         }
         Update: {
           description?: string
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: []
@@ -80,7 +110,7 @@ export type Database = {
           admin: boolean
           bio: string
           name: string
-          orgid: number
+          orgid: string
           personid: string
           supervisor: string | null
         }
@@ -88,7 +118,7 @@ export type Database = {
           admin: boolean
           bio: string
           name: string
-          orgid: number
+          orgid: string
           personid: string
           supervisor?: string | null
         }
@@ -96,7 +126,7 @@ export type Database = {
           admin?: boolean
           bio?: string
           name?: string
-          orgid?: number
+          orgid?: string
           personid?: string
           supervisor?: string | null
         }
@@ -120,6 +150,42 @@ export type Database = {
             columns: ["supervisor"]
             isOneToOne: false
             referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          description: string
+          id: string
+          orgid: string
+          title: string
+        }
+        Insert: {
+          description: string
+          id?: string
+          orgid: string
+          title: string
+        }
+        Update: {
+          description?: string
+          id?: string
+          orgid?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_roles_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roles_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
             referencedColumns: ["id"]
           },
         ]

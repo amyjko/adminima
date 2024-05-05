@@ -8,15 +8,14 @@
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Button from '$lib/Button.svelte';
 	import Admin from '$lib/Admin.svelte';
-	import { user } from '$database/Auth';
 	import { getOrg } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
-	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import { locale } from '$types/Locales';
 	import Flow from '$lib/Flow.svelte';
 	import MarkupView from '$lib/MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
 	import TeamLink from '$lib/TeamLink.svelte';
+	import Notice from '$lib/Notice.svelte';
 
 	const org = getOrg();
 
@@ -24,12 +23,9 @@
 	let newRoleError: string | undefined = undefined;
 
 	async function createRole() {
-		try {
-			const role = await Database.createRole($user.id, $org.getID(), newRole);
-			goto(`/organization/${$org.getID()}/role/${role.id}`);
-		} catch (_) {
-			newRoleError = "We couldn't create the new role.";
-		}
+		const roleID = await Database.createRole($org.getID(), newRole);
+		if (roleID) goto(`/organization/${$org.getID()}/role/${roleID}`);
+		else newRoleError = "We couldn't create the new role.";
 	}
 </script>
 
@@ -39,17 +35,32 @@
 	in this organization.</Paragraph
 >
 
-{#each $org
-	.getOrganization()
-	.teams.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
-	<Header><TeamLink id={team.id} /></Header>
-	<MarkupView markup={team.description} />
-	<Flow>
-		{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
-			<RoleLink roleID={role.id} />
-		{/each}
-	</Flow>
-{/each}
+{#if $org.getRoles().length === 0}
+	<Notice>There are no roles yet in this organization.</Notice>
+{:else}
+	{@const teamless = $org.getRoles().filter((role) => role.team === null)}
+
+	{#each $org
+		.getOrganization()
+		.teams.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
+		<Header><TeamLink id={team.id} /></Header>
+		<MarkupView markup={team.description} />
+		<Flow>
+			{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
+				<RoleLink roleID={role.id} />
+			{/each}
+		</Flow>
+	{/each}
+
+	{#if teamless.length > 0}
+		<Header>Roles without a team</Header>
+		<Flow>
+			{#each teamless as role}
+				<RoleLink roleID={role.id} />
+			{/each}
+		</Flow>
+	{/if}
+{/if}
 
 <Admin>
 	<Form action={createRole}>

@@ -57,8 +57,9 @@
 		action={async () => {
 			try {
 				const org = role.organization;
-				await Database.deleteRole(role.id);
-				goto(`/organization/${org}`);
+				const error = await Database.deleteRole(org, role.id);
+				if (error) deleteError = error.message;
+				else goto(`/organization/${org}/roles`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";
 			}

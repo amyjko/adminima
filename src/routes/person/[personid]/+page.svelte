@@ -50,7 +50,7 @@
 		>
 	{/if}
 
-	<Button action={() => (showCreateOrg = true)}>Create an organization</Button>
+	<Button action={() => (showCreateOrg = true)}>Create an organization …</Button>
 	{#if showCreateOrg}
 		<NewOrganization close={() => (showCreateOrg = false)} />
 	{/if}

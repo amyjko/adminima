@@ -40,7 +40,7 @@ create trigger on_auth_user_created
 -- A table to store people's name, bio, profiles, and status per organization.
 -- Delete if organization or user is deleted.
 create table "public"."profiles" (
-    "orgid" bigint references orgs(id) on delete cascade not null,
+    "orgid" uuid references orgs(id) on delete cascade not null,
     "personid" uuid references people(id) on delete cascade not null,
     "name" text not null,
     "bio" text not null,

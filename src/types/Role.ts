@@ -20,7 +20,7 @@ type Role = Tracked & {
 	description: Markup;
 	/** People who have this role */
 	people: PersonID[];
-	/** The team a person is on */
+	/** The team a role is on */
 	team: TeamID | null;
 	/** Optional status of this role */
 	status: StatusID | null;
