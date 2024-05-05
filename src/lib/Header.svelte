@@ -4,7 +4,7 @@
 	h2 {
 		font-size: 24pt;
 		font-weight: bold;
-		text-transform: uppercase;
+		text-transform: lowercase;
 	}
 
 	h2:not(:first-of-type) {

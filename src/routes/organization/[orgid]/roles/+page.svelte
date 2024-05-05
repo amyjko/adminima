@@ -16,9 +16,12 @@
 	import Header from '$lib/Header.svelte';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Notice from '$lib/Notice.svelte';
+	import Dialog from '$lib/Dialog.svelte';
+	import Actions from '$lib/Actions.svelte';
 
 	const org = getOrg();
 
+	let showCreateRole = false;
 	let newRole: string = '';
 	let newRoleError: string | undefined = undefined;
 
@@ -63,12 +66,23 @@
 {/if}
 
 <Admin>
-	<Form action={createRole}>
-		<Paragraph>Want to add a new role to this organization?</Paragraph>
-		<Field label="title of new role" bind:text={newRole} />
-		<Button end submit active={newRole.length > 3} action={() => {}}>create</Button>
-		{#if newRoleError}
-			<Oops text={newRoleError} />
-		{/if}
-	</Form>
+	<Button action={() => (showCreateRole = true)}>Create role …</Button>
+	{#if showCreateRole}
+		<Dialog close={() => (showCreateRole = false)}>
+			<Header>New role</Header>
+			<Paragraph>Want to add a new role to this organization?</Paragraph>
+			<Field label="title of new role" bind:text={newRole} />
+			<Actions
+				><Button end action={() => (showCreateRole = false)}>cancel</Button><Button
+					end
+					submit
+					active={newRole.length > 3}
+					action={createRole}>create</Button
+				>
+			</Actions>
+			{#if newRoleError}
+				<Oops text={newRoleError} />
+			{/if}
+		</Dialog>
+	{/if}
 </Admin>

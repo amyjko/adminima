@@ -5,9 +5,10 @@
 
 <style>
 	div {
+		display: inline-block;
 		background-color: var(--warning);
 		color: var(--background);
-		padding: var(--spacing);
+		padding: var(--padding);
 		border-radius: var(--radius);
 	}
 </style>

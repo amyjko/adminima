@@ -22,7 +22,7 @@
 		padding: var(--spacing);
 		display: flex;
 		flex-direction: column;
-		align-items: block-start;
+		align-items: baseline;
 		margin: auto;
 		gap: var(--spacing);
 		width: calc(100% - (2 * var(--spacing)));

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Loading from '$lib/Loading.svelte';
 	import ChangeForm from '$lib/ChangeForm.svelte';
 	import ChangeList from '$lib/ChangeList.svelte';
 	import { getOrg } from '$lib/contexts';

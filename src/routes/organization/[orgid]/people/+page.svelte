@@ -85,30 +85,27 @@
 </table>
 
 <Admin>
-	<Form>
-		<Paragraph
-			>Search for people by name to add them to this organization. They must already have an
-			account.</Paragraph
-		>
-		<Field label="name" bind:text={newPerson} />
-		{#if newPerson.length > 0}
-			{#await $organization.getPersonNamed(newPerson)}
-				<Loading />
-			{:then people}
-				<ul>
-					{#each people as person}
-						<li>
-							<PersonLink {person} email />
-							{#if !$organization.hasStaff(person.id)}
-								<Button action={() => Database.updateOrganization($organization.withStaff(person))}
-									>+</Button
-								>{/if}
-						</li>
-					{/each}
-				</ul>
-			{/await}
-		{/if}
-	</Form>
+	<Paragraph
+		>Search for people by name to add them to this organization. They must already have an account.</Paragraph
+	>
+	<Field label="name" bind:text={newPerson} />
+	{#if newPerson.length > 0}
+		{#await $organization.getPersonNamed(newPerson)}
+			<Loading />
+		{:then people}
+			<ul>
+				{#each people as person}
+					<li>
+						<PersonLink {person} email />
+						{#if !$organization.hasStaff(person.id)}
+							<Button action={() => Database.updateOrganization($organization.withStaff(person))}
+								>+</Button
+							>{/if}
+					</li>
+				{/each}
+			</ul>
+		{/await}
+	{/if}
 </Admin>
 
 <style>

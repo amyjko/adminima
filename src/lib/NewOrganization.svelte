@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Actions from './Actions.svelte';
 	import Button from './Button.svelte';
 	import Dialog from './Dialog.svelte';
 	import Field from './Field.svelte';
@@ -61,20 +62,12 @@
 	<Field active={!submitting} label="organization name" bind:text={orgName} />
 
 	<Paragraph>We'll create an organization with you as admin.</Paragraph>
-	<div class="actions">
+	<Actions>
 		<Button active={!submitting} action={close}>Cancel</Button><Button
 			active={!submitting && name.length > 0 && orgName.length > 0}
 			action={create}>Submit</Button
 		>
-	</div>
+	</Actions>
 
 	{#if message}<Oops text={message} />{/if}
 </Dialog>
-
-<style>
-	.actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--spacing);
-	}
-</style>
