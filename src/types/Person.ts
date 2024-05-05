@@ -14,10 +14,10 @@ type Person = {
 	bio: Markup;
 	/** Their email */
 	email: string;
-	/** An emoji to represent them */
-	icon: string;
 	/** The person's supervisor. Optional because some leaders will have no supervisor. */
 	supervisor: PersonID | null;
+	/** Whether the person is an admin in the organization */
+	admin: boolean;
 };
 
 export type { Person as default };

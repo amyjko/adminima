@@ -12,6 +12,7 @@ import type Markup from '../types/Markup';
 import ReactiveMap from './ReactiveMap';
 import type Process from '../types/Process';
 import Org from '$types/Org';
+import { supabase } from '$lib/supabaseClient';
 
 export type OrgPayload = {
 	organization: Organization;
@@ -66,6 +67,69 @@ class Database {
 	/** Cache the organization here for later access, updating the store for reactive output */
 	static async updateOrganization(organization: Organization) {
 		// TODO Update database with new organization.
+	}
+
+	static async getOrgPayload(orgid: number): Promise<OrgPayload | null> {
+		const organization = await Database.getOrganization(orgid);
+		const people = await Database.getOrganizationsPeople(orgid);
+
+		return organization === null || people === null
+			? null
+			: {
+					organization,
+					people,
+					// TODO Update when roles are defined
+					roles: [],
+					// TODO Update when processes are defined
+					processes: [],
+					changes: []
+			  };
+	}
+
+	static async getOrganization(orgid: OrganizationID): Promise<Organization | null> {
+		const { data } = await supabase.from('orgs').select().eq('id', orgid).single();
+		if (data === null) return null;
+		const people = await Database.getOrganizationsPeople(orgid);
+		if (people === null) return null;
+		return {
+			...data,
+			admins: people.filter((p) => p.admin).map((p) => p.id),
+			staff: people.map((p) => p.id),
+			teams: [],
+			concerns: [],
+			statuses: [],
+			visibility: 'public',
+			revisions: []
+		};
+	}
+
+	static async getPersonsOrganizations(
+		personid: PersonID
+	): Promise<{ id: number; name: string }[] | null> {
+		const { data } = await supabase
+			.from('orgs')
+			.select(`id, name, profiles!profiles_orgid_fkey(personid)`)
+			.not('profiles', 'is', null)
+			.eq('profiles.personid', personid);
+		return data ?? [];
+	}
+
+	static async getOrganizationsPeople(orgid: OrganizationID): Promise<Person[] | null> {
+		const { data } = await supabase
+			.from('profiles')
+			.select(`personid, orgid, name, bio, admin, supervisor, people!profiles_personid_fkey(email)`)
+			.eq('orgid', orgid);
+		return data
+			? data.map((person) => ({
+					id: person.personid,
+					organization: person.orgid,
+					name: person.name,
+					bio: person.bio,
+					email: person.people ? person.people.email : '',
+					supervisor: person.supervisor,
+					admin: person.admin
+			  }))
+			: null;
 	}
 
 	static async deleteProcess(id: ProcessID) {

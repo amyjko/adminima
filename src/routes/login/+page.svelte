@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import Button from '$lib/Button.svelte';
 	import Field from '$lib/Field.svelte';
 	import Oops from '$lib/Oops.svelte';
@@ -27,13 +29,13 @@
 		const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
 
 		if (error) message = error.code ?? error.message;
-		else submitted = false;
+		else {
+			submitted = false;
+			message = null;
+		}
 	}
 
-	async function logout() {
-		const { error } = await supabase.auth.signOut();
-		if (error) message = error.code ?? error.message;
-	}
+	$: if (browser && $user) goto(`/person/${$user.id}`);
 
 	function validEmail(text: string) {
 		return /.+@.+\..+/.test(text);
@@ -44,8 +46,6 @@
 
 {#if $user}
 	<Paragraph>You're logged in as {$user.email}.</Paragraph>
-
-	<Button action={logout}>Log out</Button>
 {:else if !submitted}
 	<p>We'll email you a one-time code each time you log in.</p>
 	<Field

@@ -1,11 +1,5 @@
 <script lang="ts">
-	import { dev } from '$app/environment';
-	import Lead from '$lib/Lead.svelte';
 	import Page from '$lib/Page.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
-	import Title from '$lib/Title.svelte';
-	import Text from '$lib/Text.svelte';
-	import Link from '$lib/Link.svelte';
 	import { locale, type Locale } from '$types/Locales';
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount, setContext } from 'svelte';

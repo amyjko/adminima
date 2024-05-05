@@ -13,8 +13,10 @@
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
 		"csv": "node csv2org.js",
-		"emu": "cp .env.local .env; supabase start",
-		"emustop": "cp .env.prod .env; supabase stop"
+		"start": "cp .env.local .env; supabase start",
+		"stop": "cp .env.prod .env; supabase stop",
+		"reset": "supabase db reset; npm run types",
+		"types": "supabase gen types typescript --local > src/database/database.types.ts"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28",

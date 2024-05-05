@@ -6,7 +6,7 @@ import type Team from './Team';
 import type Tracked from './Tracked';
 import type Visibility from './Visibility';
 
-export type OrganizationID = string;
+export type OrganizationID = number;
 
 type Organization = Tracked & {
 	/** A unique organization identifier */
