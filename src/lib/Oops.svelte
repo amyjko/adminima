@@ -9,6 +9,7 @@
 
 <style>
 	div {
+		display: inline-block;
 		background: var(--error);
 		color: var(--background);
 		padding: var(--padding);

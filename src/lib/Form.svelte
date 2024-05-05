@@ -15,6 +15,7 @@
 		gap: var(--spacing);
 		display: flex;
 		flex-direction: column;
+		align-items: baseline;
 	}
 
 	.form.inline {
