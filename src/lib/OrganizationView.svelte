@@ -4,28 +4,36 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Paragraph from './Paragraph.svelte';
-	import { user } from '$database/Auth';
 	import Database from '$database/Database';
 	import type Org from '$types/Org';
+	import { getUser } from './contexts';
 
 	export let organization: Org;
+
+	const user = getUser();
+
+	$: editable = $user && organization.hasAdmin($user.id);
 </script>
 
 <Title
 	title={organization.getName()}
 	kind={$locale?.term.organization}
-	edit={organization.hasAdmin($user.id)
-		? (text) => Database.updateOrganization(organization.withName(text))
+	edit={editable
+		? (text) => Database.updateOrganizationName(organization.getID(), text)
 		: undefined}
 	visibility={organization.getOrganization().visibility}
 />
 
-<MarkupView
-	markup={organization.getDescription()}
-	edit={organization.hasAdmin($user.id)
-		? (text) => Database.updateOrganization(organization.withDescription(text))
-		: undefined}
-/>
+{#if organization.getDescription().length === 0}
+	<Paragraph><em>No description.</em></Paragraph>
+{:else}
+	<MarkupView
+		markup={organization.getDescription()}
+		edit={editable
+			? (text) => Database.updateOrganization(organization.withDescription(text))
+			: undefined}
+	/>
+{/if}
 
 <Paragraph>
 	See <Link kind="role" to="/organization/{organization.getID()}/roles">Roles</Link> people have in this

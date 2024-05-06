@@ -7,6 +7,7 @@
 	import type { StatusID } from '$types/Status';
 	import type { default as Vis } from '$types/Visibility';
 	import Visibility from './Visibility.svelte';
+	import type { PostgrestError } from '@supabase/supabase-js';
 
 	// The title to show in the header
 	export let title: string;
@@ -17,7 +18,7 @@
 	// The visibility of this content
 	export let visibility: Vis | null;
 	// An optional function for editing the title
-	export let edit: undefined | ((text: string) => void) = undefined;
+	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
 	const org = getOrg();
 
@@ -35,19 +36,21 @@
 		{#if visibility}<Visibility {visibility} />{/if}
 	</div>
 	<h1>
-		{#if edit}<Button
-				action={() => {
+		{#if editing}<input type="text" bind:value={revision} />{:else}<span class="text">{title}</span
+			>{/if}{#if edit}<Button
+				action={async () => {
 					if (editing) {
-						if (edit) edit(revision);
-						editing = false;
+						if (edit) {
+							const error = await edit(revision);
+							if (error) console.error(error);
+							editing = false;
+						}
 					} else {
 						editing = true;
 						revision = title;
 					}
 				}}
 				>{#if editing}&checkmark;{:else}✎{/if}</Button
-			>{/if}
-		{#if editing}<input type="text" bind:value={revision} />{:else}<span class="text">{title}</span
 			>{/if}
 	</h1>
 	{#if edit}
@@ -66,6 +69,7 @@
 		text-transform: uppercase;
 		line-height: 1;
 		flex-direction: row;
+		justify-items: baseline;
 		gap: var(--padding);
 	}
 

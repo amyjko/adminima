@@ -66,6 +66,18 @@ class Database {
 		// TODO Update database with new organization.
 	}
 
+	static async updateOrganizationName(
+		orgid: OrganizationID,
+		name: string
+	): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('orgs').update({ name: name }).eq('id', orgid);
+		if (error) return error;
+		else {
+			await Database.refresh(orgid);
+			return null;
+		}
+	}
+
 	static async getOrgPayload(orgid: string): Promise<OrgPayload | null> {
 		const organization = await Database.getOrganization(orgid);
 		const people = await Database.getOrganizationsPeople(orgid);

@@ -18,7 +18,7 @@
 	let submitting = false;
 
 	function showError(error: PostgrestError) {
-		message = error.code ?? error.message;
+		message = error.message;
 		submitting = false;
 	}
 
