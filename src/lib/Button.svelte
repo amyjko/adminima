@@ -26,12 +26,12 @@
 <style>
 	button {
 		border-radius: var(--radius);
+		background: var(--chrome);
 		font-family: var(--font);
 		font-size: var(--normal-size);
-		border: 2px solid var(--border);
+		border: none;
 		cursor: pointer;
 		white-space: nowrap;
-		align-self: flex-start;
 	}
 
 	.end {

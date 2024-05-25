@@ -53,6 +53,7 @@
 		--person: #238427;
 		--focus: #784ada;
 		--background: #ffffff;
+		--chrome: #dfdfdf;
 		--separator: #eeeeee;
 		--inactive: #555555;
 		--foreground: #000000;

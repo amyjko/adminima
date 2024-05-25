@@ -2,11 +2,11 @@
 	import OrganizationLink from './OrganizationLink.svelte';
 	import { getOrg } from './contexts';
 	import { page } from '$app/stores';
-	import Button from './Button.svelte';
 	import Status from './Status.svelte';
 	import Visibility from './Visibility.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import { type Visibility as Vis } from '$database/Organizations';
+	import EditableText from './EditableText.svelte';
 
 	// The title to show in the header
 	export let title: string;
@@ -20,9 +20,6 @@
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
 	const org = getOrg();
-
-	let editing = false;
-	let revision = '';
 </script>
 
 <svelte:head>
@@ -35,22 +32,7 @@
 		{#if visibility}<Visibility {visibility} />{/if}
 	</div>
 	<h1>
-		{#if editing}<input type="text" bind:value={revision} />{:else}<span class="text">{title}</span
-			>{/if}{#if edit}<Button
-				action={async () => {
-					if (editing) {
-						if (edit) {
-							const error = await edit(revision);
-							if (error) console.error(error);
-							editing = false;
-						}
-					} else {
-						editing = true;
-						revision = title;
-					}
-				}}
-				>{#if editing}&checkmark;{:else}✎{/if}</Button
-			>{/if}
+		<EditableText text={title} {edit} />
 	</h1>
 	{#if edit}
 		<div />{/if}
@@ -80,26 +62,5 @@
 	.breadcrumbs {
 		font-size: 12pt;
 		margin-bottom: var(--padding);
-	}
-
-	input {
-		font-family: inherit;
-		font-size: inherit;
-		font-weight: inherit;
-		text-transform: inherit;
-		line-height: inherit;
-		padding: 0;
-		border: 0;
-		border-radius: 0;
-		height: 1em;
-		outline: var(--thickness) solid var(--border);
-	}
-
-	input:focus {
-		outline: var(--thickness) solid var(--focus);
-	}
-
-	.text {
-		display: inline-block;
 	}
 </style>
