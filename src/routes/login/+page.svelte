@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import Button from '$lib/Button.svelte';
 	import Field from '$lib/Field.svelte';
+	import Form from '$lib/Form.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
@@ -48,22 +49,26 @@
 	<Paragraph>You're logged in as {$user.email}.</Paragraph>
 {:else if !submitted}
 	<p>We'll email you a one-time code each time you log in.</p>
-	<Field
-		label="email"
-		bind:text={email}
-		invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid email')}
-	/>
-	<Button active={validEmail(email)} action={sendCode} submit>Send code</Button>
+	<Form>
+		<Field
+			label="email"
+			bind:text={email}
+			invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid email')}
+		/>
+		<Button active={validEmail(email)} action={sendCode} submit>Send code</Button>
+	</Form>
 {:else}
 	<Paragraph>We emailed you a code. It might take a minute to arrive.</Paragraph>
-	<Field
-		label="code"
-		bind:text={code}
-		placeholder="012345"
-		invalid={(text) =>
-			text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
-	/>
-	<Button active={code.length === 6} action={login} submit>Login</Button>
+	<Form>
+		<Field
+			label="code"
+			bind:text={code}
+			placeholder="012345"
+			invalid={(text) =>
+				text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
+		/>
+		<Button active={code.length === 6} action={login} submit>Login</Button>
+	</Form>
 {/if}
 
 {#if message}

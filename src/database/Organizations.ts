@@ -302,7 +302,7 @@ class Organizations {
 		}
 	}
 
-	static async createOrganization(name: PersonID, admin: string) {
+	static async createOrganization(name: string, admin: PersonID) {
 		// Insert the new organization
 		const { data: org, error } = await supabase
 			.from('orgs')
