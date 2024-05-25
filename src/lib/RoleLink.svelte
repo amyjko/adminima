@@ -1,7 +1,7 @@
 <script lang="ts">
+	import type { RoleID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import type { RoleID } from '../types/Role';
 	import { getOrg } from './contexts';
 
 	export let roleID: RoleID;

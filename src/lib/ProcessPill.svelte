@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type Process from '../types/Process';
+	import type { ProcessRow } from '$database/Organizations';
 	import Link from './Link.svelte';
 
-	export let process: Process;
+	export let process: ProcessRow;
 	export let left: number | undefined = undefined;
 </script>
 
 <div class="process" style:left="{left}px">
-	<Link bland to="/organization/{process.organization}/process/{process.id}">{process.what}</Link>
+	<Link bland to="/organization/{process.orgid}/process/{process.id}">{process.what}</Link>
 </div>
 
 <style>

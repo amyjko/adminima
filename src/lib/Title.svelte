@@ -4,17 +4,16 @@
 	import { page } from '$app/stores';
 	import Button from './Button.svelte';
 	import Status from './Status.svelte';
-	import type { StatusID } from '$types/Status';
-	import type { default as Vis } from '$types/Visibility';
 	import Visibility from './Visibility.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
+	import { type Visibility as Vis } from '$database/Organizations';
 
 	// The title to show in the header
 	export let title: string;
 	// A descriptive label for what kind of page this is
 	export let kind: string = '';
 	// The status of the thing
-	export let status: StatusID | null = null;
+	export let status: string | null = null;
 	// The visibility of this content
 	export let visibility: Vis | null;
 	// An optional function for editing the title

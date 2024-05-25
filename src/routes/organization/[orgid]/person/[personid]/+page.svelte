@@ -8,12 +8,12 @@
 
 	const org = getOrg();
 
-	$: person = $org.getPerson($page.params.personid);
+	$: profile = $org.getProfile($page.params.personid);
 </script>
 
-{#if person === null}
+{#if profile === null}
 	<Title title="oops" kind={$locale?.term.error} visibility="org" />
 	<Oops text={(locale) => locale.error.noPerson} />
 {:else}
-	<PersonView {person} />
+	<PersonView {profile} />
 {/if}

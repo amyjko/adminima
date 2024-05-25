@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Database from '../database/Database';
+	import Organizations from '../database/Organizations';
 	import Form from './Form.svelte';
 	import Oops from './Oops.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import type { ProcessID } from '../types/Process';
-	import type { RoleID } from '../types/Role';
 	import Header from './Header.svelte';
 	import { getOrg, getUser } from './contexts';
+	import type { ProcessID, RoleID } from '$types/Organization';
 
 	export let process: ProcessID | undefined = undefined;
 	export let role: RoleID | undefined = undefined;
@@ -22,7 +21,7 @@
 	async function createRequest() {
 		if ($user === null) return;
 		try {
-			const request = await Database.createChange(
+			const change = await Organizations.createChange(
 				$user.id,
 				$organization.getID(),
 				newRequestTitle,
@@ -30,7 +29,7 @@
 				process ? [process] : [],
 				role ? [role] : []
 			);
-			goto(`/organization/${organization}/request/${request.id}`);
+			if (change) goto(`/organization/${organization}/request/${change.id}`);
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}

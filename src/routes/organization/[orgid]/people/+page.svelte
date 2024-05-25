@@ -8,11 +8,11 @@
 	import PersonLink from '$lib/PersonLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import { locale } from '$types/Locales';
-	import type { PersonID } from '$types/Person';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
-	import Database from '$database/Database';
+	import Organizations from '$database/Organizations';
 	import TeamLink from '$lib/TeamLink.svelte';
+	import type { PersonID } from '$types/Organization';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -22,9 +22,7 @@
 	let newPerson: string = '';
 
 	function toggleAdmin(admin: boolean, person: PersonID) {
-		Database.updateOrganization(
-			admin ? $organization.withAdmin(person) : $organization.withoutAdmin(person)
-		);
+		Organizations.updateAdmin($organization.getID(), person, admin);
 	}
 </script>
 
@@ -49,11 +47,11 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each $organization.getPeople() as person}
-			{@const roles = $organization.getPersonRoles(person.id)}
+		{#each $organization.getProfiles() as profile}
+			{@const roles = $organization.getPersonRoles(profile.personid)}
 			<tr>
 				<td>
-					<PersonLink {person} />
+					<PersonLink {profile} />
 				</td>
 				<td>
 					{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
@@ -66,16 +64,16 @@
 				{#if isAdmin}
 					<td>
 						<Checkbox
-							on={$organization.hasAdmin(person.id)}
+							on={$organization.hasAdmin(profile.personid)}
 							enabled={isAdmin &&
-								($organization.getAdminCount() > 1 || !$organization.hasAdmin(person.id))}
-							change={(on) => toggleAdmin(on, person.id)}
+								($organization.getAdminCount() > 1 || !$organization.hasAdmin(profile.personid))}
+							change={(on) => toggleAdmin(on, profile.personid)}
 						/>
 					</td>
 					<td class="actions">
 						<Button
-							action={() => Database.updateOrganization($organization.withoutStaff(person))}
-							active={!$organization.hasAdmin(person)}>&times;</Button
+							action={() => Organizations.removePerson($organization.getID(), profile.personid)}
+							active={!$organization.hasAdmin(profile.personid)}>&times;</Button
 						>
 					</td>
 				{/if}
@@ -96,9 +94,9 @@
 			<ul>
 				{#each people as person}
 					<li>
-						<PersonLink {person} email />
-						{#if !$organization.hasStaff(person.id)}
-							<Button action={() => Database.updateOrganization($organization.withStaff(person))}
+						<PersonLink profile={person} />
+						{#if !$organization.hasPerson(person.personid)}
+							<Button action={() => Organizations.addPerson($organization.getID(), person.personid)}
 								>+</Button
 							>{/if}
 					</li>

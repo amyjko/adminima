@@ -40,8 +40,8 @@ export type Day = {
 	year: number;
 };
 
-export function toDate(day: Day) {
-	return new Date(day.year, day.month - 1, day.date - 1);
+export function toDate(day: string) {
+	return new Date(day);
 }
 
 export type Weeks = number;

@@ -8,42 +8,44 @@
 	import Level from '$lib/Level.svelte';
 	import Subheader from '$lib/Subheader.svelte';
 	import MarkupView from '$lib/MarkupView.svelte';
-	import type Process from '$types/Process';
-	import type Role from '$types/Role';
-	import type { RoleID } from '$types/Role';
+	import type { ProcessRow, RoleRow } from '$database/Organizations';
+	import type { RoleID } from '$types/Organization';
 
 	const organization = getOrg();
 
-	function getRolesByAccountability(processes: Process[]): Role[] {
+	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
 		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
 
 		for (const process of processes) {
-			if (!roles.has(process.accountable)) {
-				roles.set(process.accountable, { a: 0, r: 0, c: 0, i: 0 });
-			}
-			let tally = roles.get(process.accountable);
-			if (tally) tally.a++;
-
-			for (const role of process.responsible) {
-				if (!roles.has(role)) roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
-				tally = roles.get(role);
-				if (tally) tally.r++;
-			}
-
-			for (const role of process.consulted) {
-				if (!roles.has(role)) {
-					roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
+			const how = $organization.getHow(process.id);
+			if (how) {
+				if (how.accountable && !roles.has(how.accountable)) {
+					roles.set(how.accountable, { a: 0, r: 0, c: 0, i: 0 });
 				}
-				tally = roles.get(role);
-				if (tally) tally.c++;
-			}
+				let tally = how.accountable ? roles.get(how.accountable) : { a: 0, r: 0, c: 0, i: 0 };
+				if (tally) tally.a++;
 
-			for (const role of process.informed) {
-				if (!roles.has(role)) {
-					roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
+				for (const role of how.responsible) {
+					if (!roles.has(role)) roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
+					tally = roles.get(role);
+					if (tally) tally.r++;
 				}
-				tally = roles.get(role);
-				if (tally) tally.i++;
+
+				for (const role of how.consulted) {
+					if (!roles.has(role)) {
+						roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
+					}
+					tally = roles.get(role);
+					if (tally) tally.c++;
+				}
+
+				for (const role of how.informed) {
+					if (!roles.has(role)) {
+						roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
+					}
+					tally = roles.get(role);
+					if (tally) tally.i++;
+				}
 			}
 		}
 
@@ -61,7 +63,7 @@
 				);
 			})
 			.map((id) => $organization.getRole(id))
-			.filter((r): r is Role => r !== undefined);
+			.filter((r): r is RoleRow => r !== undefined);
 	}
 </script>
 
@@ -72,20 +74,26 @@
 	responsible for it, or to suggest a change.
 </Paragraph>
 
-{#each $organization.getOrganization().concerns as concern}
-	<Subheader>{concern.name}</Subheader>
-	<MarkupView markup={concern.description} />
+{#each Array.from(new Set($organization
+			.getProcesses()
+			.map((process) => process.concern))) as concern}
+	<Subheader>{concern}</Subheader>
 
 	{@const processes = $organization
 		.getProcesses()
-		.filter((p) => p.concern === concern.id)
-		.sort(
-			(a, b) =>
-				b.responsible.length +
-				b.consulted.length +
-				b.informed.length -
-				(a.responsible.length + a.consulted.length + a.informed.length)
-		)}
+		.filter((p) => p.concern === concern)
+		.sort((a, b) => {
+			const howA = $organization.getHow(a.id);
+			const howB = $organization.getHow(b.id);
+			if (howA === undefined || howB === undefined) return 0;
+
+			return (
+				howB.responsible.length +
+				howB.consulted.length +
+				howB.informed.length -
+				(howA.responsible.length + howA.consulted.length + howA.informed.length)
+			);
+		})}
 
 	{@const roles = getRolesByAccountability(processes)}
 
@@ -96,17 +104,18 @@
 			</thead>
 			<tbody>
 				{#each processes as process}
+					{@const how = $organization.getHow(process.id)}
 					<tr>
 						<td><ProcessLink processID={process.id} /></td>
 						{#each roles as role}<td class="level"
 								><Level
-									level={process.accountable === role.id
+									level={how?.accountable === role.id
 										? 'accountable'
-										: process.responsible.includes(role.id)
+										: how?.responsible.includes(role.id)
 										? 'responsible'
-										: process.consulted.includes(role.id)
+										: how?.consulted.includes(role.id)
 										? 'consulted'
-										: process.informed.includes(role.id)
+										: how?.informed.includes(role.id)
 										? 'informed'
 										: ''}
 								/></td

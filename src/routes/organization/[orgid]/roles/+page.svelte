@@ -1,9 +1,8 @@
 <script lang="ts">
-	import Database from '$database/Database';
+	import Organizations from '$database/Organizations';
 	import { goto } from '$app/navigation';
 	import Oops from '$lib/Oops.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
-	import Form from '$lib/Form.svelte';
 	import Field from '$lib/Field.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Button from '$lib/Button.svelte';
@@ -26,7 +25,7 @@
 	let newRoleError: string | undefined = undefined;
 
 	async function createRole() {
-		const roleID = await Database.createRole($org.getID(), newRole);
+		const roleID = await Organizations.createRole($org.getID(), newRole);
 		if (roleID) goto(`/organization/${$org.getID()}/role/${roleID}`);
 		else newRoleError = "We couldn't create the new role.";
 	}
@@ -44,8 +43,8 @@
 	{@const teamless = $org.getRoles().filter((role) => role.team === null)}
 
 	{#each $org
-		.getOrganization()
-		.teams.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
+		.getTeams()
+		.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
 		<Header><TeamLink id={team.id} /></Header>
 		<MarkupView markup={team.description} />
 		<Flow>

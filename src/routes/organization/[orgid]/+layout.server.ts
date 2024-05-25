@@ -1,25 +1,9 @@
-import Database from '$database/Database';
-// import data from '$database/mock.json';
-// import type Change from '$types/Change';
-// import type Organization from '$types/Organization';
-// import type Person from '$types/Person';
-// import type Process from '$types/Process';
-// import type Role from '$types/Role';
-
-// type MockData = {
-// 	roles: Role[];
-// 	organizations: Organization[];
-// 	people: Person[];
-// 	changes: Change[];
-// 	processes: Process[];
-// };
-
-// const mock = data as unknown as MockData;
+import Organizations from '$database/Organizations';
 
 /** @type {import('./$types').LayoutServerLoad} */
 export async function load({ params }) {
-	const org = await Database.getOrgPayload(params.orgid);
-	// const org = mock.organizations.find((org) => org.id === orgid);
+	/** Get the serializable organization payload from the database */
+	const org = await Organizations.getPayload(params.orgid);
 
 	return {
 		payload: org

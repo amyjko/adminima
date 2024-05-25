@@ -11,7 +11,7 @@
 <Title
 	title="Changes"
 	kind={$locale?.term.organization}
-	visibility={$organization.getOrganization().visibility}
+	visibility={$organization.getVisibility()}
 />
 
 <ChangeForm />

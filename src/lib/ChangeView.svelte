@@ -2,12 +2,11 @@
 	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import type Change from '../types/Change';
 	import MarkupView from './MarkupView.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import Database from '../database/Database';
+	import Organizations, { type ChangeRow } from '../database/Organizations';
 	import Oops from './Oops.svelte';
 	import Button from './Button.svelte';
 	import { goto } from '$app/navigation';
@@ -18,24 +17,26 @@
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
+	import timestampToDate from '$database/timestampToDate';
+	import Loading from './Loading.svelte';
 
-	export let change: Change;
+	export let change: ChangeRow;
 
 	let deleteError: string | undefined = undefined;
 
 	const org = getOrg();
 </script>
 
-<Title title={change.title} kind={$locale?.term.request} status={change.status} visibility="org" />
+<Title title={change.what} kind={$locale?.term.request} status={change.status} visibility="org" />
 
 <Status status={change.status} />
 
 <Paragraph
-	>On <TimeView time={change.revisions[0].when} />
-	<PersonLink person={$org.getPerson(change.who)} /> reported:</Paragraph
+	>On <TimeView time={timestampToDate(change.when).getTime()} />
+	<PersonLink profile={$org.getProfile(change.who)} /> reported:</Paragraph
 >
 
-<Quote><MarkupView markup={change.problem} /></Quote>
+<Quote><MarkupView markup={change.description} /></Quote>
 
 <Paragraph>This affects ...</Paragraph>
 
@@ -50,27 +51,31 @@
 
 <Header>Comments</Header>
 
-{#each change.comments as comment}
-	<div class="comment">
-		<div class="meta">
-			<TimeView time={comment.when} />
-			<PersonLink person={$org.getPerson(comment.who)} />
+{#await Organizations.getComments(change.comments)}
+	<Loading>/</Loading>
+{:then comments}
+	{#each comments as comment}
+		<div class="comment">
+			<div class="meta">
+				<TimeView time={timestampToDate(comment.when).getTime()} />
+				<PersonLink profile={$org.getProfile(comment.who)} />
+			</div>
+			<Quote>
+				<MarkupView markup={comment.what} />
+			</Quote>
 		</div>
-		<Quote>
-			<MarkupView markup={comment.what} />
-		</Quote>
-	</div>
-{:else}
-	No comments yet.
-{/each}
+	{:else}
+		No comments yet.
+	{/each}
+{/await}
 
 <Admin>
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
 	<Button
 		action={async () => {
 			try {
-				const org = change.organization;
-				await Database.deleteChange(change.id);
+				const org = change.orgid;
+				await Organizations.deleteChange(change.id);
 				goto(`/organization/${org}`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";
@@ -81,7 +86,7 @@
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
 
-<Modifications mods={change.revisions} />
+<Modifications mods={change.comments} />
 
 <style>
 	.comment {

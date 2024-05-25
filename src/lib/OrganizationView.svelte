@@ -4,33 +4,35 @@
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
 	import Paragraph from './Paragraph.svelte';
-	import Database from '$database/Database';
-	import type Org from '$types/Org';
+	import Organizations from '$database/Organizations';
+	import type Organization from '$types/Organization';
 	import { getUser } from './contexts';
 
-	export let organization: Org;
+	export let organization: Organization;
 
 	const user = getUser();
 
 	$: editable = $user && organization.hasAdmin($user.id);
+
+	$: description = organization.getDescription();
 </script>
 
 <Title
 	title={organization.getName()}
 	kind={$locale?.term.organization}
 	edit={editable
-		? (text) => Database.updateOrganizationName(organization.getID(), text)
+		? (text) => Organizations.updateOrganizationName(organization.getID(), text)
 		: undefined}
-	visibility={organization.getOrganization().visibility}
+	visibility={organization.getVisibility()}
 />
 
-{#if organization.getDescription().length === 0}
+{#if description === null}
 	<Paragraph><em>No description.</em></Paragraph>
 {:else}
 	<MarkupView
-		markup={organization.getDescription()}
+		markup={description}
 		edit={editable
-			? (text) => Database.updateOrganization(organization.withDescription(text))
+			? (text) => Organizations.updateDescription(organization.getID(), text)
 			: undefined}
 	/>
 {/if}

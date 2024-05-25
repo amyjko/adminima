@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { type StatusID } from '$types/Status';
 	import { getOrg } from './contexts';
 
-	export let status: StatusID | null;
+	export let status: string | null;
 
 	const org = getOrg();
 </script>
 
-<span class="status" title={status ? $org.getStatus(status)?.description : null}>{status}</span>
+<span class="status" title={status}>{status}</span>
 
 <style>
 	.status {

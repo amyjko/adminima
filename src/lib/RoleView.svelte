@@ -1,8 +1,7 @@
 <script lang="ts">
-	import type Role from '../types/Role';
 	import Timeline from '$lib/Timeline.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import Database from '../database/Database';
+	import Organizations, { type RoleRow } from '../database/Organizations';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import ChangeForm from './ChangeForm.svelte';
@@ -17,18 +16,15 @@
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 
-	export let role: Role;
+	export let role: RoleRow;
 
 	let deleteError: string | undefined = undefined;
 
 	const org = getOrg();
+	$: profiles = $org.getRoleProfiles(role.id);
 </script>
 
-<Title
-	title={role.title}
-	kind={$locale?.term.role}
-	status={role.status}
-	visibility={role.visibility}
+<Title title={role.title} kind={$locale?.term.role} visibility={null}
 	>{#if role.team}&nbsp;&gt; <TeamLink id={role.team} />{/if}</Title
 >
 
@@ -36,17 +32,17 @@
 
 <Paragraph
 	>This role is held by
-	{#each role.people as person, index}<PersonLink person={$org.getPerson(person)} />{#if index > 0},
-		{/if}{#if index < role.people.length - 1} and {/if}{:else}no one yet{/each}.</Paragraph
+	{#each profiles as profile, index}<PersonLink {profile} />{#if index > 0},
+		{/if}{#if index < profiles.length - 1} and {/if}{:else}no one yet{/each}.</Paragraph
 >
 
 <Header>Processes</Header>
 
-<Timeline {role} processes={$org.getRoleProcesses(role)} />
+<Timeline {role} processes={$org.getRoleProcesses(role.id)} />
 
 <ChangeForm role={role.id} />
 
-<Revisions mods={role.revisions} />
+<Revisions mods={role.comments} />
 
 <Admin>
 	<Paragraph
@@ -56,8 +52,8 @@
 	<Button
 		action={async () => {
 			try {
-				const org = role.organization;
-				const error = await Database.deleteRole(org, role.id);
+				const org = role.orgid;
+				const error = await Organizations.deleteRole(org, role.id);
 				if (error) deleteError = error.message;
 				else goto(`/organization/${org}/roles`);
 			} catch (_) {

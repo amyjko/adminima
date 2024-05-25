@@ -36,18 +36,28 @@ export type Database = {
     Tables: {
       assignments: {
         Row: {
+          orgid: string
           personid: string
           roleid: string
         }
         Insert: {
+          orgid: string
           personid: string
           roleid: string
         }
         Update: {
+          orgid?: string
           personid?: string
           roleid?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "assignments_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "assignments_personid_fkey"
             columns: ["personid"]
@@ -62,38 +72,272 @@ export type Database = {
             referencedRelation: "roles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_assignments_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      changes: {
+        Row: {
+          comments: string[]
+          description: string | null
+          id: string
+          orgid: string
+          processes: string[]
+          roles: string[]
+          status: Database["public"]["Enums"]["status"]
+          watchers: string[]
+          what: string
+          when: string
+          who: string
+        }
+        Insert: {
+          comments?: string[]
+          description?: string | null
+          id?: string
+          orgid: string
+          processes?: string[]
+          roles?: string[]
+          status?: Database["public"]["Enums"]["status"]
+          watchers?: string[]
+          what: string
+          when?: string
+          who: string
+        }
+        Update: {
+          comments?: string[]
+          description?: string | null
+          id?: string
+          orgid?: string
+          processes?: string[]
+          roles?: string[]
+          status?: Database["public"]["Enums"]["status"]
+          watchers?: string[]
+          what?: string
+          when?: string
+          who?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "changes_description_fkey"
+            columns: ["description"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "changes_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "changes_who_fkey"
+            columns: ["who"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          id: string
+          orgid: string
+          what: string
+          when: string
+          who: string
+        }
+        Insert: {
+          id?: string
+          orgid: string
+          what: string
+          when?: string
+          who: string
+        }
+        Update: {
+          id?: string
+          orgid?: string
+          what?: string
+          when?: string
+          who?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_who_fkey"
+            columns: ["who"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hows: {
+        Row: {
+          accountable: string | null
+          consulted: string[]
+          how: string[]
+          id: string
+          informed: string[]
+          orgid: string
+          processid: string
+          responsible: string[]
+          visibility: Database["public"]["Enums"]["visibility"]
+          what: string | null
+          when: string
+        }
+        Insert: {
+          accountable?: string | null
+          consulted?: string[]
+          how?: string[]
+          id?: string
+          informed?: string[]
+          orgid: string
+          processid: string
+          responsible?: string[]
+          visibility?: Database["public"]["Enums"]["visibility"]
+          what?: string | null
+          when?: string
+        }
+        Update: {
+          accountable?: string | null
+          consulted?: string[]
+          how?: string[]
+          id?: string
+          informed?: string[]
+          orgid?: string
+          processid?: string
+          responsible?: string[]
+          visibility?: Database["public"]["Enums"]["visibility"]
+          what?: string | null
+          when?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hows_accountable_fkey"
+            columns: ["accountable"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hows_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hows_what_fkey"
+            columns: ["what"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_hows_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_hows_processes_fkey"
+            columns: ["processid"]
+            isOneToOne: false
+            referencedRelation: "processes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      markup: {
+        Row: {
+          editor: string | null
+          id: string
+          text: string
+        }
+        Insert: {
+          editor?: string | null
+          id?: string
+          text?: string
+        }
+        Update: {
+          editor?: string | null
+          id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "markup_editor_fkey"
+            columns: ["editor"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
         ]
       }
       orgs: {
         Row: {
-          description: string
+          comments: string[]
+          description: string | null
           id: string
           name: string
+          visibility: Database["public"]["Enums"]["visibility"]
+          when: string
         }
         Insert: {
-          description?: string
+          comments?: string[]
+          description?: string | null
           id?: string
           name?: string
+          visibility?: Database["public"]["Enums"]["visibility"]
+          when?: string
         }
         Update: {
-          description?: string
+          comments?: string[]
+          description?: string | null
           id?: string
           name?: string
+          visibility?: Database["public"]["Enums"]["visibility"]
+          when?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orgs_description_fkey"
+            columns: ["description"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       people: {
         Row: {
           email: string
           id: string
+          when: string
         }
         Insert: {
           email: string
           id: string
+          when?: string
         }
         Update: {
           email?: string
           id?: string
+          when?: string
         }
         Relationships: [
           {
@@ -105,10 +349,71 @@ export type Database = {
           },
         ]
       }
+      processes: {
+        Row: {
+          comments: string[]
+          concern: string
+          how: string | null
+          icon: string
+          id: string
+          orgid: string
+          repeat: string | null
+          status: string
+          what: string
+          when: string
+        }
+        Insert: {
+          comments?: string[]
+          concern?: string
+          how?: string | null
+          icon?: string
+          id?: string
+          orgid: string
+          repeat?: string | null
+          status?: string
+          what?: string
+          when?: string
+        }
+        Update: {
+          comments?: string[]
+          concern?: string
+          how?: string | null
+          icon?: string
+          id?: string
+          orgid?: string
+          repeat?: string | null
+          status?: string
+          what?: string
+          when?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processes_how_fkey"
+            columns: ["how"]
+            isOneToOne: false
+            referencedRelation: "hows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processes_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_processes_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           admin: boolean
-          bio: string
+          bio: string | null
           name: string
           orgid: string
           personid: string
@@ -116,7 +421,7 @@ export type Database = {
         }
         Insert: {
           admin: boolean
-          bio: string
+          bio?: string | null
           name: string
           orgid: string
           personid: string
@@ -124,13 +429,20 @@ export type Database = {
         }
         Update: {
           admin?: boolean
-          bio?: string
+          bio?: string | null
           name?: string
           orgid?: string
           personid?: string
           supervisor?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_bio_fkey"
+            columns: ["bio"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_orgid_fkey"
             columns: ["orgid"]
@@ -156,22 +468,31 @@ export type Database = {
       }
       roles: {
         Row: {
-          description: string
+          comments: string[]
+          description: string | null
           id: string
           orgid: string
+          team: string | null
           title: string
+          when: string
         }
         Insert: {
-          description: string
+          comments?: string[]
+          description?: string | null
           id?: string
           orgid: string
+          team?: string | null
           title: string
+          when?: string
         }
         Update: {
-          description?: string
+          comments?: string[]
+          description?: string | null
           id?: string
           orgid?: string
+          team?: string | null
           title?: string
+          when?: string
         }
         Relationships: [
           {
@@ -182,7 +503,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "roles_description_fkey"
+            columns: ["description"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "roles_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "roles_team_fkey"
+            columns: ["team"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          comments: string[]
+          description: string | null
+          id: string
+          name: string
+          orgid: string
+          when: string
+        }
+        Insert: {
+          comments?: string[]
+          description?: string | null
+          id?: string
+          name?: string
+          orgid: string
+          when?: string
+        }
+        Update: {
+          comments?: string[]
+          description?: string | null
+          id?: string
+          name?: string
+          orgid?: string
+          when?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_description_fkey"
+            columns: ["description"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teams_orgid_fkey"
             columns: ["orgid"]
             isOneToOne: false
             referencedRelation: "orgs"
@@ -198,7 +575,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      status: "triage" | "backlog" | "active" | "done"
+      visibility: "public" | "org" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never

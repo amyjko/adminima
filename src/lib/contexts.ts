@@ -1,10 +1,10 @@
 import type { Writable } from 'svelte/store';
 import { getContext, setContext } from 'svelte';
-import type Org from '$types/Org';
 import type { User } from '@supabase/supabase-js';
+import type Organization from '$types/Organization';
 
 export const OrgSymbol = Symbol('organization');
-export type OrgContext = Writable<Org>;
+export type OrgContext = Writable<Organization>;
 
 export function setOrg(context: OrgContext | null) {
 	setContext(OrgSymbol, context);

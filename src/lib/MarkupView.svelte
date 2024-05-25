@@ -6,10 +6,10 @@
 	import BulletsView from '$lib/BulletsView.svelte';
 	import NumberedView from '$lib/NumberedView.svelte';
 	import { parse } from '../markup/parser';
-	import type Markup from '../types/Markup';
+	import { type Markup as Mark } from '$types/Organization';
 	import Button from './Button.svelte';
 
-	export let markup: Markup;
+	export let markup: Mark | null;
 	export let inline = false;
 	/** If given, allows the markup to be edited */
 	export let edit: undefined | ((text: string) => void) = undefined;
@@ -22,7 +22,7 @@
 	{#if edit}<Button
 			action={() => {
 				if (editing) {
-					if (edit) edit(markup);
+					if (edit) edit(markup ?? '');
 					editing = false;
 				} else editing = true;
 			}}
@@ -33,7 +33,7 @@
 		<textarea bind:value={markup} style:height="{height}px" />
 	{:else}
 		<div class="blocks" bind:clientHeight={height}>
-			{#each parse(markup).blocks as block}
+			{#each parse(markup ?? '').blocks as block}
 				{#if block instanceof Paragraph}
 					<ParagraphView {block} {inline} />
 				{:else if block instanceof Bullets}

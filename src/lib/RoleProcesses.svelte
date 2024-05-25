@@ -1,17 +1,23 @@
 <script lang="ts">
 	import Subheader from './Subheader.svelte';
 	import Flow from './Flow.svelte';
-	import type Role from '$types/Role';
-	import type Process from '$types/Process';
 	import ProcessLink from './ProcessLink.svelte';
+	import type { HowRow, ProcessRow, RoleRow } from '$database/Organizations';
+	import { getOrg } from './contexts';
 
-	export let role: Role;
-	export let processes: Process[];
+	export let role: RoleRow;
+	export let processes: ProcessRow[];
+
+	const org = getOrg();
+
+	$: hows = processes
+		.map((process) => $org.getHow(process.id))
+		.filter((how): how is HowRow => how !== undefined);
 </script>
 
 <Subheader>Accountable</Subheader>
 <Flow>
-	{#each processes.filter((process) => role.id === process.accountable) as process}
+	{#each hows.filter((how) => role.id === how.accountable) as process}
 		<ProcessLink processID={process.id} />
 	{:else}
 		Not accountable for any process outcomes.
@@ -19,7 +25,7 @@
 </Flow>
 <Subheader>Responsible</Subheader>
 <Flow>
-	{#each processes.filter((process) => process.responsible.includes(role.id)) as process}
+	{#each hows.filter((how) => how.responsible.includes(role.id)) as process}
 		<ProcessLink processID={process.id} />
 	{:else}
 		Not responsible for completing any processes.
@@ -27,7 +33,7 @@
 </Flow>
 <Subheader>Consulted</Subheader>
 <Flow>
-	{#each processes.filter((process) => process.consulted.includes(role.id)) as process}
+	{#each hows.filter((how) => how.consulted.includes(role.id)) as process}
 		<ProcessLink processID={process.id} />
 	{:else}
 		Not consulted on any processes.
@@ -35,7 +41,7 @@
 </Flow>
 <Subheader>Informed</Subheader>
 <Flow>
-	{#each processes.filter((process) => process.informed.includes(role.id)) as process}
+	{#each hows.filter((how) => how.informed.includes(role.id)) as process}
 		<ProcessLink processID={process.id} />
 	{:else}
 		Not informed about any processes.

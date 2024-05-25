@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Organizations from '$database/Organizations';
 	import Actions from './Actions.svelte';
 	import Button from './Button.svelte';
 	import Dialog from './Dialog.svelte';
@@ -26,29 +27,10 @@
 		if ($user === null) return;
 		submitting = false;
 
-		// Insert the new organization
-		const { data, error } = await supabase
-			.from('orgs')
-			.insert({
-				name: orgName,
-				description: ''
-			})
-			.select();
-		if (error) showError(error);
-		else {
-			const orgid = data[0].id;
-			// Insert the new user profile
-			const { error } = await supabase.from('profiles').insert({
-				orgid,
-				personid: $user.id,
-				name,
-				bio: '',
-				admin: true
-			});
-			if (error) showError(error);
+		const { error, id } = await Organizations.createOrganization(name, $user.id);
 
-			goto(`/organization/${orgid}`);
-		}
+		if (error) showError(error);
+		else goto(`/organization/${id}`);
 	}
 
 	let name = '';

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type Visibility from '$types/Visibility';
+	import { type Visibility as Vis } from '../database/Organizations';
 	import { getOrg } from './contexts';
 
-	export let visibility: Visibility;
+	export let visibility: Vis;
 
 	const org = getOrg();
 </script>

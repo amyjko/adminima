@@ -1,29 +1,28 @@
 <script lang="ts">
-	import type Process from '../types/Process';
 	import { toDate } from '../types/Repeat';
 	import { addWeeks, addYears, compareAsc, differenceInWeeks, format } from 'date-fns';
 	import ProcessPill from './ProcessPill.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import type Role from '$types/Role';
 	import RoleProcesses from './RoleProcesses.svelte';
 	import Subheader from './Subheader.svelte';
+	import type { ProcessRow, RoleRow } from '$database/Organizations';
 
-	export let role: Role;
-	export let processes: Process[];
+	export let role: RoleRow;
+	export let processes: ProcessRow[];
 
 	// How many pixels a week should be.
 	const PixelsPerWeek = 100;
 
 	// Get the timed processes
-	$: timed = processes.filter((a) => a.start !== null);
+	$: timed = processes.filter((a) => a.repeat !== null);
 
 	$: sorted = timed.sort((a, b) =>
-		a.start !== null && b.start !== null ? compareAsc(toDate(a.start), toDate(b.start)) : 0
+		a.repeat !== null && b.repeat !== null ? compareAsc(toDate(a.repeat), toDate(b.repeat)) : 0
 	);
 
 	// Start week is the earliest process based on start day
 	$: first = sorted[0];
-	$: start = first?.start ? toDate(first.start) : new Date();
+	$: start = first?.repeat ? toDate(first.repeat) : new Date();
 
 	// End week is now plus 3 years
 	const end = addYears(new Date(), 3);
@@ -52,9 +51,9 @@
 					</div>
 				{/each}
 				<div class="timed">
-					{#each timed as process}{#if process.start}<ProcessPill
+					{#each timed as process}{#if process.repeat}<ProcessPill
 								{process}
-								left={differenceInWeeks(toDate(process.start), start) * PixelsPerWeek}
+								left={differenceInWeeks(toDate(process.repeat), start) * PixelsPerWeek}
 							/>{/if}{/each}
 				</div>
 			</div>

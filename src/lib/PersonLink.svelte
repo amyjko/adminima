@@ -1,20 +1,18 @@
 <script lang="ts">
 	import Link from './Link.svelte';
-	import type Person from '../types/Person';
 	import Oops from './Oops.svelte';
 	import { getOrg } from './contexts';
+	import type { ProfileRow } from '$database/Organizations';
 
-	export let person: Person | null;
+	export let profile: ProfileRow | null;
 	export let short = false;
-	export let email = false;
 
 	const org = getOrg();
 </script>
 
-{#if person}
-	<Link to="/organization/{$org.getID()}/person/{person.id}" kind="person"
-		>{short ? person.name.split(' ')[0] : person.name}{#if email}
-			&nbsp;&lt;{person.email}&gt;{/if}</Link
+{#if profile}
+	<Link to="/organization/{$org.getID()}/person/{profile.personid}" kind="person"
+		>{short ? profile.name.split(' ')[0] : profile.name}</Link
 	>
 {:else}
 	<Oops inline text={(locale) => locale.error.noPerson} />

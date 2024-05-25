@@ -1,7 +1,7 @@
 <script lang="ts">
+	import type { ProcessID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import type { ProcessID } from '../types/Process';
 	import { getOrg } from './contexts';
 
 	export let processID: ProcessID;
@@ -13,5 +13,5 @@
 
 {#if process === null}<Oops inline text={(locale) => locale.error.noProcess} />{:else}<Link
 		to="/organization/{$organization.getID()}/process/{processID}"
-		kind="process">{process.title}</Link
+		kind="process">{process.what}</Link
 	>{/if}

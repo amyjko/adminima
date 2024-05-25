@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type Change from '../types/Change';
+	import { type ChangeRow } from '$database/Organizations';
+	import timestampToDate from '$database/timestampToDate';
 	import ChangeLink from './ChangeLink.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
 
-	export let changes: Change[];
+	export let changes: ChangeRow[];
 
 	const org = getOrg();
 </script>
@@ -20,10 +21,10 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each changes.sort((a, b) => a.revisions[0]?.when ?? 0 - b.revisions[0]?.when ?? 0) as change}
+			{#each changes.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime()) as change}
 				<tr>
 					<td><Status status={change.status} /></td>
-					<td><PersonLink person={$org.getPerson(change.who)} /></td>
+					<td><PersonLink profile={$org.getProfile(change.who)} /></td>
 					<td><ChangeLink changeID={change.id} /></td></tr
 				>
 			{/each}

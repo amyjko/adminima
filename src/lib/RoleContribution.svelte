@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RoleID } from '$types/Role';
+	import type { RoleID } from '$types/Organization';
 	import RoleLink from './RoleLink.svelte';
 
 	export let roles: RoleID[];

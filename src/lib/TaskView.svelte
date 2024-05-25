@@ -1,17 +1,17 @@
 <script lang="ts">
+	import type { HowRow } from '$database/Organizations';
 	import MarkupView from './MarkupView.svelte';
-	import type { Task } from '../types/Process';
 	import RoleLink from './RoleLink.svelte';
 
-	export let task: Task;
+	export let how: HowRow;
 </script>
 
 <span
-	><MarkupView inline markup={task.what} />
-	<RoleLink roleID={task.accountable} /></span
+	><MarkupView inline markup={how.what} />
+	{#if how.accountable}<RoleLink roleID={how.accountable} />{/if}</span
 >
 <ul>
-	{#each task.how as how}
-		<li><svelte:self task={how} /></li>
+	{#each how.how as subhow}
+		<li><svelte:self how={subhow} /></li>
 	{/each}
 </ul>
