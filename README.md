@@ -21,5 +21,5 @@ To run locally,
 - [ ] `npm install` inside the repository directory
 - [ ] Install [Docker](https://docs.docker.com/desktop/install/mac-install/) for local development, and start it
 - [ ] Run `npm run dev` to start the local vite dev server
-- [ ] Run `npm run emu` to start local Supabase docker image
+- [ ] Run `npm run start` to start local Supabase emulator docker image
 - [ ] Visit local host to interact with the application
