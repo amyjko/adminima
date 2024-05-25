@@ -1,0 +1,27 @@
+name: Enhancement
+description: Share an idea for improving Adminima.
+labels: ['enhancement', 'triage']
+projects: ['amyjko/2']
+assignees:
+  - amyjko
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing your idea!
+  - type: textarea
+    id: idea
+    attributes:
+      label: What are you trying to do that you can't?
+      description: In as much detail as possible, describe the task or problem you want to solve that Adminima doesn't currently support.
+      placeholder: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What is your idea?
+      description: If you have an idea for how to change Adminima to support your task, share it here. It's okay if you don't.
+      placeholder: Ideas
+    validations:
+      required: true

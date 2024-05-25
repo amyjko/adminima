@@ -1,0 +1,29 @@
+name: Defect
+description: Report something not working as intended.
+labels: ['defect', 'triage']
+projects: ['amyjko/2']
+assignees:
+  - amyjko
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this defect report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: In as much detail as possible, describe the steps you took, the unexpected thing that happened, and what you expected to happen.
+      placeholder: What happened?
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
