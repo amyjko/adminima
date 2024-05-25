@@ -302,12 +302,12 @@ class Organizations {
 		}
 	}
 
-	static async createOrganization(name: string, admin: PersonID) {
+	static async createOrganization(organizationName: string, admin: PersonID, adminName: string) {
 		// Insert the new organization
 		const { data: org, error } = await supabase
 			.from('orgs')
 			.insert({
-				name,
+				name: organizationName,
 				description: null
 			})
 			.select()
@@ -318,7 +318,7 @@ class Organizations {
 			const { error } = await supabase.from('profiles').insert({
 				orgid: org.id,
 				personid: admin,
-				name,
+				name: adminName,
 				admin: true
 			});
 			if (error) return { error, id: null };

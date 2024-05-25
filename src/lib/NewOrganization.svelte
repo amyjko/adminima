@@ -28,7 +28,7 @@
 		if ($user === null) return;
 		submitting = false;
 
-		const { error, id } = await Organizations.createOrganization(name, $user.id);
+		const { error, id } = await Organizations.createOrganization(orgName, $user.id, name);
 
 		if (error) showError(error);
 		else goto(`/organization/${id}`);
