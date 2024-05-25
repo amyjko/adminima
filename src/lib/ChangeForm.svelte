@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Database from '../database/Database';
-	import Button from './Button.svelte';
-	import Field from './Field.svelte';
 	import Form from './Form.svelte';
 	import Oops from './Oops.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import { user } from '../database/Auth';
 	import type { ProcessID } from '../types/Process';
 	import type { RoleID } from '../types/Role';
 	import Header from './Header.svelte';
-	import { getOrg } from './contexts';
+	import { getOrg, getUser } from './contexts';
 
 	export let process: ProcessID | undefined = undefined;
 	export let role: RoleID | undefined = undefined;
@@ -20,8 +17,10 @@
 	let newRequestError: string | undefined = undefined;
 
 	const organization = getOrg();
+	const user = getUser();
 
 	async function createRequest() {
+		if ($user === null) return;
 		try {
 			const request = await Database.createChange(
 				$user.id,

@@ -1,13 +1,11 @@
 <script lang="ts">
 	import Loading from '$lib/Loading.svelte';
-	import { getOrg } from '$lib/contexts';
+	import { getOrg, getUser } from '$lib/contexts';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button from '$lib/Button.svelte';
 	import PersonLink from '$lib/PersonLink.svelte';
-	import { user } from '$database/Auth';
-	import Form from '$lib/Form.svelte';
 	import Title from '$lib/Title.svelte';
 	import { locale } from '$types/Locales';
 	import type { PersonID } from '$types/Person';
@@ -17,7 +15,9 @@
 	import TeamLink from '$lib/TeamLink.svelte';
 
 	const organization = getOrg();
-	$: isAdmin = $organization.hasAdmin($user.id);
+	const user = getUser();
+
+	$: isAdmin = $user && $organization.hasAdmin($user.id);
 
 	let newPerson: string = '';
 
