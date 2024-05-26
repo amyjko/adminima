@@ -75,7 +75,7 @@
 				><Button end action={() => (showCreateRole = false)}>cancel</Button><Button
 					end
 					submit
-					active={newRole.length > 3}
+					active={newRole.length >= 3}
 					action={createRole}>create</Button
 				>
 			</Actions>

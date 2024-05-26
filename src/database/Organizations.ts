@@ -308,8 +308,7 @@ class Organizations {
 			.from('roles')
 			.insert({
 				orgid: orgid,
-				title,
-				description: ''
+				title
 			})
 			.select()
 			.single();
