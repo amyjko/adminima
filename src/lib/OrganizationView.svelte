@@ -7,6 +7,7 @@
 	import Organizations from '$database/Organizations';
 	import type Organization from '$types/Organization';
 	import { getUser } from './contexts';
+	import Visibility from './Visibility.svelte';
 
 	export let organization: Organization;
 
@@ -21,8 +22,9 @@
 	edit={editable
 		? (text) => Organizations.updateOrganizationName(organization.getID(), text)
 		: undefined}
-	visibility={organization.getVisibility()}
-/>
+>
+	<Visibility level={organization.getVisibility()} />
+</Title>
 
 <MarkupView
 	markup={organization.getDescription()}

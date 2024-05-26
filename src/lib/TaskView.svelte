@@ -2,10 +2,12 @@
 	import type { HowRow } from '$database/Organizations';
 	import MarkupView from './MarkupView.svelte';
 	import RoleLink from './RoleLink.svelte';
+	import Visibility from './Visibility.svelte';
 
 	export let how: HowRow;
 </script>
 
+<Visibility level={how.visibility} />
 <MarkupView markup={how.what} unset="No comment" />
 <span>
 	{#if how.accountable}<RoleLink roleID={how.accountable} />{/if}</span

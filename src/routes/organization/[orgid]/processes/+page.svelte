@@ -7,7 +7,6 @@
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Level from '$lib/Level.svelte';
 	import Subheader from '$lib/Subheader.svelte';
-	import MarkupView from '$lib/MarkupView.svelte';
 	import type { ProcessRow, RoleRow } from '$database/Organizations';
 	import type { RoleID } from '$types/Organization';
 
@@ -67,7 +66,7 @@
 	}
 </script>
 
-<Title title="processes" kind={$locale?.term.organization} visibility="org" />
+<Title title="processes" kind={$locale?.term.organization} />
 
 <Paragraph
 	>These are all of the processes in this organization. Select one to see how it works, who's

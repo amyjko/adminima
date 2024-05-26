@@ -12,7 +12,7 @@
 </script>
 
 {#if change === null}
-	<Title title="Oops" kind={$locale?.term.error} visibility="org" />
+	<Title title="Oops" kind={$locale?.term.error} />
 	<Error text={(locale) => locale.error.noChange} />
 {:else}
 	<ChangeView {change} />

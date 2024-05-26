@@ -8,7 +8,7 @@
 	import { dev } from '$app/environment';
 </script>
 
-<Title title="Adminima" visibility={null} />
+<Title title="Adminima" />
 <Lead><Text text={$locale?.landing.value} /></Lead>
 <Paragraph><Text text={$locale?.landing.description} /></Paragraph>
 <Paragraph

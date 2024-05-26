@@ -27,7 +27,7 @@
 	const org = getOrg();
 </script>
 
-<Title title={change.what} kind={$locale?.term.request} status={change.status} visibility="org" />
+<Title title={change.what} kind={$locale?.term.request}><Status status={change.status} /></Title>
 
 <Status status={change.status} />
 

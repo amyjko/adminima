@@ -13,7 +13,7 @@
 </script>
 
 {#if team}
-	<Title title={team.name} kind={$locale?.term.team} visibility="org" />
+	<Title title={team.name} kind={$locale?.term.team} />
 
 	<MarkupView markup={team.description} unset="No description" />
 

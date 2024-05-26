@@ -8,11 +8,7 @@
 	const organization = getOrg();
 </script>
 
-<Title
-	title="Changes"
-	kind={$locale?.term.organization}
-	visibility={$organization.getVisibility()}
-/>
+<Title title="Changes" kind={$locale?.term.organization} />
 
 <ChangeForm />
 

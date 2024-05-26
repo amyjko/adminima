@@ -16,7 +16,7 @@
 	$: roles = $org.getPersonRoles(profile.personid);
 </script>
 
-<Title title={profile.name} kind={$locale?.term.person} visibility="org" />
+<Title title={profile.name} kind={$locale?.term.person} />
 
 <MarkupView markup={profile.bio} unset="No bio" />
 

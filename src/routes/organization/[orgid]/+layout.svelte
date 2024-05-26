@@ -26,6 +26,6 @@
 {#if data.payload !== null}
 	<slot />
 {:else}
-	<Title title="Oops" kind="organization" visibility={null} />
+	<Title title="Oops" kind="organization" />
 	<Oops text="Organization not found." />
 {/if}

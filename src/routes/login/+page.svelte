@@ -43,7 +43,7 @@
 	}
 </script>
 
-<Title title="Login" visibility={null} />
+<Title title="Login" />
 
 {#if $user}
 	<Paragraph>You're logged in as {$user.email}.</Paragraph>

@@ -24,7 +24,7 @@
 	$: profiles = $org.getRoleProfiles(role.id);
 </script>
 
-<Title title={role.title} kind={$locale?.term.role} visibility={null}
+<Title title={role.title} kind={$locale?.term.role}
 	>{#if role.team}&nbsp;&gt; <TeamLink id={role.team} />{/if}</Title
 >
 

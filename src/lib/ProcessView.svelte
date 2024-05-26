@@ -15,6 +15,7 @@
 	import RoleContribution from './RoleContribution.svelte';
 	import Level from './Level.svelte';
 	import { getOrg } from './contexts';
+	import Status from './Status.svelte';
 
 	export let process: ProcessRow;
 
@@ -24,12 +25,9 @@
 	$: how = $org.getHow(process.id);
 </script>
 
-<Title
-	title={process.what}
-	kind={$locale?.term.process ?? ''}
-	status={process.status}
-	visibility={how?.visibility ?? null}
-/>
+<Title title={process.what} kind={$locale?.term.process ?? ''}>
+	<Status status={process.status} />
+</Title>
 
 <MarkupView markup={process.what} unset="No description yet." />
 

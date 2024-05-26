@@ -26,7 +26,7 @@
 	let showCreateOrg = false;
 </script>
 
-<Title title="You" visibility={null} />
+<Title title="You" />
 
 {#if data.orgs === null}
 	<Oops text="Couldn't load organizations" />
