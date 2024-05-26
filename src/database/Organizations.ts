@@ -2,6 +2,7 @@ import ReactiveMap from './ReactiveMap';
 import Organization, {
 	type ChangeID,
 	type CommentID,
+	type MarkupID,
 	type OrganizationID,
 	type PersonID,
 	type ProcessID,
@@ -247,9 +248,34 @@ class Organizations {
 		if (channel) supabase.removeChannel(channel);
 	}
 
+	/** Get markup from the database on demand */
+	static async getMarkup(id: MarkupID) {
+		const { data } = await supabase.from('markup').select().eq('id', id).single();
+		return data?.text;
+	}
+
 	/** Update an organization's description. Rely on Realtime to refresh. */
-	static async updateDescription(orgid: OrganizationID, description: string) {
-		await supabase.from('orgs').update({ description }).eq('id', orgid);
+	static async updateDescription(orgid: OrganizationID, text: string) {
+		const org = Organizations.organizations.get(orgid);
+		if (!org) return null;
+
+		const markupID = org.getDescription();
+		if (markupID) {
+			const { error } = await supabase.from('markup').update({ text }).eq('id', markupID);
+			return error;
+		} else {
+			const { data, error: markupError } = await supabase
+				.from('markup')
+				.insert({ text })
+				.select()
+				.single();
+			if (markupError || data === null) return markupError;
+			const { error } = await supabase
+				.from('orgs')
+				.update({ description: data.id })
+				.eq('id', orgid);
+			return error;
+		}
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */

@@ -15,7 +15,7 @@
 {#if team}
 	<Title title={team.name} kind={$locale?.term.team} visibility="org" />
 
-	<MarkupView markup={team.description} />
+	<MarkupView markup={team.description} unset="No description" />
 
 	{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
 		<RoleLink roleID={role.id} />

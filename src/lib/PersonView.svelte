@@ -18,7 +18,7 @@
 
 <Title title={profile.name} kind={$locale?.term.person} visibility="org" />
 
-<MarkupView markup={profile.bio} />
+<MarkupView markup={profile.bio} unset="No bio" />
 
 <Header>Roles</Header>
 <Flow>

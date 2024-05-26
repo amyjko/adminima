@@ -31,7 +31,7 @@
 	visibility={how?.visibility ?? null}
 />
 
-<MarkupView markup={how?.what ?? null} />
+<MarkupView markup={process.what} unset="No description yet." />
 
 <Paragraph><em>Area of concern</em>: <strong>{process.concern}</strong></Paragraph>
 

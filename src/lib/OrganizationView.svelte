@@ -13,8 +13,6 @@
 	const user = getUser();
 
 	$: editable = $user && organization.hasAdmin($user.id);
-
-	$: description = organization.getDescription();
 </script>
 
 <Title
@@ -26,16 +24,13 @@
 	visibility={organization.getVisibility()}
 />
 
-{#if description === null}
-	<Paragraph><em>No description.</em></Paragraph>
-{:else}
-	<MarkupView
-		markup={description}
-		edit={editable
-			? (text) => Organizations.updateDescription(organization.getID(), text)
-			: undefined}
-	/>
-{/if}
+<MarkupView
+	markup={organization.getDescription()}
+	unset="No description"
+	edit={editable
+		? (text) => Organizations.updateDescription(organization.getID(), text)
+		: undefined}
+/>
 
 <Paragraph>
 	See <Link kind="role" to="/organization/{organization.getID()}/roles">Roles</Link> people have in this

@@ -27,7 +27,7 @@
 			{#each comments as comment}
 				<Row name={format(timestampToDate(comment.when), 'MM/dd/yyyy')}>
 					<Paragraph><PersonLink profile={$org.getProfile(comment.who)} /></Paragraph>
-					<MarkupView markup={comment.what} />
+					<MarkupView markup={comment.what} unset="No comment" />
 				</Row>
 			{:else}
 				No revision history.

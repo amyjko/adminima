@@ -46,7 +46,7 @@
 		.getTeams()
 		.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
 		<Header><TeamLink id={team.id} /></Header>
-		<MarkupView markup={team.description} />
+		<MarkupView markup={team.description} unset="No description" />
 		<Flow>
 			{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
 				<RoleLink roleID={role.id} />

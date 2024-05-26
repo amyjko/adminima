@@ -36,7 +36,7 @@
 	<PersonLink profile={$org.getProfile(change.who)} /> reported:</Paragraph
 >
 
-<Quote><MarkupView markup={change.description} /></Quote>
+<Quote><MarkupView markup={change.description} unset="No description" /></Quote>
 
 <Paragraph>This affects ...</Paragraph>
 
@@ -61,7 +61,7 @@
 				<PersonLink profile={$org.getProfile(comment.who)} />
 			</div>
 			<Quote>
-				<MarkupView markup={comment.what} />
+				<MarkupView markup={comment.what} unset="No comment" />
 			</Quote>
 		</div>
 	{:else}

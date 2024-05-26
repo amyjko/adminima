@@ -28,7 +28,7 @@
 	>{#if role.team}&nbsp;&gt; <TeamLink id={role.team} />{/if}</Title
 >
 
-<MarkupView markup={role.description} />
+<MarkupView markup={role.description} unset="No description yet." />
 
 <Paragraph
 	>This role is held by

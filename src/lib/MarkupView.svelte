@@ -1,47 +1,71 @@
 <script lang="ts">
-	import Bullets from '../markup/Bullets';
-	import Numbered from '../markup/Numbered';
-	import Paragraph from '../markup/Paragraph';
-	import ParagraphView from '$lib/ParagraphView.svelte';
-	import BulletsView from '$lib/BulletsView.svelte';
-	import NumberedView from '$lib/NumberedView.svelte';
 	import { parse } from '../markup/parser';
-	import { type Markup as Mark } from '$types/Organization';
+	import { type MarkupID } from '$types/Organization';
 	import Button from './Button.svelte';
+	import type { PostgrestError } from '@supabase/supabase-js';
+	import Organizations from '$database/Organizations';
+	import Loading from './Loading.svelte';
+	import BlocksView from './BlocksView.svelte';
+	import { tick } from 'svelte';
 
-	export let markup: Mark | null;
-	export let inline = false;
-	/** If given, allows the markup to be edited */
-	export let edit: undefined | ((text: string) => void) = undefined;
+	export let markup: MarkupID | null;
+	/** What to show if the text isn't set */
+	export let unset: string;
+	/** If given, allows the markup to edited. Returns an error */
+	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
 	let editing = false;
 	let height = 0;
+	let text = '';
+	let doMarkup = getMarkup();
+	let input: HTMLTextAreaElement;
+	$: scrollHeight = text ? input?.scrollHeight ?? height : height;
+
+	function getMarkup() {
+		return markup ? Organizations.getMarkup(markup) : undefined;
+	}
 </script>
 
 <div class="markup">
-	{#if edit}<Button
-			action={() => {
-				if (editing) {
-					if (edit) edit(markup ?? '');
-					editing = false;
-				} else editing = true;
-			}}
-			>{#if editing}&checkmark;{:else}✎{/if}</Button
-		>
+	{#if edit}<div class="control">
+			<Button
+				action={async () => {
+					if (editing) {
+						if (edit) await edit(text ?? '');
+						editing = false;
+						doMarkup = getMarkup();
+					} else {
+						text = (await getMarkup()) ?? '';
+						editing = true;
+						await tick();
+						input?.focus();
+					}
+				}}
+				>{#if editing}&checkmark;{:else}✎{/if}</Button
+			>
+		</div>
 	{/if}
 	{#if editing}
-		<textarea bind:value={markup} style:height="{height}px" />
+		<textarea
+			bind:value={text}
+			bind:this={input}
+			style:height="{editing ? scrollHeight : height}px"
+		/>
 	{:else}
 		<div class="blocks" bind:clientHeight={height}>
-			{#each parse(markup ?? '').blocks as block}
-				{#if block instanceof Paragraph}
-					<ParagraphView {block} {inline} />
-				{:else if block instanceof Bullets}
-					<BulletsView {block} />
-				{:else if block instanceof Numbered}
-					<NumberedView {block} />
-				{/if}
-			{/each}
+			{#if markup === null}
+				<BlocksView blocks={parse(`_${unset}_`).blocks} />
+			{:else}
+				{#await doMarkup}
+					{#if text}
+						<BlocksView blocks={parse(text ?? '').blocks} />
+					{:else}<Loading />{/if}
+				{:then text}
+					<BlocksView blocks={parse(text ?? '').blocks} />
+				{:catch error}
+					<p>{error}</p>
+				{/await}
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -53,6 +77,10 @@
 		flex-wrap: nowrap;
 		gap: var(--padding);
 		align-items: stretch;
+	}
+
+	.control {
+		align-self: baseline;
 	}
 	.blocks {
 		display: flex;
@@ -68,6 +96,7 @@
 		border: none;
 		padding: 0;
 		outline: var(--border) solid var(--thickness);
+		min-height: 5em;
 	}
 
 	textarea:focus {

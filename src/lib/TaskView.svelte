@@ -6,8 +6,8 @@
 	export let how: HowRow;
 </script>
 
-<span
-	><MarkupView inline markup={how.what} />
+<MarkupView markup={how.what} unset="No comment" />
+<span>
 	{#if how.accountable}<RoleLink roleID={how.accountable} />{/if}</span
 >
 <ul>

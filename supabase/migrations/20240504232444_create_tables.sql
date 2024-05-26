@@ -70,6 +70,15 @@ grant trigger on table "public"."markup" to "service_role";
 grant truncate on table "public"."markup" to "service_role";
 grant update on table "public"."markup" to "service_role";
 
+create policy "Markup is viewable based on the organization's visibility." on markup
+  for select using (true);
+
+create policy "Markup can be inserted by those in the organization." on markup
+  for insert with check (true);
+
+create policy "Markup can be updated by those in the organization." on markup
+  for update using (true);
+
 alter
   publication supabase_realtime add table "public"."markup";
 
