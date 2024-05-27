@@ -168,6 +168,14 @@ grant trigger on table "public"."teams" to "service_role";
 grant truncate on table "public"."teams" to "service_role";
 grant update on table "public"."teams" to "service_role";
 
+create policy "Teams are viewable based on organization's policy." on teams
+  for select using (true);
+
+create policy "Admins can create teams." on teams
+  for insert with check (true);
+
+create policy "Admins can update teams." on teams
+  for update using (true);
 
 -- Enable realtime updates on the teams table.
 alter

@@ -30,6 +30,16 @@
 		if (roleID) goto(`/organization/${$org.getID()}/role/${roleID}`);
 		else newRoleError = "We couldn't create the new role.";
 	}
+
+	let showCreateTeam = false;
+	let newTeam = '';
+	let newTeamError: string | undefined = undefined;
+
+	async function createTeam() {
+		const teamID = await Organizations.createTeam($org.getID(), newTeam);
+		if (teamID === null) "We couldn't create the new team.";
+		showCreateTeam = false;
+	}
 </script>
 
 <Title title="roles" kind={$locale?.term.organization} />
@@ -38,7 +48,7 @@
 	in this organization.</Paragraph
 >
 
-{#if $org.getRoles().length === 0}
+{#if $org.getRoles().length === 0 && $org.getTeams().length === 0}
 	<Notice>There are no roles yet in this organization.</Notice>
 {:else}
 	{@const teamless = $org.getRoles().filter((role) => role.team === null)}
@@ -47,10 +57,11 @@
 		.getTeams()
 		.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
 		<Header><TeamLink id={team.id} /></Header>
-		<MarkupView markup={team.description} unset="No description" />
 		<Flow>
 			{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
 				<RoleLink roleID={role.id} />
+			{:else}
+				<Notice>This team has no roles.</Notice>
 			{/each}
 		</Flow>
 	{/each}
@@ -83,6 +94,28 @@
 				</Actions>
 				{#if newRoleError}
 					<Oops text={newRoleError} />
+				{/if}
+			</Form>
+		</Dialog>
+	{/if}
+
+	<Button action={() => (showCreateTeam = true)}>Create team …</Button>
+	{#if showCreateTeam}
+		<Dialog close={() => (showCreateTeam = false)}>
+			<Header>New team</Header>
+			<Paragraph>Want to add a new team to this organization, to organize roles?</Paragraph>
+			<Form action={createTeam}>
+				<Field label="name of new team" bind:text={newTeam} />
+				<Actions
+					><Button end action={() => (showCreateTeam = false)}>cancel</Button><Button
+						end
+						submit
+						active={newTeam.length >= 3}
+						action={() => {}}>create</Button
+					>
+				</Actions>
+				{#if newTeamError}
+					<Oops text={newTeamError} />
 				{/if}
 			</Form>
 		</Dialog>

@@ -6,7 +6,8 @@ import Organization, {
 	type OrganizationID,
 	type PersonID,
 	type ProcessID,
-	type RoleID
+	type RoleID,
+	type TeamID
 } from '$types/Organization';
 import { supabase } from '$lib/supabaseClient';
 import type {
@@ -379,11 +380,20 @@ class Organizations {
 
 	static async deleteRole(orgid: OrganizationID, id: RoleID): Promise<PostgrestError | null> {
 		const { error } = await supabase.from('roles').delete().eq('id', id);
-		if (error) return error;
-		else {
-			Organizations.refresh(orgid);
-			return null;
-		}
+		return error;
+	}
+
+	static async createTeam(orgid: OrganizationID, name: string): Promise<TeamID | null> {
+		const { data } = await supabase
+			.from('teams')
+			.insert({
+				orgid: orgid,
+				name
+			})
+			.select()
+			.single();
+
+		return data?.id ?? null;
 	}
 
 	static async createOrganization(organizationName: string, admin: PersonID, adminName: string) {
