@@ -13,7 +13,7 @@
 {#await Organizations.getComments(comments)}
 	<Loading>/</Loading>
 {:then comments}
-	{#each comments as comment}
+	{#each comments.reverse() as comment}
 		<CommentView {comment} />
 	{:else}
 		No changes yet.

@@ -256,15 +256,23 @@ class Organizations {
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
-	static async updateDescription(orgid: OrganizationID, text: string) {
+	static async updateDescription(
+		orgid: OrganizationID,
+		text: string,
+		who: PersonID
+	): Promise<PostgrestError | null> {
 		const org = Organizations.organizations.get(orgid);
 		if (!org) return null;
 
+		// See if we have any markup yet.
 		const markupID = org.getDescription();
+		// If we do, update it's text.
 		if (markupID) {
 			const { error } = await supabase.from('markup').update({ text }).eq('id', markupID);
-			return error;
-		} else {
+			if (error) return error;
+		}
+		// Otherwise, create new markup and then update the org to point to it.
+		else {
 			const { data, error: markupError } = await supabase
 				.from('markup')
 				.insert({ text })
@@ -275,8 +283,58 @@ class Organizations {
 				.from('orgs')
 				.update({ description: data.id })
 				.eq('id', orgid);
-			return error;
+			if (error) return error;
 		}
+
+		const commentID = await Organizations.addComment(
+			orgid,
+			'Updated organization description',
+			who
+		);
+
+		if (commentID)
+			await supabase
+				.from('orgs')
+				.update({ comments: [...org.getComments(), commentID] })
+				.eq('id', orgid);
+
+		return null;
+	}
+
+	static async updateOrganizationVisibility(
+		orgid: OrganizationID,
+		visibility: Visibility,
+		who: PersonID
+	): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('orgs').update({ visibility }).eq('id', orgid);
+		if (error) return error;
+
+		const commentID = await Organizations.addComment(
+			orgid,
+			`Updated organization visibility to ${visibility}`,
+			who
+		);
+
+		const org = Organizations.organizations.get(orgid);
+
+		if (org && commentID)
+			await supabase
+				.from('orgs')
+				.update({ comments: [...org.getComments(), commentID] })
+				.eq('id', orgid);
+
+		return null;
+	}
+
+	static async addComment(orgid: OrganizationID, what: string, who: PersonID) {
+		// Record that we edited it.
+		const { data: comment } = await supabase
+			.from('comments')
+			.insert({ orgid, what, who })
+			.select()
+			.single();
+
+		return comment?.id ?? null;
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */
@@ -358,14 +416,6 @@ class Organizations {
 		name: string
 	): Promise<PostgrestError | null> {
 		const { error } = await supabase.from('orgs').update({ name: name }).eq('id', orgid);
-		return error;
-	}
-
-	static async updateOrganizationVisibility(
-		orgid: OrganizationID,
-		visibility: Visibility
-	): Promise<PostgrestError | null> {
-		const { error } = await supabase.from('orgs').update({ visibility }).eq('id', orgid);
 		return error;
 	}
 

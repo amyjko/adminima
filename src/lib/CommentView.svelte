@@ -1,10 +1,7 @@
 <script lang="ts">
 	import type { CommentRow } from '$database/Organizations';
-	import Organizations from '$database/Organizations';
 	import timestampToDate from '$database/timestampToDate';
-	import Loading from './Loading.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import Oops from './Oops.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Quote from './Quote.svelte';
 	import TimeView from './TimeView.svelte';
@@ -17,25 +14,24 @@
 
 <div class="comment">
 	<div class="meta">
-		<TimeView time={timestampToDate(comment.when).getTime()} />
 		<PersonLink profile={$org.getProfile(comment.who)} />
+		<TimeView time={timestampToDate(comment.when).getTime()} />
 	</div>
 	<Quote>
-		<MarkupView markup={comment.what} unset="No comment" />
+		{comment.what}
 	</Quote>
 </div>
 
 <style>
 	.comment {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
+		flex-wrap: nowrap;
 		gap: var(--spacing);
 	}
 
 	.meta {
 		display: flex;
-		flex-direction: row;
-		align-items: baseline;
-		gap: var(--spacing);
+		flex-direction: column;
 	}
 </style>

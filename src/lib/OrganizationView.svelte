@@ -8,7 +8,6 @@
 	import type Organization from '$types/Organization';
 	import { getUser } from './contexts';
 	import Visibility from './Visibility.svelte';
-	import Header from './Header.svelte';
 	import CommentsView from './CommentsView.svelte';
 
 	export let organization: Organization;
@@ -27,8 +26,8 @@
 >
 	<Visibility
 		level={organization.getVisibility()}
-		edit={editable
-			? (vis) => Organizations.updateOrganizationVisibility(organization.getID(), vis)
+		edit={$user && editable
+			? (vis) => Organizations.updateOrganizationVisibility(organization.getID(), vis, $user.id)
 			: undefined}
 	/>
 </Title>
@@ -36,8 +35,8 @@
 <MarkupView
 	markup={organization.getDescription()}
 	unset="No description"
-	edit={editable
-		? (text) => Organizations.updateDescription(organization.getID(), text)
+	edit={editable && $user
+		? (text) => Organizations.updateDescription(organization.getID(), text, $user.id)
 		: undefined}
 />
 

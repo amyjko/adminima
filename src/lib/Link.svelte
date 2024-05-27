@@ -69,13 +69,18 @@
 		background-color: none;
 		color: var(--salient);
 		font-weight: bold;
+		padding-inline-start: 0;
+		padding-inline-end: 0;
 	}
+
 	.role {
 		background-color: var(--warning);
 	}
+
 	.process {
 		background-color: var(--error);
 	}
+
 	.org {
 		background-color: var(--foreground);
 	}
