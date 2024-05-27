@@ -10,7 +10,6 @@
 	import Oops from './Oops.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import { getUser } from './contexts';
-	import { supabase } from './supabaseClient';
 	import type { PostgrestError } from '@supabase/supabase-js';
 
 	export let close: () => void;

@@ -45,7 +45,7 @@
 
 	button:not(:disabled):hover,
 	button:not(:disabled):focus {
-		transform: scale(1.1);
+		transform: scale(1, 1.1);
 	}
 
 	button:disabled {
