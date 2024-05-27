@@ -40,7 +40,7 @@
 <Dialog {close}>
 	<Header>Create organization</Header>
 	<Paragraph>We need a few things things:</Paragraph>
-	<Form>
+	<Form action={create}>
 		<Field active={!submitting} label="your name" bind:text={name} />
 		<Field active={!submitting} label="organization name" bind:text={orgName} />
 

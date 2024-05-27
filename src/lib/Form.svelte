@@ -2,9 +2,19 @@
 	export let action: (() => void) | undefined = undefined;
 	export let borders = false;
 	export let inline = false;
+
+	let form: HTMLFormElement;
 </script>
 
-<form on:submit|preventDefault={action} class="form" class:borders class:inline><slot /></form>
+<form
+	bind:this={form}
+	on:submit|preventDefault={() => (action ? action() : undefined)}
+	class="form"
+	class:borders
+	class:inline
+>
+	<slot />
+</form>
 
 <style>
 	.form {

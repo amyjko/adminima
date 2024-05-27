@@ -9,12 +9,16 @@
 </script>
 
 {#if confirm}
-	<div class="row">Are you sure? <button class:warning on:click={action}><slot /></button></div>
+	<div class="row">
+		Are you sure? <button type={submit ? 'submit' : null} class:warning on:click={action}
+			><slot /></button
+		>
+	</div>
 {:else}
 	<button
 		class:warning
 		class:end
-		type={submit ? 'submit' : null}
+		type={submit ? 'submit' : 'button'}
 		disabled={!active}
 		on:click={() => {
 			if (warning) confirm = true;

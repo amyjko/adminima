@@ -17,6 +17,7 @@
 	import Notice from '$lib/Notice.svelte';
 	import Dialog from '$lib/Dialog.svelte';
 	import Actions from '$lib/Actions.svelte';
+	import Form from '$lib/Form.svelte';
 
 	const org = getOrg();
 
@@ -70,18 +71,20 @@
 		<Dialog close={() => (showCreateRole = false)}>
 			<Header>New role</Header>
 			<Paragraph>Want to add a new role to this organization?</Paragraph>
-			<Field label="title of new role" bind:text={newRole} />
-			<Actions
-				><Button end action={() => (showCreateRole = false)}>cancel</Button><Button
-					end
-					submit
-					active={newRole.length >= 3}
-					action={createRole}>create</Button
-				>
-			</Actions>
-			{#if newRoleError}
-				<Oops text={newRoleError} />
-			{/if}
+			<Form action={createRole}>
+				<Field label="title of new role" bind:text={newRole} />
+				<Actions
+					><Button end action={() => (showCreateRole = false)}>cancel</Button><Button
+						end
+						submit
+						active={newRole.length >= 3}
+						action={createRole}>create</Button
+					>
+				</Actions>
+				{#if newRoleError}
+					<Oops text={newRoleError} />
+				{/if}
+			</Form>
 		</Dialog>
 	{/if}
 </Admin>
