@@ -25,6 +25,7 @@ export type ProcessRow = Tables<'processes'>;
 export type TeamRow = Tables<'teams'>;
 export type HowRow = Tables<'hows'>;
 export type ChangeRow = Tables<'changes'>;
+export type CommentRow = Tables<'comments'>;
 export type Visibility = Database['public']['Enums']['visibility'];
 export type Status = Database['public']['Enums']['status'];
 

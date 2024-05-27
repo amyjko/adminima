@@ -8,6 +8,8 @@
 	import type Organization from '$types/Organization';
 	import { getUser } from './contexts';
 	import Visibility from './Visibility.svelte';
+	import Header from './Header.svelte';
+	import CommentsView from './CommentsView.svelte';
 
 	export let organization: Organization;
 
@@ -57,3 +59,5 @@
 	>See <Link kind="change" to="/organization/{organization.getID()}/changes">Changes</Link> proposed
 	to make this organization work better.</Paragraph
 >
+
+<CommentsView comments={organization.getComments()} />

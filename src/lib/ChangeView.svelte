@@ -18,7 +18,7 @@
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
-	import Loading from './Loading.svelte';
+	import CommentsView from './CommentsView.svelte';
 
 	export let change: ChangeRow;
 
@@ -49,25 +49,7 @@
 	{/each}
 </ul>
 
-<Header>Comments</Header>
-
-{#await Organizations.getComments(change.comments)}
-	<Loading>/</Loading>
-{:then comments}
-	{#each comments as comment}
-		<div class="comment">
-			<div class="meta">
-				<TimeView time={timestampToDate(comment.when).getTime()} />
-				<PersonLink profile={$org.getProfile(comment.who)} />
-			</div>
-			<Quote>
-				<MarkupView markup={comment.what} unset="No comment" />
-			</Quote>
-		</div>
-	{:else}
-		No comments yet.
-	{/each}
-{/await}
+<CommentsView comments={change.comments} />
 
 <Admin>
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
@@ -87,18 +69,3 @@
 </Admin>
 
 <Modifications mods={change.comments} />
-
-<style>
-	.comment {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing);
-	}
-
-	.meta {
-		display: flex;
-		flex-direction: row;
-		align-items: baseline;
-		gap: var(--spacing);
-	}
-</style>

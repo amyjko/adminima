@@ -41,6 +41,10 @@ export default class Organization {
 		return this.data.organization.visibility;
 	}
 
+	getComments() {
+		return this.data.organization.comments;
+	}
+
 	/** Create a new organization with the updated row */
 	withUpdate(row: OrganizationRow) {
 		return new Organization({

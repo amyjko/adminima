@@ -1,0 +1,21 @@
+<script lang="ts">
+	import Organizations from '$database/Organizations';
+	import { type CommentID } from '$types/Organization';
+	import CommentView from './CommentView.svelte';
+	import Header from './Header.svelte';
+	import Loading from './Loading.svelte';
+
+	export let comments: CommentID[];
+</script>
+
+<Header>Changes</Header>
+
+{#await Organizations.getComments(comments)}
+	<Loading>/</Loading>
+{:then comments}
+	{#each comments as comment}
+		<CommentView {comment} />
+	{:else}
+		No changes yet.
+	{/each}
+{/await}
