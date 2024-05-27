@@ -18,10 +18,10 @@
 	import Dialog from '$lib/Dialog.svelte';
 	import Actions from '$lib/Actions.svelte';
 	import Form from '$lib/Form.svelte';
+	import FormDialog from '$lib/FormDialog.svelte';
 
 	const org = getOrg();
 
-	let showCreateRole = false;
 	let newRole: string = '';
 	let newRoleError: string | undefined = undefined;
 
@@ -31,14 +31,12 @@
 		else newRoleError = "We couldn't create the new role.";
 	}
 
-	let showCreateTeam = false;
 	let newTeam = '';
 	let newTeamError: string | undefined = undefined;
 
 	async function createTeam() {
 		const teamID = await Organizations.createTeam($org.getID(), newTeam);
 		if (teamID === null) "We couldn't create the new team.";
-		showCreateTeam = false;
 	}
 </script>
 
@@ -77,47 +75,27 @@
 {/if}
 
 <Admin>
-	<Button action={() => (showCreateRole = true)}>Create role …</Button>
-	{#if showCreateRole}
-		<Dialog close={() => (showCreateRole = false)}>
-			<Header>New role</Header>
-			<Paragraph>Want to add a new role to this organization?</Paragraph>
-			<Form action={createRole}>
-				<Field label="title of new role" bind:text={newRole} />
-				<Actions
-					><Button end action={() => (showCreateRole = false)}>cancel</Button><Button
-						end
-						submit
-						active={newRole.length >= 3}
-						action={createRole}>create</Button
-					>
-				</Actions>
-				{#if newRoleError}
-					<Oops text={newRoleError} />
-				{/if}
-			</Form>
-		</Dialog>
-	{/if}
+	<FormDialog
+		button="Create role …"
+		header="New role"
+		explanation="Create a new role for this organization"
+		submit="Create"
+		action={createRole}
+		valid={() => newRole.length >= 3}
+		error={newRoleError}
+	>
+		<Field label="title of new role" bind:text={newRole} />
+	</FormDialog>
 
-	<Button action={() => (showCreateTeam = true)}>Create team …</Button>
-	{#if showCreateTeam}
-		<Dialog close={() => (showCreateTeam = false)}>
-			<Header>New team</Header>
-			<Paragraph>Want to add a new team to this organization, to organize roles?</Paragraph>
-			<Form action={createTeam}>
-				<Field label="name of new team" bind:text={newTeam} />
-				<Actions
-					><Button end action={() => (showCreateTeam = false)}>cancel</Button><Button
-						end
-						submit
-						active={newTeam.length >= 3}
-						action={() => {}}>create</Button
-					>
-				</Actions>
-				{#if newTeamError}
-					<Oops text={newTeamError} />
-				{/if}
-			</Form>
-		</Dialog>
-	{/if}
+	<FormDialog
+		button="Create team …"
+		header="New team"
+		explanation="Create a new team for this organization"
+		submit="Create"
+		action={createTeam}
+		valid={() => newTeam.length >= 3}
+		error={newTeamError}
+	>
+		<Field label="name of new team" bind:text={newTeam} />
+	</FormDialog>
 </Admin>

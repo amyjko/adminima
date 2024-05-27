@@ -40,7 +40,7 @@
 			if (err) error = err.message;
 			else goto(`/organization/${$org.getID()}/roles`);
 		}}
-		warning>Delete this role</Button
+		warning>Delete this team</Button
 	>
 	{#if error}<Oops text={error} />{/if}
 </Admin>
