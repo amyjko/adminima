@@ -22,8 +22,6 @@
 	}
 
 	$: if (browser && $user === null) goto(`/login`);
-
-	let showCreateOrg = false;
 </script>
 
 <Title title="You" />
@@ -50,10 +48,7 @@
 		>
 	{/if}
 
-	<Button action={() => (showCreateOrg = true)}>Create an organization …</Button>
-	{#if showCreateOrg}
-		<NewOrganization close={() => (showCreateOrg = false)} />
-	{/if}
+	<NewOrganization />
 
 	<Button action={logout}>Log out</Button>
 {/if}

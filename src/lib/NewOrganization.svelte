@@ -1,21 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Organizations from '$database/Organizations';
-	import Actions from './Actions.svelte';
-	import Button from './Button.svelte';
-	import Dialog from './Dialog.svelte';
 	import Field from './Field.svelte';
-	import Form from './Form.svelte';
-	import Header from './Header.svelte';
-	import Oops from './Oops.svelte';
-	import Paragraph from './Paragraph.svelte';
+	import FormDialog from './FormDialog.svelte';
 	import { getUser } from './contexts';
 	import type { PostgrestError } from '@supabase/supabase-js';
 
-	export let close: () => void;
-
 	const user = getUser();
-	let message: string | null = null;
+	let message: string | undefined = undefined;
 	let submitting = false;
 
 	function showError(error: PostgrestError) {
@@ -37,22 +29,15 @@
 	let orgName = '';
 </script>
 
-<Dialog {close}>
-	<Header>Create organization</Header>
-	<Paragraph>We need a few things things:</Paragraph>
-	<Form action={create}>
-		<Field active={!submitting} label="your name" bind:text={name} />
-		<Field active={!submitting} label="organization name" bind:text={orgName} />
-
-		<Paragraph>We'll create an organization with you as admin.</Paragraph>
-		<Actions>
-			<Button active={!submitting} action={close}>Cancel</Button><Button
-				active={!submitting && name.length > 0 && orgName.length > 0}
-				action={create}
-				submit>Submit</Button
-			>
-		</Actions>
-	</Form>
-
-	{#if message}<Oops text={message} />{/if}
-</Dialog>
+<FormDialog
+	button="Create organization …"
+	header="New organization"
+	explanation="We need a few things"
+	submit="Create"
+	action={create}
+	valid={() => name.length > 0 && orgName.length > 0}
+	error={message}
+>
+	<Field active={!submitting} label="your name" bind:text={name} />
+	<Field active={!submitting} label="organization name" bind:text={orgName} />
+</FormDialog>
