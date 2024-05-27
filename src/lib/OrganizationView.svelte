@@ -9,12 +9,17 @@
 	import { getUser } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
+	import { mn } from 'date-fns/locale';
+	import Oops from './Oops.svelte';
 
 	export let organization: Organization;
 
 	const user = getUser();
 
-	$: editable = $user && organization.hasAdmin($user.id);
+	$: visibility = organization.getVisibility();
+	$: isAdmin = $user && organization.hasAdmin($user.id);
+	$: hasUser = $user && organization.hasPerson($user.id);
+	$: editable = isAdmin;
 </script>
 
 <Title
@@ -32,31 +37,35 @@
 	/>
 </Title>
 
-<MarkupView
-	markup={organization.getDescription()}
-	unset="No description"
-	edit={editable && $user
-		? (text) => Organizations.updateDescription(organization.getID(), text, $user.id)
-		: undefined}
-/>
+{#if visibility === 'public' || ($user && visibility === 'org' && hasUser) || (organization.getVisibility() === 'admin' && isAdmin)}
+	<MarkupView
+		markup={organization.getDescription()}
+		unset="No description"
+		edit={editable && $user
+			? (text) => Organizations.updateDescription(organization.getID(), text, $user.id)
+			: undefined}
+	/>
 
-<Paragraph>
-	See <Link kind="role" to="/organization/{organization.getID()}/roles">Roles</Link> people have in this
-	organization.</Paragraph
->
+	<Paragraph>
+		See <Link kind="role" to="/organization/{organization.getID()}/roles">Roles</Link> people have in
+		this organization.</Paragraph
+	>
 
-<Paragraph
-	>See <Link kind="person" to="/organization/{organization.getID()}/people">People</Link> in this organization.</Paragraph
->
+	<Paragraph
+		>See <Link kind="person" to="/organization/{organization.getID()}/people">People</Link> in this organization.</Paragraph
+	>
 
-<Paragraph
-	>See <Link kind="process" to="/organization/{organization.getID()}/processes">Processes</Link>
-	that make this organization work.</Paragraph
->
+	<Paragraph
+		>See <Link kind="process" to="/organization/{organization.getID()}/processes">Processes</Link>
+		that make this organization work.</Paragraph
+	>
 
-<Paragraph
-	>See <Link kind="change" to="/organization/{organization.getID()}/changes">Changes</Link> proposed
-	to make this organization work better.</Paragraph
->
+	<Paragraph
+		>See <Link kind="change" to="/organization/{organization.getID()}/changes">Changes</Link> proposed
+		to make this organization work better.</Paragraph
+	>
 
-<CommentsView comments={organization.getComments()} />
+	<CommentsView comments={organization.getComments()} />
+{:else}
+	<Oops text="This organization's details aren't visible to you." />
+{/if}
