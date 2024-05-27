@@ -396,6 +396,12 @@ class Organizations {
 		return data?.id ?? null;
 	}
 
+	static async deleteTeam(id: TeamID): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('teams').delete().eq('id', id);
+
+		return error;
+	}
+
 	static async createOrganization(organizationName: string, admin: PersonID, adminName: string) {
 		// Insert the new organization
 		const { data: org, error } = await supabase

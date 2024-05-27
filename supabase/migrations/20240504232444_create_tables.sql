@@ -177,6 +177,9 @@ create policy "Admins can create teams." on teams
 create policy "Admins can update teams." on teams
   for update using (true);
 
+  create policy "Admins can delete" on teams
+  for delete using (true);
+
 -- Enable realtime updates on the teams table.
 alter
   publication supabase_realtime add table "public"."teams";

@@ -49,7 +49,7 @@
 >
 
 {#if $org.getRoles().length === 0 && $org.getTeams().length === 0}
-	<Notice>There are no roles yet in this organization.</Notice>
+	<Notice>There are no roles or teams yet.</Notice>
 {:else}
 	{@const teamless = $org.getRoles().filter((role) => role.team === null)}
 
