@@ -1,36 +1,38 @@
 <script lang="ts">
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import Button from './Button.svelte';
-	import { tick } from 'svelte';
 
 	export let text: string;
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
 	let editing = false;
 	let revision = '';
-	let editor: HTMLInputElement;
+
+	async function save() {
+		if (editing) {
+			if (edit) {
+				const error = await edit(revision);
+				if (error) console.error(error);
+				editing = false;
+			}
+		} else {
+			editing = true;
+			revision = text;
+		}
+	}
 </script>
 
 {#if edit}
 	<form class="editable">
 		<!-- svelte-ignore a11y-autofocus -->
-		{#if editing}<input type="text" bind:value={revision} autofocus />{:else}<span class="text"
-				>{text}</span
-			>{/if}{#if edit}<Button
-				action={async () => {
-					if (editing) {
-						if (edit) {
-							const error = await edit(revision);
-							if (error) console.error(error);
-							editing = false;
-						}
-					} else {
-						editing = true;
-						revision = text;
-					}
-				}}
-				>{#if editing}&checkmark;{:else}✎{/if}</Button
-			>{/if}
+		{#if editing}<input
+				type="text"
+				bind:value={revision}
+				on:keydown={(event) => (event.key === 'Enter' ? save() : undefined)}
+				autofocus
+			/>{:else}<span class="text">{text}</span>{/if}<Button action={save}
+			>{#if editing}&checkmark;{:else}✎{/if}</Button
+		>
 	</form>
 {:else}{text}{/if}
 

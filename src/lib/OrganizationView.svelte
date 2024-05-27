@@ -9,7 +9,6 @@
 	import { getUser } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
-	import { mn } from 'date-fns/locale';
 	import Oops from './Oops.svelte';
 
 	export let organization: Organization;
@@ -25,8 +24,8 @@
 <Title
 	title={organization.getName()}
 	kind={$locale?.term.organization}
-	edit={editable
-		? (text) => Organizations.updateOrganizationName(organization.getID(), text)
+	edit={$user && isAdmin
+		? (text) => Organizations.updateOrganizationName(organization, text, $user.id)
 		: undefined}
 >
 	<Visibility

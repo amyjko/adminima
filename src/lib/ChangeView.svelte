@@ -13,7 +13,6 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
-	import Modifications from './Revisions.svelte';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
@@ -49,8 +48,6 @@
 	{/each}
 </ul>
 
-<CommentsView comments={change.comments} />
-
 <Admin>
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
 	<Button
@@ -68,4 +65,4 @@
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
 
-<Modifications mods={change.comments} />
+<CommentsView comments={change.comments} />

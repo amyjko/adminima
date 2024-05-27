@@ -302,6 +302,29 @@ class Organizations {
 		return null;
 	}
 
+	static async updateOrganizationName(
+		org: Organization,
+		name: string,
+		who: PersonID
+	): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('orgs').update({ name: name }).eq('id', org.getID());
+		if (error) return error;
+
+		const commentID = await Organizations.addComment(
+			org.getID(),
+			`Updated organization name to ${name}`,
+			who
+		);
+
+		if (org && commentID)
+			await supabase
+				.from('orgs')
+				.update({ comments: [...org.getComments(), commentID] })
+				.eq('id', org.getID());
+
+		return null;
+	}
+
 	static async updateOrganizationVisibility(
 		orgid: OrganizationID,
 		visibility: Visibility,
@@ -378,7 +401,30 @@ class Organizations {
 		return data?.id ?? null;
 	}
 
-	static async deleteRole(orgid: OrganizationID, id: RoleID): Promise<PostgrestError | null> {
+	static async updateRoleTitle(
+		role: RoleRow,
+		title: string,
+		who: PersonID
+	): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('roles').update({ title: title }).eq('id', role.id);
+		if (error) return error;
+
+		const commentID = await Organizations.addComment(
+			role.orgid,
+			`Updated role title to ${title}`,
+			who
+		);
+
+		if (commentID)
+			await supabase
+				.from('roles')
+				.update({ comments: [...role.comments, commentID] })
+				.eq('id', role.id);
+
+		return null;
+	}
+
+	static async deleteRole(id: RoleID): Promise<PostgrestError | null> {
 		const { error } = await supabase.from('roles').delete().eq('id', id);
 		return error;
 	}
@@ -425,14 +471,6 @@ class Organizations {
 
 			return { error: null, id: org.id };
 		}
-	}
-
-	static async updateOrganizationName(
-		orgid: OrganizationID,
-		name: string
-	): Promise<PostgrestError | null> {
-		const { error } = await supabase.from('orgs').update({ name: name }).eq('id', orgid);
-		return error;
 	}
 
 	static async getPayload(orgid: string): Promise<OrganizationPayload | null> {

@@ -11,20 +11,27 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
-	import Revisions from '$lib/Revisions.svelte';
-	import { getOrg } from './contexts';
+	import { getOrg, getUser } from './contexts';
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
+	import CommentsView from './CommentsView.svelte';
 
 	export let role: RoleRow;
 
 	let deleteError: string | undefined = undefined;
 
+	const user = getUser();
 	const org = getOrg();
 	$: profiles = $org.getRoleProfiles(role.id);
+	$: isAdmin = $user && $org.hasAdmin($user.id);
 </script>
 
-<Title title={role.title} kind={$locale?.term.role}
+<Title
+	title={role.title}
+	kind={$locale?.term.role}
+	edit={isAdmin && $user
+		? (text) => Organizations.updateRoleTitle(role, text, $user.id)
+		: undefined}
 	>{#if role.team}&nbsp;&gt; <TeamLink id={role.team} />{/if}</Title
 >
 
@@ -42,7 +49,7 @@
 
 <ChangeForm role={role.id} />
 
-<Revisions mods={role.comments} />
+<CommentsView comments={role.comments} />
 
 <Admin>
 	<Paragraph
@@ -53,7 +60,7 @@
 		action={async () => {
 			try {
 				const org = role.orgid;
-				const error = await Organizations.deleteRole(org, role.id);
+				const error = await Organizations.deleteRole(role.id);
 				if (error) deleteError = error.message;
 				else goto(`/organization/${org}/roles`);
 			} catch (_) {

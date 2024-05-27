@@ -11,11 +11,11 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
-	import Modifications from './Revisions.svelte';
 	import RoleContribution from './RoleContribution.svelte';
 	import Level from './Level.svelte';
 	import { getOrg } from './contexts';
 	import Status from './Status.svelte';
+	import CommentsView from './CommentsView.svelte';
 
 	export let process: ProcessRow;
 
@@ -105,4 +105,4 @@
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
 
-<Modifications mods={process.comments} />
+<CommentsView comments={process.comments} />
