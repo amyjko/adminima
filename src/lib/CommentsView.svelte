@@ -11,7 +11,7 @@
 <Header>Changes</Header>
 
 {#await Organizations.getComments(comments)}
-	<Loading>/</Loading>
+	<Loading />
 {:then comments}
 	<table>
 		<tbody>
