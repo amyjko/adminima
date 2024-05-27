@@ -357,11 +357,15 @@ class Organizations {
 		name: string
 	): Promise<PostgrestError | null> {
 		const { error } = await supabase.from('orgs').update({ name: name }).eq('id', orgid);
-		if (error) return error;
-		else {
-			await Organizations.refresh(orgid);
-			return null;
-		}
+		return error;
+	}
+
+	static async updateOrganizationVisibility(
+		orgid: OrganizationID,
+		visibility: Visibility
+	): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('orgs').update({ visibility }).eq('id', orgid);
+		return error;
 	}
 
 	static async getPayload(orgid: string): Promise<OrganizationPayload | null> {

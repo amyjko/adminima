@@ -23,7 +23,12 @@
 		? (text) => Organizations.updateOrganizationName(organization.getID(), text)
 		: undefined}
 >
-	<Visibility level={organization.getVisibility()} />
+	<Visibility
+		level={organization.getVisibility()}
+		edit={editable
+			? (vis) => Organizations.updateOrganizationVisibility(organization.getID(), vis)
+			: undefined}
+	/>
 </Title>
 
 <MarkupView
