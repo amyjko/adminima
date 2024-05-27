@@ -12,15 +12,19 @@
 	const org = getOrg();
 </script>
 
-<div class="comment">
-	<div class="meta">
-		<PersonLink profile={$org.getProfile(comment.who)} />
-		<TimeView time={timestampToDate(comment.when).getTime()} />
-	</div>
-	<Quote>
-		{comment.what}
-	</Quote>
-</div>
+<tr class="comment">
+	<td>
+		<div class="meta">
+			<PersonLink profile={$org.getProfile(comment.who)} />
+			<TimeView time={timestampToDate(comment.when).getTime()} />
+		</div>
+	</td>
+	<td
+		><Quote>
+			{comment.what}
+		</Quote>
+	</td>
+</tr>
 
 <style>
 	.comment {
