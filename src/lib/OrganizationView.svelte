@@ -47,22 +47,32 @@
 	/>
 
 	<Paragraph>
-		See <Link kind="role" to="/organization/{organization.getID()}/roles">Roles</Link> people have in
-		this organization.</Paragraph
+		See the <strong>{organization.getRoles().length}</strong>
+		<Link kind="role" to="/organization/{organization.getID()}/roles"
+			>Role{organization.getRoles().length !== 1 ? 's' : ''}</Link
+		> people have in this organization.</Paragraph
 	>
 
 	<Paragraph
-		>See <Link kind="person" to="/organization/{organization.getID()}/people">People</Link> in this organization.</Paragraph
+		>See the <strong>{organization.getProfiles().length} </strong>
+		<Link kind="person" to="/organization/{organization.getID()}/people"
+			>{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
+		> in this organization.</Paragraph
 	>
 
 	<Paragraph
-		>See <Link kind="process" to="/organization/{organization.getID()}/processes">Processes</Link>
+		>See the <strong>{organization.getProcesses().length}</strong>
+		<Link kind="process" to="/organization/{organization.getID()}/processes"
+			>Process{organization.getProcesses().length !== 1 ? 'es' : ''}</Link
+		>
 		that make this organization work.</Paragraph
 	>
 
 	<Paragraph
-		>See <Link kind="change" to="/organization/{organization.getID()}/changes">Changes</Link> proposed
-		to make this organization work better.</Paragraph
+		>See the <strong>{organization.getChanges().length}</strong>
+		<Link kind="change" to="/organization/{organization.getID()}/changes"
+			>Change{organization.getChanges().length !== 1 ? 's' : ''}</Link
+		> proposed.</Paragraph
 	>
 
 	<CommentsView comments={organization.getComments()} />
