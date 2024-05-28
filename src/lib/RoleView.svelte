@@ -35,7 +35,11 @@
 	>{#if role.team}&nbsp;&gt; <TeamLink id={role.team} />{/if}</Title
 >
 
-<MarkupView markup={role.description} unset="No description yet." />
+<MarkupView
+	markup={role.description}
+	unset="No description yet."
+	edit={$user ? (text) => Organizations.updateRoleDescription(role, text, $user.id) : undefined}
+/>
 
 <Paragraph
 	>This role is held by

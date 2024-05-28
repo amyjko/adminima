@@ -257,52 +257,25 @@ class Organizations {
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
-	static async updateDescription(
-		orgid: OrganizationID,
+	static async updateOrgDescription(
+		org: Organization,
 		text: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		const org = Organizations.organizations.get(orgid);
-		if (!org) return null;
-
-		// See if we have any markup yet.
-		const markupID = org.getDescription();
-		// If we do, update it's text.
-		if (markupID) {
-			const { error } = await supabase.from('markup').update({ text }).eq('id', markupID);
-			if (error) return error;
-		}
-		// Otherwise, create new markup and then update the org to point to it.
-		else {
-			const { data, error: markupError } = await supabase
-				.from('markup')
-				.insert({ text })
-				.select()
-				.single();
-			if (markupError || data === null) return markupError;
-			const { error } = await supabase
-				.from('orgs')
-				.update({ description: data.id })
-				.eq('id', orgid);
-			if (error) return error;
-		}
-
-		const commentID = await Organizations.addComment(
-			orgid,
+		Organizations.addOrCreateMarkup(org.getDescription(), text, 'orgs', org.getID());
+		Organizations.addComment(
+			org.getID(),
+			who,
 			'Updated organization description',
-			who
+			'orgs',
+			org.getID(),
+			org.getComments()
 		);
-
-		if (commentID)
-			await supabase
-				.from('orgs')
-				.update({ comments: [...org.getComments(), commentID] })
-				.eq('id', orgid);
 
 		return null;
 	}
 
-	static async updateOrganizationName(
+	static async updateOrgName(
 		org: Organization,
 		name: string,
 		who: PersonID
@@ -310,55 +283,42 @@ class Organizations {
 		const { error } = await supabase.from('orgs').update({ name: name }).eq('id', org.getID());
 		if (error) return error;
 
-		const commentID = await Organizations.addComment(
+		Organizations.addComment(
 			org.getID(),
+			who,
 			`Updated organization name to ${name}`,
-			who
+			'orgs',
+			org.getID(),
+			org?.getComments()
 		);
-
-		if (org && commentID)
-			await supabase
-				.from('orgs')
-				.update({ comments: [...org.getComments(), commentID] })
-				.eq('id', org.getID());
 
 		return null;
 	}
 
-	static async updateOrganizationVisibility(
-		orgid: OrganizationID,
+	static async updateOrgVisibility(
+		org: Organization,
 		visibility: Visibility,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		const { error } = await supabase.from('orgs').update({ visibility }).eq('id', orgid);
+		const { error } = await supabase.from('orgs').update({ visibility }).eq('id', org.getID());
 		if (error) return error;
 
-		const commentID = await Organizations.addComment(
-			orgid,
+		Organizations.addComment(
+			org.getID(),
+			who,
 			`Updated organization visibility to ${visibility}`,
-			who
+			'orgs',
+			org.getID(),
+			org?.getComments()
 		);
-
-		const org = Organizations.organizations.get(orgid);
-
-		if (org && commentID)
-			await supabase
-				.from('orgs')
-				.update({ comments: [...org.getComments(), commentID] })
-				.eq('id', orgid);
 
 		return null;
 	}
 
-	static async addComment(orgid: OrganizationID, what: string, who: PersonID) {
-		// Record that we edited it.
-		const { data: comment } = await supabase
-			.from('comments')
-			.insert({ orgid, what, who })
-			.select()
-			.single();
+	static async createMarkup(text: string) {
+		const { data } = await supabase.from('markup').insert({ text }).select().single();
 
-		return comment?.id ?? null;
+		return data?.id ?? null;
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */
@@ -409,19 +369,70 @@ class Organizations {
 		const { error } = await supabase.from('roles').update({ title: title }).eq('id', role.id);
 		if (error) return error;
 
-		const commentID = await Organizations.addComment(
+		Organizations.addComment(
 			role.orgid,
+			who,
 			`Updated role title to ${title}`,
-			who
+			'roles',
+			role.id,
+			role.comments
 		);
+
+		return null;
+	}
+
+	static async updateRoleDescription(role: RoleRow, description: string, who: PersonID) {
+		Organizations.addOrCreateMarkup(role.description, description, 'roles', role.id);
+		Organizations.addComment(
+			role.orgid,
+			who,
+			'Updated role description',
+			'roles',
+			role.id,
+			role.comments
+		);
+
+		return null;
+	}
+
+	static async addOrCreateMarkup(
+		markupID: MarkupID | null,
+		text: string,
+		table: 'roles' | 'orgs',
+		id: string
+	) {
+		// If we do, update it's text.
+		if (markupID) {
+			const { error } = await supabase.from('markup').update({ text }).eq('id', markupID);
+			if (error) return error;
+		}
+		// Otherwise, create new markup and then update the org to point to it.
+		else {
+			const newMarkupID = await Organizations.createMarkup(text);
+			if (newMarkupID === null) return null;
+			const { error } = await supabase.from(table).update({ description: text }).eq('id', id);
+			if (error) return error;
+		}
+	}
+
+	static async addComment(
+		orgid: OrganizationID,
+		who: PersonID,
+		what: string,
+		table: 'orgs' | 'roles',
+		id: string,
+		comments: CommentID[]
+	) {
+		// Record that we edited it.
+		const { data } = await supabase.from('comments').insert({ orgid, what, who }).select().single();
+
+		const commentID = data?.id ?? null;
 
 		if (commentID)
 			await supabase
-				.from('roles')
-				.update({ comments: [...role.comments, commentID] })
-				.eq('id', role.id);
-
-		return null;
+				.from(table)
+				.update({ comments: [...comments, commentID] })
+				.eq('id', id);
 	}
 
 	static async deleteRole(id: RoleID): Promise<PostgrestError | null> {

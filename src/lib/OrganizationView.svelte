@@ -25,13 +25,13 @@
 	title={organization.getName()}
 	kind={$locale?.term.organization}
 	edit={$user && isAdmin
-		? (text) => Organizations.updateOrganizationName(organization, text, $user.id)
+		? (text) => Organizations.updateOrgName(organization, text, $user.id)
 		: undefined}
 >
 	<Visibility
 		level={organization.getVisibility()}
 		edit={$user && editable
-			? (vis) => Organizations.updateOrganizationVisibility(organization.getID(), vis, $user.id)
+			? (vis) => Organizations.updateOrgVisibility(organization, vis, $user.id)
 			: undefined}
 	/>
 </Title>
@@ -41,7 +41,7 @@
 		markup={organization.getDescription()}
 		unset="No description"
 		edit={editable && $user
-			? (text) => Organizations.updateDescription(organization.getID(), text, $user.id)
+			? (text) => Organizations.updateOrgDescription(organization, text, $user.id)
 			: undefined}
 	/>
 
