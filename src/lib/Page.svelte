@@ -27,6 +27,7 @@
 		width: calc(100% - (2 * var(--spacing)));
 		max-width: 36em;
 		margin-block-start: 6vh;
+		align-items: flex-start;
 	}
 
 	.header {

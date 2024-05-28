@@ -16,6 +16,7 @@
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Choice from './Choice.svelte';
+	import Notice from './Notice.svelte';
 
 	export let role: RoleRow;
 
@@ -58,11 +59,14 @@
 	edit={$user ? (text) => Organizations.updateRoleDescription(role, text, $user.id) : undefined}
 />
 
-<Paragraph
-	>This role is held by
-	{#each profiles as profile, index}<PersonLink {profile} />{#if index > 0},
-		{/if}{#if index < profiles.length - 1} and {/if}{:else}no one yet{/each}.</Paragraph
->
+<Header>Who</Header>
+
+{#if profiles.length === 0}<Notice>No one holds this role.</Notice>{:else}
+	<Paragraph
+		>This role is held by
+		{#each profiles as profile, index}<PersonLink {profile} />{#if index > 0},
+			{/if}{#if index < profiles.length - 1} and {/if}{/each}.</Paragraph
+	>{/if}
 
 <Header>Processes</Header>
 
