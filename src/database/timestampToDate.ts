@@ -1,5 +1,5 @@
 export default function (timestamp: string): Date {
-	const t = timestamp.split(/[- :]/);
+	const t = timestamp.split(/[- :+T]/);
 	return new Date(
 		Date.UTC(
 			parseInt(t[0]),
