@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
-	import { getOrg } from '$lib/contexts';
+	import { getOrg, getUser } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
 	import { locale } from '$types/Locales';
 	import { page } from '$app/stores';
@@ -13,18 +13,32 @@
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
 
+	const user = getUser();
 	const org = getOrg();
 
 	let error: string | undefined = undefined;
 
 	$: teamID = $page.params.teamid;
 	$: team = $org.getTeam(teamID);
+	$: isAdmin = $user && $org.hasAdmin($user.id);
 </script>
 
 {#if team}
-	<Title title={team.name} kind={$locale?.term.team} />
+	<Title
+		title={team.name}
+		kind={$locale?.term.team}
+		edit={$user && isAdmin
+			? (text) => Organizations.updateTeamName(team, text, $user.id)
+			: undefined}
+	/>
 
-	<MarkupView markup={team.description} unset="No description" />
+	<MarkupView
+		markup={team.description}
+		unset="No description"
+		edit={isAdmin && $user
+			? (text) => Organizations.updateTeamDescription(team, text, $user.id)
+			: undefined}
+	/>
 
 	{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
 		<RoleLink roleID={role.id} />

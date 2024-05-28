@@ -447,7 +447,7 @@ class Organizations {
 	static async addOrCreateMarkup(
 		markupID: MarkupID | null,
 		text: string,
-		table: 'roles' | 'orgs' | 'profiles',
+		table: 'roles' | 'orgs' | 'profiles' | 'teams',
 		id: string,
 		idName: string = 'id'
 	) {
@@ -460,7 +460,10 @@ class Organizations {
 		else {
 			const newMarkupID = await Organizations.createMarkup(text);
 			if (newMarkupID === null) return null;
-			const { error } = await supabase.from(table).update({ description: text }).eq(idName, id);
+			const { error } = await supabase
+				.from(table)
+				.update({ description: newMarkupID })
+				.eq(idName, id);
 			if (error) return error;
 		}
 	}
@@ -469,7 +472,7 @@ class Organizations {
 		orgid: OrganizationID,
 		who: PersonID,
 		what: string,
-		table: 'orgs' | 'roles',
+		table: 'orgs' | 'roles' | 'teams',
 		id: string,
 		comments: CommentID[]
 	) {
@@ -501,6 +504,45 @@ class Organizations {
 			.single();
 
 		return data?.id ?? null;
+	}
+
+	/** Update an organization's description. Rely on Realtime to refresh. */
+	static async updateTeamDescription(
+		team: TeamRow,
+		text: string,
+		who: PersonID
+	): Promise<PostgrestError | null> {
+		Organizations.addOrCreateMarkup(team.description, text, 'teams', team.id);
+		Organizations.addComment(
+			team.orgid,
+			who,
+			'Updated team description',
+			'teams',
+			team.id,
+			team.comments
+		);
+
+		return null;
+	}
+
+	static async updateTeamName(
+		team: TeamRow,
+		name: string,
+		who: PersonID
+	): Promise<PostgrestError | null> {
+		const { error } = await supabase.from('teams').update({ name }).eq('id', team.id);
+		if (error) return error;
+
+		Organizations.addComment(
+			team.orgid,
+			who,
+			`Updated team name to ${name}`,
+			'orgs',
+			team.id,
+			team.comments
+		);
+
+		return null;
 	}
 
 	static async deleteTeam(id: TeamID): Promise<PostgrestError | null> {

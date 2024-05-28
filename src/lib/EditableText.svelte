@@ -13,6 +13,7 @@
 			if (edit) {
 				const error = await edit(revision);
 				if (error) console.error(error);
+				text = revision;
 				editing = false;
 			}
 		} else {
