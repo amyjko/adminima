@@ -16,14 +16,13 @@
 
 	let editing = false;
 	let height = 0;
-	let text = '';
-	let doMarkup = getMarkup();
+	let revisedText = '';
+	/** The markup's text */
+	let text: string | undefined = undefined;
 	let input: HTMLTextAreaElement;
 	$: scrollHeight = text ? input?.scrollHeight ?? height : height;
 
-	function getMarkup() {
-		return markup ? Organizations.getMarkup(markup) : undefined;
-	}
+	$: if (markup) Organizations.getMarkup(markup).then((m) => (text = m));
 </script>
 
 <div class="markup">
@@ -31,11 +30,11 @@
 			<Button
 				action={async () => {
 					if (editing) {
-						if (edit) await edit(text ?? '');
+						if (edit) await edit(revisedText ?? '');
 						editing = false;
-						doMarkup = getMarkup();
+						text = revisedText;
 					} else {
-						text = (await getMarkup()) ?? '';
+						revisedText = text ?? '';
 						editing = true;
 						await tick();
 						input?.focus();
@@ -47,7 +46,7 @@
 	{/if}
 	{#if editing}
 		<textarea
-			bind:value={text}
+			bind:value={revisedText}
 			bind:this={input}
 			style:height="{editing ? scrollHeight : height}px"
 		/>
@@ -55,16 +54,10 @@
 		<div class="blocks" bind:clientHeight={height}>
 			{#if markup === null}
 				<BlocksView blocks={parse(`_${unset}_`).blocks} />
+			{:else if text === undefined}
+				<Loading />
 			{:else}
-				{#await doMarkup}
-					{#if text}
-						<BlocksView blocks={parse(text ?? '').blocks} />
-					{:else}<Loading />{/if}
-				{:then text}
-					<BlocksView blocks={parse(text ?? '').blocks} />
-				{:catch error}
-					<p>{error}</p>
-				{/await}
+				<BlocksView blocks={parse(text).blocks} />
 			{/if}
 		</div>
 	{/if}
