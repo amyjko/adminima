@@ -8,6 +8,7 @@
 	import { getOrg } from './contexts';
 	import MarkupView from './MarkupView.svelte';
 	import type { ProfileRow } from '$database/Organizations';
+	import Notice from './Notice.svelte';
 
 	export let profile: ProfileRow;
 
@@ -27,4 +28,8 @@
 	{/each}
 </Flow>
 
-<RoleProcesses role={roles[0]} processes={$org.getRoleProcesses(roles[0].id)} />
+{#if roles.length > 0}
+	<RoleProcesses role={roles[0]} processes={$org.getRoleProcesses(roles[0].id)} />
+{:else}
+	<Notice>This person has no roles in this organization.</Notice>
+{/if}
