@@ -199,14 +199,14 @@ create table "public"."profiles" (
 
 alter table "public"."profiles" enable row level security;
 
-create policy "People are viewable by everyone." on people
+create policy "People are viewable by everyone." on profiles
   for select using (true);
 
-create policy "Users can insert their own person record." on people
-  for insert with check ((select auth.uid()) = id);
+create policy "Users can insert their own person record." on profiles
+  for insert with check ((select auth.uid()) = personid);
 
-create policy "Users can update own person record." on people
-  for update using ((select auth.uid()) = id);
+create policy "Users can update own person record." on profiles
+  for update using ((select auth.uid()) = personid);
 
 -- Create an index on the people table with the pair of the organization ID and user email.
 CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (orgid, personid);

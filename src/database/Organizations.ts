@@ -411,11 +411,33 @@ class Organizations {
 		return null;
 	}
 
+	static async updateProfileDescription(profile: ProfileRow, text: string) {
+		const markupID = profile.bio;
+		// If we do, update it's text.
+		if (markupID) {
+			const { error } = await supabase.from('markup').update({ text }).eq('id', markupID);
+			if (error) return error;
+		}
+		// Otherwise, create new markup and then update the org to point to it.
+		else {
+			const newMarkupID = await Organizations.createMarkup(text);
+			if (newMarkupID === null) return null;
+			const { error } = await supabase
+				.from('profiles')
+				.update({ bio: newMarkupID })
+				.eq('personid', profile.personid)
+				.eq('orgid', profile.orgid);
+			if (error) return error;
+		}
+		return null;
+	}
+
 	static async addOrCreateMarkup(
 		markupID: MarkupID | null,
 		text: string,
-		table: 'roles' | 'orgs',
-		id: string
+		table: 'roles' | 'orgs' | 'profiles',
+		id: string,
+		idName: string = 'id'
 	) {
 		// If we do, update it's text.
 		if (markupID) {
@@ -426,7 +448,7 @@ class Organizations {
 		else {
 			const newMarkupID = await Organizations.createMarkup(text);
 			if (newMarkupID === null) return null;
-			const { error } = await supabase.from(table).update({ description: text }).eq('id', id);
+			const { error } = await supabase.from(table).update({ description: text }).eq(idName, id);
 			if (error) return error;
 		}
 	}
