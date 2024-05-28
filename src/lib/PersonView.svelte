@@ -7,7 +7,7 @@
 	import RoleProcesses from './RoleProcesses.svelte';
 	import { getOrg, getUser } from './contexts';
 	import MarkupView from './MarkupView.svelte';
-	import type { ProfileRow } from '$database/Organizations';
+	import type { ProcessRow, ProfileRow } from '$database/Organizations';
 	import Notice from './Notice.svelte';
 	import Organizations from '$database/Organizations';
 
@@ -17,6 +17,10 @@
 	const org = getOrg();
 
 	$: roles = $org.getPersonRoles(profile.personid);
+	$: allProcesses = roles.reduce(
+		(processes: ProcessRow[], role) => [...processes, ...$org.getRoleProcesses(role.id)],
+		[]
+	);
 </script>
 
 <Title
@@ -41,7 +45,7 @@
 		{/each}
 	</Flow>
 
-	<RoleProcesses role={roles[0]} processes={$org.getRoleProcesses(roles[0].id)} />
+	<RoleProcesses role={roles[0]} processes={allProcesses} />
 {:else}
 	<Notice>This person has no roles in this organization.</Notice>
 {/if}
