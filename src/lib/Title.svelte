@@ -2,7 +2,6 @@
 	import OrganizationLink from './OrganizationLink.svelte';
 	import { getOrg } from './contexts';
 	import { page } from '$app/stores';
-	import Status from './Status.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
 
@@ -30,7 +29,7 @@
 	{#if edit}
 		<div />{/if}
 	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
-		<div class="breadcrumbs"><OrganizationLink org={$org} /><slot /></div>
+		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
 	{/if}
 	<slot />
 </div>

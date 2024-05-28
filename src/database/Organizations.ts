@@ -395,6 +395,22 @@ class Organizations {
 		return null;
 	}
 
+	static async updateRoleTeam(role: RoleRow, team: TeamRow, who: PersonID) {
+		const { error } = await supabase.from('roles').update({ team: team.id }).eq('id', role.id);
+		if (error) return error;
+
+		Organizations.addComment(
+			role.orgid,
+			who,
+			`Updated role team to ${team.name}`,
+			'roles',
+			role.id,
+			role.comments
+		);
+
+		return null;
+	}
+
 	static async addOrCreateMarkup(
 		markupID: MarkupID | null,
 		text: string,

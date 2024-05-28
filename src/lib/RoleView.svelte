@@ -15,6 +15,7 @@
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
+	import Choice from './Choice.svelte';
 
 	export let role: RoleRow;
 
@@ -32,8 +33,24 @@
 	edit={isAdmin && $user
 		? (text) => Organizations.updateRoleTitle(role, text, $user.id)
 		: undefined}
-	>{#if role.team}&nbsp;&gt; <TeamLink id={role.team} />{/if}</Title
 >
+	<Choice
+		choice={role.team ? $org.getTeam(role.team)?.name ?? '' : '—'}
+		choices={Object.fromEntries(
+			$org.getTeams().map((team) => [team.name, `Change to team ${team.name}`])
+		)}
+		edit={async (name) => {
+			if (isAdmin && $user) {
+				const team = $org.getTeams().find((team) => team.name === name);
+				if (team) {
+					return await Organizations.updateRoleTeam(role, team, $user.id);
+				}
+			}
+			return null;
+		}}
+		>{#if role.team}<TeamLink id={role.team} />{:else}no team{/if}</Choice
+	>
+</Title>
 
 <MarkupView
 	markup={role.description}

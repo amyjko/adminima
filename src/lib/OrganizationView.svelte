@@ -31,7 +31,10 @@
 	<Visibility
 		level={organization.getVisibility()}
 		edit={$user && editable
-			? (vis) => Organizations.updateOrgVisibility(organization, vis, $user.id)
+			? (vis) =>
+					vis === 'org' || vis === 'admin' || vis === 'public'
+						? Organizations.updateOrgVisibility(organization, vis, $user.id)
+						: undefined
 			: undefined}
 	/>
 </Title>
