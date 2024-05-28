@@ -11,6 +11,7 @@
 	import Button from '$lib/Button.svelte';
 	import Organizations from '$database/Organizations';
 	import { goto } from '$app/navigation';
+	import Notice from '$lib/Notice.svelte';
 
 	const org = getOrg();
 
@@ -27,6 +28,8 @@
 
 	{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
 		<RoleLink roleID={role.id} />
+	{:else}
+		<Notice>This team has no roles.</Notice>
 	{/each}
 {:else}
 	<Oops text="No team" />
