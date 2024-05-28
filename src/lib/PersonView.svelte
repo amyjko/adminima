@@ -19,7 +19,13 @@
 	$: roles = $org.getPersonRoles(profile.personid);
 </script>
 
-<Title title={profile.name} kind={$locale?.term.person} />
+<Title
+	title={profile.name}
+	kind={$locale?.term.person}
+	edit={$user && profile.personid === $user.id
+		? (text) => Organizations.updateProfileName(profile, text)
+		: undefined}
+/>
 
 <MarkupView
 	markup={profile.bio}

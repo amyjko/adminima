@@ -411,6 +411,18 @@ class Organizations {
 		return null;
 	}
 
+	static async updateProfileName(
+		profile: ProfileRow,
+		name: string
+	): Promise<PostgrestError | null> {
+		const { error } = await supabase
+			.from('profiles')
+			.update({ name })
+			.eq('personid', profile.personid)
+			.eq('orgid', profile.orgid);
+		return error;
+	}
+
 	static async updateProfileDescription(profile: ProfileRow, text: string) {
 		const markupID = profile.bio;
 		// If we do, update it's text.
