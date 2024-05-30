@@ -13,6 +13,7 @@
 	import Organizations from '$database/Organizations';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import type { PersonID } from '$types/Organization';
+	import Select from '$lib/Select.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -20,10 +21,6 @@
 	$: isAdmin = $user && $organization.hasAdmin($user.id);
 
 	let newPerson: string = '';
-
-	function toggleAdmin(admin: boolean, person: PersonID) {
-		Organizations.updateAdmin($organization.getID(), person, admin);
-	}
 </script>
 
 <Title title="people" kind={$locale?.term.organization} />
@@ -37,12 +34,12 @@
 <table>
 	<thead>
 		<tr>
-			<th>person</th>
-			<th>roles</th>
-			<th>teams</th>
+			<th style:width="30%">person</th>
+			<th style:width="30%">roles</th>
+			<th style:width="25%">teams</th>
+			<th style:width="10%">admin</th>
 			{#if isAdmin}
-				<th>admin</th>
-				<th>remove</th>
+				<th style:width="5%">remove</th>
 			{/if}
 		</tr>
 	</thead>
@@ -54,6 +51,23 @@
 					<PersonLink {profile} />
 				</td>
 				<td>
+					{#if isAdmin}
+						<Select
+							selection={roles[0]?.id}
+							options={[
+								{ value: undefined, label: '—' },
+								...$organization.getRoles().map((role) => {
+									return { value: role.id, label: role.title };
+								})
+							]}
+							change={(roleID) => {
+								for (const role of roles)
+									Organizations.unassignPerson($organization.getID(), profile.personid, role.id);
+								if (roleID !== undefined)
+									Organizations.assignPerson($organization.getID(), profile.personid, roleID);
+							}}
+						/>
+					{/if}
 					{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
 						<span class="role"><RoleLink roleID={role.id} /></span>
 					{/each}
@@ -67,7 +81,8 @@
 							on={$organization.hasAdmin(profile.personid)}
 							enabled={isAdmin &&
 								($organization.getAdminCount() > 1 || !$organization.hasAdmin(profile.personid))}
-							change={(on) => toggleAdmin(on, profile.personid)}
+							change={(on) =>
+								Organizations.updateAdmin($organization.getID(), profile.personid, on)}
 						/>
 					</td>
 					<td class="actions">

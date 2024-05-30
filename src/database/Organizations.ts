@@ -135,15 +135,19 @@ class Organizations {
 					filter: `orgid=eq.${orgid}`
 				},
 				(payload: RealtimePostgresChangesPayload<AssignmentRow>) => {
-					Organizations.synchronizeRow(
-						orgid,
-						payload,
-						(org, assignment) => org.withAssignment(assignment),
-						(org, assignment) =>
-							assignment.roleid && assignment.personid
-								? org.withoutAssignment(assignment.roleid, assignment.personid)
-								: org
-					);
+					const org = Organizations.organizations.get(orgid);
+					if (!org) return;
+
+					// Otherwise, update the organization's profile.
+					if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+						Organizations.organizations.set(orgid, org.withAssignment(payload.new));
+					} else if (payload.eventType === 'DELETE' && payload.old.roleid && payload.old.personid) {
+						// Supabase doesn't allow filtering on delete events, so we have to filter here.
+						Organizations.organizations.set(
+							orgid,
+							org.withoutAssignment(payload.old.roleid, payload.old.personid)
+						);
+					}
 				}
 			)
 			/** When a team for this organization changes, update it's client-side store. */
@@ -329,6 +333,19 @@ class Organizations {
 	/** Add a person to the organization's profiles if not already added. Rely on Realtime notification for update. */
 	static async addPerson(orgid: OrganizationID, personid: PersonID) {
 		await supabase.from('profiles').insert({ orgid, personid, name: '', admin: false });
+	}
+
+	static async assignPerson(orgid: OrganizationID, personid: PersonID, roleid: RoleID) {
+		await supabase.from('assignments').insert({ orgid, personid, roleid });
+	}
+
+	static async unassignPerson(orgid: OrganizationID, personid: PersonID, roleid: RoleID) {
+		await supabase
+			.from('assignments')
+			.delete()
+			.eq('orgid', orgid)
+			.eq('personid', personid)
+			.eq('roleid', roleid);
 	}
 
 	/** Remove a perosn from the organization's profiles if included. Rely on Realtime notification for update. */

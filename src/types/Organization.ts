@@ -207,7 +207,12 @@ export default class Organization {
 	withAssignment(assignment: AssignmentRow) {
 		return new Organization({
 			...this.data,
-			assignments: [...this.data.assignments, assignment]
+			// only add if it's not in the list yet
+			assignments: this.data.assignments.find(
+				(ass) => ass.personid === assignment.personid && ass.roleid === assignment.roleid
+			)
+				? this.data.assignments
+				: [...this.data.assignments, assignment]
 		});
 	}
 

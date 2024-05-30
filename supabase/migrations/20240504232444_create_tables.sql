@@ -397,6 +397,18 @@ alter
   publication supabase_realtime add table "public"."assignments";
 
 
+create policy "Roles are viewable by everyone." on assignments
+  for select using (true);
+
+create policy "Admins can insert." on assignments
+  for insert with check (true);
+
+create policy "Admins can update" on assignments
+  for update using (true);
+
+create policy "Admins can delete" on assignments
+  for delete using (true);
+
 
 -- Define the hows table and configuration.
 create table "public"."hows" (
