@@ -67,10 +67,11 @@
 									Organizations.assignPerson($organization.getID(), profile.personid, roleID);
 							}}
 						/>
+					{:else}
+						{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+							<span class="role"><RoleLink roleID={role.id} /></span>
+						{/each}
 					{/if}
-					{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-						<span class="role"><RoleLink roleID={role.id} /></span>
-					{/each}
 				</td>
 				<td class="team">
 					{#each roles as role}{#if role.team}<TeamLink id={role.team} />{/if}{/each}
