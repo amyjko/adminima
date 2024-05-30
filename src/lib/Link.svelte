@@ -63,6 +63,7 @@
 	.kinded {
 		color: var(--background);
 		text-decoration: none;
+		white-space: nowrap;
 	}
 
 	.person {

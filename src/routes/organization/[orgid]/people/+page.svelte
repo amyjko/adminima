@@ -12,7 +12,6 @@
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Organizations from '$database/Organizations';
 	import TeamLink from '$lib/TeamLink.svelte';
-	import type { PersonID } from '$types/Organization';
 	import Select from '$lib/Select.svelte';
 
 	const organization = getOrg();
@@ -34,12 +33,13 @@
 <table>
 	<thead>
 		<tr>
-			<th style:width="30%">person</th>
-			<th style:width="30%">roles</th>
-			<th style:width="25%">teams</th>
+			<th style:width="20%">person</th>
+			<th style:width="20%">roles</th>
+			<th style:width="20%">teams</th>
+			<th style:width="20%">supervisor</th>
 			<th style:width="10%">admin</th>
 			{#if isAdmin}
-				<th style:width="5%">remove</th>
+				<th style:width="10%">remove</th>
 			{/if}
 		</tr>
 	</thead>
@@ -76,8 +76,33 @@
 				<td class="team">
 					{#each roles as role}{#if role.team}<TeamLink id={role.team} />{/if}{/each}
 				</td>
-				{#if isAdmin}
-					<td>
+				<td class="supervisor">
+					{#if isAdmin}
+						<Select
+							options={[
+								{ value: undefined, label: '—' },
+								...$organization
+									.getProfiles()
+									.filter((prof) => prof.personid !== profile.personid)
+									.map((prof) => {
+										return { value: prof.personid, label: prof.name };
+									})
+							]}
+							selection={profile.supervisor ?? undefined}
+							change={(personID) => {
+								Organizations.updatePersonSupervisor(
+									$organization.getID(),
+									profile.personid,
+									personID ?? null
+								);
+							}}
+						/>
+					{:else if profile.supervisor}<PersonLink
+							profile={$organization.getProfile(profile.supervisor)}
+						/>{/if}
+				</td>
+				<td>
+					{#if isAdmin}
 						<Checkbox
 							on={$organization.hasAdmin(profile.personid)}
 							enabled={isAdmin &&
@@ -85,8 +110,11 @@
 							change={(on) =>
 								Organizations.updateAdmin($organization.getID(), profile.personid, on)}
 						/>
-					</td>
-					<td class="actions">
+					{:else if $organization.hasAdmin(profile.personid)}&check;{/if}
+				</td>
+
+				{#if isAdmin}
+					<td>
 						<Button
 							action={() => Organizations.removePerson($organization.getID(), profile.personid)}
 							active={!$organization.hasAdmin(profile.personid)}>&times;</Button
@@ -123,13 +151,6 @@
 </Admin>
 
 <style>
-	.actions {
-		display: flex;
-		flex-direction: column;
-		gap: var(--padding);
-		align-items: left;
-	}
-
 	.role,
 	.team {
 		font-size: var(--small-size);

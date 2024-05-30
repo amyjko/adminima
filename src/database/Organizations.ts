@@ -348,6 +348,18 @@ class Organizations {
 			.eq('roleid', roleid);
 	}
 
+	static async updatePersonSupervisor(
+		orgid: OrganizationID,
+		personid: PersonID,
+		supervisor: PersonID | null
+	) {
+		await supabase
+			.from('profiles')
+			.update({ supervisor })
+			.eq('orgid', orgid)
+			.eq('personid', personid);
+	}
+
 	/** Remove a perosn from the organization's profiles if included. Rely on Realtime notification for update. */
 	static async removePerson(orgid: OrganizationID, personid: PersonID) {
 		await supabase.from('profiles').delete().eq('orgid', orgid).eq('personid', personid);
