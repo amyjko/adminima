@@ -25,15 +25,16 @@
 
 {#if edit}
 	<form class="editable">
-		<!-- svelte-ignore a11y-autofocus -->
-		{#if editing}<input
+		<Button action={save}
+			>{#if editing}&checkmark;{:else}✎{/if}</Button
+		>{#if editing}
+			<!-- svelte-ignore a11y-autofocus -->
+			<input
 				type="text"
 				bind:value={revision}
 				on:keydown={(event) => (event.key === 'Enter' ? save() : undefined)}
 				autofocus
-			/>{:else}<span class="text">{text}</span>{/if}<Button action={save}
-			>{#if editing}&checkmark;{:else}✎{/if}</Button
-		>
+			/>{:else}<span class="text">{text}</span>{/if}
 	</form>
 {:else}{text}{/if}
 
@@ -42,7 +43,8 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: var(--padding);
+		gap: calc(2 * var(--padding));
+		margin-inline-start: calc(-7 * (var(--padding)));
 	}
 
 	input {

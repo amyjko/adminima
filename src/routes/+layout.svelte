@@ -41,7 +41,7 @@
 		--font: 'Rokkitt', sans-serif;
 		--spacing: 1.25rem;
 		--thickness: 3px;
-		--padding: 0.25em;
+		--padding: 0.25rem;
 		--radius: 4px;
 		--normal-size: 18pt;
 		--small-size: 13pt;

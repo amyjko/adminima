@@ -25,7 +25,7 @@
 	$: if (markup) Organizations.getMarkup(markup).then((m) => (text = m));
 </script>
 
-<div class="markup">
+<div class="markup" class:editable={edit !== undefined}>
 	{#if edit}<div class="control">
 			<Button
 				action={async () => {
@@ -68,8 +68,12 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: nowrap;
-		gap: var(--padding);
+		gap: calc(2 * var(--padding));
 		align-items: stretch;
+	}
+
+	.editable {
+		margin-left: calc(-7 * var(--padding));
 	}
 
 	.control {

@@ -20,7 +20,8 @@
 	}
 </script>
 
-<div class="row">
+<div class="row" class:editable={edit !== undefined}>
+	{#if edit}<Button action={() => (editing = !editing)}>✎</Button>{/if}
 	{#if editing}
 		<div class="choices" role="radiogroup">
 			{#each levels as key}
@@ -46,16 +47,20 @@
 			<slot />
 		</div>
 	{/if}
-	{#if edit}<Button action={() => (editing = !editing)}>✎</Button>{/if}
 </div>
 
 <style>
 	.row {
 		display: flex;
 		flex-direction: row;
-		gap: var(--padding);
+		gap: calc(2 * var(--padding));
 		align-items: middle;
 	}
+
+	.editable {
+		margin-left: calc(-7 * var(--padding));
+	}
+
 	.choices {
 		display: flex;
 		flex-direction: row;

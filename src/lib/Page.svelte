@@ -20,6 +20,7 @@
 <style>
 	.page {
 		padding: var(--spacing);
+		padding-left: calc(var(--spacing) * 2);
 		display: flex;
 		flex-direction: column;
 		margin: auto;
