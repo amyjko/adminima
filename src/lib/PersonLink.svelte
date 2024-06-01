@@ -11,8 +11,8 @@
 </script>
 
 {#if profile}
-	<Link to="/organization/{$org.getID()}/person/{profile.personid}" kind="person"
-		>{short ? profile.name.split(' ')[0] : profile.name}</Link
+	<Link to="/organization/{$org.getID()}/person/{profile.id}" kind="person"
+		>{profile.name === '' ? profile.email : short ? profile.name.split(' ')[0] : profile.name}</Link
 	>
 {:else}
 	<Oops inline text={(locale) => locale.error.noPerson} />

@@ -24,9 +24,7 @@
 
 <style>
 	a {
-		color: var(--foreground);
-		padding-inline-start: var(--padding);
-		padding-inline-end: var(--padding);
+		color: currentColor;
 		transition: transform 200ms;
 		display: inline-block;
 		border-radius: var(--padding);
@@ -64,6 +62,8 @@
 		color: var(--background);
 		text-decoration: none;
 		white-space: nowrap;
+		padding-inline-start: var(--padding);
+		padding-inline-end: var(--padding);
 	}
 
 	.person {

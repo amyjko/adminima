@@ -10,16 +10,23 @@
 	import { locale } from '$types/Locales';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
-	import Organizations from '$database/Organizations';
+	import Organizations, { type PersonRow } from '$database/Organizations';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Select from '$lib/Select.svelte';
+	import Subheader from '$lib/Subheader.svelte';
+	import validEmail from '../../../validEmail';
+	import Form from '$lib/Form.svelte';
+	import Notice from '$lib/Notice.svelte';
+	import Link from '$lib/Link.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
 
-	$: isAdmin = $user && $organization.hasAdmin($user.id);
+	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
 
-	let newPerson: string = '';
+	let newPersonEmail: string = '';
+	let match: PersonRow | undefined | null = undefined;
+	$: existing = $organization.getProfileWithEmail(newPersonEmail);
 </script>
 
 <Title title="people" kind={$locale?.term.organization} />
@@ -29,6 +36,14 @@
 	remove people from the organization, promote or demote people from admin status, and create and delete
 	roles. Select a person to see the roles they have.</Paragraph
 >
+
+{#if isAdmin && $organization.getRoles().length === 0}
+	<Notice
+		>Want to give people roles? First you'll need to <Link
+			to="/organization/{$organization.getID()}/roles">define some</Link
+		>.</Notice
+	>
+{/if}
 
 <table>
 	<thead>
@@ -45,36 +60,42 @@
 	</thead>
 	<tbody>
 		{#each $organization.getProfiles() as profile}
-			{@const roles = $organization.getPersonRoles(profile.personid)}
+			{@const roles = $organization.getProfileRoles(profile.id)}
 			<tr>
 				<td>
 					<PersonLink {profile} />
 				</td>
 				<td>
 					{#if isAdmin}
-						<Select
-							selection={roles[0]?.id}
-							options={[
-								{ value: undefined, label: '—' },
-								...$organization.getRoles().map((role) => {
-									return { value: role.id, label: role.title };
-								})
-							]}
-							change={(roleID) => {
-								for (const role of roles)
-									Organizations.unassignPerson($organization.getID(), profile.personid, role.id);
-								if (roleID !== undefined)
-									Organizations.assignPerson($organization.getID(), profile.personid, roleID);
-							}}
-						/>
+						{#if roles.length === 0}
+							<em>&mdash;</em>
+						{:else}
+							<Select
+								selection={roles[0]?.id}
+								options={[
+									{ value: undefined, label: '—' },
+									...$organization.getRoles().map((role) => {
+										return { value: role.id, label: role.title };
+									})
+								]}
+								change={(roleID) => {
+									for (const role of roles)
+										Organizations.unassignPerson($organization.getID(), profile.id, role.id);
+									if (roleID !== undefined)
+										Organizations.assignPerson($organization.getID(), profile.id, roleID);
+								}}
+							/>
+						{/if}
 					{:else}
 						{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
 							<span class="role"><RoleLink roleID={role.id} /></span>
+						{:else}<em>&mdash;</em>
 						{/each}
 					{/if}
 				</td>
 				<td class="team">
-					{#each roles as role}{#if role.team}<TeamLink id={role.team} />{/if}{/each}
+					{#each roles as role}{#if role.team}<TeamLink id={role.team} />{/if}{:else}<em>&mdash;</em
+						>{/each}
 				</td>
 				<td class="supervisor">
 					{#if isAdmin}
@@ -83,16 +104,16 @@
 								{ value: undefined, label: '—' },
 								...$organization
 									.getProfiles()
-									.filter((prof) => prof.personid !== profile.personid)
+									.filter((prof) => prof.id !== profile.id)
 									.map((prof) => {
-										return { value: prof.personid, label: prof.name };
+										return { value: prof.id, label: prof.name };
 									})
 							]}
 							selection={profile.supervisor ?? undefined}
 							change={(personID) => {
-								Organizations.updatePersonSupervisor(
+								Organizations.updateProfileSupervisor(
 									$organization.getID(),
-									profile.personid,
+									profile.id,
 									personID ?? null
 								);
 							}}
@@ -104,20 +125,20 @@
 				<td>
 					{#if isAdmin}
 						<Checkbox
-							on={$organization.hasAdmin(profile.personid)}
+							on={$organization.hasAdminProfile(profile.id)}
 							enabled={isAdmin &&
-								($organization.getAdminCount() > 1 || !$organization.hasAdmin(profile.personid))}
-							change={(on) =>
-								Organizations.updateAdmin($organization.getID(), profile.personid, on)}
+								($organization.getAdminCount() > 1 || !$organization.hasAdminProfile(profile.id))}
+							change={(on) => Organizations.updateAdmin($organization.getID(), profile.id, on)}
 						/>
-					{:else if $organization.hasAdmin(profile.personid)}&check;{/if}
+					{:else if $organization.hasAdminProfile(profile.id)}&check;{/if}
 				</td>
 
 				{#if isAdmin}
 					<td>
 						<Button
-							action={() => Organizations.removePerson($organization.getID(), profile.personid)}
-							active={!$organization.hasAdmin(profile.personid)}>&times;</Button
+							action={() => Organizations.removeProfile(profile.id)}
+							active={profile.personid !== null && !$organization.hasAdminProfile(profile.id)}
+							>&times;</Button
 						>
 					</td>
 				{/if}
@@ -127,27 +148,34 @@
 </table>
 
 <Admin>
+	<Subheader>Add people</Subheader>
 	<Paragraph
-		>Search for people by name to add them to this organization. They must already have an account.</Paragraph
+		>Enter the email of the person to add. <em
+			>This will not send an invitation; they can create an account at any time</em
+		>.</Paragraph
 	>
-	<Field label="name" bind:text={newPerson} />
-	{#if newPerson.length > 0}
-		{#await $organization.getPersonNamed(newPerson)}
-			<Loading />
-		{:then people}
-			<ul>
-				{#each people as person}
-					<li>
-						<PersonLink profile={person} />
-						{#if !$organization.hasPerson(person.personid)}
-							<Button action={() => Organizations.addPerson($organization.getID(), person.personid)}
-								>+</Button
-							>{/if}
-					</li>
-				{/each}
-			</ul>
-		{/await}
-	{/if}
+	<Form
+		action={async () => {
+			match = undefined;
+			match = await Organizations.getPersonWithEmail(newPersonEmail);
+			await (match === null
+				? Organizations.addPersonByEmail($organization.getID(), newPersonEmail)
+				: Organizations.addPersonByID($organization.getID(), match.id));
+			newPersonEmail = '';
+		}}
+	>
+		<Field
+			label="email"
+			bind:text={newPersonEmail}
+			invalid={(text) => (text.length === 0 || validEmail(text) ? undefined : 'Not a valid email')}
+		/>
+		<Button action={() => {}} active={!match && !existing && newPersonEmail.length > 0} submit
+			>Add</Button
+		>
+		{#if existing}
+			<Paragraph>This person is already added.</Paragraph>
+		{/if}
+	</Form>
 </Admin>
 
 <style>

@@ -16,7 +16,7 @@
 	const user = getUser();
 
 	$: visibility = organization.getVisibility();
-	$: isAdmin = $user && organization.hasAdmin($user.id);
+	$: isAdmin = $user && organization.hasAdminPerson($user.id);
 	$: hasUser = $user && organization.hasPerson($user.id);
 	$: editable = isAdmin;
 </script>

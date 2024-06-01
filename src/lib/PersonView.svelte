@@ -16,7 +16,7 @@
 	const user = getUser();
 	const org = getOrg();
 
-	$: roles = $org.getPersonRoles(profile.personid);
+	$: roles = $org.getProfileRoles(profile.id);
 	$: allProcesses = roles.reduce(
 		(processes: ProcessRow[], role) => [...processes, ...$org.getRoleProcesses(role.id)],
 		[]
@@ -24,12 +24,20 @@
 </script>
 
 <Title
-	title={profile.name}
+	title={profile.name.length === 0 ? '(no name)' : profile.name}
 	kind={$locale?.term.person}
 	edit={$user && profile.personid === $user.id
 		? (text) => Organizations.updateProfileName(profile, text)
 		: undefined}
-/>
+>
+	{profile.email}
+</Title>
+
+{#if profile.personid === null}
+	<Notice
+		>This person does not yet have an account on Adminima. If they create one, they can add a bio.</Notice
+	>
+{/if}
 
 <MarkupView
 	markup={profile.bio}

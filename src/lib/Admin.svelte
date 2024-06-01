@@ -7,9 +7,9 @@
 </script>
 
 <!-- Demarcates a view that is admin only, to clarify to users who has the ability to do this. -->
-{#if $user && $organization.hasAdmin($user.id)}
+{#if $user && $organization.hasAdminPerson($user.id)}
 	<section class="admin">
-		<Header>admins only</Header>
+		<Header><em>Admins only</em></Header>
 		<slot />
 	</section>
 {/if}

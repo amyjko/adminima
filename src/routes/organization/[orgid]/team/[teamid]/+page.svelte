@@ -20,7 +20,7 @@
 
 	$: teamID = $page.params.teamid;
 	$: team = $org.getTeam(teamID);
-	$: isAdmin = $user && $org.hasAdmin($user.id);
+	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 </script>
 
 {#if team}

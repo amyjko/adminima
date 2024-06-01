@@ -6,18 +6,20 @@ import Organization, {
 	type OrganizationID,
 	type PersonID,
 	type ProcessID,
+	type ProfileID,
 	type RoleID,
 	type TeamID
 } from '$types/Organization';
 import { supabase } from '$lib/supabaseClient';
-import type {
-	PostgrestError,
-	RealtimeChannel,
-	RealtimePostgresChangesPayload
+import {
+	type PostgrestError,
+	type RealtimeChannel,
+	type RealtimePostgresChangesPayload
 } from '@supabase/supabase-js';
 import type { Database, Tables } from './database.types';
 import { type Markup } from '$types/Organization';
 
+export type PersonRow = Tables<'people'>;
 export type OrganizationRow = Tables<'orgs'>;
 export type RoleRow = Tables<'roles'>;
 export type ProfileRow = Tables<'profiles'>;
@@ -101,7 +103,7 @@ class Organizations {
 						orgid,
 						payload,
 						(org, role) => org.withProfile(role),
-						(org, role) => (role.personid ? org.withoutProfile(role.personid) : org)
+						(org, role) => (role.id ? org.withoutProfile(role.id) : org)
 					);
 				}
 			)
@@ -141,11 +143,15 @@ class Organizations {
 					// Otherwise, update the organization's profile.
 					if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
 						Organizations.organizations.set(orgid, org.withAssignment(payload.new));
-					} else if (payload.eventType === 'DELETE' && payload.old.roleid && payload.old.personid) {
+					} else if (
+						payload.eventType === 'DELETE' &&
+						payload.old.roleid &&
+						payload.old.profileid
+					) {
 						// Supabase doesn't allow filtering on delete events, so we have to filter here.
 						Organizations.organizations.set(
 							orgid,
-							org.withoutAssignment(payload.old.roleid, payload.old.personid)
+							org.withoutAssignment(payload.old.roleid, payload.old.profileid)
 						);
 					}
 				}
@@ -326,43 +332,59 @@ class Organizations {
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */
-	static async updateAdmin(orgid: OrganizationID, personid: PersonID, admin: boolean) {
-		await supabase.from('profiles').update({ admin }).eq('orgid', orgid).eq('personid', personid);
+	static async updateAdmin(orgid: OrganizationID, profileid: ProfileID, admin: boolean) {
+		await supabase.from('profiles').update({ admin }).eq('orgid', orgid).eq('id', profileid);
 	}
 
 	/** Add a person to the organization's profiles if not already added. Rely on Realtime notification for update. */
-	static async addPerson(orgid: OrganizationID, personid: PersonID) {
-		await supabase.from('profiles').insert({ orgid, personid, name: '', admin: false });
+	static async addPersonByID(orgid: OrganizationID, person: PersonID | PersonRow) {
+		const data = typeof person === 'string' ? await Organizations.getPerson(person) : person;
+		if (!data) return null;
+		await supabase
+			.from('profiles')
+			.insert({ orgid, personid: data.id, name: '', email: data.email, admin: false });
 	}
 
-	static async assignPerson(orgid: OrganizationID, personid: PersonID, roleid: RoleID) {
-		await supabase.from('assignments').insert({ orgid, personid, roleid });
+	/** Add a person to the organization's profiles by email. Rely on Realtime notification for update. */
+	static async addPersonByEmail(orgid: OrganizationID, email: string) {
+		await supabase
+			.from('profiles')
+			.insert({ orgid, personid: null, name: '', email, admin: false });
 	}
 
-	static async unassignPerson(orgid: OrganizationID, personid: PersonID, roleid: RoleID) {
+	static async assignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
+		await supabase.from('assignments').insert({ orgid, profileid, roleid });
+	}
+
+	static async unassignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
 		await supabase
 			.from('assignments')
 			.delete()
 			.eq('orgid', orgid)
-			.eq('personid', personid)
+			.eq('profileid', profileid)
 			.eq('roleid', roleid);
 	}
 
-	static async updatePersonSupervisor(
+	static async getPersonWithEmail(email: string) {
+		const { data } = await supabase.from('people').select().eq('email', email).single();
+		return data;
+	}
+
+	static async updateProfileSupervisor(
 		orgid: OrganizationID,
-		personid: PersonID,
+		profileid: ProfileID,
 		supervisor: PersonID | null
 	) {
 		await supabase
 			.from('profiles')
 			.update({ supervisor })
 			.eq('orgid', orgid)
-			.eq('personid', personid);
+			.eq('personid', profileid);
 	}
 
 	/** Remove a perosn from the organization's profiles if included. Rely on Realtime notification for update. */
-	static async removePerson(orgid: OrganizationID, personid: PersonID) {
-		await supabase.from('profiles').delete().eq('orgid', orgid).eq('personid', personid);
+	static async removeProfile(profileid: ProfileID) {
+		await supabase.from('profiles').delete().eq('id', profileid);
 	}
 
 	static updateOrg(org: OrganizationPayload) {
@@ -447,7 +469,7 @@ class Organizations {
 		const { error } = await supabase
 			.from('profiles')
 			.update({ name })
-			.eq('personid', profile.personid)
+			.eq('email', profile.email)
 			.eq('orgid', profile.orgid);
 		return error;
 	}
@@ -466,7 +488,7 @@ class Organizations {
 			const { error } = await supabase
 				.from('profiles')
 				.update({ bio: newMarkupID })
-				.eq('personid', profile.personid)
+				.eq('email', profile.email)
 				.eq('orgid', profile.orgid);
 			if (error) return error;
 		}
@@ -580,9 +602,19 @@ class Organizations {
 		return error;
 	}
 
-	static async createOrganization(organizationName: string, admin: PersonID, adminName: string) {
-		// Insert the new organization
-		const { data: org, error } = await supabase
+	static async getPerson(id: PersonID): Promise<PersonRow | null> {
+		const { data } = await supabase.from('people').select().eq('id', id).single();
+		return data;
+	}
+
+	static async createOrganization(
+		organizationName: string,
+		adminID: PersonID,
+		email: string,
+		adminName: string
+	) {
+		// Create the new organization.
+		const { data: org, error: orgError } = await supabase
 			.from('orgs')
 			.insert({
 				name: organizationName,
@@ -590,19 +622,20 @@ class Organizations {
 			})
 			.select()
 			.single();
-		if (error) return { error, id: null };
-		else {
-			// Insert the new user profile
-			const { error } = await supabase.from('profiles').insert({
-				orgid: org.id,
-				personid: admin,
-				name: adminName,
-				admin: true
-			});
-			if (error) return { error, id: null };
 
-			return { error: null, id: org.id };
-		}
+		if (orgError) return { error: orgError, id: null };
+
+		// Insert the new user profile
+		const { error } = await supabase.from('profiles').insert({
+			orgid: org.id,
+			personid: adminID,
+			email: email,
+			name: adminName,
+			admin: true
+		});
+		if (error) return { error, id: null };
+
+		return { error: null, id: org.id };
 	}
 
 	static async getPayload(orgid: string): Promise<OrganizationPayload | null> {

@@ -22,14 +22,21 @@ create table people (
 alter table people
   enable row level security;
 
+create policy "People are viewable by everyone." on people
+  for select using (true);
+
 
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
 -- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
 create function public.handle_new_person()
 returns trigger as $$
 begin
+  -- Insert the new user into the people table.
   insert into public.people (id, email)
   values (new.id, new.email);
+  -- If any profile has this email address, update the profile's personid.
+  update public.profiles set personid = new.id where email = new.email;
+  -- Return the new row.
   return new;
 end;
 $$ language plpgsql security definer;
@@ -185,15 +192,17 @@ alter
   publication supabase_realtime add table "public"."teams";
 
 
-
 -- A table to store people's name, bio, profiles, and status per organization.
 create table "public"."profiles" (
+    "id" uuid not null default uuid_generate_v1() primary key,
     "orgid" uuid not null references orgs(id) on delete cascade,
-    "personid" uuid not null references people(id) on delete cascade,
+    -- An optional link to the person this corresponds to in auth
+    "personid" uuid null default null references people(id) on delete cascade,
     "name" text not null,
+    "email" text not null,
     "bio" uuid default null references markup(id) on delete set null,
     "admin" boolean not null,
-    "supervisor" uuid default null references people(id) on delete set null
+    "supervisor" uuid default null references profiles(id) on delete set null
 );
 
 
@@ -203,15 +212,10 @@ create policy "People are viewable by everyone." on profiles
   for select using (true);
 
 create policy "Users can insert their own person record." on profiles
-  for insert with check ((select auth.uid()) = personid);
+  for insert with check (true);
 
 create policy "Users can update own person record." on profiles
-  for update using ((select auth.uid()) = personid);
-
--- Create an index on the people table with the pair of the organization ID and user email.
-CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (orgid, personid);
-
-alter table "public"."profiles" add constraint "profiles_pkey" PRIMARY KEY using index "profiles_pkey";
+  for update using (true);
 
 grant delete on table "public"."profiles" to "anon";
 grant insert on table "public"."profiles" to "anon";
@@ -249,14 +253,14 @@ on "public"."profiles"
 as permissive
 for insert
 to public
-with check ((( SELECT auth.uid() AS uid) = personid));
+with check (true);
 
 create policy "Users can update own profile."
 on "public"."profiles"
 as permissive
 for update
 to public
-using ((( SELECT auth.uid() AS uid) = personid));
+with check (true);
 
 -- Enable realtime updates on the profiles table.
 alter
@@ -357,15 +361,13 @@ alter
 create table "public"."assignments" (
     "orgid" uuid not null references orgs(id) on delete cascade,
     "roleid" uuid not null references roles(id) on delete cascade,
-    "personid" uuid not null references people(id) on delete cascade
+    "profileid" uuid not null references profiles(id) on delete cascade
 );
 
 alter table "public"."assignments" enable row level security;
 
-CREATE UNIQUE INDEX assignments_pkey ON public.assignments USING btree (roleid, personid);
+CREATE UNIQUE INDEX assignments_pkey ON public.assignments USING btree (roleid, profileid);
 alter table "public"."assignments" add constraint "assignments_pkey" PRIMARY KEY using index "assignments_pkey";
-
-alter table "public"."assignments" add constraint "public_assignments_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;
 
 grant delete on table "public"."assignments" to "anon";
 grant insert on table "public"."assignments" to "anon";

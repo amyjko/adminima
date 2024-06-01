@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import Notice from '$lib/Notice.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import PersonView from '$lib/PersonView.svelte';
 	import Title from '$lib/Title.svelte';
@@ -8,7 +9,7 @@
 
 	const org = getOrg();
 
-	$: profile = $org.getProfile($page.params.personid);
+	$: profile = $org.getProfile($page.params.profileid);
 </script>
 
 {#if profile === null}

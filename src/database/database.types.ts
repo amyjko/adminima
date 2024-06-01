@@ -37,17 +37,17 @@ export type Database = {
       assignments: {
         Row: {
           orgid: string
-          personid: string
+          profileid: string
           roleid: string
         }
         Insert: {
           orgid: string
-          personid: string
+          profileid: string
           roleid: string
         }
         Update: {
           orgid?: string
-          personid?: string
+          profileid?: string
           roleid?: string
         }
         Relationships: [
@@ -59,10 +59,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "assignments_personid_fkey"
-            columns: ["personid"]
+            foreignKeyName: "assignments_profileid_fkey"
+            columns: ["profileid"]
             isOneToOne: false
-            referencedRelation: "people"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -70,13 +70,6 @@ export type Database = {
             columns: ["roleid"]
             isOneToOne: false
             referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_assignments_orgid_fkey"
-            columns: ["orgid"]
-            isOneToOne: false
-            referencedRelation: "orgs"
             referencedColumns: ["id"]
           },
         ]
@@ -414,25 +407,31 @@ export type Database = {
         Row: {
           admin: boolean
           bio: string | null
+          email: string
+          id: string
           name: string
           orgid: string
-          personid: string
+          personid: string | null
           supervisor: string | null
         }
         Insert: {
           admin: boolean
           bio?: string | null
+          email: string
+          id?: string
           name: string
           orgid: string
-          personid: string
+          personid?: string | null
           supervisor?: string | null
         }
         Update: {
           admin?: boolean
           bio?: string | null
+          email?: string
+          id?: string
           name?: string
           orgid?: string
-          personid?: string
+          personid?: string | null
           supervisor?: string | null
         }
         Relationships: [
@@ -461,7 +460,7 @@ export type Database = {
             foreignKeyName: "profiles_supervisor_fkey"
             columns: ["supervisor"]
             isOneToOne: false
-            referencedRelation: "people"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

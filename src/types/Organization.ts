@@ -15,6 +15,7 @@ export type ProcessID = string;
 export type TeamID = string;
 export type RoleID = string;
 export type PersonID = string;
+export type ProfileID = string;
 export type HowID = string;
 export type ChangeID = string;
 export type CommentID = string;
@@ -58,19 +59,17 @@ export default class Organization {
 		return new Organization({
 			...this.data,
 			// If the profiles contains this person, replace the current record with the new one. Otherwise, add the new record.
-			profiles: this.data.profiles.some((profile) => profile.personid === newProfile.personid)
-				? this.data.profiles.map((profile) =>
-						profile.personid === newProfile.personid ? newProfile : profile
-				  )
+			profiles: this.data.profiles.some((profile) => profile.id === newProfile.id)
+				? this.data.profiles.map((profile) => (profile.id === newProfile.id ? newProfile : profile))
 				: [...this.data.profiles, newProfile]
 		});
 	}
 
 	/** Remove the person from the record */
-	withoutProfile(personID: PersonID) {
+	withoutProfile(profileid: ProfileID) {
 		return new Organization({
 			...this.data,
-			profiles: this.data.profiles.filter((profile) => profile.personid !== personID)
+			profiles: this.data.profiles.filter((profile) => profile.id !== profileid)
 		});
 	}
 
@@ -80,8 +79,13 @@ export default class Organization {
 	}
 
 	/** Return true if the given person ID is an admin in this organization */
-	hasAdmin(personID: PersonID): boolean {
-		return this.getAdmins().some((profile) => profile.personid === personID);
+	hasAdminPerson(personid: PersonID): boolean {
+		return this.getAdmins().some((profile) => profile.personid === personid);
+	}
+
+	/** Return true if the given person ID is an admin in this organization */
+	hasAdminProfile(profileid: ProfileID): boolean {
+		return this.getAdmins().some((profile) => profile.id === profileid);
 	}
 
 	/** Get the organization's description. */
@@ -190,15 +194,20 @@ export default class Organization {
 	}
 
 	/** Find the profile of the given person, or null if no match */
-	getProfile(id: PersonID): ProfileRow | null {
-		return this.data.profiles.find((person) => person.personid === id) ?? null;
+	getProfile(id: ProfileID): ProfileRow | null {
+		return this.data.profiles.find((person) => person.id === id) ?? null;
+	}
+
+	/** Find the profile with the given email **/
+	getProfileWithEmail(email: string): ProfileRow | null {
+		return this.data.profiles.find((person) => person.email === email) ?? null;
 	}
 
 	/** Get the roles that the given person has */
-	getPersonRoles(personid: PersonID): RoleRow[] {
+	getProfileRoles(id: ProfileID): RoleRow[] {
 		// Get the assignments for the person, and convert them into roles.
 		return this.data.assignments
-			.filter((assignment) => assignment.personid === personid)
+			.filter((assignment) => assignment.profileid === id)
 			.map((assignment) => this.data.roles.find((role) => assignment.roleid === role.id))
 			.filter((role): role is RoleRow => role !== undefined);
 	}
@@ -209,7 +218,7 @@ export default class Organization {
 			...this.data,
 			// only add if it's not in the list yet
 			assignments: this.data.assignments.find(
-				(ass) => ass.personid === assignment.personid && ass.roleid === assignment.roleid
+				(ass) => ass.profileid === assignment.profileid && ass.roleid === assignment.roleid
 			)
 				? this.data.assignments
 				: [...this.data.assignments, assignment]
@@ -217,11 +226,11 @@ export default class Organization {
 	}
 
 	/** Create an organization without the given assignment */
-	withoutAssignment(roleid: RoleID, personid: PersonID) {
+	withoutAssignment(roleid: RoleID, profileid: ProfileID) {
 		return new Organization({
 			...this.data,
 			assignments: this.data.assignments.filter(
-				(ass) => !(ass.personid === personid && ass.roleid === roleid)
+				(ass) => !(ass.profileid === profileid && ass.roleid === roleid)
 			)
 		});
 	}
@@ -254,7 +263,7 @@ export default class Organization {
 	getRoleProfiles(role: RoleID): ProfileRow[] {
 		return this.data.assignments
 			.filter((ass) => ass.roleid === role)
-			.map((ass) => this.data.profiles.find((profile) => profile.personid === ass.personid))
+			.map((ass) => this.data.profiles.find((profile) => profile.id === ass.profileid))
 			.filter((profile): profile is ProfileRow => profile !== undefined);
 	}
 

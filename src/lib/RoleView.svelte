@@ -25,7 +25,7 @@
 	const user = getUser();
 	const org = getOrg();
 	$: profiles = $org.getRoleProfiles(role.id);
-	$: isAdmin = $user && $org.hasAdmin($user.id);
+	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 </script>
 
 <Title

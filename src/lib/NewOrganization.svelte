@@ -16,10 +16,15 @@
 	}
 
 	async function create() {
-		if ($user === null) return;
+		if ($user === null || $user.email === undefined) return;
 		submitting = false;
 
-		const { error, id } = await Organizations.createOrganization(orgName, $user.id, name);
+		const { error, id } = await Organizations.createOrganization(
+			orgName,
+			$user.id,
+			$user.email,
+			name
+		);
 
 		if (error) showError(error);
 		else goto(`/organization/${id}`);

@@ -9,6 +9,7 @@
 	import Title from '$lib/Title.svelte';
 	import { getUser } from '$lib/contexts';
 	import { supabase } from '$lib/supabaseClient';
+	import validEmail from '../validEmail';
 
 	let email = '';
 	let code = '';
@@ -37,10 +38,6 @@
 	}
 
 	$: if (browser && $user) goto(`/person/${$user.id}`);
-
-	function validEmail(text: string) {
-		return /.+@.+\..+/.test(text);
-	}
 </script>
 
 <Title title="Login" />
