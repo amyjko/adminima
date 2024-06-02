@@ -32,7 +32,7 @@
 
 <Paragraph
 	>On <TimeView time={timestampToDate(change.when).getTime()} />
-	<PersonLink profile={$org.getProfile(change.who)} /> reported:</Paragraph
+	<PersonLink profile={$org.getProfileWithID(change.who)} /> reported:</Paragraph
 >
 
 <Quote><MarkupView markup={change.description} unset="No description" /></Quote>

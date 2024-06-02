@@ -24,7 +24,7 @@
 			{#each changes.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime()) as change}
 				<tr>
 					<td><Status status={change.status} /></td>
-					<td><PersonLink profile={$org.getProfile(change.who)} /></td>
+					<td><PersonLink profile={$org.getProfileWithID(change.who)} /></td>
 					<td><ChangeLink changeID={change.id} /></td></tr
 				>
 			{/each}

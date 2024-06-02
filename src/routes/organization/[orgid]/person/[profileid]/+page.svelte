@@ -9,7 +9,7 @@
 
 	const org = getOrg();
 
-	$: profile = $org.getProfile($page.params.profileid);
+	$: profile = $org.getProfileWithID($page.params.profileid);
 </script>
 
 {#if profile === null}

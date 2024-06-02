@@ -119,7 +119,7 @@
 							}}
 						/>
 					{:else if profile.supervisor}<PersonLink
-							profile={$organization.getProfile(profile.supervisor)}
+							profile={$organization.getProfileWithID(profile.supervisor)}
 						/>{/if}
 				</td>
 				<td>

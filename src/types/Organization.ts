@@ -194,8 +194,12 @@ export default class Organization {
 	}
 
 	/** Find the profile of the given person, or null if no match */
-	getProfile(id: ProfileID): ProfileRow | null {
+	getProfileWithID(id: ProfileID): ProfileRow | null {
 		return this.data.profiles.find((person) => person.id === id) ?? null;
+	}
+
+	getProfileWithPersonID(id: PersonID): ProfileRow | null {
+		return this.data.profiles.find((person) => person.personid === id) ?? null;
 	}
 
 	/** Find the profile with the given email **/

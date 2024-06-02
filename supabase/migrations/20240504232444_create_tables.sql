@@ -287,14 +287,16 @@ on "public"."orgs"
 as permissive
 for update
 to public
-using (true)
-with check (exists (select from profiles where profiles.admin = true and id = profiles.orgid and profiles.personid = auth.uid()));
+using (true);
+--using (exists (select from profiles where profiles.admin = true and id = profiles.orgid and profiles.personid = auth.uid()))
+--with check (true);
 
 create policy "Only org admins can delete an org."
 on "public"."orgs"
 as permissive
 for delete
-to public using (exists (select from profiles where profiles.admin = true and id = profiles.orgid and profiles.personid = auth.uid()));
+to public 
+using (exists (select from profiles where profiles.admin = true and id = profiles.orgid and profiles.personid = auth.uid()));
 
 
 
