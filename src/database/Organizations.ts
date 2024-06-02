@@ -721,6 +721,22 @@ class Organizations {
 		return null;
 	}
 
+	static async updateProcessConcern(process: ProcessRow, concern: string, who: PersonID) {
+		const { error } = await supabase.from('processes').update({ concern }).eq('id', process.id);
+		if (error) return error;
+
+		Organizations.addComment(
+			process.orgid,
+			who,
+			`Updated concern to ${concern}`,
+			'processes',
+			process.id,
+			process.comments
+		);
+
+		return null;
+	}
+
 	static async updateProcessDescription(process: ProcessRow, description: Markup, who: PersonID) {
 		const markupError = await Organizations.addOrCreateMarkup(
 			process.description,

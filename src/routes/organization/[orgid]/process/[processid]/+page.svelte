@@ -2,7 +2,7 @@
 	import MarkupView from '$lib/MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
 	import TaskView from '$lib/TaskView.svelte';
-	import Organizations, { type ProcessRow } from '$database/Organizations';
+	import Organizations from '$database/Organizations';
 	import Oops from '$lib/Oops.svelte';
 	import ChangeForm from '$lib/ChangeForm.svelte';
 	import Button from '$lib/Button.svelte';
@@ -17,10 +17,12 @@
 	import Status from '$lib/Status.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import { page } from '$app/stores';
-	import el from 'date-fns/locale/el';
 	import Notice from '$lib/Notice.svelte';
-	import { yearsToMonths } from 'date-fns';
 	import Concern from '$lib/Concern.svelte';
+	import EditableText from '$lib/EditableText.svelte';
+	import Choice from '$lib/Choice.svelte';
+	import Form from '$lib/Form.svelte';
+	import Field from '$lib/Field.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -28,6 +30,10 @@
 	const user = getUser();
 	$: process = $org.getProcess($page.params.processid);
 	$: how = process ? $org.getHow(process.id) : undefined;
+
+	$: editable = true;
+
+	let newConcern = '';
 </script>
 
 {#if process === null}
@@ -39,7 +45,6 @@
 		edit={$user ? (text) => Organizations.updateProcessTitle(process, text, $user.id) : undefined}
 	>
 		<Status status={process.status} />
-		<Concern concern={process.concern} />
 	</Title>
 
 	<MarkupView
@@ -49,6 +54,30 @@
 			? (text) => Organizations.updateProcessDescription(process, text, $user.id)
 			: undefined}
 	/>
+
+	<Header>Concern</Header>
+
+	<Paragraph>Choose an area of concern to help group processes.</Paragraph>
+
+	{#if editable && $user}
+		<div>
+			<Choice
+				edit={(text) => Organizations.updateProcessConcern(process, text, $user.id)}
+				choice={process.concern}
+				choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}
+				>{process.concern}</Choice
+			>
+			<Form
+				action={() => {
+					Organizations.updateProcessConcern(process, newConcern, $user.id);
+					newConcern = '';
+				}}
+			>
+				<Field label="new concern" bind:text={newConcern} />
+				<Button submit action={() => {}}>add concern</Button>
+			</Form>
+		</div>
+	{/if}
 
 	<Header>Who</Header>
 

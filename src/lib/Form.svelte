@@ -19,7 +19,7 @@
 <style>
 	.form {
 		background: var(--background);
-		gap: var(--spacing);
+		gap: var(--padding);
 		display: flex;
 		flex-direction: column;
 		align-items: baseline;
@@ -37,5 +37,6 @@
 		flex-direction: row;
 		gap: var(--spacing);
 		justify-items: baseline;
+		align-items: bottom;
 	}
 </style>

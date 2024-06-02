@@ -247,6 +247,12 @@ export default class Organization {
 		return this.data.processes;
 	}
 
+	getConcerns() {
+		return Array.from(
+			new Set(this.data.processes.map((p) => p.concern).filter((p) => p.length > 0))
+		);
+	}
+
 	getHow(process: ProcessID) {
 		return this.data.hows.find((how) => how.processid === process);
 	}

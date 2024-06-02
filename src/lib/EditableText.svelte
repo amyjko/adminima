@@ -36,7 +36,9 @@
 				bind:value={revision}
 				on:keydown={(event) => (event.key === 'Enter' ? save() : undefined)}
 				autofocus
-			/>{:else}<span class="text">{text}</span>{/if}
+			/>{:else}<span class="text"
+				>{#if text.length === 0}&mdash;{:else}{text}{/if}</span
+			>{/if}
 	</form>
 {:else}{text}{/if}
 {#if error}<Error {error} inline={false} />{/if}
