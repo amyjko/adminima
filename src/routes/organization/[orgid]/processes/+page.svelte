@@ -83,8 +83,8 @@
 <Title title="processes" kind={$locale?.term.organization} />
 
 <Paragraph
-	>These are all of the processes in this organization. Select one to see how it works, who's
-	responsible for it, or to suggest a change.
+	>These are all of the processes in this organization and which roles are involved in them. Select
+	one to see how it works, who's responsible for it, or to suggest a change.
 </Paragraph>
 
 <FormDialog
@@ -128,7 +128,8 @@
 	<div class="processes">
 		<table>
 			<thead>
-				<th />{#each roles as role}<th class="role"><RoleLink roleID={role.id} /></th>{/each}
+				<th />{#each roles as role}<th class="role"><RoleLink roleID={role.id} /></th>{:else}<th
+					/>{/each}
 			</thead>
 			<tbody>
 				{#each processes as process}
@@ -147,7 +148,7 @@
 										? 'informed'
 										: ''}
 								/></td
-							>{/each}
+							>{:else}<td><em>no roles</em></td>{/each}
 					</tr>
 				{/each}
 			</tbody>
