@@ -7,6 +7,7 @@
 	import Loading from './Loading.svelte';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
+	import Error from './Error.svelte';
 
 	export let markup: MarkupID | null;
 	/** What to show if the text isn't set */
@@ -20,9 +21,20 @@
 	/** The markup's text */
 	let text: string | undefined = undefined;
 	let input: HTMLTextAreaElement;
+	let error: PostgrestError | null = null;
+
 	$: scrollHeight = text ? input?.scrollHeight ?? height : height;
 
 	$: if (markup) Organizations.getMarkup(markup).then((m) => (text = m));
+
+	async function save() {
+		if (edit) {
+			error = await edit(revisedText ?? '');
+			if (error) return;
+			editing = false;
+			text = revisedText;
+		}
+	}
 </script>
 
 <div class="markup" class:editable={edit !== undefined}>
@@ -30,9 +42,7 @@
 			<Button
 				action={async () => {
 					if (editing) {
-						if (edit) await edit(revisedText ?? '');
-						editing = false;
-						text = revisedText;
+						save();
 					} else {
 						revisedText = text ?? '';
 						editing = true;
@@ -45,11 +55,23 @@
 		</div>
 	{/if}
 	{#if editing}
-		<textarea
-			bind:value={revisedText}
-			bind:this={input}
-			style:height="{editing ? scrollHeight : height}px"
-		/>
+		<div class="text">
+			{#if error}
+				<Error {error} />
+			{/if}
+			<textarea
+				bind:value={revisedText}
+				bind:this={input}
+				on:keydown={(e) => {
+					// Shortcut to submit without using button.
+					if (e.key === 'Enter' && e.metaKey) {
+						e.preventDefault();
+						save();
+					}
+				}}
+				style:height="{editing ? scrollHeight : height}px"
+			/>
+		</div>
 	{:else}
 		<div class="blocks" bind:clientHeight={height}>
 			{#if markup === null}
@@ -70,6 +92,12 @@
 		flex-wrap: nowrap;
 		gap: calc(2 * var(--padding));
 		align-items: stretch;
+	}
+
+	.text {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing);
 	}
 
 	.editable {

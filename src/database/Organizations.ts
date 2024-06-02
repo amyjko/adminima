@@ -272,8 +272,14 @@ class Organizations {
 		text: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		Organizations.addOrCreateMarkup(org.getDescription(), text, 'orgs', org.getID());
-		Organizations.addComment(
+		const markupError = await Organizations.addOrCreateMarkup(
+			org.getDescription(),
+			text,
+			'orgs',
+			org.getID()
+		);
+		if (markupError) return markupError;
+		const commentError = await Organizations.addComment(
 			org.getID(),
 			who,
 			'Updated organization description',
@@ -281,8 +287,7 @@ class Organizations {
 			org.getID(),
 			org.getComments()
 		);
-
-		return null;
+		return commentError;
 	}
 
 	static async updateOrgName(
@@ -528,15 +533,23 @@ class Organizations {
 		comments: CommentID[]
 	) {
 		// Record that we edited it.
-		const { data } = await supabase.from('comments').insert({ orgid, what, who }).select().single();
+		const { data, error: insertError } = await supabase
+			.from('comments')
+			.insert({ orgid, what, who })
+			.select()
+			.single();
+		if (insertError) return insertError;
 
 		const commentID = data?.id ?? null;
 
-		if (commentID)
-			await supabase
+		if (commentID) {
+			const { error: updateError } = await supabase
 				.from(table)
 				.update({ comments: [...comments, commentID] })
 				.eq('id', id);
+			if (updateError) return updateError;
+		}
+		return null;
 	}
 
 	static async deleteRole(id: RoleID): Promise<PostgrestError | null> {

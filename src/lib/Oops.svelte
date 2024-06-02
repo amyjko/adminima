@@ -9,8 +9,10 @@
 
 <style>
 	div {
-		display: inline-block;
+		display: block;
 		background: var(--error);
+		text-transform: none;
+		font-size: var(--normal-size);
 		color: var(--background);
 		padding: var(--padding);
 		border-spacing: var(--radius);
@@ -20,6 +22,7 @@
 
 	.inline {
 		display: inline;
+		margin: 0;
 		padding-inline-start: calc(var(--spacing) / 2);
 		padding-inline-end: calc(var(--spacing) / 2);
 	}
