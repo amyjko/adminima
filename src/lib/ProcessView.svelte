@@ -95,7 +95,7 @@
 			try {
 				const org = process.orgid;
 				await Organizations.deleteProcess(process.id);
-				goto(`/organization/${org}`);
+				goto(`/organization/${org}/processes`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";
 			}
