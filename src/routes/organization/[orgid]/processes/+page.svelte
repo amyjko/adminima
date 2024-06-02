@@ -9,6 +9,10 @@
 	import Subheader from '$lib/Subheader.svelte';
 	import type { ProcessRow, RoleRow } from '$database/Organizations';
 	import type { RoleID } from '$types/Organization';
+	import FormDialog from '$lib/FormDialog.svelte';
+	import Field from '$lib/Field.svelte';
+	import Organizations from '$database/Organizations';
+	import { goto } from '$app/navigation';
 
 	const organization = getOrg();
 
@@ -64,6 +68,14 @@
 			.map((id) => $organization.getRole(id))
 			.filter((r): r is RoleRow => r !== undefined);
 	}
+
+	let title = '';
+	let message: string | undefined = undefined;
+	async function newProcess() {
+		const { error, id } = await Organizations.addProcess($organization.getID(), title);
+		if (error) message = error.message;
+		else goto(`/organization/${$organization.getID()}/process/${id}`);
+	}
 </script>
 
 <Title title="processes" kind={$locale?.term.organization} />
@@ -72,6 +84,18 @@
 	>These are all of the processes in this organization. Select one to see how it works, who's
 	responsible for it, or to suggest a change.
 </Paragraph>
+
+<FormDialog
+	button="Create process …"
+	header="New process"
+	explanation="Let's give the process a name."
+	submit="Create"
+	action={newProcess}
+	valid={() => title.length > 0}
+	error={message}
+>
+	<Field active={true} label="title" bind:text={title} />
+</FormDialog>
 
 {#each Array.from(new Set($organization
 			.getProcesses()

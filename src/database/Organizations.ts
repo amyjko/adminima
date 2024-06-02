@@ -695,6 +695,16 @@ class Organizations {
 		return data ?? [];
 	}
 
+	/** Create a new process, relying on Realtime for refresh */
+	static async addProcess(orgid: OrganizationID, title: string) {
+		const { data, error } = await supabase
+			.from('processes')
+			.insert({ what: title, orgid })
+			.select()
+			.single();
+		return { error, id: data?.id };
+	}
+
 	/** Delete this process, relying on Realtime for refresh. */
 	static async deleteProcess(id: ProcessID) {
 		await supabase.from('processes').delete().eq('id', id);

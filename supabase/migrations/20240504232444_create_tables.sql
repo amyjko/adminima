@@ -490,14 +490,14 @@ alter
 create table "public"."processes" (
     -- A unique ID for this process
     "id" uuid not null default uuid_generate_v1() primary key,
+    -- The organization for which this process is defined
+    "orgid" uuid not null references orgs(id) on delete cascade,
     -- Text representing the process
     "what" text not null default '',
     -- When the process was created
     "when" timestamp with time zone not null default now(),
     -- An optional repeat pattern encoded as text
     "repeat" text default null,
-    -- The organization for which this process is defined
-    "orgid" uuid not null references orgs(id) on delete cascade,
 		-- An emoji representing the theme of the process
 		"icon" text not null default '',
     -- Text representing the status of the process
