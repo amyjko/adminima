@@ -43,9 +43,7 @@
 		title={process.title}
 		kind={$locale?.term.process ?? ''}
 		edit={$user ? (text) => Organizations.updateProcessTitle(process, text, $user.id) : undefined}
-	>
-		<Status status={process.status} />
-	</Title>
+	/>
 
 	<MarkupView
 		markup={process.description}

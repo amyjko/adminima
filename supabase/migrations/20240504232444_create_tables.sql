@@ -502,8 +502,6 @@ create table "public"."processes" (
     "repeat" text default null,
 		-- An emoji representing the theme of the process
 		"icon" text not null default '',
-    -- Text representing the status of the process
-    "status" text not null default '',
     -- Text representing the concern of the process
     "concern" text not null default '',
     -- The how representing the processes steps. Empty by default.

@@ -39,7 +39,7 @@
 		line-height: 1.4;
 
 		--font: 'Rokkitt', sans-serif;
-		--spacing: 1.25rem;
+		--spacing: 0.75rem;
 		--thickness: 3px;
 		--padding: 0.25rem;
 		--radius: 4px;
