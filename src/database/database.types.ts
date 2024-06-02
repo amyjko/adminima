@@ -346,40 +346,50 @@ export type Database = {
         Row: {
           comments: string[]
           concern: string
+          description: string | null
           how: string | null
           icon: string
           id: string
           orgid: string
           repeat: string | null
           status: string
-          what: string
+          title: string
           when: string
         }
         Insert: {
           comments?: string[]
           concern?: string
+          description?: string | null
           how?: string | null
           icon?: string
           id?: string
           orgid: string
           repeat?: string | null
           status?: string
-          what?: string
+          title?: string
           when?: string
         }
         Update: {
           comments?: string[]
           concern?: string
+          description?: string | null
           how?: string | null
           icon?: string
           id?: string
           orgid?: string
           repeat?: string | null
           status?: string
-          what?: string
+          title?: string
           when?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "processes_description_fkey"
+            columns: ["description"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "processes_how_fkey"
             columns: ["how"]

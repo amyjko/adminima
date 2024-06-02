@@ -13,7 +13,7 @@
 	import { locale } from '$types/Locales';
 	import RoleContribution from '$lib/RoleContribution.svelte';
 	import Level from '$lib/Level.svelte';
-	import { getOrg } from '$lib/contexts';
+	import { getOrg, getUser } from '$lib/contexts';
 	import Status from '$lib/Status.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import { page } from '$app/stores';
@@ -21,6 +21,7 @@
 	let deleteError: string | undefined = undefined;
 
 	const org = getOrg();
+	const user = getUser();
 	$: process = $org.getProcess($page.params.processid);
 	$: how = process ? $org.getHow(process.id) : undefined;
 </script>
@@ -28,11 +29,21 @@
 {#if process === null}
 	<Oops text={(locale) => locale.error.noProcess} />
 {:else}
-	<Title title={process.what} kind={$locale?.term.process ?? ''}>
+	<Title
+		title={process.title}
+		kind={$locale?.term.process ?? ''}
+		edit={$user ? (text) => Organizations.updateProcessTitle(process, text, $user.id) : undefined}
+	>
 		<Status status={process.status} />
 	</Title>
 
-	<MarkupView markup={process.what} unset="No description yet." />
+	<MarkupView
+		markup={process.description}
+		unset="No description yet."
+		edit={$user
+			? (text) => Organizations.updateProcessDescription(process, text, $user.id)
+			: undefined}
+	/>
 
 	<Paragraph><em>Area of concern</em>: <strong>{process.concern}</strong></Paragraph>
 

@@ -503,7 +503,7 @@ class Organizations {
 	static async addOrCreateMarkup(
 		markupID: MarkupID | null,
 		text: string,
-		table: 'roles' | 'orgs' | 'profiles' | 'teams',
+		table: 'roles' | 'orgs' | 'profiles' | 'teams' | 'processes',
 		id: string,
 		idName: string = 'id'
 	) {
@@ -528,7 +528,7 @@ class Organizations {
 		orgid: OrganizationID,
 		who: PersonID,
 		what: string,
-		table: 'orgs' | 'roles' | 'teams',
+		table: 'orgs' | 'roles' | 'teams' | 'processes',
 		id: string,
 		comments: CommentID[]
 	) {
@@ -699,10 +699,45 @@ class Organizations {
 	static async addProcess(orgid: OrganizationID, title: string) {
 		const { data, error } = await supabase
 			.from('processes')
-			.insert({ what: title, orgid })
+			.insert({ title, orgid })
 			.select()
 			.single();
 		return { error, id: data?.id };
+	}
+
+	static async updateProcessTitle(process: ProcessRow, title: string, who: PersonID) {
+		const { error } = await supabase.from('processes').update({ title }).eq('id', process.id);
+		if (error) return error;
+
+		Organizations.addComment(
+			process.orgid,
+			who,
+			`Updated process title to ${title}`,
+			'processes',
+			process.id,
+			process.comments
+		);
+
+		return null;
+	}
+
+	static async updateProcessDescription(process: ProcessRow, description: Markup, who: PersonID) {
+		const markupError = await Organizations.addOrCreateMarkup(
+			process.description,
+			description,
+			'processes',
+			process.id
+		);
+		if (markupError) return markupError;
+		const commentError = await Organizations.addComment(
+			process.orgid,
+			who,
+			'Updated process description',
+			'processes',
+			process.id,
+			process.comments
+		);
+		return commentError;
 	}
 
 	/** Delete this process, relying on Realtime for refresh. */

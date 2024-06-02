@@ -14,6 +14,7 @@
 	import Organizations from '$database/Organizations';
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
+	import Oops from '$lib/Oops.svelte';
 
 	const organization = getOrg();
 
@@ -97,6 +98,9 @@
 >
 	<Field active={true} label="title" bind:text={title} />
 </FormDialog>
+{#if message}
+	<Oops text={message} />
+{/if}
 
 {#each Array.from(new Set($organization
 			.getProcesses()

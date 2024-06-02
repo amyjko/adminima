@@ -492,8 +492,10 @@ create table "public"."processes" (
     "id" uuid not null default uuid_generate_v1() primary key,
     -- The organization for which this process is defined
     "orgid" uuid not null references orgs(id) on delete cascade,
+    -- The short title of the process
+    "title" text not null default '',
     -- Text representing the process
-    "what" text not null default '',
+    "description" uuid default null references markup(id) on delete set null,
     -- When the process was created
     "when" timestamp with time zone not null default now(),
     -- An optional repeat pattern encoded as text

@@ -7,7 +7,7 @@
 </script>
 
 <div class="process" style:left="{left}px">
-	<Link bland to="/organization/{process.orgid}/process/{process.id}">{process.what}</Link>
+	<Link bland to="/organization/{process.orgid}/process/{process.id}">{process.title}</Link>
 </div>
 
 <style>
