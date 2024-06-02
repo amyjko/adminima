@@ -16,9 +16,3 @@
 		>Write her</Link
 	> if you're curious.</Paragraph
 >
-
-{#if dev}
-	<Paragraph>
-		See an example organization: <Link to="/organization/ischool">The Information School</Link>
-	</Paragraph>
-{/if}
