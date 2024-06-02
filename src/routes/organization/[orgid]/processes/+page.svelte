@@ -13,6 +13,7 @@
 	import Field from '$lib/Field.svelte';
 	import Organizations from '$database/Organizations';
 	import { goto } from '$app/navigation';
+	import Notice from '$lib/Notice.svelte';
 
 	const organization = getOrg();
 
@@ -148,6 +149,8 @@
 			</tbody>
 		</table>
 	</div>
+{:else}
+	<Notice>This organization has no processes.</Notice>
 {/each}
 
 <style>
