@@ -17,6 +17,10 @@
 	import Status from '$lib/Status.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import { page } from '$app/stores';
+	import el from 'date-fns/locale/el';
+	import Notice from '$lib/Notice.svelte';
+	import { yearsToMonths } from 'date-fns';
+	import Concern from '$lib/Concern.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -35,6 +39,7 @@
 		edit={$user ? (text) => Organizations.updateProcessTitle(process, text, $user.id) : undefined}
 	>
 		<Status status={process.status} />
+		<Concern concern={process.concern} />
 	</Title>
 
 	<MarkupView
@@ -44,8 +49,6 @@
 			? (text) => Organizations.updateProcessDescription(process, text, $user.id)
 			: undefined}
 	/>
-
-	<Paragraph><em>Area of concern</em>: <strong>{process.concern}</strong></Paragraph>
 
 	<Header>Who</Header>
 
@@ -76,26 +79,29 @@
 				outcome: <RoleContribution roles={how.informed} />
 			</Paragraph>
 		{/if}
+	{:else}
+		<Notice>No one is involved in this process yet. Define how to do it.</Notice>
 	{/if}
 
 	<Header>When</Header>
 
-	<!-- {#if process.repeat}
-	{#if process.repeat.type === 'monthly'}
-		This happens on the {process.repeat.date}st day of each month.
-	{:else if process.repeat.type === 'weekly'}
-		This happens every {process.repeat.weekday} of each week.
-	{:else if process.repeat.type === 'annually'}
-		This happens on day {process.repeat.day} of month {process.repeat.month} each year.
+	{#if process.repeat}
+		Haven't built repeation renderer yet.
+		<!-- {#if process.repeat.type === 'monthly'}
+			This happens on the {process.repeat.date}st day of each month.
+		{:else if process.repeat.type === 'weekly'}
+			This happens every {process.repeat.weekday} of each week.
+		{:else if process.repeat.type === 'annually'}
+			This happens on day {process.repeat.day} of month {process.repeat.month} each year.
+		{/if} -->
+	{:else}
+		This process doesn't happen at a particular time.
 	{/if}
-{:else}
-	This process doesn't happen at a particular time.
-{/if} -->
 
 	<Header>How</Header>
 
 	{#if how === undefined}
-		<p>This process doesn't have any tasks listed yet.</p>
+		<Notice>This process doesn't have tasks yet.</Notice>
 	{:else}
 		<TaskView {how} />
 	{/if}
