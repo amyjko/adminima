@@ -423,9 +423,9 @@ create table "public"."hows" (
     -- The organization this belongs to; delete it if the organization is deleted
     "orgid" uuid not null references orgs(id) on delete cascade,
     -- The process this belongs to; delete it if the process is deleted
-    "processid" uuid not null,
+    "processid" uuid not null references processes(id) on delete cascade,
     -- A description of how to do this step
-    "what" uuid default null references markup(id) on delete set null,
+    "what" text not null default '',
     -- Visibility of this step
     "visibility" visibility not null default 'org',
     -- A list of how to do this
