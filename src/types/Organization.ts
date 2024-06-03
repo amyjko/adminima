@@ -253,8 +253,12 @@ export default class Organization {
 		);
 	}
 
-	getHow(process: ProcessID) {
-		return this.data.hows.find((how) => how.processid === process);
+	getHow(id: HowID) {
+		return this.data.hows.find((how) => how.id === id);
+	}
+
+	getHowParent(id: HowID) {
+		return this.data.hows.find((how) => how.how.includes(id));
 	}
 
 	getRoleProcesses(role: RoleID): ProcessRow[] {

@@ -350,7 +350,7 @@ export type Database = {
           comments: string[]
           concern: string
           description: string | null
-          how: string | null
+          howid: string | null
           icon: string
           id: string
           orgid: string
@@ -362,7 +362,7 @@ export type Database = {
           comments?: string[]
           concern?: string
           description?: string | null
-          how?: string | null
+          howid?: string | null
           icon?: string
           id?: string
           orgid: string
@@ -374,7 +374,7 @@ export type Database = {
           comments?: string[]
           concern?: string
           description?: string | null
-          how?: string | null
+          howid?: string | null
           icon?: string
           id?: string
           orgid?: string
@@ -391,8 +391,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "processes_how_fkey"
-            columns: ["how"]
+            foreignKeyName: "processes_howid_fkey"
+            columns: ["howid"]
             isOneToOne: false
             referencedRelation: "hows"
             referencedColumns: ["id"]

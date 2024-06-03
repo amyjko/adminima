@@ -698,12 +698,23 @@ class Organizations {
 
 	/** Create a new process, relying on Realtime for refresh */
 	static async addProcess(orgid: OrganizationID, title: string) {
-		const { data, error } = await supabase
+		const { data: processData, error } = await supabase
 			.from('processes')
 			.insert({ title, orgid })
 			.select()
 			.single();
-		return { error, id: data?.id };
+
+		if (error) return { error, id: null };
+
+		const { data: newHow, error: howError } = await supabase
+			.from('hows')
+			.insert({ orgid, processid: processData.id, what: '' })
+			.select()
+			.single();
+
+		if (howError) return { error: howError, id: null };
+		await supabase.from('processes').update({ howid: newHow.id }).eq('id', processData.id);
+		return { error, id: processData.id };
 	}
 
 	static async updateProcessTitle(process: ProcessRow, title: string, who: PersonID) {
@@ -757,15 +768,12 @@ class Organizations {
 		return commentError;
 	}
 
-	static async setProcessHow(process: ProcessRow) {
-		const { data: how, error: howError } = await supabase
+	static async createHow(process: ProcessRow) {
+		return await supabase
 			.from('hows')
 			.insert({ orgid: process.orgid, processid: process.id, what: '' })
 			.select()
 			.single();
-		if (howError) return howError;
-		const updateError = await supabase.from('processes').update({ how: how.id });
-		return updateError;
 	}
 
 	static async updateHowText(how: HowRow, text: Markup) {
@@ -781,6 +789,29 @@ class Organizations {
 	static async updateHowDone(how: HowRow, completion: Completion) {
 		const { error } = await supabase.from('hows').update({ done: completion }).eq('id', how.id);
 		return error;
+	}
+
+	static async insertHow(process: ProcessRow, how: HowRow, index: number) {
+		const { data: newHow, error: howError } = await Organizations.createHow(process);
+		if (howError) return { error: howError, id: null };
+		const { error } = await supabase
+			.from('hows')
+			.update({ how: [...how.how.slice(0, index), newHow.id, ...how.how.slice(index)] })
+			.eq('id', how.id);
+		return { error, id: newHow.id };
+	}
+
+	static async deleteHow(parent: HowRow, how: HowRow) {
+		// Remove the how from it's parent
+		const { error: parentError } = await supabase
+			.from('hows')
+			.update({ how: parent.how.filter((howid) => howid !== how.id) })
+			.eq('id', how.id);
+		if (parentError) return parentError;
+		// Remove the how
+		const { error: deleteError } = await supabase.from('hows').delete().eq('id', how.id);
+
+		return deleteError;
 	}
 
 	/** Delete this process, relying on Realtime for refresh. */

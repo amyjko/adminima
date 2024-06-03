@@ -515,7 +515,7 @@ create table "public"."processes" (
     -- Text representing the concern of the process
     "concern" text not null default '',
     -- The how representing the processes steps. Empty by default.
-    "how" uuid references hows(id) default null,
+    "howid" uuid references hows(id) default null,
     -- Comments describing changes to the process
     "comments" uuid[] not null default '{}'
 );

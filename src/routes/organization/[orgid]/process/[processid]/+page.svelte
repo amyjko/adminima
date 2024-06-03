@@ -26,7 +26,7 @@
 	const org = getOrg();
 	const user = getUser();
 	$: process = $org.getProcess($page.params.processid);
-	$: how = process ? $org.getHow(process.id) : undefined;
+	$: how = process && process.howid ? $org.getHow(process.howid) : undefined;
 
 	$: editable = true;
 
@@ -101,13 +101,9 @@
 	<Header>How</Header>
 
 	{#if how === undefined}
-		{#if editable}
-			<Button action={() => Organizations.setProcessHow(process)}>Define how…</Button>
-		{:else}
-			<Notice>No one is defined to do this process yet.</Notice>
-		{/if}
+		<Notice>No one is defined to do this process yet.</Notice>
 	{:else}
-		<HowView {how} />
+		<HowView {how} {process} />
 	{/if}
 
 	<Header>Concern</Header>
