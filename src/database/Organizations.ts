@@ -713,7 +713,16 @@ class Organizations {
 			.single();
 
 		if (howError) return { error: howError, id: null };
-		await supabase.from('processes').update({ howid: newHow.id }).eq('id', processData.id);
+
+		const { data: rootHow, error: rootError } = await supabase
+			.from('hows')
+			.insert({ orgid, processid: processData.id, how: [newHow.id], what: '' })
+			.select()
+			.single();
+
+		if (rootError) return { error: rootError, id: null };
+
+		await supabase.from('processes').update({ howid: rootHow.id }).eq('id', processData.id);
 		return { error, id: processData.id };
 	}
 

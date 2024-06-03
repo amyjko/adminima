@@ -45,7 +45,11 @@
 
 	function deleteHow() {
 		const parent = $org.getHowParent(how.id);
-		if (process.howid !== how.id && parent) {
+		if (
+			parent &&
+			process.howid !== how.id &&
+			!(parent.id === process.howid && parent.how[0] === how.id)
+		) {
 			Organizations.deleteHow(parent, how);
 
 			const focusID =
@@ -58,36 +62,38 @@
 </script>
 
 <div class="how">
-	<div class="main">
-		<div
-			role="checkbox"
-			class="complete"
-			aria-checked={how.done === 'no' ? 'false' : how.done === 'pending' ? 'mixed' : 'true'}
-			tabindex="0"
-			on:keydown={(event) =>
-				event.key === 'Enter' || event.key === ' ' ? toggleDone() : undefined}
-			on:pointerdown={toggleDone}
-		>
-			{#if how.done === 'no'}&nbsp;{:else if how.done === 'pending'}…{:else}✔{/if}
+	{#if process.howid !== how.id}
+		<div class="main">
+			<div
+				role="checkbox"
+				class="complete"
+				aria-checked={how.done === 'no' ? 'false' : how.done === 'pending' ? 'mixed' : 'true'}
+				tabindex="0"
+				on:keydown={(event) =>
+					event.key === 'Enter' || event.key === ' ' ? toggleDone() : undefined}
+				on:pointerdown={toggleDone}
+			>
+				{#if how.done === 'no'}&nbsp;{:else if how.done === 'pending'}…{:else}✔{/if}
+			</div>
+			<textarea
+				rows={text.split('\n').length}
+				class:done={how.done === 'yes'}
+				class:pending={how.done === 'pending'}
+				id="how-{how.id}"
+				bind:value={text}
+				bind:this={input}
+				on:blur={save}
+				on:keydown={(e) => {
+					if (e.key === 'Enter' && e.metaKey) {
+						e.preventDefault();
+						insertHow();
+					} else if (e.key === 'Backspace' && text === '') {
+						deleteHow();
+					}
+				}}
+			/>
 		</div>
-		<textarea
-			rows={text.split('\n').length}
-			class:done={how.done === 'yes'}
-			class:pending={how.done === 'pending'}
-			id="how-{how.id}"
-			bind:value={text}
-			bind:this={input}
-			on:blur={save}
-			on:keydown={(e) => {
-				if (e.key === 'Enter' && e.metaKey) {
-					e.preventDefault();
-					insertHow();
-				} else if (e.key === 'Backspace' && text === '') {
-					deleteHow();
-				}
-			}}
-		/>
-	</div>
+	{/if}
 	<div class="meta">
 		<Visibility
 			level={how.visibility}
