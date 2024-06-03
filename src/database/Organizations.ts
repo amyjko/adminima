@@ -30,6 +30,7 @@ export type HowRow = Tables<'hows'>;
 export type ChangeRow = Tables<'changes'>;
 export type CommentRow = Tables<'comments'>;
 export type Visibility = Database['public']['Enums']['visibility'];
+export type Completion = Database['public']['Enums']['completion'];
 export type Status = Database['public']['Enums']['status'];
 
 /** A serializable version of all organization data, used to store raw data from the database. */
@@ -774,6 +775,11 @@ class Organizations {
 
 	static async updateHowVisibility(how: HowRow, vis: Visibility) {
 		const { error } = await supabase.from('hows').update({ visibility: vis }).eq('id', how.id);
+		return error;
+	}
+
+	static async updateHowDone(how: HowRow, completion: Completion) {
+		const { error } = await supabase.from('hows').update({ done: completion }).eq('id', how.id);
 		return error;
 	}
 
