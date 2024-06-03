@@ -23,6 +23,7 @@
 	import Choice from '$lib/Choice.svelte';
 	import Form from '$lib/Form.svelte';
 	import Field from '$lib/Field.svelte';
+	import FormDialog from '$lib/FormDialog.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -52,30 +53,6 @@
 			? (text) => Organizations.updateProcessDescription(process, text, $user.id)
 			: undefined}
 	/>
-
-	<Header>Concern</Header>
-
-	<Paragraph>Choose an area of concern to help group processes.</Paragraph>
-
-	{#if editable && $user}
-		<div>
-			<Choice
-				edit={(text) => Organizations.updateProcessConcern(process, text, $user.id)}
-				choice={process.concern}
-				choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}
-				>{process.concern}</Choice
-			>
-			<Form
-				action={() => {
-					Organizations.updateProcessConcern(process, newConcern, $user.id);
-					newConcern = '';
-				}}
-			>
-				<Field label="new concern" bind:text={newConcern} />
-				<Button submit action={() => {}}>add concern</Button>
-			</Form>
-		</div>
-	{/if}
 
 	<Header>Who</Header>
 
@@ -131,6 +108,32 @@
 		<Notice>This process doesn't have tasks yet.</Notice>
 	{:else}
 		<TaskView {how} />
+	{/if}
+
+	<Header>Concern</Header>
+
+	<Paragraph>Choose an area of concern to help group processes.</Paragraph>
+
+	{#if editable && $user}
+		<Choice
+			edit={(text) => Organizations.updateProcessConcern(process, text, $user.id)}
+			choice={process.concern}
+			choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}>{process.concern}</Choice
+		>
+		<FormDialog
+			submit="Set concern"
+			button="Set concern..."
+			header="Set a new concern"
+			explanation="Set a new concern to group processes."
+			valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
+			error={undefined}
+			action={() => {
+				Organizations.updateProcessConcern(process, newConcern, $user.id);
+				newConcern = '';
+			}}
+		>
+			<Field label="new concern" bind:text={newConcern} />
+		</FormDialog>
 	{/if}
 
 	<ChangeForm process={process.id} />
