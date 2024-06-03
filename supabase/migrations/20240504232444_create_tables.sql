@@ -414,6 +414,14 @@ create policy "Admins can delete" on assignments
   for delete using (true);
 
 
+
+-- Define the states for hows.
+create type completion as enum (
+  'no', -- Anyone in the world can see it
+  'pending', -- Anyone with a role in the organization can see it
+  'yes' -- Only admins can see it
+);
+
 -- Define the hows table and configuration.
 create table "public"."hows" (
     -- A unique ID for how
@@ -423,9 +431,11 @@ create table "public"."hows" (
     -- The organization this belongs to; delete it if the organization is deleted
     "orgid" uuid not null references orgs(id) on delete cascade,
     -- The process this belongs to; delete it if the process is deleted
-    "processid" uuid not null references processes(id) on delete cascade,
+    "processid" uuid not null,
     -- A description of how to do this step
     "what" text not null default '',
+    -- Status of this step
+    "done" completion not null default 'no',
     -- Visibility of this step
     "visibility" visibility not null default 'org',
     -- A list of how to do this
@@ -525,6 +535,9 @@ create policy "Anyone with the role can delete" on processes
   for delete using (true);
 
 alter table "public"."processes" add constraint "public_processes_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;
+
+-- Now that the processes table is defined, create the reference in the hows table.
+alter table "public"."hows" add constraint "public_hows_proceses_fkey" FOREIGN KEY (processid) REFERENCES processes(id) ON DELETE CASCADE not valid;
 
 grant delete on table "public"."processes" to "anon";
 grant insert on table "public"."processes" to "anon";

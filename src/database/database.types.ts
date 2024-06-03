@@ -181,6 +181,7 @@ export type Database = {
         Row: {
           accountable: string | null
           consulted: string[]
+          done: Database["public"]["Enums"]["completion"]
           how: string[]
           id: string
           informed: string[]
@@ -188,12 +189,13 @@ export type Database = {
           processid: string
           responsible: string[]
           visibility: Database["public"]["Enums"]["visibility"]
-          what: string | null
+          what: string
           when: string
         }
         Insert: {
           accountable?: string | null
           consulted?: string[]
+          done?: Database["public"]["Enums"]["completion"]
           how?: string[]
           id?: string
           informed?: string[]
@@ -201,12 +203,13 @@ export type Database = {
           processid: string
           responsible?: string[]
           visibility?: Database["public"]["Enums"]["visibility"]
-          what?: string | null
+          what?: string
           when?: string
         }
         Update: {
           accountable?: string | null
           consulted?: string[]
+          done?: Database["public"]["Enums"]["completion"]
           how?: string[]
           id?: string
           informed?: string[]
@@ -214,7 +217,7 @@ export type Database = {
           processid?: string
           responsible?: string[]
           visibility?: Database["public"]["Enums"]["visibility"]
-          what?: string | null
+          what?: string
           when?: string
         }
         Relationships: [
@@ -233,17 +236,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hows_what_fkey"
-            columns: ["what"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "public_hows_orgid_fkey"
             columns: ["orgid"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_hows_proceses_fkey"
+            columns: ["processid"]
+            isOneToOne: false
+            referencedRelation: "processes"
             referencedColumns: ["id"]
           },
           {
@@ -352,7 +355,6 @@ export type Database = {
           id: string
           orgid: string
           repeat: string | null
-          status: string
           title: string
           when: string
         }
@@ -365,7 +367,6 @@ export type Database = {
           id?: string
           orgid: string
           repeat?: string | null
-          status?: string
           title?: string
           when?: string
         }
@@ -378,7 +379,6 @@ export type Database = {
           id?: string
           orgid?: string
           repeat?: string | null
-          status?: string
           title?: string
           when?: string
         }
@@ -584,6 +584,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      completion: "no" | "pending" | "yes"
       status: "triage" | "backlog" | "active" | "done"
       visibility: "public" | "org" | "admin"
     }

@@ -9,7 +9,10 @@
 	import { tick } from 'svelte';
 	import Error from './Error.svelte';
 
-	export let markup: MarkupID | null;
+	/** The markup's text */
+	export let text: string | undefined = undefined;
+	/** The id to optionally load to set the text */
+	export let markup: MarkupID | null = null;
 	/** What to show if the text isn't set */
 	export let unset: string;
 	/** If given, allows the markup to edited. Returns an error */
@@ -18,14 +21,19 @@
 	let editing = false;
 	let height = 0;
 	let revisedText = '';
-	/** The markup's text */
-	let text: string | undefined = undefined;
 	let input: HTMLTextAreaElement;
 	let error: PostgrestError | null = null;
 
 	$: scrollHeight = text ? input?.scrollHeight ?? height : height;
 
 	$: if (markup) Organizations.getMarkup(markup).then((m) => (text = m));
+
+	async function startEditing() {
+		revisedText = text ?? '';
+		editing = true;
+		await tick();
+		input?.focus();
+	}
 
 	async function save() {
 		if (edit) {
@@ -44,10 +52,7 @@
 					if (editing) {
 						save();
 					} else {
-						revisedText = text ?? '';
-						editing = true;
-						await tick();
-						input?.focus();
+						startEditing();
 					}
 				}}
 				>{#if editing}&checkmark;{:else}✎{/if}</Button
@@ -59,9 +64,11 @@
 			{#if error}
 				<Error {error} />
 			{/if}
+			<!-- svelte-ignore a11y-autofocus -->
 			<textarea
 				bind:value={revisedText}
 				bind:this={input}
+				autofocus
 				on:keydown={(e) => {
 					// Shortcut to submit without using button.
 					if (e.key === 'Enter' && e.metaKey) {
@@ -73,8 +80,8 @@
 			/>
 		</div>
 	{:else}
-		<div class="blocks" bind:clientHeight={height}>
-			{#if markup === null}
+		<div class="blocks" bind:clientHeight={height} on:pointerdown|preventDefault={startEditing}>
+			{#if !text || text.length === 0}
 				<BlocksView blocks={parse(`_${unset}_`).blocks} />
 			{:else if text === undefined}
 				<Loading />
@@ -121,7 +128,7 @@
 		border: none;
 		padding: 0;
 		outline: var(--border) solid var(--thickness);
-		min-height: 5em;
+		min-height: 1em;
 	}
 
 	textarea:focus {

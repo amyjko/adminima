@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PostgrestError } from '@supabase/supabase-js';
-	import { type Visibility as Vis } from '../database/Organizations';
+	import { type Visibility as Vis, type Visibility } from '../database/Organizations';
 	import Choice from './Choice.svelte';
 
 	export let level: Vis;

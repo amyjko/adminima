@@ -756,6 +756,27 @@ class Organizations {
 		return commentError;
 	}
 
+	static async setProcessHow(process: ProcessRow) {
+		const { data: how, error: howError } = await supabase
+			.from('hows')
+			.insert({ orgid: process.orgid, processid: process.id, what: '' })
+			.select()
+			.single();
+		if (howError) return howError;
+		const updateError = await supabase.from('processes').update({ how: how.id });
+		return updateError;
+	}
+
+	static async updateHowText(how: HowRow, text: Markup) {
+		const { error } = await supabase.from('hows').update({ what: text }).eq('id', how.id);
+		return error;
+	}
+
+	static async updateHowVisibility(how: HowRow, vis: Visibility) {
+		const { error } = await supabase.from('hows').update({ visibility: vis }).eq('id', how.id);
+		return error;
+	}
+
 	/** Delete this process, relying on Realtime for refresh. */
 	static async deleteProcess(id: ProcessID) {
 		await supabase.from('processes').delete().eq('id', id);

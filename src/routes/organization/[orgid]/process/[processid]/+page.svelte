@@ -1,7 +1,7 @@
 <script lang="ts">
 	import MarkupView from '$lib/MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
-	import TaskView from '$lib/TaskView.svelte';
+	import HowView from '$lib/HowView.svelte';
 	import Organizations from '$database/Organizations';
 	import Oops from '$lib/Oops.svelte';
 	import ChangeForm from '$lib/ChangeForm.svelte';
@@ -14,14 +14,10 @@
 	import RoleContribution from '$lib/RoleContribution.svelte';
 	import Level from '$lib/Level.svelte';
 	import { getOrg, getUser } from '$lib/contexts';
-	import Status from '$lib/Status.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import { page } from '$app/stores';
 	import Notice from '$lib/Notice.svelte';
-	import Concern from '$lib/Concern.svelte';
-	import EditableText from '$lib/EditableText.svelte';
 	import Choice from '$lib/Choice.svelte';
-	import Form from '$lib/Form.svelte';
 	import Field from '$lib/Field.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 
@@ -58,9 +54,9 @@
 
 	{#if how}
 		<Paragraph>
-			<Level level="accountable" /><strong>ccountable</strong>{#if how?.responsible.length === 0}and <strong
-					>responsible</strong
-				>{/if} for this task's outcomes:
+			<Level level="accountable" /><strong>ccountable</strong>
+			{#if how?.responsible.length === 0}
+				and <strong>responsible</strong>{/if} for this task's outcomes:
 			<RoleContribution roles={how.accountable ? [how.accountable] : []} />
 		</Paragraph>
 		{#if how.responsible.length > 0}
@@ -105,9 +101,13 @@
 	<Header>How</Header>
 
 	{#if how === undefined}
-		<Notice>This process doesn't have tasks yet.</Notice>
+		{#if editable}
+			<Button action={() => Organizations.setProcessHow(process)}>Define how…</Button>
+		{:else}
+			<Notice>No one is defined to do this process yet.</Notice>
+		{/if}
 	{:else}
-		<TaskView {how} />
+		<HowView {how} />
 	{/if}
 
 	<Header>Concern</Header>
