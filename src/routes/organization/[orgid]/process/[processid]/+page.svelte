@@ -115,11 +115,14 @@
 	<Paragraph>Choose an area of concern to help group processes.</Paragraph>
 
 	{#if editable && $user}
-		<Choice
-			edit={(text) => Organizations.updateProcessConcern(process, text, $user.id)}
-			choice={process.concern}
-			choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}>{process.concern}</Choice
-		>
+		{#if process.concern === ''}<em>no concern</em>{:else}
+			<Choice
+				edit={(text) => Organizations.updateProcessConcern(process, text, $user.id)}
+				choice={process.concern}
+				choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}
+				>{process.concern}</Choice
+			>
+		{/if}
 		<FormDialog
 			submit="Set concern"
 			button="Set concern..."
