@@ -110,6 +110,7 @@
 				{/if}
 			{/each}
 		</ol>
+		<Button action={() => Organizations.insertHow(process, how, how.how.length)}>+</Button>
 	{/if}
 
 	<Header>Concern</Header>
