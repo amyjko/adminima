@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { HowRow, ProcessRow } from '$database/Organizations';
 	import Organizations from '$database/Organizations';
+	import { tick } from 'svelte';
 	import RoleLink from './RoleLink.svelte';
 	import Visibility from './Visibility.svelte';
 	import { getOrg } from './contexts';
@@ -12,16 +13,19 @@
 
 	let text = how.what;
 
+	// When the org changes, and there's a focus ID to focus on, focus on it.
 	let focusID: string | undefined = undefined;
 	$: {
 		$org;
-		if (focusID) {
-			const element = document.getElementById(`how-${focusID}`);
-			if (element) {
-				document.getElementById(`how-${focusID}`)?.focus();
-				focusID = undefined;
+		tick().then(() => {
+			if (focusID) {
+				const element = document.getElementById(`how-${focusID}`);
+				if (element) {
+					element.focus();
+					focusID = undefined;
+				}
 			}
-		}
+		});
 	}
 
 	function save() {
@@ -38,35 +42,63 @@
 	async function insertHow() {
 		// See if this how has a parent, and if so, insert after this how.
 		const parent = $org.getHowParent(how.id);
-		let howID: string | undefined = undefined;
 		if (parent) {
 			const { id } = await Organizations.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
 			if (id) {
-				howID = id;
+				focusID = id;
 			}
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
 			const { id } = await Organizations.insertHow(process, how, 0);
-			if (id) howID = id;
+			if (id) focusID = id;
 		}
-
-		focusID = howID;
 	}
 
-	function deleteHow() {
+	async function deleteHow() {
 		const parent = $org.getHowParent(how.id);
 		if (
 			parent &&
 			process.howid !== how.id &&
 			!(parent.id === process.howid && parent.how[0] === how.id)
 		) {
-			Organizations.deleteHow(parent, how);
+			await Organizations.deleteHow(parent, how);
 
 			focusID =
 				parent.how.length === 1 || parent.how[0] === how.id
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
+		}
+	}
+
+	async function indentHow() {
+		const parent = $org.getHowParent(how.id);
+		if (parent) {
+			const index = parent.how.indexOf(how.id);
+			if (index > 0) {
+				const previousID = parent.how[index - 1];
+				const previousHow = $org.getHow(previousID);
+				if (previousHow) {
+					await Organizations.moveHow(how, parent, previousHow, previousHow.how.length);
+					focusID = how.id;
+				}
+			}
+		}
+	}
+
+	async function unindentHow() {
+		const parent = $org.getHowParent(how.id);
+		if (parent) {
+			const grandparent = $org.getHowParent(parent.id);
+			if (grandparent) {
+				await Organizations.moveHow(
+					how,
+					parent,
+					grandparent,
+					grandparent.how.indexOf(parent.id) + 1
+				);
+				focusID = how.id;
+			}
 		}
 	}
 </script>
@@ -97,7 +129,14 @@
 						e.preventDefault();
 						insertHow();
 					} else if (e.key === 'Backspace' && text === '') {
+						e.preventDefault();
 						deleteHow();
+					} else if (e.key === 'ArrowRight' && e.metaKey) {
+						e.preventDefault();
+						indentHow();
+					} else if (e.key === 'ArrowLeft' && e.metaKey) {
+						e.preventDefault();
+						unindentHow();
 					}
 				}}
 			/>

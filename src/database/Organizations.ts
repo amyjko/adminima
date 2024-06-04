@@ -791,6 +791,21 @@ class Organizations {
 		return { error, id: newHow.id };
 	}
 
+	static async moveHow(how: HowRow, oldParent: HowRow, newParent: HowRow, index: number) {
+		// Remove from the current parent
+		const { error: oldError } = await supabase
+			.from('hows')
+			.update({ how: oldParent.how.filter((h) => h !== how.id) })
+			.eq('id', oldParent.id);
+		if (oldError) return oldError;
+		// Insert in the new parent
+		const { error: newError } = await supabase
+			.from('hows')
+			.update({ how: [...newParent.how.slice(0, index), how.id, ...newParent.how.slice(index)] })
+			.eq('id', newParent.id);
+		return newError;
+	}
+
 	static async deleteHow(parent: HowRow, how: HowRow) {
 		// Remove the how from it's parent
 		const { error: parentError } = await supabase
