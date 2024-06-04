@@ -5,12 +5,14 @@
 	import RoleLink from './RoleLink.svelte';
 	import Visibility from './Visibility.svelte';
 	import { getOrg } from './contexts';
+	import type { HowID } from '$types/Organization';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
 
 	const org = getOrg();
 
+	let input: HTMLTextAreaElement;
 	let text = how.what;
 
 	// When the org changes, and there's a focus ID to focus on, focus on it.
@@ -101,6 +103,30 @@
 			}
 		}
 	}
+
+	function enumerate(how: HowRow, list: HowID[] = []) {
+		list.push(how.id);
+		for (const subhow of how.how
+			.map((id) => $org.getHow(id))
+			.filter((h): h is HowRow => h !== undefined)) {
+			enumerate(subhow, list);
+		}
+		return list;
+	}
+
+	function moveVertically(dir: -1 | 1) {
+		if (process.howid) {
+			const root = $org.getHow(process.howid);
+			if (root) {
+				const list = enumerate(root);
+				const index = list.indexOf(how.id);
+				if (index >= 0 && index + dir < list.length) {
+					const next = list[index + dir];
+					document.getElementById(`how-${next}`)?.focus();
+				}
+			}
+		}
+	}
 </script>
 
 <div class="how">
@@ -123,6 +149,7 @@
 				class:pending={how.done === 'pending'}
 				id="how-{how.id}"
 				bind:value={text}
+				bind:this={input}
 				on:blur={save}
 				on:keydown={(e) => {
 					if (e.key === 'Enter' && e.metaKey) {
@@ -137,6 +164,16 @@
 					} else if (e.key === 'ArrowLeft' && e.metaKey) {
 						e.preventDefault();
 						unindentHow();
+					} else if (e.key === 'ArrowDown') {
+						if (input && input.selectionEnd === text.length) {
+							e.preventDefault();
+							moveVertically(1);
+						}
+					} else if (e.key === 'ArrowUp') {
+						if (input && input.selectionEnd === 0) {
+							e.preventDefault();
+							moveVertically(-1);
+						}
 					}
 				}}
 			/>
