@@ -6,6 +6,7 @@
 	import Visibility from './Visibility.svelte';
 	import { getOrg } from './contexts';
 	import type { HowID } from '$types/Organization';
+	import Button from './Button.svelte';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
@@ -62,7 +63,7 @@
 		if (
 			parent &&
 			process.howid !== how.id &&
-			!(parent.id === process.howid && parent.how[0] === how.id)
+			!(parent.id === process.howid && parent.how.length === 1)
 		) {
 			await Organizations.deleteHow(parent, how);
 
@@ -73,34 +74,45 @@
 		}
 	}
 
-	async function indentHow() {
+	function getIndent() {
 		const parent = $org.getHowParent(how.id);
 		if (parent) {
 			const index = parent.how.indexOf(how.id);
 			if (index > 0) {
 				const previousID = parent.how[index - 1];
 				const previousHow = $org.getHow(previousID);
-				if (previousHow) {
-					await Organizations.moveHow(how, parent, previousHow, previousHow.how.length);
-					focusID = how.id;
-				}
+				if (previousHow) return [parent, previousHow];
 			}
+		}
+		return undefined;
+	}
+
+	async function indentHow() {
+		const result = getIndent();
+		if (result) {
+			const [parent, previousHow] = result;
+			await Organizations.moveHow(how, parent, previousHow, previousHow.how.length);
+			focusID = how.id;
 		}
 	}
 
-	async function unindentHow() {
+	function getUnindent() {
 		const parent = $org.getHowParent(how.id);
 		if (parent) {
 			const grandparent = $org.getHowParent(parent.id);
 			if (grandparent) {
-				await Organizations.moveHow(
-					how,
-					parent,
-					grandparent,
-					grandparent.how.indexOf(parent.id) + 1
-				);
-				focusID = how.id;
+				return [parent, grandparent];
 			}
+		}
+		return undefined;
+	}
+
+	async function unindentHow() {
+		const result = getUnindent();
+		if (result) {
+			const [parent, grandparent] = result;
+			await Organizations.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1);
+			focusID = how.id;
 		}
 	}
 
@@ -189,6 +201,10 @@
 					? Organizations.updateHowVisibility(how, vis)
 					: undefined}
 		/>
+		<Button action={unindentHow} active={getUnindent() !== undefined}>&lt;</Button>
+		<Button action={indentHow} active={getIndent() !== undefined}>&gt;</Button>
+		<Button action={insertHow}>+</Button>
+		<Button action={deleteHow}>−</Button>
 		<span>
 			{#if how.accountable}<RoleLink roleID={how.accountable} />{/if}</span
 		>

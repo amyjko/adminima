@@ -36,6 +36,8 @@
 		border: none;
 		cursor: pointer;
 		white-space: nowrap;
+		line-height: 1.25;
+		vertical-align: baseline;
 	}
 
 	.end {
