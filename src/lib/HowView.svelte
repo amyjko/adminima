@@ -165,12 +165,14 @@
 						e.preventDefault();
 						unindentHow();
 					} else if (e.key === 'ArrowDown') {
-						if (input && input.selectionEnd === text.length) {
+						const lines = text.split('\n');
+						if (input && input.selectionEnd >= text.length - lines[lines.length - 1].length) {
 							e.preventDefault();
 							moveVertically(1);
 						}
 					} else if (e.key === 'ArrowUp') {
-						if (input && input.selectionEnd === 0) {
+						const lines = text.split('\n');
+						if (input && input.selectionEnd <= lines[0].length) {
 							e.preventDefault();
 							moveVertically(-1);
 						}
