@@ -12,6 +12,18 @@
 
 	let text = how.what;
 
+	let focusID: string | undefined = undefined;
+	$: {
+		$org;
+		if (focusID) {
+			const element = document.getElementById(`how-${focusID}`);
+			if (element) {
+				document.getElementById(`how-${focusID}`)?.focus();
+				focusID = undefined;
+			}
+		}
+	}
+
 	function save() {
 		Organizations.updateHowText(how, text);
 	}
@@ -39,7 +51,7 @@
 			if (id) howID = id;
 		}
 
-		if (howID) document.getElementById(`how-${howID}`)?.focus();
+		focusID = howID;
 	}
 
 	function deleteHow() {
@@ -51,11 +63,10 @@
 		) {
 			Organizations.deleteHow(parent, how);
 
-			const focusID =
+			focusID =
 				parent.how.length === 1 || parent.how[0] === how.id
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
-			document.getElementById(`how-${focusID}`)?.focus();
 		}
 	}
 </script>
