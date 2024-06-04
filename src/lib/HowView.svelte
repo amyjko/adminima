@@ -87,12 +87,12 @@
 		return undefined;
 	}
 
-	async function indentHow() {
+	async function indentHow(focus: boolean) {
 		const result = getIndent();
 		if (result) {
 			const [parent, previousHow] = result;
 			await Organizations.moveHow(how, parent, previousHow, previousHow.how.length);
-			focusID = how.id;
+			if (focus) focusID = how.id;
 		}
 	}
 
@@ -107,12 +107,12 @@
 		return undefined;
 	}
 
-	async function unindentHow() {
+	async function unindentHow(focus: boolean) {
 		const result = getUnindent();
 		if (result) {
 			const [parent, grandparent] = result;
 			await Organizations.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1);
-			focusID = how.id;
+			if (focus) focusID = how.id;
 		}
 	}
 
@@ -172,10 +172,10 @@
 						deleteHow();
 					} else if (e.key === 'ArrowRight' && e.metaKey) {
 						e.preventDefault();
-						indentHow();
+						indentHow(true);
 					} else if (e.key === 'ArrowLeft' && e.metaKey) {
 						e.preventDefault();
-						unindentHow();
+						unindentHow(true);
 					} else if (e.key === 'ArrowDown') {
 						const lines = text.split('\n');
 						if (input && input.selectionEnd >= text.length - lines[lines.length - 1].length) {
@@ -201,8 +201,8 @@
 					? Organizations.updateHowVisibility(how, vis)
 					: undefined}
 		/>
-		<Button action={unindentHow} active={getUnindent() !== undefined}>&lt;</Button>
-		<Button action={indentHow} active={getIndent() !== undefined}>&gt;</Button>
+		<Button action={() => unindentHow(false)} active={getUnindent() !== undefined}>&lt;</Button>
+		<Button action={() => indentHow(false)} active={getIndent() !== undefined}>&gt;</Button>
 		<Button action={insertHow}>+</Button>
 		<Button action={deleteHow}>−</Button>
 		<span>
