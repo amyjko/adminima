@@ -42,13 +42,13 @@
 		edit={$user ? (text) => Organizations.updateProcessTitle(process, text, $user.id) : undefined}
 	/>
 
-	<MarkupView
-		markup={process.description}
-		unset="No description yet."
-		edit={$user
-			? (text) => Organizations.updateProcessDescription(process, text, $user.id)
-			: undefined}
-	/>
+	{#if how}
+		<MarkupView
+			text={how.what}
+			unset="No description yet."
+			edit={$user ? (text) => Organizations.updateHowText(how, text) : undefined}
+		/>
+	{/if}
 
 	<Header>Who</Header>
 
@@ -103,7 +103,13 @@
 	{#if how === undefined}
 		<Notice>No one is defined to do this process yet.</Notice>
 	{:else}
-		<HowView {how} {process} />
+		<ol>
+			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
+				{#if subHow}
+					<li><HowView how={subHow} {process} /></li>
+				{/if}
+			{/each}
+		</ol>
 	{/if}
 
 	<Header>Concern</Header>

@@ -349,7 +349,6 @@ export type Database = {
         Row: {
           comments: string[]
           concern: string
-          description: string | null
           howid: string | null
           icon: string
           id: string
@@ -361,7 +360,6 @@ export type Database = {
         Insert: {
           comments?: string[]
           concern?: string
-          description?: string | null
           howid?: string | null
           icon?: string
           id?: string
@@ -373,7 +371,6 @@ export type Database = {
         Update: {
           comments?: string[]
           concern?: string
-          description?: string | null
           howid?: string | null
           icon?: string
           id?: string
@@ -383,13 +380,6 @@ export type Database = {
           when?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "processes_description_fkey"
-            columns: ["description"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "processes_howid_fkey"
             columns: ["howid"]

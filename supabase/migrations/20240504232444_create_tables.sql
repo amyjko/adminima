@@ -504,8 +504,6 @@ create table "public"."processes" (
     "orgid" uuid not null references orgs(id) on delete cascade,
     -- The short title of the process
     "title" text not null default '',
-    -- Text representing the process
-    "description" uuid default null references markup(id) on delete set null,
     -- When the process was created
     "when" timestamp with time zone not null default now(),
     -- An optional repeat pattern encoded as text

@@ -10,7 +10,6 @@
 
 	const org = getOrg();
 
-	let input: HTMLTextAreaElement;
 	let text = how.what;
 
 	function save() {
@@ -81,7 +80,6 @@
 				class:pending={how.done === 'pending'}
 				id="how-{how.id}"
 				bind:value={text}
-				bind:this={input}
 				on:blur={save}
 				on:keydown={(e) => {
 					if (e.key === 'Enter' && e.metaKey) {

@@ -758,25 +758,6 @@ class Organizations {
 		return null;
 	}
 
-	static async updateProcessDescription(process: ProcessRow, description: Markup, who: PersonID) {
-		const markupError = await Organizations.addOrCreateMarkup(
-			process.description,
-			description,
-			'processes',
-			process.id
-		);
-		if (markupError) return markupError;
-		const commentError = await Organizations.addComment(
-			process.orgid,
-			who,
-			'Updated process description',
-			'processes',
-			process.id,
-			process.comments
-		);
-		return commentError;
-	}
-
 	static async createHow(process: ProcessRow) {
 		return await supabase
 			.from('hows')
