@@ -1,35 +1,24 @@
 <script lang="ts">
 	import type { HowRow, ProcessRow } from '$database/Organizations';
 	import Organizations from '$database/Organizations';
-	import { tick } from 'svelte';
+	import { getContext, tick } from 'svelte';
 	import RoleLink from './RoleLink.svelte';
 	import Visibility from './Visibility.svelte';
 	import { getOrg } from './contexts';
 	import type { HowID } from '$types/Organization';
 	import Button from './Button.svelte';
+	import type { Writable } from 'svelte/store';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
 
 	const org = getOrg();
+	const focusID = getContext<Writable<string | undefined>>('focusID');
 
 	let input: HTMLTextAreaElement;
 	let text = how.what;
-
-	// When the org changes, and there's a focus ID to focus on, focus on it.
-	let focusID: string | undefined = undefined;
-	$: {
-		$org;
-		tick().then(() => {
-			if (focusID) {
-				const element = document.getElementById(`how-${focusID}`);
-				if (element) {
-					element.focus();
-					focusID = undefined;
-				}
-			}
-		});
-	}
+	// Helps us keep track of whether to give this an HTML ID for purposes of focusing.
+	let deleted = false;
 
 	function save() {
 		Organizations.updateHowText(how, text);
@@ -48,13 +37,13 @@
 		if (parent) {
 			const { id } = await Organizations.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
 			if (id) {
-				focusID = id;
+				focusID.set(id);
 			}
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
 			const { id } = await Organizations.insertHow(process, how, 0);
-			if (id) focusID = id;
+			if (id) focusID.set(id);
 		}
 	}
 
@@ -65,12 +54,14 @@
 			process.howid !== how.id &&
 			!(parent.id === process.howid && parent.how.length === 1)
 		) {
-			await Organizations.deleteHow(parent, how);
-
-			focusID =
+			const newFocusID =
 				parent.how.length === 1 || parent.how[0] === how.id
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
+
+			await Organizations.deleteHow(parent, how);
+
+			focusID.set(newFocusID);
 		}
 	}
 
@@ -91,8 +82,10 @@
 		const result = getIndent();
 		if (result) {
 			const [parent, previousHow] = result;
+			deleted = true;
 			await Organizations.moveHow(how, parent, previousHow, previousHow.how.length);
-			if (focus) focusID = how.id;
+			await tick();
+			if (focus) focusID.set(how.id);
 		}
 	}
 
@@ -111,8 +104,10 @@
 		const result = getUnindent();
 		if (result) {
 			const [parent, grandparent] = result;
+			deleted = true;
 			await Organizations.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1);
-			if (focus) focusID = how.id;
+			await tick();
+			if (focus) focusID.set(how.id);
 		}
 	}
 
@@ -159,7 +154,7 @@
 				rows={text.split('\n').length}
 				class:done={how.done === 'yes'}
 				class:pending={how.done === 'pending'}
-				id="how-{how.id}"
+				id={deleted ? '' : `how-${how.id}`}
 				bind:value={text}
 				bind:this={input}
 				on:blur={save}

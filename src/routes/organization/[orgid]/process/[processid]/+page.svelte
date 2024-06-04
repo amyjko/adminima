@@ -20,6 +20,9 @@
 	import Choice from '$lib/Choice.svelte';
 	import Field from '$lib/Field.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
+	import { setContext, tick } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
+	import { browser } from '$app/environment';
 
 	let deleteError: string | undefined = undefined;
 
@@ -31,6 +34,20 @@
 	$: editable = true;
 
 	let newConcern = '';
+
+	const focusID = writable<string | undefined>(undefined);
+	setContext<Writable<string | undefined>>('focusID', focusID);
+
+	// When the org changes, and there's a focus ID to focus on, focus on it.
+	$: if ($org && browser && $focusID) {
+		tick().then(() => {
+			const element = document.getElementById(`how-${$focusID}`);
+			if (element) {
+				element.focus();
+				focusID.set(undefined);
+			}
+		});
+	}
 </script>
 
 {#if process === null}
