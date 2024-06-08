@@ -1,6 +1,6 @@
 <!-- Represents ARCH for a processes's how to -->
 <script lang="ts">
-	import type { HowRow } from '$database/Organizations';
+	import type { HowRow, ProcessRow } from '$database/Organizations';
 	import Organizations from '$database/Organizations';
 	import Button from './Button.svelte';
 	import Level from './Level.svelte';
@@ -9,6 +9,7 @@
 	import { getOrg } from './contexts';
 
 	export let how: HowRow;
+	export let process: ProcessRow;
 
 	const org = getOrg();
 
@@ -16,7 +17,13 @@
 		{ value: undefined, label: '▼' },
 		...$org
 			.getRoles()
-			.filter((r) => !how.responsible.includes(r.id))
+			.filter(
+				(r) =>
+					!how.responsible.includes(r.id) &&
+					!how.consulted.includes(r.id) &&
+					!how.informed.includes(r.id) &&
+					r.id !== process.accountable
+			)
 			.map((role) => {
 				return { value: role.id, label: role.title };
 			})

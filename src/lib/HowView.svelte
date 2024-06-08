@@ -203,7 +203,7 @@
 		/>
 		<Button action={() => unindentHow(false)} active={getUnindent() !== undefined}>&lt;</Button>
 		<Button action={() => indentHow(false)} active={getIndent() !== undefined}>&gt;</Button>
-		<ARCI {how} />
+		<ARCI {how} {process} />
 		<Button action={insertHow}>+</Button>
 		<Button action={deleteHow} active={canDelete()}>×</Button>
 	</div>
