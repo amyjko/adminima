@@ -8,7 +8,6 @@
 	.level {
 		display: inline-block;
 		font-weight: bold;
-		font-size: 200%;
 	}
 	.accountable {
 		color: var(--error);

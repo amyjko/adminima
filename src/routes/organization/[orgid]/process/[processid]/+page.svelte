@@ -23,6 +23,7 @@
 	import { setContext, tick } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { browser } from '$app/environment';
+	import Select from '$lib/Select.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -69,13 +70,20 @@
 
 	<Header>Who</Header>
 
-	{#if how}
-		<Paragraph>
-			<Level level="accountable" /><strong>ccountable</strong>
-			{#if how?.responsible.length === 0}
-				and <strong>responsible</strong>{/if} for this task's outcomes:
-			<RoleContribution roles={how.accountable ? [how.accountable] : []} />
-		</Paragraph>
+	<Paragraph>
+		<Select
+			options={[
+				{ value: undefined, label: '—' },
+				...$org.getRoles().map((role) => {
+					return { value: role.id, label: role.title };
+				})
+			]}
+			selection={process.accountable ?? undefined}
+			change={(value) => Organizations.updateProcessAccountable(process, value ?? null)}
+		/> is <Level level="accountable" /><strong>ccountable</strong> for this processes outcomes.
+	</Paragraph>
+
+	<!-- {#if how}
 		{#if how.responsible.length > 0}
 			<Paragraph>
 				<Level level="responsible" /><strong>esponsible</strong> for completing this process: <RoleContribution
@@ -98,7 +106,7 @@
 		{/if}
 	{:else}
 		<Notice>No one is involved in this process yet. Define how to do it.</Notice>
-	{/if}
+	{/if} -->
 
 	<Header>When</Header>
 

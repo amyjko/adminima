@@ -781,6 +781,46 @@ class Organizations {
 		return error;
 	}
 
+	static async updateProcessAccountable(process: ProcessRow, role: RoleID | null) {
+		const { error } = await supabase
+			.from('processes')
+			.update({ accountable: role })
+			.eq('id', process.id);
+		return error;
+	}
+
+	static async addHowRCI(how: HowRow, role: RoleID, rci: 'responsible' | 'consulted' | 'informed') {
+		const { error } = await supabase
+			.from('hows')
+			.update(
+				rci === 'responsible'
+					? { responsible: [...how.responsible, role] }
+					: rci === 'consulted'
+					? { consulted: [...how.consulted, role] }
+					: { informed: [...how.informed, role] }
+			)
+			.eq('id', how.id);
+		return error;
+	}
+
+	static async removeHowRCI(
+		how: HowRow,
+		role: RoleID,
+		rci: 'responsible' | 'consulted' | 'informed'
+	) {
+		const { error } = await supabase
+			.from('hows')
+			.update(
+				rci === 'responsible'
+					? { responsible: how.responsible.filter((r) => r !== role) }
+					: rci === 'consulted'
+					? { consulted: how.consulted.filter((c) => c !== role) }
+					: { informed: how.informed.filter((i) => i !== role) }
+			)
+			.eq('id', how.id);
+		return error;
+	}
+
 	static async insertHow(process: ProcessRow, how: HowRow, index: number) {
 		const { data: newHow, error: howError } = await Organizations.createHow(process);
 		if (howError) return { error: howError, id: null };

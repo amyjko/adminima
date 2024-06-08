@@ -2,12 +2,12 @@
 	import type { HowRow, ProcessRow } from '$database/Organizations';
 	import Organizations from '$database/Organizations';
 	import { getContext, tick } from 'svelte';
-	import RoleLink from './RoleLink.svelte';
 	import Visibility from './Visibility.svelte';
 	import { getOrg } from './contexts';
 	import type { HowID } from '$types/Organization';
 	import Button from './Button.svelte';
 	import type { Writable } from 'svelte/store';
+	import ARCI from './ARCI.svelte';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
@@ -47,13 +47,18 @@
 		}
 	}
 
-	async function deleteHow() {
+	function canDelete() {
 		const parent = $org.getHowParent(how.id);
-		if (
+		return (
 			parent &&
 			process.howid !== how.id &&
 			!(parent.id === process.howid && parent.how.length === 1)
-		) {
+		);
+	}
+
+	async function deleteHow() {
+		const parent = $org.getHowParent(how.id);
+		if (parent && canDelete()) {
 			const newFocusID =
 				parent.how.length === 1 || parent.how[0] === how.id
 					? parent.id
@@ -198,11 +203,9 @@
 		/>
 		<Button action={() => unindentHow(false)} active={getUnindent() !== undefined}>&lt;</Button>
 		<Button action={() => indentHow(false)} active={getIndent() !== undefined}>&gt;</Button>
+		<ARCI {how} />
 		<Button action={insertHow}>+</Button>
-		<Button action={deleteHow}>−</Button>
-		<span>
-			{#if how.accountable}<RoleLink roleID={how.accountable} />{/if}</span
-		>
+		<Button action={deleteHow} active={canDelete()}>×</Button>
 	</div>
 	<ol>
 		{#each how.how

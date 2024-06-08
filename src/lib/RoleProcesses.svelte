@@ -17,7 +17,7 @@
 
 <Subheader>Accountable</Subheader>
 <Flow>
-	{#each hows.filter((how) => role.id === how.accountable) as process}
+	{#each processes.filter((process) => role.id === process.accountable) as process}
 		<ProcessLink processID={process.id} />
 	{:else}
 		Not accountable for any process outcomes.

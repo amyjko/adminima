@@ -179,7 +179,6 @@ export type Database = {
       }
       hows: {
         Row: {
-          accountable: string | null
           consulted: string[]
           done: Database["public"]["Enums"]["completion"]
           how: string[]
@@ -193,7 +192,6 @@ export type Database = {
           when: string
         }
         Insert: {
-          accountable?: string | null
           consulted?: string[]
           done?: Database["public"]["Enums"]["completion"]
           how?: string[]
@@ -207,7 +205,6 @@ export type Database = {
           when?: string
         }
         Update: {
-          accountable?: string | null
           consulted?: string[]
           done?: Database["public"]["Enums"]["completion"]
           how?: string[]
@@ -221,13 +218,6 @@ export type Database = {
           when?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "hows_accountable_fkey"
-            columns: ["accountable"]
-            isOneToOne: false
-            referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "hows_orgid_fkey"
             columns: ["orgid"]
@@ -347,6 +337,7 @@ export type Database = {
       }
       processes: {
         Row: {
+          accountable: string | null
           comments: string[]
           concern: string
           howid: string | null
@@ -358,6 +349,7 @@ export type Database = {
           when: string
         }
         Insert: {
+          accountable?: string | null
           comments?: string[]
           concern?: string
           howid?: string | null
@@ -369,6 +361,7 @@ export type Database = {
           when?: string
         }
         Update: {
+          accountable?: string | null
           comments?: string[]
           concern?: string
           howid?: string | null
@@ -380,6 +373,13 @@ export type Database = {
           when?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "processes_accountable_fkey"
+            columns: ["accountable"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "processes_howid_fkey"
             columns: ["howid"]

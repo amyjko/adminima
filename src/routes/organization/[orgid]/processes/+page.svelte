@@ -24,10 +24,12 @@
 		for (const process of processes) {
 			const how = $organization.getHow(process.id);
 			if (how) {
-				if (how.accountable && !roles.has(how.accountable)) {
-					roles.set(how.accountable, { a: 0, r: 0, c: 0, i: 0 });
+				if (process.accountable && !roles.has(process.accountable)) {
+					roles.set(process.accountable, { a: 0, r: 0, c: 0, i: 0 });
 				}
-				let tally = how.accountable ? roles.get(how.accountable) : { a: 0, r: 0, c: 0, i: 0 };
+				let tally = process.accountable
+					? roles.get(process.accountable)
+					: { a: 0, r: 0, c: 0, i: 0 };
 				if (tally) tally.a++;
 
 				for (const role of how.responsible) {
@@ -138,7 +140,7 @@
 						<td><ProcessLink processID={process.id} /></td>
 						{#each roles as role}<td class="level"
 								><Level
-									level={how?.accountable === role.id
+									level={process?.accountable === role.id
 										? 'accountable'
 										: how?.responsible.includes(role.id)
 										? 'responsible'

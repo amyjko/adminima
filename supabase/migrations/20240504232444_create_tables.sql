@@ -440,8 +440,6 @@ create table "public"."hows" (
     "visibility" visibility not null default 'org',
     -- A list of how to do this
     "how" uuid[] not null default '{}',
-    -- Role accountable for this step
-    "accountable" uuid default null references roles(id) on delete set null,
     -- Roles responsible for this step
     "responsible" uuid[] not null default'{}',
     -- Roles consulted for this step
@@ -512,6 +510,8 @@ create table "public"."processes" (
 		"icon" text not null default '',
     -- Text representing the concern of the process
     "concern" text not null default '',
+    -- Who is accountable for this process's outcome
+    "accountable" uuid default null references roles(id) on delete set null,
     -- The how representing the processes steps. Empty by default.
     "howid" uuid references hows(id) default null,
     -- Comments describing changes to the process
