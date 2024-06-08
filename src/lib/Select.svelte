@@ -20,6 +20,7 @@
 		border-radius: var(--radius);
 		border: none;
 		width: 2em;
+		max-width: 10em;
 		height: 1.25rem;
 	}
 
