@@ -125,6 +125,11 @@
 
 	<Header>How</Header>
 
+	<Paragraph
+		>This is how to do this process, who is <Level level="responsible" />esponsible for doing it,
+		and who is <Level level="consulted" />onsulted and <Level level="informed" />nformed about it.
+	</Paragraph>
+
 	{#if how === undefined}
 		<Notice>No one is defined to do this process yet.</Notice>
 	{:else}

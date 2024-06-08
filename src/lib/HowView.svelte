@@ -8,6 +8,7 @@
 	import Button from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
+	import Paragraph from './Paragraph.svelte';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
@@ -160,6 +161,7 @@
 				class:done={how.done === 'yes'}
 				class:pending={how.done === 'pending'}
 				id={deleted ? '' : `how-${how.id}`}
+				placeholder="instructions …"
 				bind:value={text}
 				bind:this={input}
 				on:blur={save}
