@@ -8,7 +8,14 @@
 	// The title to show in the header
 	export let title: string;
 	// A descriptive label for what kind of page this is
-	export let kind: string = '';
+	export let kind:
+		| 'process'
+		| 'suggestion'
+		| 'team'
+		| 'person'
+		| 'role'
+		| 'organization'
+		| 'error' = 'organization';
 	// An optional function for editing the title
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
@@ -19,7 +26,7 @@
 	<title>{title}</title>
 </svelte:head>
 
-<div class="title">
+<div class="title {kind}">
 	<div class="kind">
 		{kind}
 	</div>
@@ -35,6 +42,11 @@
 </div>
 
 <style>
+	.title {
+		width: 100%;
+		padding: var(--padding);
+	}
+
 	h1 {
 		display: flex;
 		font-size: 42pt;
@@ -47,8 +59,45 @@
 	}
 
 	.kind {
-		color: var(--inactive);
+		color: var(--chrome);
 		text-transform: uppercase;
+	}
+
+	.organization {
+		background: var(--foreground);
+		color: var(--background);
+	}
+
+	.role {
+		background-color: var(--warning);
+		color: var(--background);
+	}
+
+	.process {
+		background-color: var(--error);
+		color: var(--background);
+	}
+
+	.person {
+		color: var(--salient);
+	}
+
+	.person .kind {
+		color: var(--inactive);
+	}
+
+	.org {
+		background-color: var(--foreground);
+		color: var(--background);
+	}
+	.suggestion {
+		background-color: var(--salient);
+		color: var(--background);
+	}
+
+	.team {
+		background-color: var(--foreground);
+		color: var(--background);
 	}
 
 	.breadcrumbs {

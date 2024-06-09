@@ -82,7 +82,7 @@
 	}
 </script>
 
-<Title title="processes" kind={$locale?.term.organization} />
+<Title title="processes" kind="process" />
 
 <Paragraph
 	>These are all of the processes in this organization and which roles are involved in them. Select

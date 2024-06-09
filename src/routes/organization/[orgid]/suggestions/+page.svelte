@@ -9,7 +9,7 @@
 	const organization = getOrg();
 </script>
 
-<Title title="Suggestions" kind={$locale?.term.organization} />
+<Title title="Suggestions" kind="suggestion" />
 
 <Link to="/organization/{$organization.getID()}/suggestions/new">Make a suggestion…</Link>
 

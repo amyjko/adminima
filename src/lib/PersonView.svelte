@@ -25,7 +25,7 @@
 
 <Title
 	title={profile.name.length === 0 ? '(no name)' : profile.name}
-	kind={$locale?.term.person}
+	kind="person"
 	edit={$user && profile.personid === $user.id
 		? (text) => Organizations.updateProfileName(profile, text)
 		: undefined}

@@ -17,7 +17,7 @@ export type RoleID = string;
 export type PersonID = string;
 export type ProfileID = string;
 export type HowID = string;
-export type ChangeID = string;
+export type SuggestionID = string;
 export type CommentID = string;
 export type Markup = string;
 export type MarkupID = string;
@@ -107,7 +107,7 @@ export default class Organization {
 		return this.data.profiles.some((profile) => profile.personid === personID);
 	}
 
-	getSuggestion(id: ChangeID) {
+	getSuggestion(id: SuggestionID) {
 		return this.data.suggestions.find((change) => change.id === id) ?? null;
 	}
 
@@ -124,7 +124,7 @@ export default class Organization {
 		});
 	}
 
-	withoutChange(changeID: ChangeID) {
+	withoutChange(changeID: SuggestionID) {
 		return new Organization({
 			...this.data,
 			suggestions: this.data.suggestions.filter((change) => change.id !== changeID)

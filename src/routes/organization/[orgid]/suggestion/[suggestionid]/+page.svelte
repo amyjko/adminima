@@ -12,7 +12,7 @@
 </script>
 
 {#if suggestion === null}
-	<Title title="Oops" kind={$locale?.term.error} />
+	<Title title="Oops" kind="error" />
 	<Error text={(locale) => locale.error.noSuggestion} />
 {:else}
 	<SuggestionView {suggestion} />

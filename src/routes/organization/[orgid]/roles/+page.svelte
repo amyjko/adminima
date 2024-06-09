@@ -40,7 +40,7 @@
 	}
 </script>
 
-<Title title="roles" kind={$locale?.term.organization} />
+<Title title="roles" kind="role" />
 <Paragraph
 	>These are the roles held in this organization. Each one is responsible for particular processes
 	in this organization.</Paragraph

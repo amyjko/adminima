@@ -1,6 +1,6 @@
 import ReactiveMap from './ReactiveMap';
 import Organization, {
-	type ChangeID,
+	type SuggestionID,
 	type CommentID,
 	type MarkupID,
 	type OrganizationID,
@@ -364,6 +364,11 @@ class Organizations {
 		return data?.id ?? null;
 	}
 
+	static async updateMarkup(id: MarkupID, text: string) {
+		const { error } = await supabase.from('markup').update({ text }).eq('id', id);
+		return error;
+	}
+
 	/** Update admin status of a person. Rely on realtime to refresh. */
 	static async updateAdmin(orgid: OrganizationID, profileid: ProfileID, admin: boolean) {
 		await supabase.from('profiles').update({ admin }).eq('orgid', orgid).eq('id', profileid);
@@ -511,7 +516,7 @@ class Organizations {
 		const markupID = profile.bio;
 		// If we do, update it's text.
 		if (markupID) {
-			const { error } = await supabase.from('markup').update({ text }).eq('id', markupID);
+			const error = await Organizations.updateMarkup(markupID, text);
 			if (error) return error;
 		}
 		// Otherwise, create new markup and then update the org to point to it.
@@ -538,7 +543,7 @@ class Organizations {
 	) {
 		// If we do, update it's text.
 		if (markupID) {
-			const { error } = await supabase.from('markup').update({ text }).eq('id', markupID);
+			const error = await Organizations.updateMarkup(markupID, text);
 			if (error) return error;
 		}
 		// Otherwise, create new markup and then update the org to point to it.
@@ -928,7 +933,7 @@ class Organizations {
 		else return null;
 	}
 
-	static async deleteChange(id: ChangeID) {
+	static async deleteChange(id: SuggestionID) {
 		await supabase.from('suggestions').delete().eq('id', id);
 	}
 

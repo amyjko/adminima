@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Notice from '$lib/Notice.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import PersonView from '$lib/PersonView.svelte';
 	import Title from '$lib/Title.svelte';
 	import { getOrg } from '$lib/contexts';
-	import { locale } from '$types/Locales';
 
 	const org = getOrg();
 
@@ -13,7 +11,7 @@
 </script>
 
 {#if profile === null}
-	<Title title="oops" kind={$locale?.term.error} />
+	<Title title="oops" kind="error" />
 	<Oops text={(locale) => locale.error.noPerson} />
 {:else}
 	<PersonView {profile} />

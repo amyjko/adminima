@@ -58,7 +58,7 @@
 {:else}
 	<Title
 		title={process.title}
-		kind={$locale?.term.process ?? ''}
+		kind="process"
 		edit={$user ? (text) => Organizations.updateProcessTitle(process, text, $user.id) : undefined}
 	/>
 

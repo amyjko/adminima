@@ -32,7 +32,7 @@
 
 <Title
 	title={role.title}
-	kind={$locale?.term.role}
+	kind="role"
 	edit={isAdmin && $user
 		? (text) => Organizations.updateRoleTitle(role, text, $user.id)
 		: undefined}

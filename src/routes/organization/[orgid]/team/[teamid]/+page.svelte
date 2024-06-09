@@ -26,7 +26,7 @@
 {#if team}
 	<Title
 		title={team.name}
-		kind={$locale?.term.team}
+		kind="team"
 		edit={$user && isAdmin
 			? (text) => Organizations.updateTeamName(team, text, $user.id)
 			: undefined}

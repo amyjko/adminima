@@ -29,7 +29,7 @@
 	$: existing = $organization.getProfileWithEmail(newPersonEmail);
 </script>
 
-<Title title="people" kind={$locale?.term.organization} />
+<Title title="people" kind="person" />
 
 <Paragraph
 	>This is the list of people in this organization. <strong>Admins</strong> have permission to add and

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { ChangeID } from '$types/Organization';
+	import type { SuggestionID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
 	import { getOrg } from './contexts';
 
-	export let changeID: ChangeID;
+	export let changeID: SuggestionID;
 
 	const org = getOrg();
 

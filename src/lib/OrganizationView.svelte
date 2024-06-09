@@ -23,7 +23,7 @@
 
 <Title
 	title={organization.getName()}
-	kind={$locale?.term.organization}
+	kind="organization"
 	edit={$user && isAdmin
 		? (text) => Organizations.updateOrgName(organization, text, $user.id)
 		: undefined}
@@ -72,7 +72,7 @@
 
 	<Paragraph
 		>See the <strong>{organization.getSuggestions().length}</strong>
-		<Link kind="change" to="/organization/{organization.getID()}/suggestions"
+		<Link kind="suggestion" to="/organization/{organization.getID()}/suggestions"
 			>Suggestion{organization.getSuggestions().length !== 1 ? 's' : ''}</Link
 		> proposed.</Paragraph
 	>

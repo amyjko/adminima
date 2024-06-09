@@ -16,7 +16,8 @@
 	/** What to show if the text isn't set */
 	export let unset: string;
 	/** If given, allows the markup to edited. Returns an error */
-	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
+	export let edit: undefined | ((text: string) => Promise<PostgrestError | null> | null) =
+		undefined;
 	/** Whether in editing state */
 	export let editing = false;
 	let height = 0;

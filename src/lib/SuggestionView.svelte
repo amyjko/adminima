@@ -26,11 +26,12 @@
 	const user = getUser();
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
+	$: editable = $user && isAdmin && suggestion.who === $user.id;
 </script>
 
 <Title
 	title={suggestion.what}
-	kind={$locale?.term.request}
+	kind="suggestion"
 	edit={$user && isAdmin && suggestion.who === $user.id
 		? (text) => Organizations.updateSuggestionWhat(suggestion, text)
 		: undefined}><Status status={suggestion.status} /></Title
@@ -41,7 +42,16 @@
 	<PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /> reported:</Paragraph
 >
 
-<Quote><MarkupView markup={suggestion.description} unset="No description" /></Quote>
+<Quote
+	><MarkupView
+		markup={suggestion.description}
+		unset="No description"
+		edit={editable && suggestion.description
+			? (text) =>
+					suggestion.description ? Organizations.updateMarkup(suggestion.description, text) : null
+			: undefined}
+	/></Quote
+>
 
 <Paragraph>This affects ...</Paragraph>
 
