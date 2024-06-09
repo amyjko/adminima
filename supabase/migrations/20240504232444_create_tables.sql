@@ -2,6 +2,9 @@
 create type visibility as enum (
   'public', -- Anyone in the world can see it
   'org', -- Anyone with a role in the organization can see it
+  'people', -- Only specified people
+  'teams', -- Only specified teams
+  'roles', --- Only specified roles
   'admin' -- Only admins can see it
 );
 
@@ -96,7 +99,10 @@ create table "public"."orgs" (
     "when" timestamp with time zone not null default now(),
     "name" text not null default ''::text,
     "description" uuid default null references markup(id) on delete set null,
+    -- Visibility of the org
     "visibility" visibility not null default 'org',
+    -- Who is authorized, if not public, org, or admin
+    "authorized" uuid[] not null default '{}',
     -- Comments describing changes to the org
     "comments" uuid[] not null default '{}'
 );
@@ -438,6 +444,8 @@ create table "public"."hows" (
     "done" completion not null default 'no',
     -- Visibility of this step
     "visibility" visibility not null default 'org',
+    -- Who is authorized, if not public, org, or admin
+    "authorized" uuid[] not null default '{}',
     -- A list of how to do this
     "how" uuid[] not null default '{}',
     -- Roles responsible for this step
@@ -592,6 +600,10 @@ create table "public"."changes" (
     "description" uuid default null references markup(id),
     -- Status of the change
     "status" status not null default 'triage',
+    -- Who the change is visible to
+    "visibility" visibility not null default 'org',
+    -- Who is authorized, if not public, org, or admin
+    "authorized" uuid[] not null default '{}',
     -- The organization it concerns
     "orgid" uuid not null references orgs(id) on delete cascade,
     -- People watching the change

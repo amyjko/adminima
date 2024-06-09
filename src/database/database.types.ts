@@ -76,6 +76,7 @@ export type Database = {
       }
       changes: {
         Row: {
+          authorized: string[]
           comments: string[]
           description: string | null
           id: string
@@ -83,12 +84,14 @@ export type Database = {
           processes: string[]
           roles: string[]
           status: Database["public"]["Enums"]["status"]
+          visibility: Database["public"]["Enums"]["visibility"]
           watchers: string[]
           what: string
           when: string
           who: string
         }
         Insert: {
+          authorized?: string[]
           comments?: string[]
           description?: string | null
           id?: string
@@ -96,12 +99,14 @@ export type Database = {
           processes?: string[]
           roles?: string[]
           status?: Database["public"]["Enums"]["status"]
+          visibility?: Database["public"]["Enums"]["visibility"]
           watchers?: string[]
           what: string
           when?: string
           who: string
         }
         Update: {
+          authorized?: string[]
           comments?: string[]
           description?: string | null
           id?: string
@@ -109,6 +114,7 @@ export type Database = {
           processes?: string[]
           roles?: string[]
           status?: Database["public"]["Enums"]["status"]
+          visibility?: Database["public"]["Enums"]["visibility"]
           watchers?: string[]
           what?: string
           when?: string
@@ -179,6 +185,7 @@ export type Database = {
       }
       hows: {
         Row: {
+          authorized: string[]
           consulted: string[]
           done: Database["public"]["Enums"]["completion"]
           how: string[]
@@ -192,6 +199,7 @@ export type Database = {
           when: string
         }
         Insert: {
+          authorized?: string[]
           consulted?: string[]
           done?: Database["public"]["Enums"]["completion"]
           how?: string[]
@@ -205,6 +213,7 @@ export type Database = {
           when?: string
         }
         Update: {
+          authorized?: string[]
           consulted?: string[]
           done?: Database["public"]["Enums"]["completion"]
           how?: string[]
@@ -276,6 +285,7 @@ export type Database = {
       }
       orgs: {
         Row: {
+          authorized: string[]
           comments: string[]
           description: string | null
           id: string
@@ -284,6 +294,7 @@ export type Database = {
           when: string
         }
         Insert: {
+          authorized?: string[]
           comments?: string[]
           description?: string | null
           id?: string
@@ -292,6 +303,7 @@ export type Database = {
           when?: string
         }
         Update: {
+          authorized?: string[]
           comments?: string[]
           description?: string | null
           id?: string
@@ -576,7 +588,7 @@ export type Database = {
     Enums: {
       completion: "no" | "pending" | "yes"
       status: "triage" | "backlog" | "active" | "done"
-      visibility: "public" | "org" | "admin"
+      visibility: "public" | "org" | "people" | "teams" | "roles" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
