@@ -322,6 +322,7 @@ class Organizations {
 		name: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
+		if (org.getName() === name) return null;
 		const { error } = await supabase.from('orgs').update({ name: name }).eq('id', org.getID());
 		if (error) return error;
 
@@ -921,6 +922,7 @@ class Organizations {
 	}
 
 	static async updateSuggestionWhat(suggestion: SuggestionRow, what: string) {
+		if (suggestion.what === what) return null;
 		const { error } = await supabase.from('suggestions').update({ what }).eq('id', suggestion.id);
 		if (error) return error;
 		else return null;
