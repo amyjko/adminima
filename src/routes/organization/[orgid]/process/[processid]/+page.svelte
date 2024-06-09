@@ -25,7 +25,7 @@
 	import { browser } from '$app/environment';
 	import Select from '$lib/Select.svelte';
 	import Link from '$lib/Link.svelte';
-	import ChangeList from '$lib/Suggestions.svelte';
+	import Suggestions from '$lib/Suggestions.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -177,11 +177,11 @@
 
 	<Link to="/organization/{$org.getID()}/suggestions?process={process.id}">Suggest a change</Link>
 
-	<ChangeList
+	<Suggestions
 		suggestions={$org
 			.getSuggestions()
 			.filter((change) => change.status === 'active' && change.processes.includes(process.id))}
-		><Paragraph>There are no active changes suggested for this process.</Paragraph></ChangeList
+		><Paragraph>There are no active changes suggested for this process.</Paragraph></Suggestions
 	>
 
 	<Admin>

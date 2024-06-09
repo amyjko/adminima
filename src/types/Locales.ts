@@ -34,7 +34,7 @@ export type Locale = {
 		noPerson: string;
 		noOrganization: string;
 		noRole: string;
-		noChange: string;
+		noSuggestion: string;
 		noProcessChanges: string;
 		noTeam: string;
 	};

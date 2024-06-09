@@ -18,7 +18,7 @@
 	import Choice from './Choice.svelte';
 	import Notice from './Notice.svelte';
 	import Link from './Link.svelte';
-	import ChangeList from './Suggestions.svelte';
+	import Suggestions from './Suggestions.svelte';
 
 	export let role: RoleRow;
 
@@ -78,11 +78,11 @@
 
 <Link to="/organization/{$org.getID()}/suggestions?role={role.id}">Suggest a change</Link>
 
-<ChangeList
+<Suggestions
 	suggestions={$org
 		.getSuggestions()
 		.filter((change) => change.status === 'active' && change.roles.includes(role.id))}
-	><Paragraph>There are no active changes suggested for this role.</Paragraph></ChangeList
+	><Paragraph>There are no active changes suggested for this role.</Paragraph></Suggestions
 >
 
 <Admin>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Header from './Header.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import MarkupView from './MarkupView.svelte';
@@ -15,7 +14,7 @@
 	import { locale } from '$types/Locales';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
-	import { getOrg } from './contexts';
+	import { getOrg, getUser } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
 	import CommentsView from './CommentsView.svelte';
 
@@ -24,10 +23,17 @@
 	let deleteError: string | undefined = undefined;
 
 	const org = getOrg();
+	const user = getUser();
+
+	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 </script>
 
-<Title title={suggestion.what} kind={$locale?.term.request}
-	><Status status={suggestion.status} /></Title
+<Title
+	title={suggestion.what}
+	kind={$locale?.term.request}
+	edit={$user && isAdmin && suggestion.who === $user.id
+		? (text) => Organizations.updateSuggestionWhat(suggestion, text)
+		: undefined}><Status status={suggestion.status} /></Title
 >
 
 <Paragraph

@@ -107,7 +107,7 @@ export default class Organization {
 		return this.data.profiles.some((profile) => profile.personid === personID);
 	}
 
-	getChange(id: ChangeID) {
+	getSuggestion(id: ChangeID) {
 		return this.data.suggestions.find((change) => change.id === id) ?? null;
 	}
 

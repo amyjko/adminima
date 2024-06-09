@@ -8,9 +8,9 @@
 
 	const org = getOrg();
 
-	$: change = $org.getChange(changeID);
+	$: change = $org.getSuggestion(changeID);
 </script>
 
 {#if change === null}<Oops inline text={(locale) => locale.error.noPerson} />{:else}<Link
-		to="/organization/{$org.getID()}/change/{changeID}">{change.what}</Link
+		to="/organization/{$org.getID()}/suggestion/{changeID}">{change.what}</Link
 	>{/if}

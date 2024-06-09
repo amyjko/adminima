@@ -903,7 +903,7 @@ class Organizations {
 
 		if (data === null) return;
 		// Insert
-		const { data: change } = await supabase
+		const { data: suggestion } = await supabase
 			.from('suggestions')
 			.insert({
 				who,
@@ -917,7 +917,13 @@ class Organizations {
 			.select()
 			.single();
 
-		return change;
+		return suggestion;
+	}
+
+	static async updateSuggestionWhat(suggestion: SuggestionRow, what: string) {
+		const { error } = await supabase.from('suggestions').update({ what }).eq('id', suggestion.id);
+		if (error) return error;
+		else return null;
 	}
 
 	static async deleteChange(id: ChangeID) {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type SuggestionRow } from '$database/Organizations';
 	import timestampToDate from '$database/timestampToDate';
-	import ChangeLink from './ChangeLink.svelte';
+	import SuggestionLink from './SuggestionLink.svelte';
 	import PersonLink from './PersonLink.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
@@ -21,11 +21,12 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each suggestions.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime()) as change}
+			{#each suggestions.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime()) as suggestion}
 				<tr>
-					<td><Status status={change.status} /></td>
-					<td><PersonLink profile={$org.getProfileWithID(change.who)} /></td>
-					<td><ChangeLink changeID={change.id} /></td></tr
+					<td><Status status={suggestion.status} /></td>
+
+					<td><PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /></td>
+					<td><SuggestionLink changeID={suggestion.id} /></td></tr
 				>
 			{/each}
 		</tbody>
