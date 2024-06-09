@@ -175,7 +175,9 @@
 
 	<Header>Changes</Header>
 
-	<Link to="/organization/{$org.getID()}/suggestions?process={process.id}">Suggest a change</Link>
+	<Link to="/organization/{$org.getID()}/suggestions/new?process={process.id}"
+		>Suggest a change</Link
+	>
 
 	<Suggestions
 		suggestions={$org

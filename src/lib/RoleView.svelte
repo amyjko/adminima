@@ -76,7 +76,7 @@
 
 <Header>Pending changes</Header>
 
-<Link to="/organization/{$org.getID()}/suggestions?role={role.id}">Suggest a change</Link>
+<Link to="/organization/{$org.getID()}/suggestions/new?role={role.id}">Suggest a change</Link>
 
 <Suggestions
 	suggestions={$org
