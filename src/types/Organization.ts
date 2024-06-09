@@ -1,6 +1,6 @@
 import type {
 	AssignmentRow,
-	ChangeRow,
+	SuggestionRow,
 	HowRow,
 	OrganizationPayload,
 	OrganizationRow,
@@ -40,6 +40,10 @@ export default class Organization {
 
 	getVisibility() {
 		return this.data.organization.visibility;
+	}
+
+	getPrompt() {
+		return this.data.organization.prompt;
 	}
 
 	getComments() {
@@ -104,26 +108,26 @@ export default class Organization {
 	}
 
 	getChange(id: ChangeID) {
-		return this.data.changes.find((change) => change.id === id) ?? null;
+		return this.data.suggestions.find((change) => change.id === id) ?? null;
 	}
 
-	getChanges() {
-		return this.data.changes;
+	getSuggestions() {
+		return this.data.suggestions;
 	}
 
-	withChange(newChange: ChangeRow) {
+	withSuggestion(newChange: SuggestionRow) {
 		return new Organization({
 			...this.data,
-			changes: this.data.changes.some((change) => change.id === newChange.id)
-				? this.data.changes.map((change) => (change.id === newChange.id ? newChange : change))
-				: [...this.data.changes, newChange]
+			suggestions: this.data.suggestions.some((change) => change.id === newChange.id)
+				? this.data.suggestions.map((change) => (change.id === newChange.id ? newChange : change))
+				: [...this.data.suggestions, newChange]
 		});
 	}
 
 	withoutChange(changeID: ChangeID) {
 		return new Organization({
 			...this.data,
-			changes: this.data.changes.filter((change) => change.id !== changeID)
+			suggestions: this.data.suggestions.filter((change) => change.id !== changeID)
 		});
 	}
 

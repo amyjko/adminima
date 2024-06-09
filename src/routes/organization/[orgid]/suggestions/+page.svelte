@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ChangeForm from '$lib/ChangeForm.svelte';
-	import ChangeList from '$lib/ChangeList.svelte';
+	import ChangeForm from '$lib/SuggestionForm.svelte';
+	import Suggestions from '$lib/Suggestions.svelte';
 	import { getOrg } from '$lib/contexts';
 	import Header from '$lib/Header.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
@@ -12,18 +12,16 @@
 
 	$: role = $page.url.searchParams.get('role') ?? undefined;
 	$: process = $page.url.searchParams.get('process') ?? undefined;
-
-	$: console.log($page.url.searchParams.get('process'));
 </script>
 
-<Title title="Changes" kind={$locale?.term.organization} />
+<Title title="Suggestions" kind={$locale?.term.organization} />
 
 <Header>Suggest a Change</Header>
 
 <ChangeForm {role} {process} />
 
-<Header>Changes</Header>
+<Header>Suggestions</Header>
 
-<ChangeList changes={$organization.getChanges()}
-	><Paragraph>There are no changes suggested for this organization.</Paragraph></ChangeList
+<Suggestions suggestions={$organization.getSuggestions()}
+	><Paragraph>There are no changes suggested for this organization.</Paragraph></Suggestions
 >

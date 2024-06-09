@@ -74,76 +74,6 @@ export type Database = {
           },
         ]
       }
-      changes: {
-        Row: {
-          authorized: string[]
-          comments: string[]
-          description: string | null
-          id: string
-          orgid: string
-          processes: string[]
-          roles: string[]
-          status: Database["public"]["Enums"]["status"]
-          visibility: Database["public"]["Enums"]["visibility"]
-          watchers: string[]
-          what: string
-          when: string
-          who: string
-        }
-        Insert: {
-          authorized?: string[]
-          comments?: string[]
-          description?: string | null
-          id?: string
-          orgid: string
-          processes?: string[]
-          roles?: string[]
-          status?: Database["public"]["Enums"]["status"]
-          visibility?: Database["public"]["Enums"]["visibility"]
-          watchers?: string[]
-          what: string
-          when?: string
-          who: string
-        }
-        Update: {
-          authorized?: string[]
-          comments?: string[]
-          description?: string | null
-          id?: string
-          orgid?: string
-          processes?: string[]
-          roles?: string[]
-          status?: Database["public"]["Enums"]["status"]
-          visibility?: Database["public"]["Enums"]["visibility"]
-          watchers?: string[]
-          what?: string
-          when?: string
-          who?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "changes_description_fkey"
-            columns: ["description"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "changes_orgid_fkey"
-            columns: ["orgid"]
-            isOneToOne: false
-            referencedRelation: "orgs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "changes_who_fkey"
-            columns: ["who"]
-            isOneToOne: false
-            referencedRelation: "people"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       comments: {
         Row: {
           id: string
@@ -290,6 +220,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          prompt: string | null
           visibility: Database["public"]["Enums"]["visibility"]
           when: string
         }
@@ -299,6 +230,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          prompt?: string | null
           visibility?: Database["public"]["Enums"]["visibility"]
           when?: string
         }
@@ -308,6 +240,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          prompt?: string | null
           visibility?: Database["public"]["Enums"]["visibility"]
           when?: string
         }
@@ -315,6 +248,13 @@ export type Database = {
           {
             foreignKeyName: "orgs_description_fkey"
             columns: ["description"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orgs_prompt_fkey"
+            columns: ["prompt"]
             isOneToOne: false
             referencedRelation: "markup"
             referencedColumns: ["id"]
@@ -532,6 +472,76 @@ export type Database = {
             columns: ["team"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggestions: {
+        Row: {
+          authorized: string[]
+          comments: string[]
+          description: string | null
+          id: string
+          orgid: string
+          processes: string[]
+          roles: string[]
+          status: Database["public"]["Enums"]["status"]
+          visibility: Database["public"]["Enums"]["visibility"]
+          watchers: string[]
+          what: string
+          when: string
+          who: string
+        }
+        Insert: {
+          authorized?: string[]
+          comments?: string[]
+          description?: string | null
+          id?: string
+          orgid: string
+          processes?: string[]
+          roles?: string[]
+          status?: Database["public"]["Enums"]["status"]
+          visibility?: Database["public"]["Enums"]["visibility"]
+          watchers?: string[]
+          what: string
+          when?: string
+          who: string
+        }
+        Update: {
+          authorized?: string[]
+          comments?: string[]
+          description?: string | null
+          id?: string
+          orgid?: string
+          processes?: string[]
+          roles?: string[]
+          status?: Database["public"]["Enums"]["status"]
+          visibility?: Database["public"]["Enums"]["visibility"]
+          watchers?: string[]
+          what?: string
+          when?: string
+          who?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestions_description_fkey"
+            columns: ["description"]
+            isOneToOne: false
+            referencedRelation: "markup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestions_orgid_fkey"
+            columns: ["orgid"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestions_who_fkey"
+            columns: ["who"]
+            isOneToOne: false
+            referencedRelation: "people"
             referencedColumns: ["id"]
           },
         ]

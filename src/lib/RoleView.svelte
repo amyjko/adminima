@@ -4,7 +4,7 @@
 	import Organizations, { type RoleRow } from '../database/Organizations';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import ChangeForm from './ChangeForm.svelte';
+	import ChangeForm from './SuggestionForm.svelte';
 	import Button from './Button.svelte';
 	import Oops from './Oops.svelte';
 	import { goto } from '$app/navigation';
@@ -18,7 +18,7 @@
 	import Choice from './Choice.svelte';
 	import Notice from './Notice.svelte';
 	import Link from './Link.svelte';
-	import ChangeList from './ChangeList.svelte';
+	import ChangeList from './Suggestions.svelte';
 
 	export let role: RoleRow;
 
@@ -76,11 +76,11 @@
 
 <Header>Pending changes</Header>
 
-<Link to="/organization/{$org.getID()}/changes?role={role.id}">Suggest a change</Link>
+<Link to="/organization/{$org.getID()}/suggestions?role={role.id}">Suggest a change</Link>
 
 <ChangeList
-	changes={$org
-		.getChanges()
+	suggestions={$org
+		.getSuggestions()
 		.filter((change) => change.status === 'active' && change.roles.includes(role.id))}
 	><Paragraph>There are no active changes suggested for this role.</Paragraph></ChangeList
 >

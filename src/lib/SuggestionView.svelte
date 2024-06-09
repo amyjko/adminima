@@ -6,7 +6,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import Organizations, { type ChangeRow } from '../database/Organizations';
+	import Organizations, { type SuggestionRow } from '../database/Organizations';
 	import Oops from './Oops.svelte';
 	import Button from './Button.svelte';
 	import { goto } from '$app/navigation';
@@ -19,29 +19,31 @@
 	import timestampToDate from '$database/timestampToDate';
 	import CommentsView from './CommentsView.svelte';
 
-	export let change: ChangeRow;
+	export let suggestion: SuggestionRow;
 
 	let deleteError: string | undefined = undefined;
 
 	const org = getOrg();
 </script>
 
-<Title title={change.what} kind={$locale?.term.request}><Status status={change.status} /></Title>
-
-<Paragraph
-	>On <TimeView time={timestampToDate(change.when).getTime()} />
-	<PersonLink profile={$org.getProfileWithPersonID(change.who)} /> reported:</Paragraph
+<Title title={suggestion.what} kind={$locale?.term.request}
+	><Status status={suggestion.status} /></Title
 >
 
-<Quote><MarkupView markup={change.description} unset="No description" /></Quote>
+<Paragraph
+	>On <TimeView time={timestampToDate(suggestion.when).getTime()} />
+	<PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /> reported:</Paragraph
+>
+
+<Quote><MarkupView markup={suggestion.description} unset="No description" /></Quote>
 
 <Paragraph>This affects ...</Paragraph>
 
 <ul>
-	{#each change.roles as role}
+	{#each suggestion.roles as role}
 		<li><RoleLink roleID={role} /></li>
 	{/each}
-	{#each change.processes as process}
+	{#each suggestion.processes as process}
 		<li><ProcessLink processID={process} /></li>
 	{/each}
 </ul>
@@ -51,8 +53,8 @@
 	<Button
 		action={async () => {
 			try {
-				const org = change.orgid;
-				await Organizations.deleteChange(change.id);
+				const org = suggestion.orgid;
+				await Organizations.deleteChange(suggestion.id);
 				goto(`/organization/${org}`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";
@@ -63,4 +65,4 @@
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
 
-<CommentsView comments={change.comments} />
+<CommentsView comments={suggestion.comments} />

@@ -2,7 +2,7 @@
 	import Error from '$lib/Oops.svelte';
 	import { page } from '$app/stores';
 	import { locale } from '../../../../../types/Locales';
-	import ChangeView from '$lib/ChangeView.svelte';
+	import ChangeView from '$lib/SuggestionView.svelte';
 	import Title from '$lib/Title.svelte';
 	import { getOrg } from '$lib/contexts';
 
@@ -15,5 +15,5 @@
 	<Title title="Oops" kind={$locale?.term.error} />
 	<Error text={(locale) => locale.error.noChange} />
 {:else}
-	<ChangeView {change} />
+	<ChangeView suggestion={change} />
 {/if}

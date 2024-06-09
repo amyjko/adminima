@@ -27,7 +27,7 @@ export type AssignmentRow = Tables<'assignments'>;
 export type ProcessRow = Tables<'processes'>;
 export type TeamRow = Tables<'teams'>;
 export type HowRow = Tables<'hows'>;
-export type ChangeRow = Tables<'changes'>;
+export type SuggestionRow = Tables<'suggestions'>;
 export type CommentRow = Tables<'comments'>;
 export type Visibility = Database['public']['Enums']['visibility'];
 export type Completion = Database['public']['Enums']['completion'];
@@ -42,7 +42,7 @@ export type OrganizationPayload = {
 	teams: TeamRow[];
 	processes: ProcessRow[];
 	hows: HowRow[];
-	changes: ChangeRow[];
+	suggestions: SuggestionRow[];
 };
 
 /** A front end interface to the backing store, caching data loaded from the database and offering operations for modifying the database. */
@@ -220,16 +220,16 @@ class Organizations {
 				{
 					event: '*',
 					schema: 'public',
-					table: 'changes',
+					table: 'suggestions',
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<ChangeRow>) => {
+				(payload: RealtimePostgresChangesPayload<SuggestionRow>) => {
 					Organizations.synchronizeRow(
 						orgid,
 						payload,
-						(org, change) => org.withChange(change),
-						(org, change) => (change.id ? org.withoutChange(change.id) : org)
+						(org, suggestion) => org.withSuggestion(suggestion),
+						(org, suggestion) => (suggestion.id ? org.withoutChange(suggestion.id) : org)
 					);
 				}
 			)
@@ -284,6 +284,32 @@ class Organizations {
 			org.getID(),
 			who,
 			'Updated organization description',
+			'orgs',
+			org.getID(),
+			org.getComments()
+		);
+		return commentError;
+	}
+
+	/** Update an organization's description. Rely on Realtime to refresh. */
+	static async updateOrgPrompt(
+		org: Organization,
+		text: string,
+		who: PersonID
+	): Promise<PostgrestError | null> {
+		const markupError = await Organizations.addOrCreateMarkup(
+			org.getPrompt(),
+			text,
+			'orgs',
+			org.getID(),
+			'id',
+			'prompt'
+		);
+		if (markupError) return markupError;
+		const commentError = await Organizations.addComment(
+			org.getID(),
+			who,
+			'Updated organization suggestion prompt',
 			'orgs',
 			org.getID(),
 			org.getComments()
@@ -506,7 +532,8 @@ class Organizations {
 		text: string,
 		table: 'roles' | 'orgs' | 'profiles' | 'teams' | 'processes',
 		id: string,
-		idName: string = 'id'
+		idName: string = 'id',
+		field: string = 'description'
 	) {
 		// If we do, update it's text.
 		if (markupID) {
@@ -517,10 +544,9 @@ class Organizations {
 		else {
 			const newMarkupID = await Organizations.createMarkup(text);
 			if (newMarkupID === null) return null;
-			const { error } = await supabase
-				.from(table)
-				.update({ description: newMarkupID })
-				.eq(idName, id);
+			const fields: Record<string, string> = {};
+			fields[field] = newMarkupID;
+			const { error } = await supabase.from(table).update(fields).eq(idName, id);
 			if (error) return error;
 		}
 	}
@@ -661,7 +687,7 @@ class Organizations {
 		const { data: processes } = await supabase.from('processes').select(`*`).eq('orgid', orgid);
 		const { data: hows } = await supabase.from('hows').select(`*`).eq('orgid', orgid);
 		const { data: teams } = await supabase.from('teams').select(`*`).eq('orgid', orgid);
-		const { data: changes } = await supabase.from('changes').select(`*`).eq('orgid', orgid);
+		const { data: suggestions } = await supabase.from('suggestions').select(`*`).eq('orgid', orgid);
 
 		// If we didn't receive any of it, return null. Otherwise, return the payload.
 		return organization === null ||
@@ -671,7 +697,7 @@ class Organizations {
 			processes === null ||
 			hows === null ||
 			teams === null ||
-			changes === null
+			suggestions === null
 			? null
 			: {
 					organization,
@@ -681,7 +707,7 @@ class Organizations {
 					processes,
 					hows,
 					teams,
-					changes
+					suggestions
 			  };
 	}
 
@@ -864,7 +890,7 @@ class Organizations {
 		await supabase.from('processes').delete().eq('id', id);
 	}
 
-	static async createChange(
+	static async createSuggestion(
 		who: PersonID,
 		organization: OrganizationID,
 		what: string,
@@ -878,7 +904,7 @@ class Organizations {
 		if (data === null) return;
 		// Insert
 		const { data: change } = await supabase
-			.from('changes')
+			.from('suggestions')
 			.insert({
 				who,
 				what,
@@ -895,7 +921,7 @@ class Organizations {
 	}
 
 	static async deleteChange(id: ChangeID) {
-		await supabase.from('changes').delete().eq('id', id);
+		await supabase.from('suggestions').delete().eq('id', id);
 	}
 
 	static async getComments(ids: CommentID[]) {

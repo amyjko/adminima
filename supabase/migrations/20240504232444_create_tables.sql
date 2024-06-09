@@ -99,9 +99,11 @@ create table "public"."orgs" (
     "when" timestamp with time zone not null default now(),
     "name" text not null default ''::text,
     "description" uuid default null references markup(id) on delete set null,
+    -- The suggestion prompt
+    "prompt" uuid default null references markup(id) on delete set null,
     -- Visibility of the org
     "visibility" visibility not null default 'org',
-    -- Who is authorized, if not public, org, or admin
+    -- Who is authorized to view, if not public, org, or admin
     "authorized" uuid[] not null default '{}',
     -- Comments describing changes to the org
     "comments" uuid[] not null default '{}'
@@ -578,7 +580,7 @@ alter
 alter table "public"."hows" add constraint "public_hows_processes_fkey" FOREIGN KEY (processid) REFERENCES processes(id) ON DELETE CASCADE not valid;
 
 
--- Define the status enum for changes.
+-- Define the status enum for suggestions.
 create type status as enum (
   'triage', -- Needs to be reviewed
   'backlog', -- Reviewed, but not being worked on
@@ -586,8 +588,8 @@ create type status as enum (
   'done' -- Done being worked on
 );
 
--- Define the changes table
-create table "public"."changes" (
+-- Define the suggestions table
+create table "public"."suggestions" (
     -- A unique ID for the change
     "id" uuid not null default uuid_generate_v1() primary key,
     -- Person who reported it
@@ -616,33 +618,33 @@ create table "public"."changes" (
     "comments" uuid[] not null default '{}'
 );
 
-grant delete on table "public"."changes" to "anon";
-grant insert on table "public"."changes" to "anon";
-grant references on table "public"."changes" to "anon";
-grant select on table "public"."changes" to "anon";
-grant trigger on table "public"."changes" to "anon";
-grant truncate on table "public"."changes" to "anon";
-grant update on table "public"."changes" to "anon";
+grant delete on table "public"."suggestions" to "anon";
+grant insert on table "public"."suggestions" to "anon";
+grant references on table "public"."suggestions" to "anon";
+grant select on table "public"."suggestions" to "anon";
+grant trigger on table "public"."suggestions" to "anon";
+grant truncate on table "public"."suggestions" to "anon";
+grant update on table "public"."suggestions" to "anon";
 
-grant delete on table "public"."changes" to "authenticated";
-grant insert on table "public"."changes" to "authenticated";
-grant references on table "public"."changes" to "authenticated";
-grant select on table "public"."changes" to "authenticated";
-grant trigger on table "public"."changes" to "authenticated";
-grant truncate on table "public"."changes" to "authenticated";
-grant update on table "public"."changes" to "authenticated";
+grant delete on table "public"."suggestions" to "authenticated";
+grant insert on table "public"."suggestions" to "authenticated";
+grant references on table "public"."suggestions" to "authenticated";
+grant select on table "public"."suggestions" to "authenticated";
+grant trigger on table "public"."suggestions" to "authenticated";
+grant truncate on table "public"."suggestions" to "authenticated";
+grant update on table "public"."suggestions" to "authenticated";
 
-grant delete on table "public"."changes" to "service_role";
-grant insert on table "public"."changes" to "service_role";
-grant references on table "public"."changes" to "service_role";
-grant select on table "public"."changes" to "service_role";
-grant trigger on table "public"."changes" to "service_role";
-grant truncate on table "public"."changes" to "service_role";
-grant update on table "public"."changes" to "service_role";
+grant delete on table "public"."suggestions" to "service_role";
+grant insert on table "public"."suggestions" to "service_role";
+grant references on table "public"."suggestions" to "service_role";
+grant select on table "public"."suggestions" to "service_role";
+grant trigger on table "public"."suggestions" to "service_role";
+grant truncate on table "public"."suggestions" to "service_role";
+grant update on table "public"."suggestions" to "service_role";
 
--- Enable realtime updates on the changes table.
+-- Enable realtime updates on the suggestions table.
 alter
-  publication supabase_realtime add table "public"."changes";
+  publication supabase_realtime add table "public"."suggestions";
 
 
 create table "public"."comments" (

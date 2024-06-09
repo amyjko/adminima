@@ -71,9 +71,9 @@
 	>
 
 	<Paragraph
-		>See the <strong>{organization.getChanges().length}</strong>
-		<Link kind="change" to="/organization/{organization.getID()}/changes"
-			>Change{organization.getChanges().length !== 1 ? 's' : ''}</Link
+		>See the <strong>{organization.getSuggestions().length}</strong>
+		<Link kind="change" to="/organization/{organization.getID()}/suggestions"
+			>Suggestion{organization.getSuggestions().length !== 1 ? 's' : ''}</Link
 		> proposed.</Paragraph
 	>
 

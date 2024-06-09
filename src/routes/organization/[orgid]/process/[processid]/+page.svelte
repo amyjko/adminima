@@ -4,7 +4,7 @@
 	import HowView from '$lib/HowView.svelte';
 	import Organizations from '$database/Organizations';
 	import Oops from '$lib/Oops.svelte';
-	import ChangeForm from '$lib/ChangeForm.svelte';
+	import ChangeForm from '$lib/SuggestionForm.svelte';
 	import Button from '$lib/Button.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import { goto } from '$app/navigation';
@@ -25,7 +25,7 @@
 	import { browser } from '$app/environment';
 	import Select from '$lib/Select.svelte';
 	import Link from '$lib/Link.svelte';
-	import ChangeList from '$lib/ChangeList.svelte';
+	import ChangeList from '$lib/Suggestions.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -175,11 +175,11 @@
 
 	<Header>Changes</Header>
 
-	<Link to="/organization/{$org.getID()}/changes?process={process.id}">Suggest a change</Link>
+	<Link to="/organization/{$org.getID()}/suggestions?process={process.id}">Suggest a change</Link>
 
 	<ChangeList
-		changes={$org
-			.getChanges()
+		suggestions={$org
+			.getSuggestions()
 			.filter((change) => change.status === 'active' && change.processes.includes(process.id))}
 		><Paragraph>There are no active changes suggested for this process.</Paragraph></ChangeList
 	>

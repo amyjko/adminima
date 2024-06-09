@@ -79,6 +79,7 @@
 						save();
 					}
 				}}
+				on:blur={save}
 				style:height="{editing ? scrollHeight : height}px"
 			/>
 		</div>

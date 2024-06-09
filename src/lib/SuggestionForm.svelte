@@ -25,7 +25,7 @@
 	async function createRequest() {
 		if ($user === null) return;
 		try {
-			const change = await Organizations.createChange(
+			const suggestion = await Organizations.createSuggestion(
 				$user.id,
 				$organization.getID(),
 				newRequestTitle,
@@ -33,7 +33,7 @@
 				process ? [process] : [],
 				role ? [role] : []
 			);
-			if (change) goto(`/organization/${$organization.getID()}/change/${change.id}`);
+			if (suggestion) goto(`/organization/${$organization.getID()}/suggestion/${suggestion.id}`);
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}
@@ -41,13 +41,13 @@
 </script>
 
 <Form action={createRequest}>
-	<Paragraph
-		>What should change about this {role
-			? 'role'
-			: process
-			? 'process'
-			: 'organization'}?</Paragraph
-	>
+	<MarkupView
+		markup={$organization.getPrompt()}
+		unset="What is your suggestion?"
+		edit={$user
+			? (text) => Organizations.updateOrgPrompt($organization, text, $user.id)
+			: undefined}
+	/>
 	<Field label="Title" bind:text={newRequestTitle} />
 	<Labeled
 		label="Describe the problem you're experiencing and any ideas you have for addressing it."
