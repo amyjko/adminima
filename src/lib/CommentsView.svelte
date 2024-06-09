@@ -8,8 +8,6 @@
 	export let comments: CommentID[];
 </script>
 
-<Header>Changes</Header>
-
 {#await Organizations.getComments(comments)}
 	<Loading />
 {:then comments}

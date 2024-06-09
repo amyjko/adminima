@@ -28,11 +28,9 @@
 
 <Title title={change.what} kind={$locale?.term.request}><Status status={change.status} /></Title>
 
-<Status status={change.status} />
-
 <Paragraph
 	>On <TimeView time={timestampToDate(change.when).getTime()} />
-	<PersonLink profile={$org.getProfileWithID(change.who)} /> reported:</Paragraph
+	<PersonLink profile={$org.getProfileWithPersonID(change.who)} /> reported:</Paragraph
 >
 
 <Quote><MarkupView markup={change.description} unset="No description" /></Quote>
@@ -60,7 +58,7 @@
 				deleteError = "We couldn't delete this";
 			}
 		}}
-		warning>Delete this process</Button
+		warning>Delete this suggestion</Button
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>

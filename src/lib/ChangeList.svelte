@@ -31,7 +31,7 @@
 		</tbody>
 	</table>
 {:else}
-	<p>No changes have been proposed for this organization.</p>
+	<slot />
 {/if}
 
 <style>

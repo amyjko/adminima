@@ -19,10 +19,12 @@
 <style>
 	.form {
 		background: var(--background);
-		gap: var(--padding);
+		gap: var(--spacing);
 		display: flex;
 		flex-direction: column;
 		align-items: baseline;
+		border: var(--chrome) solid var(--thickness);
+		padding: var(--spacing);
 	}
 
 	form.borders {

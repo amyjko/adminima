@@ -5,13 +5,19 @@
 	export let fit: boolean = true;
 </script>
 
-{#if fit}▾ {/if}<select bind:value={selection} on:change={change(selection)} class:fit>
-	{#each options as option}
-		<option value={option.value}>{option.label}</option>
-	{/each}
-</select>
+<div class="select">
+	{#if fit}▾ {/if}<select bind:value={selection} on:change={change(selection)} class:fit>
+		{#each options as option}
+			<option value={option.value}>{option.label}</option>
+		{/each}
+	</select>
+</div>
 
 <style>
+	.select {
+		display: inline-block;
+	}
+
 	select {
 		appearance: none;
 		background: var(--chrome);

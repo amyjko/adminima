@@ -4,9 +4,13 @@
 	import Form from './Form.svelte';
 	import Oops from './Oops.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import Header from './Header.svelte';
 	import { getOrg, getUser } from './contexts';
 	import type { ProcessID, RoleID } from '$types/Organization';
+	import Field from './Field.svelte';
+	import Button from './Button.svelte';
+	import Select from './Select.svelte';
+	import Labeled from './Labeled.svelte';
+	import MarkupView from './MarkupView.svelte';
 
 	export let process: ProcessID | undefined = undefined;
 	export let role: RoleID | undefined = undefined;
@@ -29,32 +33,57 @@
 				process ? [process] : [],
 				role ? [role] : []
 			);
-			if (change) goto(`/organization/${organization}/request/${change.id}`);
+			if (change) goto(`/organization/${$organization.getID()}/change/${change.id}`);
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}
 	}
 </script>
 
-<Header>Suggest a Change</Header>
 <Form action={createRequest}>
 	<Paragraph
-		>Is there something you'd like to change about this {#if role}
-			role{:else if process}process{/if}? Give your request a title and describe the problem you'd
-		like to address.</Paragraph
+		>What should change about this {role
+			? 'role'
+			: process
+			? 'process'
+			: 'organization'}?</Paragraph
 	>
-	<Oops text="Suggestions are not available yet." />
-	<!-- <Field label="Title" bind:text={newRequestTitle} />
-	<Field
+	<Field label="Title" bind:text={newRequestTitle} />
+	<Labeled
 		label="Describe the problem you're experiencing and any ideas you have for addressing it."
-		bind:text={newRequestProblem}
-	/>
+	>
+		<MarkupView bind:text={newRequestProblem} editing unset="Detail your suggestion" />
+	</Labeled>
+	<Labeled label="Affected Roles">
+		<Select
+			options={[
+				{ value: undefined, label: '—' },
+				...$organization.getRoles().map((role) => {
+					return { value: role.id, label: role.title };
+				})
+			]}
+			selection={role}
+			change={(r) => (role = r)}
+		/>
+	</Labeled>
+	<Labeled label="Affected Processes">
+		<Select
+			options={[
+				{ value: undefined, label: '—' },
+				...$organization.getProcesses().map((process) => {
+					return { value: process.id, label: process.title };
+				})
+			]}
+			selection={process}
+			change={(p) => (process = p)}
+		/>
+	</Labeled>
 	<Button
 		submit
 		end
 		active={newRequestTitle.length > 0 && newRequestProblem.length > 0}
 		action={() => {}}>create</Button
-	> -->
+	>
 
 	{#if newRequestError}
 		<Oops text={newRequestError} />

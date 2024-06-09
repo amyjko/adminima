@@ -44,7 +44,7 @@
 		--padding: 0.25rem;
 		--radius: 4px;
 		--normal-size: 18pt;
-		--small-size: 13pt;
+		--small-size: 14pt;
 		--error: #e25f55;
 		--warning: #e28d1d;
 		--warning-background: #faecdc;
@@ -57,8 +57,8 @@
 		--separator: #eeeeee;
 		--inactive: #555555;
 		--foreground: #000000;
-		--border: #000000;
-		--thickness: 4px;
+		--border: var(--inactive);
+		--thickness: 2px;
 	}
 
 	:global(

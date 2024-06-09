@@ -17,8 +17,8 @@
 	export let unset: string;
 	/** If given, allows the markup to edited. Returns an error */
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
-
-	let editing = false;
+	/** Whether in editing state */
+	export let editing = false;
 	let height = 0;
 	let revisedText = '';
 	let input: HTMLTextAreaElement;
@@ -27,6 +27,9 @@
 	$: scrollHeight = text ? input?.scrollHeight ?? height : height;
 
 	$: if (markup) Organizations.getMarkup(markup).then((m) => (text = m));
+
+	// Not an edit function, just a text field? Update the text immediately.
+	$: if (edit === undefined) text = revisedText;
 
 	async function startEditing() {
 		revisedText = text ?? '';
@@ -105,6 +108,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing);
+		flex: 1;
 	}
 
 	.editable {
@@ -126,9 +130,10 @@
 		font-size: inherit;
 		line-height: inherit;
 		border: none;
-		padding: 0;
+		padding: var(--padding);
 		outline: var(--border) solid var(--thickness);
 		min-height: 1em;
+		border-radius: var(--radius);
 	}
 
 	textarea:focus {

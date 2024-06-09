@@ -17,6 +17,8 @@
 	import CommentsView from './CommentsView.svelte';
 	import Choice from './Choice.svelte';
 	import Notice from './Notice.svelte';
+	import Link from './Link.svelte';
+	import ChangeList from './ChangeList.svelte';
 
 	export let role: RoleRow;
 
@@ -72,9 +74,16 @@
 
 <Timeline {role} processes={$org.getRoleProcesses(role.id)} />
 
-<ChangeForm role={role.id} />
+<Header>Pending changes</Header>
 
-<CommentsView comments={role.comments} />
+<Link to="/organization/{$org.getID()}/changes?role={role.id}">Suggest a change</Link>
+
+<ChangeList
+	changes={$org
+		.getChanges()
+		.filter((change) => change.status === 'active' && change.roles.includes(role.id))}
+	><Paragraph>There are no active changes suggested for this role.</Paragraph></ChangeList
+>
 
 <Admin>
 	<Paragraph
@@ -96,3 +105,7 @@
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
+
+<Header>History</Header>
+
+<CommentsView comments={role.comments} />

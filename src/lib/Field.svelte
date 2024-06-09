@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Labeled from './Labeled.svelte';
+
 	export let label: string;
 	export let text: string;
 	export let active: boolean = true;
@@ -8,23 +10,17 @@
 	$: message = invalid ? invalid(text) : undefined;
 </script>
 
-<label
-	>{label}
-	{#if message}<span class="invalid">{message}</span>{/if}
-	<br /><input type="text" disabled={!active} bind:value={text} {placeholder} /></label
->
+<Labeled {label} {message}>
+	<input type="text" disabled={!active} bind:value={text} {placeholder} />
+</Labeled>
 
 <style>
-	label {
-		font-size: var(--small-size);
-		color: var(--inactive);
-	}
-
-	.invalid {
-		color: var(--error);
-	}
-
 	input:focus {
 		outline: var(--focus) solid var(--thickness);
+	}
+
+	input {
+		outline: var(--border) solid var(--thickness);
+		border: none;
 	}
 </style>

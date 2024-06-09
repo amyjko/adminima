@@ -606,12 +606,12 @@ create table "public"."changes" (
     "authorized" uuid[] not null default '{}',
     -- The organization it concerns
     "orgid" uuid not null references orgs(id) on delete cascade,
-    -- People watching the change
-    "watchers" uuid[] not null default '{}',
     -- Processes it affects
     "processes" uuid[] not null default '{}',
     -- Roles it affects
     "roles" uuid[] not null default '{}',
+    -- People watching the change
+    "watchers" uuid[] not null default '{}',
     -- Comments descripting status updates corresponding to comments table
     "comments" uuid[] not null default '{}'
 );

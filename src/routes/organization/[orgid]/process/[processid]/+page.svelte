@@ -24,6 +24,8 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { browser } from '$app/environment';
 	import Select from '$lib/Select.svelte';
+	import Link from '$lib/Link.svelte';
+	import ChangeList from '$lib/ChangeList.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -171,7 +173,16 @@
 		</FormDialog>
 	{/if}
 
-	<ChangeForm process={process.id} />
+	<Header>Changes</Header>
+
+	<Link to="/organization/{$org.getID()}/changes?process={process.id}">Suggest a change</Link>
+
+	<ChangeList
+		changes={$org
+			.getChanges()
+			.filter((change) => change.status === 'active' && change.processes.includes(process.id))}
+		><Paragraph>There are no active changes suggested for this process.</Paragraph></ChangeList
+	>
 
 	<Admin>
 		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
@@ -189,6 +200,8 @@
 		>
 		{#if deleteError}<Oops text={deleteError} />{/if}
 	</Admin>
+
+	<Header>History</Header>
 
 	<CommentsView comments={process.comments} />
 {/if}
