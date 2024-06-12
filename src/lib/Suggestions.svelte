@@ -23,8 +23,8 @@
 		</thead>
 		<tbody>
 			{#each suggestions
-				.sort((a, b) => Levels[a.status] - Levels[b.status])
-				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime()) as suggestion}
+				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
+				.sort((a, b) => Levels[a.status] - Levels[b.status]) as suggestion}
 				<tr>
 					<td><Status status={suggestion.status} /></td>
 
