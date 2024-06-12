@@ -16,6 +16,7 @@
 	import { getOrg, getUser } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
 	import CommentsView from './CommentsView.svelte';
+	import Choice from './Choice.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -33,8 +34,16 @@
 	kind="suggestion"
 	edit={$user && isAdmin && suggestion.who === $user.id
 		? (text) => Organizations.updateSuggestionWhat(suggestion, text)
-		: undefined}><Status status={suggestion.status} /></Title
+		: undefined}
 >
+	<Choice
+		choice={suggestion.status}
+		choices={{ triage: 'Triage', active: 'Active', done: 'Done', backlog: 'Backlog' }}
+		edit={async (status) => {
+			if ($user) return await Organizations.updateSuggestionStatus(suggestion, status, $user.id);
+		}}><Status status={suggestion.status} /></Choice
+	>
+</Title>
 
 <Paragraph
 	>On <TimeView time={timestampToDate(suggestion.when).getTime()} />

@@ -561,7 +561,7 @@ class Organizations {
 		orgid: OrganizationID,
 		who: PersonID,
 		what: string,
-		table: 'orgs' | 'roles' | 'teams' | 'processes',
+		table: 'orgs' | 'roles' | 'teams' | 'processes' | 'suggestions',
 		id: string,
 		comments: CommentID[]
 	) {
@@ -931,6 +931,23 @@ class Organizations {
 		const { error } = await supabase.from('suggestions').update({ what }).eq('id', suggestion.id);
 		if (error) return error;
 		else return null;
+	}
+
+	static async updateSuggestionStatus(suggestion: SuggestionRow, status: Status, who: PersonID) {
+		if (suggestion.status === status) return null;
+		const { error } = await supabase.from('suggestions').update({ status }).eq('id', suggestion.id);
+		if (error) return error;
+
+		Organizations.addComment(
+			suggestion.orgid,
+			who,
+			`Updated status to ${status}`,
+			'suggestions',
+			suggestion.id,
+			suggestion.comments
+		);
+
+		return null;
 	}
 
 	static async deleteChange(id: SuggestionID) {
