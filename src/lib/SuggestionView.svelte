@@ -11,7 +11,6 @@
 	import { goto } from '$app/navigation';
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
-	import { locale } from '$types/Locales';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
 	import { getOrg, getUser } from './contexts';

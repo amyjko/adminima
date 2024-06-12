@@ -27,6 +27,9 @@
 </svelte:head>
 
 <div class="title {kind}">
+	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
+		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
+	{/if}
 	<div class="kind">
 		{kind}
 	</div>
@@ -35,9 +38,6 @@
 	</h1>
 	{#if edit}
 		<div />{/if}
-	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
-		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
-	{/if}
 	<slot />
 </div>
 
