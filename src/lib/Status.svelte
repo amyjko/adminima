@@ -6,7 +6,7 @@
 	const org = getOrg();
 </script>
 
-<span class="status" title={status}
+<span class="status {status}" title={status}
 	>{#if status.length === 0}<em>no status</em>{:else}{status}{/if}</span
 >
 
@@ -19,6 +19,26 @@
 		padding-left: var(--padding);
 		padding-right: var(--padding);
 		background: var(--warning);
+		color: var(--background);
+	}
+
+	.triage {
+		background: var(--warning);
+		color: var(--background);
+	}
+
+	.done {
+		background: var(--foreground);
+		color: var(--background);
+	}
+
+	.active {
+		background: var(--salient);
+		color: var(--background);
+	}
+
+	.backlog {
+		background: var(--person);
 		color: var(--background);
 	}
 </style>

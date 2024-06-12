@@ -3,7 +3,6 @@
 	import { getOrg } from '$lib/contexts';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { locale } from '$types/Locales';
 	import Link from '$lib/Link.svelte';
 
 	const organization = getOrg();
