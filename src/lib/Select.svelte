@@ -3,10 +3,16 @@
 	export let change: (value: string | undefined) => any;
 	export let selection: string | undefined;
 	export let fit: boolean = true;
+	export let active: boolean = true;
 </script>
 
 <div class="select">
-	{#if fit}▾ {/if}<select bind:value={selection} on:change={change(selection)} class:fit>
+	{#if fit}▾ {/if}<select
+		bind:value={selection}
+		on:change={change(selection)}
+		class:fit
+		disabled={active === false}
+	>
 		{#each options as option}
 			<option value={option.value}>{option.label}</option>
 		{/each}
@@ -28,6 +34,12 @@
 		width: 2em;
 		max-width: 10em;
 		height: 1.25rem;
+	}
+
+	select[disabled] {
+		background: var(--inactive);
+		color: var(--inactive);
+		cursor: default;
 	}
 
 	.fit {

@@ -17,6 +17,7 @@
 	import timestampToDate from '$database/timestampToDate';
 	import CommentsView from './CommentsView.svelte';
 	import Choice from './Choice.svelte';
+	import Select from './Select.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -24,9 +25,12 @@
 
 	const org = getOrg();
 	const user = getUser();
+	const Statuses = { triage: 'Triage', active: 'Active', done: 'Done', backlog: 'Backlog' };
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 	$: editable = $user && isAdmin && suggestion.who === $user.id;
+	$: unselectedRoles = $org.getRoles().filter((r) => !suggestion.roles.includes(r.id));
+	$: unselectedProcesses = $org.getProcesses().filter((p) => !suggestion.processes.includes(p.id));
 </script>
 
 <Title
@@ -38,9 +42,14 @@
 >
 	<Choice
 		choice={suggestion.status}
-		choices={{ triage: 'Triage', active: 'Active', done: 'Done', backlog: 'Backlog' }}
+		choices={Statuses}
 		edit={async (status) => {
-			if ($user) return await Organizations.updateSuggestionStatus(suggestion, status, $user.id);
+			if (
+				$user &&
+				(status === 'triage' || status === 'active' || status === 'done' || status === 'backlog')
+			)
+				return await Organizations.updateSuggestionStatus(suggestion, status, $user.id);
+			else return null;
 		}}><Status status={suggestion.status} /></Choice
 	>
 </Title>
@@ -61,16 +70,73 @@
 	/></Quote
 >
 
-<Paragraph>This affects ...</Paragraph>
-
-<ul>
+<div class="row">
+	<Paragraph>This affects these roles:</Paragraph>
 	{#each suggestion.roles as role}
-		<li><RoleLink roleID={role} /></li>
+		<RoleLink roleID={role} />
+		<Button
+			action={() =>
+				Organizations.updateSuggestionRoles(
+					suggestion,
+					suggestion.roles.filter((r) => r !== role)
+				)}
+		>
+			x</Button
+		>
 	{/each}
+	{#if unselectedRoles.length > 0}
+		<Select
+			options={[
+				{ value: undefined, label: '—' },
+				...unselectedRoles.map((role) => {
+					return { value: role.id, label: role.title };
+				})
+			]}
+			selection={undefined}
+			change={(r) =>
+				r !== undefined
+					? Organizations.updateSuggestionRoles(
+							suggestion,
+							Array.from(new Set([...suggestion.roles, r]))
+					  )
+					: undefined}
+		/>
+	{/if}
+</div>
+
+<div class="row">
+	<Paragraph>This affects these processes:</Paragraph>
 	{#each suggestion.processes as process}
-		<li><ProcessLink processID={process} /></li>
+		<ProcessLink processID={process} />
+		<Button
+			action={() =>
+				Organizations.updateSuggestionProcesses(
+					suggestion,
+					suggestion.processes.filter((p) => p !== process)
+				)}
+		>
+			x</Button
+		>
 	{/each}
-</ul>
+	{#if unselectedProcesses.length > 0}
+		<Select
+			options={[
+				{ value: undefined, label: '—' },
+				...unselectedProcesses.map((process) => {
+					return { value: process.id, label: process.title };
+				})
+			]}
+			selection={undefined}
+			change={(p) =>
+				p !== undefined
+					? Organizations.updateSuggestionProcesses(
+							suggestion,
+							Array.from(new Set([...suggestion.processes, p]))
+					  )
+					: undefined}
+		/>
+	{/if}
+</div>
 
 <Admin>
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
@@ -90,3 +156,12 @@
 </Admin>
 
 <CommentsView comments={suggestion.comments} />
+
+<style>
+	.row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: var(--padding);
+	}
+</style>

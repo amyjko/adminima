@@ -950,6 +950,23 @@ class Organizations {
 		return null;
 	}
 
+	static async updateSuggestionRoles(suggestion: SuggestionRow, roles: RoleID[]) {
+		const { error } = await supabase.from('suggestions').update({ roles }).eq('id', suggestion.id);
+		if (error) return error;
+
+		return null;
+	}
+
+	static async updateSuggestionProcesses(suggestion: SuggestionRow, processes: ProcessID[]) {
+		const { error } = await supabase
+			.from('suggestions')
+			.update({ processes })
+			.eq('id', suggestion.id);
+		if (error) return error;
+
+		return null;
+	}
+
 	static async deleteChange(id: SuggestionID) {
 		await supabase.from('suggestions').delete().eq('id', id);
 	}
