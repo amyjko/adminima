@@ -15,7 +15,8 @@
 		| 'person'
 		| 'role'
 		| 'organization'
-		| 'error' = 'organization';
+		| 'error'
+		| undefined = undefined;
 	// An optional function for editing the title
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
@@ -30,9 +31,11 @@
 	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
 		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
 	{/if}
-	<div class="kind">
-		{kind}
-	</div>
+	{#if kind}
+		<div class="kind">
+			{kind}
+		</div>
+	{/if}
 	<h1>
 		<EditableText text={title} {edit} />
 	</h1>
