@@ -8,8 +8,11 @@
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
 	import { getUser } from '$lib/contexts';
-	import { supabase } from '$lib/supabaseClient';
 	import validEmail from '../validEmail';
+
+	export let data;
+
+	$: ({ supabase } = data);
 
 	let email = '';
 	let code = '';

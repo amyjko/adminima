@@ -1,19 +1,18 @@
 <script lang="ts">
 	import type { HowRow, ProcessRow } from '$database/Organizations';
-	import Organizations from '$database/Organizations';
 	import { getContext, tick } from 'svelte';
 	import Visibility from './Visibility.svelte';
-	import { getOrg } from './contexts';
+	import { getDB, getOrg } from './contexts';
 	import type { HowID } from '$types/Organization';
 	import Button from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
-	import Paragraph from './Paragraph.svelte';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
 
 	const org = getOrg();
+	const db = getDB();
 	const focusID = getContext<Writable<string | undefined>>('focusID');
 
 	let input: HTMLTextAreaElement;
@@ -22,28 +21,25 @@
 	let deleted = false;
 
 	function save() {
-		Organizations.updateHowText(how, text);
+		$db.updateHowText(how, text);
 	}
 
 	function toggleDone() {
-		Organizations.updateHowDone(
-			how,
-			how.done === 'no' ? 'pending' : how.done === 'pending' ? 'yes' : 'no'
-		);
+		$db.updateHowDone(how, how.done === 'no' ? 'pending' : how.done === 'pending' ? 'yes' : 'no');
 	}
 
 	async function insertHow() {
 		// See if this how has a parent, and if so, insert after this how.
 		const parent = $org.getHowParent(how.id);
 		if (parent) {
-			const { id } = await Organizations.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
+			const { id } = await $db.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
 			if (id) {
 				focusID.set(id);
 			}
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
-			const { id } = await Organizations.insertHow(process, how, 0);
+			const { id } = await $db.insertHow(process, how, 0);
 			if (id) focusID.set(id);
 		}
 	}
@@ -65,7 +61,7 @@
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
 
-			await Organizations.deleteHow(parent, how);
+			await $db.deleteHow(parent, how);
 
 			focusID.set(newFocusID);
 		}
@@ -89,7 +85,7 @@
 		if (result) {
 			const [parent, previousHow] = result;
 			deleted = true;
-			await Organizations.moveHow(how, parent, previousHow, previousHow.how.length);
+			await $db.moveHow(how, parent, previousHow, previousHow.how.length);
 			await tick();
 			if (focus) focusID.set(how.id);
 		}
@@ -111,7 +107,7 @@
 		if (result) {
 			const [parent, grandparent] = result;
 			deleted = true;
-			await Organizations.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1);
+			await $db.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1);
 			await tick();
 			if (focus) focusID.set(how.id);
 		}
@@ -200,7 +196,7 @@
 			level={how.visibility}
 			edit={(vis) =>
 				vis === 'public' || vis === 'org' || vis === 'admin'
-					? Organizations.updateHowVisibility(how, vis)
+					? $db.updateHowVisibility(how, vis)
 					: undefined}
 		/>
 		<Button action={() => unindentHow(false)} active={getUnindent() !== undefined}>&lt;</Button>

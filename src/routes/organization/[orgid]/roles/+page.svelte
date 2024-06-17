@@ -1,32 +1,25 @@
 <script lang="ts">
-	import Organizations from '$database/Organizations';
 	import { goto } from '$app/navigation';
-	import Oops from '$lib/Oops.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Field from '$lib/Field.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
-	import Button from '$lib/Button.svelte';
 	import Admin from '$lib/Admin.svelte';
-	import { getOrg } from '$lib/contexts';
+	import { getDB, getOrg } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
-	import { locale } from '$types/Locales';
 	import Flow from '$lib/Flow.svelte';
-	import MarkupView from '$lib/MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Notice from '$lib/Notice.svelte';
-	import Dialog from '$lib/Dialog.svelte';
-	import Actions from '$lib/Actions.svelte';
-	import Form from '$lib/Form.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 
 	const org = getOrg();
+	const db = getDB();
 
 	let newRole: string = '';
 	let newRoleError: string | undefined = undefined;
 
 	async function createRole() {
-		const roleID = await Organizations.createRole($org.getID(), newRole);
+		const roleID = await $db.createRole($org.getID(), newRole);
 		if (roleID) goto(`/organization/${$org.getID()}/role/${roleID}`);
 		else newRoleError = "We couldn't create the new role.";
 	}
@@ -35,7 +28,7 @@
 	let newTeamError: string | undefined = undefined;
 
 	async function createTeam() {
-		const teamID = await Organizations.createTeam($org.getID(), newTeam);
+		const teamID = await $db.createTeam($org.getID(), newTeam);
 		if (teamID === null) "We couldn't create the new team.";
 	}
 </script>

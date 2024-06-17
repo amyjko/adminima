@@ -4,16 +4,13 @@
 	import HowView from '$lib/HowView.svelte';
 	import Organizations from '$database/Organizations';
 	import Oops from '$lib/Oops.svelte';
-	import ChangeForm from '$lib/SuggestionForm.svelte';
 	import Button from '$lib/Button.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import { goto } from '$app/navigation';
 	import Admin from '$lib/Admin.svelte';
 	import Title from '$lib/Title.svelte';
-	import { locale } from '$types/Locales';
-	import RoleContribution from '$lib/RoleContribution.svelte';
 	import Level from '$lib/Level.svelte';
-	import { getOrg, getUser } from '$lib/contexts';
+	import { getDB, getOrg, getUser } from '$lib/contexts';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import { page } from '$app/stores';
 	import Notice from '$lib/Notice.svelte';
@@ -26,15 +23,19 @@
 	import Select from '$lib/Select.svelte';
 	import Link from '$lib/Link.svelte';
 	import Suggestions from '$lib/Suggestions.svelte';
+	import RoleLink from '$lib/RoleLink.svelte';
 
 	let deleteError: string | undefined = undefined;
 
 	const org = getOrg();
 	const user = getUser();
+	const db = getDB();
+
 	$: process = $org.getProcess($page.params.processid);
 	$: how = process && process.howid ? $org.getHow(process.howid) : undefined;
 
-	$: editable = true;
+	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
+	$: editable = $user !== null && ($org.hasAdminPerson($user.id) || $org.hasPerson($user.id));
 
 	let newConcern = '';
 
@@ -53,36 +54,47 @@
 	}
 </script>
 
-{#if process === null}
+{#if $user === null && $org.getVisibility() !== 'public'}
+	<Title title={$org.getName()} />
+	<Oops text="This process is private. If you believe you have access, log in to view it." />
+{:else if $user !== null && !$org.hasPerson($user.id) && $org.getVisibility() !== 'public'}
+	<Title title={$org.getName()} />
+	<Oops
+		text="This process is only visible to people in the organization. If you want access, write the organization's administrators."
+	/>
+{:else if process === null}
+	<Title title={$org.getName()} />
 	<Oops text={(locale) => locale.error.noProcess} />
 {:else}
 	<Title
 		title={process.title}
 		kind="process"
-		edit={$user ? (text) => Organizations.updateProcessTitle(process, text, $user.id) : undefined}
+		edit={$user && editable ? (text) => $db.updateProcessTitle(process, text, $user.id) : undefined}
 	/>
 
 	{#if how}
 		<MarkupView
 			text={how.what}
 			unset="No description yet."
-			edit={$user ? (text) => Organizations.updateHowText(how, text) : undefined}
+			edit={$user && editable ? (text) => $db.updateHowText(how, text) : undefined}
 		/>
 	{/if}
 
 	<Header>Who</Header>
 
 	<Paragraph>
-		<Select
-			options={[
-				{ value: undefined, label: '—' },
-				...$org.getRoles().map((role) => {
-					return { value: role.id, label: role.title };
-				})
-			]}
-			selection={process.accountable ?? undefined}
-			change={(value) => Organizations.updateProcessAccountable(process, value ?? null)}
-		/> is <Level level="accountable" /><strong>ccountable</strong> for this processes outcomes.
+		{#if editable}
+			<Select
+				options={[
+					{ value: undefined, label: '—' },
+					...$org.getRoles().map((role) => {
+						return { value: role.id, label: role.title };
+					})
+				]}
+				selection={process.accountable ?? undefined}
+				change={(value) => $db.updateProcessAccountable(process, value ?? null)}
+			/>{:else if process.accountable}<RoleLink roleID={process.accountable} />{:else}No one{/if} is
+		<Level level="accountable" /><strong>ccountable</strong> for this processes outcomes.
 	</Paragraph>
 
 	<!-- {#if how}
@@ -133,7 +145,7 @@
 	</Paragraph>
 
 	{#if how === undefined}
-		<Notice>No one is defined to do this process yet.</Notice>
+		<Notice>No one has defined to do this process yet.</Notice>
 	{:else}
 		<ol>
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
@@ -151,7 +163,7 @@
 	{#if editable && $user}
 		{#if process.concern === ''}<em>no concern</em>{:else}
 			<Choice
-				edit={(text) => Organizations.updateProcessConcern(process, text, $user.id)}
+				edit={(text) => $db.updateProcessConcern(process, text, $user.id)}
 				choice={process.concern}
 				choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}
 				>{process.concern}</Choice
@@ -165,7 +177,7 @@
 			valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
 			error={undefined}
 			action={() => {
-				Organizations.updateProcessConcern(process, newConcern, $user.id);
+				$db.updateProcessConcern(process, newConcern, $user.id);
 				newConcern = '';
 			}}
 		>
@@ -192,7 +204,7 @@
 			action={async () => {
 				try {
 					const org = process.orgid;
-					await Organizations.deleteProcess(process.id);
+					await $db.deleteProcess(process.id);
 					goto(`/organization/${org}/processes`);
 				} catch (_) {
 					deleteError = "We couldn't delete this";

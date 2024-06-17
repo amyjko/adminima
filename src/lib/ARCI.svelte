@@ -1,17 +1,17 @@
 <!-- Represents ARCH for a processes's how to -->
 <script lang="ts">
 	import type { HowRow, ProcessRow } from '$database/Organizations';
-	import Organizations from '$database/Organizations';
 	import Button from './Button.svelte';
 	import Level from './Level.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import Select from './Select.svelte';
-	import { getOrg } from './contexts';
+	import { getDB, getOrg } from './contexts';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
 
 	const org = getOrg();
+	const db = getDB();
 
 	$: options = [
 		{ value: undefined, label: '▼' },
@@ -38,7 +38,7 @@
 	<Level level="responsible" />
 	{#each how.responsible as responsible}
 		<RoleLink roleID={responsible} />
-		<Button action={() => Organizations.removeHowRCI(how, responsible, 'responsible')}>×</Button>
+		<Button action={() => $db.removeHowRCI(how, responsible, 'responsible')}>×</Button>
 	{/each}
 	{#if options.length > 0}
 		<Select
@@ -47,7 +47,7 @@
 			bind:selection={responsible}
 			change={(value) => {
 				if (value) {
-					Organizations.addHowRCI(how, value, 'responsible');
+					$db.addHowRCI(how, value, 'responsible');
 					responsible = undefined;
 				}
 			}}
@@ -56,7 +56,7 @@
 	<Level level="consulted" />
 	{#each how.consulted as consulted}
 		<RoleLink roleID={consulted} />
-		<Button action={() => Organizations.removeHowRCI(how, consulted, 'consulted')}>×</Button>
+		<Button action={() => $db.removeHowRCI(how, consulted, 'consulted')}>×</Button>
 	{/each}
 	{#if options.length > 0}
 		<Select
@@ -65,7 +65,7 @@
 			fit={false}
 			change={(value) => {
 				if (value) {
-					Organizations.addHowRCI(how, value, 'consulted');
+					$db.addHowRCI(how, value, 'consulted');
 					consulted = undefined;
 				}
 			}}
@@ -74,7 +74,7 @@
 	<Level level="informed" />
 	{#each how.informed as informed}
 		<RoleLink roleID={informed} />
-		<Button action={() => Organizations.removeHowRCI(how, informed, 'informed')}>×</Button>
+		<Button action={() => $db.removeHowRCI(how, informed, 'informed')}>×</Button>
 	{/each}
 	{#if options.length > 0}
 		<Select
@@ -83,7 +83,7 @@
 			fit={false}
 			change={(value) => {
 				if (value) {
-					Organizations.addHowRCI(how, value, 'informed');
+					$db.addHowRCI(how, value, 'informed');
 					informed = undefined;
 				}
 			}}

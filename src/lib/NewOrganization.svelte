@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Organizations from '$database/Organizations';
 	import Field from './Field.svelte';
 	import FormDialog from './FormDialog.svelte';
-	import { getUser } from './contexts';
+	import { getDB, getUser } from './contexts';
 	import type { PostgrestError } from '@supabase/supabase-js';
 
+	const db = getDB();
 	const user = getUser();
+
 	let message: string | undefined = undefined;
 	let submitting = false;
 
@@ -19,12 +20,7 @@
 		if ($user === null || $user.email === undefined) return;
 		submitting = false;
 
-		const { error, id } = await Organizations.createOrganization(
-			orgName,
-			$user.id,
-			$user.email,
-			name
-		);
+		const { error, id } = await $db.createOrganization(orgName, $user.id, $user.email, name);
 
 		if (error) showError(error);
 		else goto(`/organization/${id}`);

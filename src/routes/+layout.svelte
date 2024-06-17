@@ -1,24 +1,29 @@
 <script lang="ts">
 	import Page from '$lib/Page.svelte';
-	import { locale, type Locale } from '$types/Locales';
-	import { supabase } from '$lib/supabaseClient';
+	import { locale } from '$types/Locales';
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { UserSymbol, type UserContext } from '$lib/contexts';
+	import { DBSymbol, UserSymbol, type DBContext, type UserContext } from '$lib/contexts';
+	import Organizations from '$database/Organizations.js';
 
-	export let data: { locale: Locale };
+	export let data;
 
-	locale.set(data.locale);
+	const db: DBContext = writable(new Organizations(data.supabase));
+	setContext(DBSymbol, db);
+	$: $db.setSupabaseClient(data.supabase);
 
 	const user: UserContext = writable(null);
 	setContext(UserSymbol, user);
 
-	const subscription = supabase.auth.onAuthStateChange((_, session) => {
-		// Update the user.
-		user.set(session?.user ?? null);
-	});
+	$: ({ strings, supabase } = data);
+	$: locale.set(strings);
 
 	onMount(() => {
+		const subscription = supabase.auth.onAuthStateChange((_, newSession) => {
+			// Update the user.
+			user.set(newSession?.user ?? null);
+		});
+
 		// call unsubscribe to remove the callback
 		return () => {
 			subscription.data.subscription.unsubscribe();

@@ -2,13 +2,15 @@
 	import Organizations from '$database/Organizations';
 	import { type CommentID } from '$types/Organization';
 	import CommentView from './CommentView.svelte';
-	import Header from './Header.svelte';
 	import Loading from './Loading.svelte';
+	import { getDB } from './contexts';
 
 	export let comments: CommentID[];
+
+	const db = getDB();
 </script>
 
-{#await Organizations.getComments(comments)}
+{#await $db.getComments(comments)}
 	<Loading />
 {:then comments}
 	<table>

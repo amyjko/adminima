@@ -8,16 +8,15 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getUser } from '$lib/contexts';
-	import { supabase } from '$lib/supabaseClient';
-
-	export let data;
+	import { getDB, getUser } from '$lib/contexts';
+	import { page } from '$app/stores';
 
 	let user = getUser();
+	let db = getDB();
 	let message: string | null = null;
 
 	async function logout() {
-		const { error } = await supabase.auth.signOut();
+		const { error } = await $db.signOut();
 		if (error) message = error.code ?? error.message;
 	}
 
@@ -26,32 +25,34 @@
 
 <Title title="You" />
 
-{#if data.orgs === null}
-	<Oops text="Couldn't load organizations" />
-{:else if $user}
-	<Paragraph>Hi <strong>{$user.email}</strong>.</Paragraph>
+{#await $db.getPersonsOrganizations($page.params.personid) then orgs}
+	{#if orgs === null}
+		<Oops text="Couldn't load organizations" />
+	{:else if $user}
+		<Paragraph>Hi <strong>{$user.email}</strong>.</Paragraph>
 
-	{#if data.orgs.length}
-		<Paragraph>Here are the organizations you're part of:</Paragraph>
-		<ul>
-			{#each data.orgs as org}
-				<li><Link to={`/organization/${org.id}`}>{org.name}</Link></li>
-			{/each}
-		</ul>
-	{:else}
-		<Notice
-			>You're not part of any organizations.
+		{#if orgs.length}
+			<Paragraph>Here are the organizations you're part of:</Paragraph>
 			<ul>
-				<li>Join one by asking the person in charge.</li>
-				<li>Create one if you're in charge.</li>
-			</ul></Notice
-		>
+				{#each orgs as org}
+					<li><Link to={`/organization/${org.id}`}>{org.name}</Link></li>
+				{/each}
+			</ul>
+		{:else}
+			<Notice
+				>You're not part of any organizations.
+				<ul>
+					<li>Join one by asking the person in charge.</li>
+					<li>Create one if you're in charge.</li>
+				</ul></Notice
+			>
+		{/if}
+
+		<NewOrganization />
+
+		<Button action={logout}>Log out</Button>
 	{/if}
-
-	<NewOrganization />
-
-	<Button action={logout}>Log out</Button>
-{/if}
+{/await}
 
 {#if message}
 	<Oops text={message} />

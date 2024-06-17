@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { getOrg } from '$lib/contexts';
+	import { getDB, getOrg, getUser } from '$lib/contexts';
 	import ProcessLink from '$lib/ProcessLink.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { locale } from '$types/Locales';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Level from '$lib/Level.svelte';
 	import Subheader from '$lib/Subheader.svelte';
@@ -11,12 +10,13 @@
 	import type { RoleID } from '$types/Organization';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import Field from '$lib/Field.svelte';
-	import Organizations from '$database/Organizations';
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
 	import Oops from '$lib/Oops.svelte';
 
 	const organization = getOrg();
+	const user = getUser();
+	const db = getDB();
 
 	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
 		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
@@ -76,7 +76,7 @@
 	let title = '';
 	let message: string | undefined = undefined;
 	async function newProcess() {
-		const { error, id } = await Organizations.addProcess($organization.getID(), title);
+		const { error, id } = await $db.addProcess($organization.getID(), title);
 		if (error) message = error.message;
 		else goto(`/organization/${$organization.getID()}/process/${id}`);
 	}
@@ -84,81 +84,87 @@
 
 <Title title="processes" kind="process" />
 
-<Paragraph
-	>These are all of the processes in this organization and which roles are involved in them. Select
-	one to see how it works, who's responsible for it, or to suggest a change.
-</Paragraph>
-
-<FormDialog
-	button="Create process …"
-	header="New process"
-	explanation="Let's give the process a name."
-	submit="Create"
-	action={newProcess}
-	valid={() => title.length > 0}
-	error={message}
->
-	<Field active={true} label="title" bind:text={title} />
-</FormDialog>
-{#if message}
-	<Oops text={message} />
-{/if}
-
-{#each Array.from(new Set($organization
-			.getProcesses()
-			.map((process) => process.concern))) as concern}
-	<Subheader>{concern}</Subheader>
-
-	{@const processes = $organization
-		.getProcesses()
-		.filter((p) => p.concern === concern)
-		.sort((a, b) => {
-			const howA = $organization.getHow(a.id);
-			const howB = $organization.getHow(b.id);
-			if (howA === undefined || howB === undefined) return 0;
-
-			return (
-				howB.responsible.length +
-				howB.consulted.length +
-				howB.informed.length -
-				(howA.responsible.length + howA.consulted.length + howA.informed.length)
-			);
-		})}
-
-	{@const roles = getRolesByAccountability(processes)}
-
-	<div class="processes">
-		<table>
-			<thead>
-				<th />{#each roles as role}<th class="role"><RoleLink roleID={role.id} /></th>{:else}<th
-					/>{/each}
-			</thead>
-			<tbody>
-				{#each processes as process}
-					{@const how = $organization.getHow(process.id)}
-					<tr>
-						<td><ProcessLink processID={process.id} /></td>
-						{#each roles as role}<td class="level"
-								><Level
-									level={process?.accountable === role.id
-										? 'accountable'
-										: how?.responsible.includes(role.id)
-										? 'responsible'
-										: how?.consulted.includes(role.id)
-										? 'consulted'
-										: how?.informed.includes(role.id)
-										? 'informed'
-										: ''}
-								/></td
-							>{:else}<td><em>no roles</em></td>{/each}
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
+{#if ($user === null && $organization.getVisibility() !== 'public') || ($user !== null && !$organization.hasPerson($user.id))}
+	<Oops text="This organization's processes are not public." />
 {:else}
-	<Notice>This organization has no processes.</Notice>
-{/each}
+	<Paragraph
+		>These are all of the processes in this organization and which roles are involved in them.
+		Select one to see how it works, who's responsible for it, or to suggest a change.
+	</Paragraph>
+
+	{#if $user && $organization.hasPerson($user.id)}
+		<FormDialog
+			button="Create process …"
+			header="New process"
+			explanation="Let's give the process a name."
+			submit="Create"
+			action={newProcess}
+			valid={() => title.length > 0}
+			error={message}
+		>
+			<Field active={true} label="title" bind:text={title} />
+		</FormDialog>
+	{/if}
+	{#if message}
+		<Oops text={message} />
+	{/if}
+
+	{#each Array.from(new Set($organization
+				.getProcesses()
+				.map((process) => process.concern))) as concern}
+		<Subheader>{concern}</Subheader>
+
+		{@const processes = $organization
+			.getProcesses()
+			.filter((p) => p.concern === concern)
+			.sort((a, b) => {
+				const howA = $organization.getHow(a.id);
+				const howB = $organization.getHow(b.id);
+				if (howA === undefined || howB === undefined) return 0;
+
+				return (
+					howB.responsible.length +
+					howB.consulted.length +
+					howB.informed.length -
+					(howA.responsible.length + howA.consulted.length + howA.informed.length)
+				);
+			})}
+
+		{@const roles = getRolesByAccountability(processes)}
+
+		<div class="processes">
+			<table>
+				<thead>
+					<th />{#each roles as role}<th class="role"><RoleLink roleID={role.id} /></th>{:else}<th
+						/>{/each}
+				</thead>
+				<tbody>
+					{#each processes as process}
+						{@const how = $organization.getHow(process.id)}
+						<tr>
+							<td><ProcessLink processID={process.id} /></td>
+							{#each roles as role}<td class="level"
+									><Level
+										level={process?.accountable === role.id
+											? 'accountable'
+											: how?.responsible.includes(role.id)
+											? 'responsible'
+											: how?.consulted.includes(role.id)
+											? 'consulted'
+											: how?.informed.includes(role.id)
+											? 'informed'
+											: ''}
+									/></td
+								>{:else}<td><em>no roles</em></td>{/each}
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	{:else}
+		<Notice>This organization has no processes.</Notice>
+	{/each}
+{/if}
 
 <style>
 	.processes {

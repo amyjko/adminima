@@ -8,6 +8,9 @@
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
 	import Error from './Error.svelte';
+	import { getDB } from './contexts';
+
+	const db = getDB();
 
 	/** The markup's text */
 	export let text: string | undefined = undefined;
@@ -27,7 +30,7 @@
 
 	$: scrollHeight = text ? input?.scrollHeight ?? height : height;
 
-	$: if (markup) Organizations.getMarkup(markup).then((m) => (text = m));
+	$: if (markup) $db.getMarkup(markup).then((m) => (text = m));
 
 	// Not an edit function, just a text field? Update the text immediately.
 	$: if (edit === undefined) text = revisedText;

@@ -3,8 +3,7 @@
 	import Organizations from '../database/Organizations';
 	import Form from './Form.svelte';
 	import Oops from './Oops.svelte';
-	import Paragraph from './Paragraph.svelte';
-	import { getOrg, getUser } from './contexts';
+	import { getDB, getOrg, getUser } from './contexts';
 	import type { ProcessID, RoleID } from '$types/Organization';
 	import Field from './Field.svelte';
 	import Button from './Button.svelte';
@@ -21,11 +20,12 @@
 
 	const organization = getOrg();
 	const user = getUser();
+	const db = getDB();
 
 	async function createRequest() {
 		if ($user === null) return;
 		try {
-			const suggestion = await Organizations.createSuggestion(
+			const suggestion = await $db.createSuggestion(
 				$user.id,
 				$organization.getID(),
 				newRequestTitle,
@@ -44,9 +44,7 @@
 	<MarkupView
 		markup={$organization.getPrompt()}
 		unset="What is your suggestion?"
-		edit={$user
-			? (text) => Organizations.updateOrgPrompt($organization, text, $user.id)
-			: undefined}
+		edit={$user ? (text) => $db.updateOrgPrompt($organization, text, $user.id) : undefined}
 	/>
 	<Field label="Title" bind:text={newRequestTitle} />
 	<Labeled

@@ -5,7 +5,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import Organizations, { type SuggestionRow } from '../database/Organizations';
+	import { type SuggestionRow } from '../database/Organizations';
 	import Oops from './Oops.svelte';
 	import Button from './Button.svelte';
 	import { goto } from '$app/navigation';
@@ -13,7 +13,7 @@
 	import Title from './Title.svelte';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
-	import { getOrg, getUser } from './contexts';
+	import { getDB, getOrg, getUser } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
 	import CommentsView from './CommentsView.svelte';
 	import Choice from './Choice.svelte';
@@ -25,6 +25,7 @@
 
 	const org = getOrg();
 	const user = getUser();
+	const db = getDB();
 	const Statuses = { triage: 'Triage', active: 'Active', done: 'Done', backlog: 'Backlog' };
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
@@ -37,7 +38,7 @@
 	title={suggestion.what}
 	kind="suggestion"
 	edit={$user && isAdmin && suggestion.who === $user.id
-		? (text) => Organizations.updateSuggestionWhat(suggestion, text)
+		? (text) => $db.updateSuggestionWhat(suggestion, text)
 		: undefined}
 >
 	<Choice
@@ -48,7 +49,7 @@
 				$user &&
 				(status === 'triage' || status === 'active' || status === 'done' || status === 'backlog')
 			)
-				return await Organizations.updateSuggestionStatus(suggestion, status, $user.id);
+				return await $db.updateSuggestionStatus(suggestion, status, $user.id);
 			else return null;
 		}}><Status status={suggestion.status} /></Choice
 	>
@@ -64,8 +65,7 @@
 		markup={suggestion.description}
 		unset="No description"
 		edit={editable && suggestion.description
-			? (text) =>
-					suggestion.description ? Organizations.updateMarkup(suggestion.description, text) : null
+			? (text) => (suggestion.description ? $db.updateMarkup(suggestion.description, text) : null)
 			: undefined}
 	/></Quote
 >
@@ -76,7 +76,7 @@
 		<RoleLink roleID={role} />
 		<Button
 			action={() =>
-				Organizations.updateSuggestionRoles(
+				$db.updateSuggestionRoles(
 					suggestion,
 					suggestion.roles.filter((r) => r !== role)
 				)}
@@ -95,10 +95,7 @@
 			selection={undefined}
 			change={(r) =>
 				r !== undefined
-					? Organizations.updateSuggestionRoles(
-							suggestion,
-							Array.from(new Set([...suggestion.roles, r]))
-					  )
+					? $db.updateSuggestionRoles(suggestion, Array.from(new Set([...suggestion.roles, r])))
 					: undefined}
 		/>
 	{/if}
@@ -110,7 +107,7 @@
 		<ProcessLink processID={process} />
 		<Button
 			action={() =>
-				Organizations.updateSuggestionProcesses(
+				$db.updateSuggestionProcesses(
 					suggestion,
 					suggestion.processes.filter((p) => p !== process)
 				)}
@@ -129,7 +126,7 @@
 			selection={undefined}
 			change={(p) =>
 				p !== undefined
-					? Organizations.updateSuggestionProcesses(
+					? $db.updateSuggestionProcesses(
 							suggestion,
 							Array.from(new Set([...suggestion.processes, p]))
 					  )
@@ -144,7 +141,7 @@
 		action={async () => {
 			try {
 				const org = suggestion.orgid;
-				await Organizations.deleteChange(suggestion.id);
+				await $db.deleteChange(suggestion.id);
 				goto(`/organization/${org}`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";

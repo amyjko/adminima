@@ -11,7 +11,7 @@
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { locale } from '$types/Locales';
-	import { getOrg, getUser } from './contexts';
+	import { getDB, getOrg, getUser } from './contexts';
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
@@ -26,6 +26,8 @@
 
 	const user = getUser();
 	const org = getOrg();
+	const db = getDB();
+
 	$: profiles = $org.getRoleProfiles(role.id);
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 </script>
@@ -33,9 +35,7 @@
 <Title
 	title={role.title}
 	kind="role"
-	edit={isAdmin && $user
-		? (text) => Organizations.updateRoleTitle(role, text, $user.id)
-		: undefined}
+	edit={isAdmin && $user ? (text) => $db.updateRoleTitle(role, text, $user.id) : undefined}
 >
 	<Choice
 		choice={role.team ? $org.getTeam(role.team)?.name ?? '' : '—'}
@@ -46,7 +46,7 @@
 			if (isAdmin && $user) {
 				const team = $org.getTeams().find((team) => team.name === name);
 				if (team) {
-					return await Organizations.updateRoleTeam(role, team, $user.id);
+					return await $db.updateRoleTeam(role, team, $user.id);
 				}
 			}
 			return null;
@@ -58,7 +58,7 @@
 <MarkupView
 	markup={role.description}
 	unset="No description yet."
-	edit={$user ? (text) => Organizations.updateRoleDescription(role, text, $user.id) : undefined}
+	edit={$user ? (text) => $db.updateRoleDescription(role, text, $user.id) : undefined}
 />
 
 <Header>Who</Header>
@@ -94,7 +94,7 @@
 		action={async () => {
 			try {
 				const org = role.orgid;
-				const error = await Organizations.deleteRole(role.id);
+				const error = await $db.deleteRole(role.id);
 				if (error) deleteError = error.message;
 				else goto(`/organization/${org}/roles`);
 			} catch (_) {

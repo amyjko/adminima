@@ -1,13 +1,11 @@
 <script lang="ts">
-	import Loading from '$lib/Loading.svelte';
-	import { getOrg, getUser } from '$lib/contexts';
+	import { getDB, getOrg, getUser } from '$lib/contexts';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button from '$lib/Button.svelte';
 	import PersonLink from '$lib/PersonLink.svelte';
 	import Title from '$lib/Title.svelte';
-	import { locale } from '$types/Locales';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Organizations, { type PersonRow } from '$database/Organizations';
@@ -21,6 +19,7 @@
 
 	const organization = getOrg();
 	const user = getUser();
+	const db = getDB();
 
 	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
 
@@ -80,9 +79,9 @@
 								]}
 								change={(roleID) => {
 									for (const role of roles)
-										Organizations.unassignPerson($organization.getID(), profile.id, role.id);
+										$db.unassignPerson($organization.getID(), profile.id, role.id);
 									if (roleID !== undefined)
-										Organizations.assignPerson($organization.getID(), profile.id, roleID);
+										$db.assignPerson($organization.getID(), profile.id, roleID);
 								}}
 							/>
 						{/if}
@@ -111,11 +110,7 @@
 							]}
 							selection={profile.supervisor ?? undefined}
 							change={(personID) => {
-								Organizations.updateProfileSupervisor(
-									$organization.getID(),
-									profile.id,
-									personID ?? null
-								);
+								$db.updateProfileSupervisor($organization.getID(), profile.id, personID ?? null);
 							}}
 						/>
 					{:else if profile.supervisor}<PersonLink
@@ -128,7 +123,7 @@
 							on={$organization.hasAdminProfile(profile.id)}
 							enabled={isAdmin &&
 								($organization.getAdminCount() > 1 || !$organization.hasAdminProfile(profile.id))}
-							change={(on) => Organizations.updateAdmin($organization.getID(), profile.id, on)}
+							change={(on) => $db.updateAdmin($organization.getID(), profile.id, on)}
 						/>
 					{:else if $organization.hasAdminProfile(profile.id)}&check;{/if}
 				</td>
@@ -136,7 +131,7 @@
 				{#if isAdmin}
 					<td>
 						<Button
-							action={() => Organizations.removeProfile(profile.id)}
+							action={() => $db.removeProfile(profile.id)}
 							active={profile.personid !== null && !$organization.hasAdminProfile(profile.id)}
 							>&times;</Button
 						>
@@ -157,10 +152,12 @@
 	<Form
 		action={async () => {
 			match = undefined;
-			match = await Organizations.getPersonWithEmail(newPersonEmail);
+			match = await $db.getPersonWithEmail(newPersonEmail);
 			await (match === null
-				? Organizations.addPersonByEmail($organization.getID(), newPersonEmail)
-				: Organizations.addPersonByID($organization.getID(), match.id));
+				? $db.addPersonByEmail($organization.getID(), newPersonEmail)
+				: match !== null && match !== undefined
+				? $db.addPersonByID($organization.getID(), match.id)
+				: undefined);
 			newPersonEmail = '';
 		}}
 	>

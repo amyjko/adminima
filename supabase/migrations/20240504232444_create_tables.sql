@@ -530,16 +530,38 @@ create table "public"."processes" (
 
 alter table "public"."processes" enable row level security;
 
-create policy "Processes are viewable by everyone." on processes
-  for select using (true);
+create policy "Processes are readable by everyone in an organization and anyone if the organization is public." on processes
+  for select using (
+    (select visibility from orgs where orgs.id = processes.orgid) = 'public'
+    OR 
+    (select personid from profiles where profiles.orgid = orgid) = auth.uid()
+  );
 
-create policy "Anyone in the org can insert." on processes
-  for insert with check (true);
+create policy "Anyone in the organization can insert new processes." on processes
+  for insert with check ((select personid from profiles where profiles.orgid = orgid) = auth.uid());
 
-create policy "Anyone with the role can update" on processes
-  for update using (true);
+create policy "Anyone admin or anyone in the organization with a role that is accountable or responsible for the process can update it." on processes
+  for update using (
+    exists (
+        select personid from profiles where 
+          profiles.orgid = orgid AND 
+          profiles.personid = auth.uid() AND 
+          profiles.admin = true
+    )
+    or exists (
+      select id 
+      from hows where 
+        hows.processid = processes.id AND 
+        (select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid())) = ANY(hows.responsible)
+    )
+    or exists (
+      select accountable 
+      from processes where 
+        accountable = (select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid()))
+    )
+  );
 
-create policy "Anyone with the role can delete" on processes
+create policy "Anyone accountable or responsible for the process can delete it." on processes
   for delete using (true);
 
 alter table "public"."processes" add constraint "public_processes_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;

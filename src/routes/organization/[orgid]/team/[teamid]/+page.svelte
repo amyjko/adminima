@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
-	import { getOrg, getUser } from '$lib/contexts';
+	import { getDB, getOrg, getUser } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
 	import { locale } from '$types/Locales';
 	import { page } from '$app/stores';
@@ -15,6 +15,7 @@
 
 	const user = getUser();
 	const org = getOrg();
+	const db = getDB();
 
 	let error: string | undefined = undefined;
 
@@ -27,17 +28,13 @@
 	<Title
 		title={team.name}
 		kind="team"
-		edit={$user && isAdmin
-			? (text) => Organizations.updateTeamName(team, text, $user.id)
-			: undefined}
+		edit={$user && isAdmin ? (text) => $db.updateTeamName(team, text, $user.id) : undefined}
 	/>
 
 	<MarkupView
 		markup={team.description}
 		unset="No description"
-		edit={isAdmin && $user
-			? (text) => Organizations.updateTeamDescription(team, text, $user.id)
-			: undefined}
+		edit={isAdmin && $user ? (text) => $db.updateTeamDescription(team, text, $user.id) : undefined}
 	/>
 
 	{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
@@ -53,7 +50,7 @@
 	<Paragraph>If you delete this team, the roles on it will be without a team.</Paragraph>
 	<Button
 		action={async () => {
-			const err = await Organizations.deleteTeam(teamID);
+			const err = await $db.deleteTeam(teamID);
 			if (err) error = err.message;
 			else goto(`/organization/${$org.getID()}/roles`);
 		}}

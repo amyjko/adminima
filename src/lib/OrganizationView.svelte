@@ -2,11 +2,9 @@
 	import MarkupView from './MarkupView.svelte';
 	import Link from './Link.svelte';
 	import Title from './Title.svelte';
-	import { locale } from '$types/Locales';
 	import Paragraph from './Paragraph.svelte';
-	import Organizations from '$database/Organizations';
 	import type Organization from '$types/Organization';
-	import { getUser } from './contexts';
+	import { getDB, getUser } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Oops from './Oops.svelte';
@@ -14,6 +12,7 @@
 	export let organization: Organization;
 
 	const user = getUser();
+	const db = getDB();
 
 	$: visibility = organization.getVisibility();
 	$: isAdmin = $user && organization.hasAdminPerson($user.id);
@@ -24,16 +23,14 @@
 <Title
 	title={organization.getName()}
 	kind="organization"
-	edit={$user && isAdmin
-		? (text) => Organizations.updateOrgName(organization, text, $user.id)
-		: undefined}
+	edit={$user && isAdmin ? (text) => $db.updateOrgName(organization, text, $user.id) : undefined}
 >
 	<Visibility
 		level={organization.getVisibility()}
 		edit={$user && editable
 			? (vis) =>
 					vis === 'org' || vis === 'admin' || vis === 'public'
-						? Organizations.updateOrgVisibility(organization, vis, $user.id)
+						? $db.updateOrgVisibility(organization, vis, $user.id)
 						: undefined
 			: undefined}
 	/>
@@ -44,7 +41,7 @@
 		markup={organization.getDescription()}
 		unset="No description"
 		edit={editable && $user
-			? (text) => Organizations.updateOrgDescription(organization, text, $user.id)
+			? (text) => $db.updateOrgDescription(organization, text, $user.id)
 			: undefined}
 	/>
 
