@@ -540,7 +540,7 @@ create policy "Processes are readable by everyone in an organization and anyone 
 create policy "Anyone in the organization can insert new processes." on processes
   for insert with check ((select personid from profiles where profiles.orgid = orgid) = auth.uid());
 
-create policy "Anyone admin or anyone in the organization with a role that is accountable or responsible for the process can update it." on processes
+create policy "Anyone admin, anyone in the organization if no one is accountable, or anyone in the organization with a role that is accountable or responsible for the process." on processes
   for update using (
     exists (
         select personid from profiles where 
@@ -548,21 +548,27 @@ create policy "Anyone admin or anyone in the organization with a role that is ac
           profiles.personid = auth.uid() AND 
           profiles.admin = true
     )
+    or (accountable = null and exists (select personid from profiles where profiles.orgid = orgid AND profiles.personid = auth.uid()))
     or exists (
       select id 
       from hows where 
         hows.processid = processes.id AND 
         (select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid())) = ANY(hows.responsible)
     )
-    or exists (
-      select accountable 
-      from processes where 
-        accountable = (select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid()))
-    )
+    or (accountable = (select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid())))
   );
 
-create policy "Anyone accountable or responsible for the process can delete it." on processes
-  for delete using (true);
+create policy "Any admin, or any person in the org if no one is accountable, or the person accountable." on processes
+  for delete using (
+    exists (
+        select personid from profiles where 
+          profiles.orgid = orgid AND 
+          profiles.personid = auth.uid() AND 
+          profiles.admin = true
+    )
+    or (accountable = null and exists (select personid from profiles where profiles.orgid = orgid AND profiles.personid = auth.uid()))
+    or (accountable = ((select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid()))))
+  );
 
 alter table "public"."processes" add constraint "public_processes_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;
 

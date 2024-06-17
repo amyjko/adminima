@@ -12,7 +12,7 @@
 	setContext(DBSymbol, db);
 	$: $db.setSupabaseClient(data.supabase);
 
-	const user: UserContext = writable(null);
+	const user: UserContext = writable(data.user);
 	setContext(UserSymbol, user);
 
 	$: ({ strings, supabase } = data);
