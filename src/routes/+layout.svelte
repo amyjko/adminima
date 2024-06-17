@@ -19,9 +19,12 @@
 	$: locale.set(strings);
 
 	onMount(() => {
-		const subscription = supabase.auth.onAuthStateChange((_, newSession) => {
+		const subscription = supabase.auth.onAuthStateChange(async () => {
+			const {
+				data: { user: latestUser }
+			} = await supabase.auth.getUser();
 			// Update the user.
-			user.set(newSession?.user ?? null);
+			user.set(latestUser);
 		});
 
 		// call unsubscribe to remove the callback
