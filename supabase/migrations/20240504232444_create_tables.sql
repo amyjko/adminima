@@ -139,65 +139,20 @@ grant trigger on table "public"."orgs" to "service_role";
 grant truncate on table "public"."orgs" to "service_role";
 grant update on table "public"."orgs" to "service_role";
 
+-- Get an organization's visibility
+-- Define a function to check if someone is a member of an organization
+create function getVisibility("_orgid" uuid) 
+returns visibility
+language sql
+as $$
+  select visibility from orgs where id = _orgid;
+$$;
+
 
 -- Enable realtime updates on the orgs table.
 alter
   publication supabase_realtime add table "public"."orgs";
 
-
-
--- Define teams table
-create table "public"."teams" (
-    "id" uuid not null default uuid_generate_v1() primary key,
-    "when" timestamp with time zone not null default now(),
-    "orgid" uuid not null references orgs(id) on delete cascade,
-    "name" text not null default ''::text,
-    "description" uuid default null references markup(id) on delete set null,
-    -- Comments describing changes to the team
-    "comments" uuid[] not null default '{}'
-);
-
-alter table "public"."teams" enable row level security;
-
-grant delete on table "public"."teams" to "anon";
-grant insert on table "public"."teams" to "anon";
-grant references on table "public"."teams" to "anon";
-grant select on table "public"."teams" to "anon";
-grant trigger on table "public"."teams" to "anon";
-grant truncate on table "public"."teams" to "anon";
-grant update on table "public"."teams" to "anon";
-
-grant delete on table "public"."teams" to "authenticated";
-grant insert on table "public"."teams" to "authenticated";
-grant references on table "public"."teams" to "authenticated";
-grant select on table "public"."teams" to "authenticated";
-grant trigger on table "public"."teams" to "authenticated";
-grant truncate on table "public"."teams" to "authenticated";
-grant update on table "public"."teams" to "authenticated";
-
-grant delete on table "public"."teams" to "service_role";
-grant insert on table "public"."teams" to "service_role";
-grant references on table "public"."teams" to "service_role";
-grant select on table "public"."teams" to "service_role";
-grant trigger on table "public"."teams" to "service_role";
-grant truncate on table "public"."teams" to "service_role";
-grant update on table "public"."teams" to "service_role";
-
-create policy "Teams are viewable based on organization's policy." on teams
-  for select using (true);
-
-create policy "Admins can create teams." on teams
-  for insert with check (true);
-
-create policy "Admins can update teams." on teams
-  for update using (true);
-
-  create policy "Admins can delete" on teams
-  for delete using (true);
-
--- Enable realtime updates on the teams table.
-alter
-  publication supabase_realtime add table "public"."teams";
 
 
 -- A table to store people's name, bio, profiles, and status per organization.
@@ -307,6 +262,59 @@ $$;
 -- Enable realtime updates on the profiles table.
 alter
   publication supabase_realtime add table "public"."profiles";
+
+-- Define teams table
+create table "public"."teams" (
+    "id" uuid not null default uuid_generate_v1() primary key,
+    "when" timestamp with time zone not null default now(),
+    "orgid" uuid not null references orgs(id) on delete cascade,
+    "name" text not null default ''::text,
+    "description" uuid default null references markup(id) on delete set null,
+    -- Comments describing changes to the team
+    "comments" uuid[] not null default '{}'
+);
+
+alter table "public"."teams" enable row level security;
+
+grant delete on table "public"."teams" to "anon";
+grant insert on table "public"."teams" to "anon";
+grant references on table "public"."teams" to "anon";
+grant select on table "public"."teams" to "anon";
+grant trigger on table "public"."teams" to "anon";
+grant truncate on table "public"."teams" to "anon";
+grant update on table "public"."teams" to "anon";
+
+grant delete on table "public"."teams" to "authenticated";
+grant insert on table "public"."teams" to "authenticated";
+grant references on table "public"."teams" to "authenticated";
+grant select on table "public"."teams" to "authenticated";
+grant trigger on table "public"."teams" to "authenticated";
+grant truncate on table "public"."teams" to "authenticated";
+grant update on table "public"."teams" to "authenticated";
+
+grant delete on table "public"."teams" to "service_role";
+grant insert on table "public"."teams" to "service_role";
+grant references on table "public"."teams" to "service_role";
+grant select on table "public"."teams" to "service_role";
+grant trigger on table "public"."teams" to "service_role";
+grant truncate on table "public"."teams" to "service_role";
+grant update on table "public"."teams" to "service_role";
+
+create policy "Teams are viewable based on organization's policy." on teams
+  for select using (getVisibility(orgid) = 'public' or isMember(orgid));
+
+create policy "Admins can create teams." on teams
+  for insert with check (isAdmin(orgid));
+
+create policy "Admins can update teams." on teams
+  for update using (isAdmin(orgid));
+
+  create policy "Admins can delete teams." on teams
+  for delete using (isAdmin(orgid));
+
+-- Enable realtime updates on the teams table.
+alter
+  publication supabase_realtime add table "public"."teams";
 
 
 -- Now that we've defined both orgs and tables, we can define org policies based on profiles.
@@ -565,14 +573,10 @@ create table "public"."processes" (
 alter table "public"."processes" enable row level security;
 
 create policy "Processes are readable by everyone in an organization and anyone if the organization is public." on processes
-  for select using (
-    (select visibility from orgs where orgs.id = processes.orgid) = 'public'
-    or
-    isMember(orgid)
-  );
+  for select using (getVisibility(orgid) = 'public' or isMember(orgid));
 
 create policy "Anyone in the organization can insert new processes." on processes
-  for insert with check (exists (select personid from profiles where profiles.orgid = orgid and profiles.personid = auth.uid()));
+  for insert with check (isMember(orgid));
 
 create policy "Any admin, anyone in the organization if no one is accountable, or anyone in the organization with a role that is accountable or responsible for the process." on processes
   for update using (

@@ -2,14 +2,12 @@
 	import Oops from '$lib/Oops.svelte';
 	import { getDB, getOrg, getUser } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
-	import { locale } from '$types/Locales';
 	import { page } from '$app/stores';
 	import MarkupView from '$lib/MarkupView.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Button from '$lib/Button.svelte';
-	import Organizations from '$database/Organizations';
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
 

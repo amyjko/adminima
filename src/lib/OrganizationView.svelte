@@ -49,7 +49,9 @@
 		See the <strong>{organization.getRoles().length}</strong>
 		<Link kind="role" to="/organization/{organization.getID()}/roles"
 			>Role{organization.getRoles().length !== 1 ? 's' : ''}</Link
-		> people have in this organization.</Paragraph
+		> and <strong>{organization.getTeams().length}</strong> team{organization.getTeams().length > 1
+			? 's'
+			: ''} in this organization.</Paragraph
 	>
 
 	<Paragraph

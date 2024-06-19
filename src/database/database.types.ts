@@ -599,6 +599,12 @@ export type Database = {
         }
         Returns: string
       }
+      getvisibility: {
+        Args: {
+          _orgid: string
+        }
+        Returns: Database["public"]["Enums"]["visibility"]
+      }
       isadmin: {
         Args: {
           _orgid: string
