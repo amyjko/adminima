@@ -1,16 +1,19 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
 	import Title from '$lib/Title.svelte';
-	import { OrgSymbol, getDB } from '$lib/contexts';
+	import { OrgSymbol, getDB, getUser } from '$lib/contexts';
 	import { onMount, setContext } from 'svelte';
 	import { page } from '$app/stores';
 
 	export let data;
 
 	const db = getDB();
+	const user = getUser();
 
 	// Save the payload in the database cache.
-	$: if (data.payload) setContext(OrgSymbol, $db.updateOrg(data.payload));
+	$: payload = data.payload;
+	$: org = data.payload ? $db.updateOrg(data.payload) : undefined;
+	$: if (payload) setContext(OrgSymbol, org);
 
 	onMount(() => {
 		// When this layout mounts, listen to realtime changes on the organization payload.
@@ -24,8 +27,12 @@
 	});
 </script>
 
-{#if data.payload !== null}
-	<slot />
+{#if $org}
+	{#if $org.getVisibility() === 'public' || ($user && $org.getVisibility() === 'org' && $org.hasPerson($user.id)) || ($user && $org.getVisibility() === 'admin' && $org.hasAdminPerson($user.id))}
+		<slot />
+	{:else}
+		<Oops text="This organization's details aren't visible to you." />
+	{/if}
 {:else}
 	<Title title="Oops" kind="organization" />
 	<Oops text="Organization not found." />

@@ -301,54 +301,34 @@ grant truncate on table "public"."teams" to "service_role";
 grant update on table "public"."teams" to "service_role";
 
 create policy "Teams are viewable based on organization's policy." on teams
-  for select using (getVisibility(orgid) = 'public' or isMember(orgid));
+  for select to public using (getVisibility(orgid) = 'public' or isMember(orgid));
 
 create policy "Admins can create teams." on teams
-  for insert with check (isAdmin(orgid));
+  for insert to public with check (isAdmin(orgid));
 
 create policy "Admins can update teams." on teams
-  for update using (isAdmin(orgid));
+  for update to public using (isAdmin(orgid));
 
   create policy "Admins can delete teams." on teams
-  for delete using (isAdmin(orgid));
+  for delete to public using (isAdmin(orgid));
 
 -- Enable realtime updates on the teams table.
 alter
   publication supabase_realtime add table "public"."teams";
 
 
--- Now that we've defined both orgs and tables, we can define org policies based on profiles.
-create policy "Anyone can view the organization's metadata."
-on "public"."orgs"
-as permissive
-for select
-to public
-using (true);
+-- Now that we've defined both orgs and profiles, we can define org policies based on profiles.
+create policy "If public or no one is added to an organization, anyone can view an organization's metadata. Otherwise any member can view." on orgs
+for select to public using (visibility = 'public' or isMember(id) or not exists(select * from profiles where orgid = id));
 
-create policy "Anyone can create organizations."
-on "public"."orgs"
-as permissive
-for insert
-to public
-with check (true);
+create policy "Anyone can create organizations." on orgs
+for insert to public with check (true);
 
-create policy "Only org admins can update an org."
-on "public"."orgs"
-as permissive
-for update
-to public
-using (true);
---using (exists (select from profiles where profiles.admin = true and id = profiles.orgid and profiles.personid = auth.uid()))
---with check (true);
+create policy "Only admins can update an organization." on orgs
+for update to public using (isAdmin(id));
 
-create policy "Only org admins can delete an org."
-on "public"."orgs"
-as permissive
-for delete
-to public 
-using (exists (select from profiles where profiles.admin = true and id = profiles.orgid and profiles.personid = auth.uid()));
-
-
+create policy "Only admins can delete an organization." on orgs
+for delete to public using (isAdmin(id));
 
 -- Define the roles table and configuration.
 create table "public"."roles" (
