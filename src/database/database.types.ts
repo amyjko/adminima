@@ -593,7 +593,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      getprofileid: {
+        Args: {
+          _orgid: string
+        }
+        Returns: string
+      }
+      isadmin: {
+        Args: {
+          _orgid: string
+        }
+        Returns: boolean
+      }
+      ismember: {
+        Args: {
+          _orgid: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       completion: "no" | "pending" | "yes"
