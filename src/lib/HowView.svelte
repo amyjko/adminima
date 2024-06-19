@@ -10,6 +10,7 @@
 
 	export let how: HowRow;
 	export let process: ProcessRow;
+	export let editable: boolean;
 
 	const org = getOrg();
 	const db = getDB();
@@ -144,51 +145,56 @@
 			<div
 				role="checkbox"
 				class="complete"
+				aria-disabled={!editable}
 				aria-checked={how.done === 'no' ? 'false' : how.done === 'pending' ? 'mixed' : 'true'}
-				tabindex="0"
+				tabindex={editable ? 0 : null}
 				on:keydown={(event) =>
-					event.key === 'Enter' || event.key === ' ' ? toggleDone() : undefined}
-				on:pointerdown={toggleDone}
+					editable && (event.key === 'Enter' || event.key === ' ') ? toggleDone() : undefined}
+				on:pointerdown={editable ? toggleDone : undefined}
 			>
 				{#if how.done === 'no'}&nbsp;{:else if how.done === 'pending'}…{:else}✔{/if}
 			</div>
-			<textarea
-				rows={text.split('\n').length}
-				class:done={how.done === 'yes'}
-				class:pending={how.done === 'pending'}
-				id={deleted ? '' : `how-${how.id}`}
-				placeholder="instructions …"
-				bind:value={text}
-				bind:this={input}
-				on:blur={save}
-				on:keydown={(e) => {
-					if (e.key === 'Enter' && e.metaKey) {
-						e.preventDefault();
-						insertHow();
-					} else if (e.key === 'Backspace' && text === '') {
-						e.preventDefault();
-						deleteHow();
-					} else if (e.key === 'ArrowRight' && e.metaKey) {
-						e.preventDefault();
-						indentHow(true);
-					} else if (e.key === 'ArrowLeft' && e.metaKey) {
-						e.preventDefault();
-						unindentHow(true);
-					} else if (e.key === 'ArrowDown') {
-						const lines = text.split('\n');
-						if (input && input.selectionEnd >= text.length - lines[lines.length - 1].length) {
+			{#if editable}
+				<textarea
+					rows={text.split('\n').length}
+					class:done={how.done === 'yes'}
+					class:pending={how.done === 'pending'}
+					id={deleted ? '' : `how-${how.id}`}
+					placeholder="instructions …"
+					bind:value={text}
+					bind:this={input}
+					on:blur={save}
+					on:keydown={(e) => {
+						if (e.key === 'Enter' && e.metaKey) {
 							e.preventDefault();
-							moveVertically(1);
-						}
-					} else if (e.key === 'ArrowUp') {
-						const lines = text.split('\n');
-						if (input && input.selectionEnd <= lines[0].length) {
+							insertHow();
+						} else if (e.key === 'Backspace' && text === '') {
 							e.preventDefault();
-							moveVertically(-1);
+							deleteHow();
+						} else if (e.key === 'ArrowRight' && e.metaKey) {
+							e.preventDefault();
+							indentHow(true);
+						} else if (e.key === 'ArrowLeft' && e.metaKey) {
+							e.preventDefault();
+							unindentHow(true);
+						} else if (e.key === 'ArrowDown') {
+							const lines = text.split('\n');
+							if (input && input.selectionEnd >= text.length - lines[lines.length - 1].length) {
+								e.preventDefault();
+								moveVertically(1);
+							}
+						} else if (e.key === 'ArrowUp') {
+							const lines = text.split('\n');
+							if (input && input.selectionEnd <= lines[0].length) {
+								e.preventDefault();
+								moveVertically(-1);
+							}
 						}
-					}
-				}}
-			/>
+					}}
+				/>
+			{:else}
+				{text}
+			{/if}
 		</div>
 	{/if}
 	<div class="meta">
@@ -209,7 +215,7 @@
 		{#each how.how
 			.map((h) => $org.getHow(h))
 			.filter((h) => h !== undefined) as subhow, index (subhow ? subhow.id : index)}
-			<li><svelte:self how={subhow} {process} /></li>
+			<li><svelte:self how={subhow} {process} {editable} /></li>
 		{/each}
 	</ol>
 </div>
@@ -242,6 +248,11 @@
 		justify-content: space-around;
 		cursor: pointer;
 		user-select: none;
+	}
+
+	.complete[aria-disabled='true'] {
+		cursor: not-allowed;
+		background: none;
 	}
 
 	.complete:focus {

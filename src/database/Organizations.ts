@@ -679,30 +679,43 @@ class Organizations {
 
 	async getPayload(orgid: string): Promise<OrganizationPayload | null> {
 		// Load all of the organization metadata from the database
-		const { data: organization } = await this.supabase
+		const { data: organization, error: orgError } = await this.supabase
 			.from('orgs')
 			.select()
 			.eq('id', orgid)
 			.single();
-		const { data: profiles } = await this.supabase.from('profiles').select(`*`).eq('orgid', orgid);
-		const { data: roles } = await this.supabase.from('roles').select(`*`).eq('orgid', orgid);
-		const { data: assignments } = await this.supabase
+		const { data: profiles, error: profileError } = await this.supabase
+			.from('profiles')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: roles, error: rolesError } = await this.supabase
+			.from('roles')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: assignments, error: assignmentsError } = await this.supabase
 			.from('assignments')
 			.select(`*`)
 			.eq('orgid', orgid);
-		const { data: processes } = await this.supabase
+		const { data: processes, error: processesError } = await this.supabase
 			.from('processes')
 			.select(`*`)
 			.eq('orgid', orgid);
-		const { data: hows } = await this.supabase.from('hows').select(`*`).eq('orgid', orgid);
-		const { data: teams } = await this.supabase.from('teams').select(`*`).eq('orgid', orgid);
-		const { data: suggestions } = await this.supabase
+		const { data: hows, error: howError } = await this.supabase
+			.from('hows')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: teams, error: teamsError } = await this.supabase
+			.from('teams')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: suggestions, error: suggestionsError } = await this.supabase
 			.from('suggestions')
 			.select(`*`)
 			.eq('orgid', orgid);
 
-		// If we didn't receive any of it, return null. Otherwise, return the payload.
-		return organization === null ||
+		// If we didn't receive any of it, return null.
+		if (
+			organization === null ||
 			profiles === null ||
 			roles === null ||
 			assignments === null ||
@@ -710,17 +723,34 @@ class Organizations {
 			hows === null ||
 			teams === null ||
 			suggestions === null
-			? null
-			: {
-					organization,
-					profiles,
-					roles,
-					assignments,
-					processes,
-					hows,
-					teams,
-					suggestions
-			  };
+		) {
+			console.log('Missing something');
+			console.log(
+				orgError,
+				rolesError,
+				profileError,
+				assignmentsError,
+				processesError,
+				howError,
+				teamsError,
+				suggestionsError
+			);
+
+			return null;
+		}
+
+		// Otherwise, return the payload.
+		else
+			return {
+				organization,
+				profiles,
+				roles,
+				assignments,
+				processes,
+				hows,
+				teams,
+				suggestions
+			};
 	}
 
 	async getPersonsOrganizations(

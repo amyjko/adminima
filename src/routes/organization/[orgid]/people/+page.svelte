@@ -26,6 +26,17 @@
 	let newPersonEmail: string = '';
 	let match: PersonRow | undefined | null = undefined;
 	$: existing = $organization.getProfileWithEmail(newPersonEmail);
+
+	async function addEmail() {
+		match = undefined;
+		match = await $db.getPersonWithEmail(newPersonEmail);
+		await (match === null
+			? $db.addPersonByEmail($organization.getID(), newPersonEmail)
+			: match !== null && match !== undefined
+			? $db.addPersonByID($organization.getID(), match.id)
+			: undefined);
+		newPersonEmail = '';
+	}
 </script>
 
 <Title title="people" kind="person" />
@@ -149,18 +160,7 @@
 			>This will not send an invitation; they can create an account at any time</em
 		>.</Paragraph
 	>
-	<Form
-		action={async () => {
-			match = undefined;
-			match = await $db.getPersonWithEmail(newPersonEmail);
-			await (match === null
-				? $db.addPersonByEmail($organization.getID(), newPersonEmail)
-				: match !== null && match !== undefined
-				? $db.addPersonByID($organization.getID(), match.id)
-				: undefined);
-			newPersonEmail = '';
-		}}
-	>
+	<Form action={addEmail}>
 		<Field
 			label="email"
 			bind:text={newPersonEmail}

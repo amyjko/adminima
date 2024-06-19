@@ -24,6 +24,7 @@
 	import Link from '$lib/Link.svelte';
 	import Suggestions from '$lib/Suggestions.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
+	import Tip from '$lib/Tip.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -35,7 +36,21 @@
 	$: how = process && process.howid ? $org.getHow(process.howid) : undefined;
 
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
-	$: editable = $user !== null && ($org.hasAdminPerson($user.id) || $org.hasPerson($user.id));
+	$: personRoles = $user ? $org.getPersonRoles($user.id) : [];
+	$: admin = $user !== null && $org.hasAdminPerson($user.id);
+	$: accountable =
+		$user !== null &&
+		process !== null &&
+		(process.accountable === null || personRoles.includes(process.accountable));
+	$: responsible =
+		$user !== null &&
+		process !== null &&
+		(admin ||
+			accountable ||
+			$org
+				.getProcessHows(process.id)
+				.some((how) => how.responsible.filter((r) => personRoles.includes(r)).length > 0));
+	$: editable = process !== null && $user !== null && responsible;
 
 	let newConcern = '';
 
@@ -72,11 +87,17 @@
 		edit={$user && editable ? (text) => $db.updateProcessTitle(process, text, $user.id) : undefined}
 	/>
 
+	<Tip
+		>Admins and anyone <Level level="accountable" />ccountable or <Level
+			level="responsible"
+		/>esponsible can edit a process. If no one is accountable, anyone in the organization can edit.</Tip
+	>
+
 	{#if how}
 		<MarkupView
 			text={how.what}
 			unset="No description yet."
-			edit={$user && editable ? (text) => $db.updateHowText(how, text) : undefined}
+			edit={editable ? (text) => $db.updateHowText(how, text) : undefined}
 		/>
 	{/if}
 
@@ -150,7 +171,7 @@
 		<ol>
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
 				{#if subHow}
-					<li><HowView how={subHow} {process} /></li>
+					<li><HowView how={subHow} {process} {editable} /></li>
 				{/if}
 			{/each}
 		</ol>
@@ -198,8 +219,10 @@
 		><Paragraph>There are no active changes suggested for this process.</Paragraph></Suggestions
 	>
 
-	<Admin>
+	{#if admin || accountable}
+		<Header>Delete</Header>
 		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
+		<Tip>Only admins and those role <Level level="accountable" />ccountable roles can delete.</Tip>
 		<Button
 			action={async () => {
 				try {
@@ -213,7 +236,7 @@
 			warning>Delete this process</Button
 		>
 		{#if deleteError}<Oops text={deleteError} />{/if}
-	</Admin>
+	{/if}
 
 	<Header>History</Header>
 

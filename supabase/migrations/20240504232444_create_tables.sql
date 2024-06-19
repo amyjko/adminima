@@ -534,40 +534,45 @@ create policy "Processes are readable by everyone in an organization and anyone 
   for select using (
     (select visibility from orgs where orgs.id = processes.orgid) = 'public'
     OR 
-    (select personid from profiles where profiles.orgid = orgid) = auth.uid()
+    exists (select personid from profiles where profiles.orgid = orgid and profiles.personid = auth.uid())
   );
 
 create policy "Anyone in the organization can insert new processes." on processes
-  for insert with check ((select personid from profiles where profiles.orgid = orgid) = auth.uid());
+  for insert with check (exists (select personid from profiles where profiles.orgid = orgid and profiles.personid = auth.uid()));
 
-create policy "Anyone admin, anyone in the organization if no one is accountable, or anyone in the organization with a role that is accountable or responsible for the process." on processes
+create policy "Any admin, anyone in the organization if no one is accountable, or anyone in the organization with a role that is accountable or responsible for the process." on processes
   for update using (
     exists (
         select personid from profiles where 
-          profiles.orgid = orgid AND 
-          profiles.personid = auth.uid() AND 
+          profiles.orgid = orgid and 
+          profiles.personid = auth.uid() and
           profiles.admin = true
     )
+    -- If no one is accountable, anyone in the org can update it.
     or (accountable = null and exists (select personid from profiles where profiles.orgid = orgid AND profiles.personid = auth.uid()))
+    -- If the person is accountable, they can update it.
+    or exists (select roleid from assignments where accountable = roleid and assignments.profileid = (select profileid from profiles where profiles.orgid = orgid and personid = auth.uid()))
+    -- If there is a how for this process that contains an assignment with this person's ID, they can update it.
     or exists (
       select id 
       from hows where 
         hows.processid = processes.id AND 
-        (select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid())) = ANY(hows.responsible)
+        (select roleid from assignments where assignments.profileid = (select profileid from profiles where profiles.orgid = orgid and personid = auth.uid())) = ANY(hows.responsible)
     )
-    or (accountable = (select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid())))
   );
 
 create policy "Any admin, or any person in the org if no one is accountable, or the person accountable." on processes
   for delete using (
     exists (
         select personid from profiles where 
-          profiles.orgid = orgid AND 
-          profiles.personid = auth.uid() AND 
+          profiles.orgid = orgid and 
+          profiles.personid = auth.uid() and
           profiles.admin = true
     )
+    -- If no one is accountable, anyone in the org can update it.
     or (accountable = null and exists (select personid from profiles where profiles.orgid = orgid AND profiles.personid = auth.uid()))
-    or (accountable = ((select roleid from assignments where assignments.profileid = (select profileid from profiles where personid = auth.uid()))))
+    -- If the person is accountable, they can update it.
+    or exists (select roleid from assignments where accountable = roleid and assignments.profileid = (select profileid from profiles where profiles.orgid = orgid and personid = auth.uid()))
   );
 
 alter table "public"."processes" add constraint "public_processes_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;

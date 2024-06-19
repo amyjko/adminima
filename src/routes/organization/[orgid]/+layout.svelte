@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Organizations from '$database/Organizations.js';
 	import Oops from '$lib/Oops.svelte';
 	import Title from '$lib/Title.svelte';
 	import { OrgSymbol, getDB } from '$lib/contexts';

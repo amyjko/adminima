@@ -261,6 +261,10 @@ export default class Organization {
 		return this.data.hows.find((how) => how.id === id);
 	}
 
+	getProcessHows(id: ProcessID) {
+		return this.data.hows.filter((how) => how.processid === id);
+	}
+
 	getHowParent(id: HowID) {
 		return this.data.hows.find((how) => how.how.includes(id));
 	}
@@ -295,6 +299,14 @@ export default class Organization {
 		return this.data.profiles.filter((person) =>
 			person.name.toLocaleLowerCase().includes(name.toLocaleLowerCase())
 		);
+	}
+
+	getPersonRoles(id: PersonID) {
+		const profile = this.data.profiles.find((prof) => prof.personid === id);
+		if (profile === undefined) return [];
+		return this.data.assignments
+			.filter((ass) => ass.profileid === profile.id)
+			.map((ass) => ass.roleid);
 	}
 
 	withTeam(newTeam: TeamRow) {
