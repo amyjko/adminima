@@ -5,6 +5,7 @@
 	import { writable } from 'svelte/store';
 	import { DBSymbol, UserSymbol, type DBContext, type UserContext } from '$lib/contexts';
 	import Organizations from '$database/Organizations.js';
+	import { goto } from '$app/navigation';
 
 	export let data;
 
@@ -19,12 +20,17 @@
 	$: locale.set(strings);
 
 	onMount(() => {
-		const subscription = supabase.auth.onAuthStateChange(async () => {
-			const {
-				data: { user: latestUser }
-			} = await supabase.auth.getUser();
-			// Update the user.
-			user.set(latestUser);
+		const subscription = supabase.auth.onAuthStateChange(async (newUser) => {
+			if (newUser === 'SIGNED_OUT') {
+				user.set(null);
+				goto('/login');
+			} else {
+				const {
+					data: { user: latestUser }
+				} = await supabase.auth.getUser();
+				// Update the user.
+				user.set(latestUser);
+			}
 		});
 
 		// call unsubscribe to remove the callback
