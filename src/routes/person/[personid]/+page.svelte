@@ -18,6 +18,7 @@
 	async function logout() {
 		const { error } = await $db.signOut();
 		if (error) message = error.code ?? error.message;
+		else goto(`/login`);
 	}
 
 	$: if (browser && $user === null) goto(`/login`);

@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
-import { type Handle, redirect } from '@sveltejs/kit';
+import { type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 import { PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
@@ -37,7 +37,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 			data: { session }
 		} = await event.locals.supabase.auth.getSession();
 		if (!session) {
-			return { session: null, user: null };
+			return { user: null };
 		}
 
 		const {
@@ -46,10 +46,10 @@ const supabase: Handle = async ({ event, resolve }) => {
 		} = await event.locals.supabase.auth.getUser();
 		if (error) {
 			// JWT validation has failed
-			return { session: null, user: null };
+			return { user: null };
 		}
 
-		return { session, user };
+		return { user };
 	};
 
 	return resolve(event, {
@@ -64,17 +64,8 @@ const supabase: Handle = async ({ event, resolve }) => {
 };
 
 const authGuard: Handle = async ({ event, resolve }) => {
-	const { session, user } = await event.locals.safeGetSession();
-	event.locals.session = session;
+	const { user } = await event.locals.safeGetSession();
 	event.locals.user = user;
-
-	if (!event.locals.session && event.url.pathname.startsWith('/private')) {
-		return redirect(303, '/auth');
-	}
-
-	if (event.locals.session && event.url.pathname === '/auth') {
-		return redirect(303, '/private');
-	}
 
 	return resolve(event);
 };
