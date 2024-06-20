@@ -344,17 +344,18 @@ create table "public"."roles" (
 
 alter table "public"."roles" enable row level security;
 
-create policy "Roles are viewable by everyone." on roles
-  for select using (true);
+create policy "Roles are viewable by everyone if public, by members otherwise." on roles
+  for select using (getVisibility(orgid) = 'public' or isMember(orgid));
 
 create policy "Admins can insert." on roles
-  for insert with check (true);
+  for insert with check (isAdmin(orgid));
 
 create policy "Admins can update" on roles
-  for update using (true);
+  for update using (isAdmin(orgid));
 
 create policy "Admins can delete" on roles
-  for delete using (true);
+  for delete using (isAdmin(orgid));
+
 
 alter table "public"."roles" add constraint "public_roles_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;
 alter table "public"."roles" validate constraint "public_roles_orgid_fkey";
