@@ -238,11 +238,11 @@ $$;
 
 create policy "Public profiles are viewable by everyone." on profiles 
 for select to anon, authenticated
-using (isMember(orgid) or getVisibility(orgid) = 'public' or auth.uid() = personid);
+using (true);
 
-create policy "Admins can insert profiles." on profiles 
+create policy "Admins can insert profiles, or anyone if there are no profiles." on profiles 
 for insert to anon, authenticated
-with check (isAdmin(orgid));
+with check (isAdmin(orgid) or not exists(select * from profiles where orgid = id));
 
 create policy "Admins can update a user's profile, as can a user of their own profile." on profiles 
 for update to anon, authenticated
@@ -312,7 +312,7 @@ alter
 
 -- Now that we've defined both orgs and profiles, we can define org policies based on profiles.
 create policy "If public or no one is added to an organization, anyone can view an organization's metadata. Otherwise any member can view." on orgs
-for select to anon, authenticated using (visibility = 'public' or isMember(id) or not exists(select * from profiles where orgid = id));
+for select to anon, authenticated using (visibility = 'public' or isMember(id) or not exists (select * from profiles where orgid = id));
 
 create policy "Anyone can create organizations." on orgs
 for insert to anon, authenticated with check (true);
@@ -425,17 +425,21 @@ alter
   publication supabase_realtime add table "public"."assignments";
 
 
-create policy "Roles are viewable by everyone." on assignments
-  for select to anon, authenticated using (true);
+create policy "Roles are viewable by anyone in the organization, or everyone if public." on assignments
+  for select to anon, authenticated 
+  using (getVisibility(orgid) = 'public' or isMember(orgid));
 
 create policy "Admins can insert." on assignments
-  for insert to anon, authenticated with check (true);
+  for insert to anon, authenticated 
+  with check (isAdmin(orgid));
 
 create policy "Admins can update" on assignments
-  for update to anon, authenticated using (true);
+  for update to anon, authenticated 
+  using (isAdmin(orgid));
 
 create policy "Admins can delete" on assignments
-  for delete to anon, authenticated using (true);
+  for delete to anon, authenticated 
+  using (isAdmin(orgid));
 
 
 

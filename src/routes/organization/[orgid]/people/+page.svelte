@@ -8,7 +8,7 @@
 	import Title from '$lib/Title.svelte';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
-	import Organizations, { type PersonRow } from '$database/Organizations';
+	import { type PersonRow } from '$database/Organizations';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Select from '$lib/Select.svelte';
 	import Subheader from '$lib/Subheader.svelte';
@@ -77,7 +77,7 @@
 				</td>
 				<td>
 					{#if isAdmin}
-						{#if roles.length === 0}
+						{#if $organization.getRoles().length === 0}
 							<em>&mdash;</em>
 						{:else}
 							<Select
