@@ -14,7 +14,7 @@ create or replace function auth.email() returns text as $$
 $$ language sql;
 
 -- A table to store people by email.
-create table people (
+create table "public"."people" (
   id uuid references auth.users on delete cascade not null primary key,
   -- Timestamp of creation time
   "when" timestamp with time zone not null default now(),
@@ -25,8 +25,14 @@ create table people (
 alter table people
   enable row level security;
 
-create policy "People are viewable by everyone." on people
-  for select to anon, authenticated using (true);
+create policy "People are viewable by themselves." on people
+  for select to anon, authenticated using (id = auth.uid());
+
+create policy "People can update themselves." on people
+  for update to anon, authenticated using (id = auth.uid());
+
+create policy "People can delete themselves." on people
+  for delete to anon, authenticated using (id = auth.uid());
 
 
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
@@ -43,6 +49,7 @@ begin
   return new;
 end;
 $$ language plpgsql security definer;
+
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_person();
