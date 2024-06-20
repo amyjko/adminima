@@ -26,7 +26,7 @@ alter table people
   enable row level security;
 
 create policy "People are viewable by everyone." on people
-  for select using (true);
+  for select to anon, authenticated using (true);
 
 
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
@@ -81,13 +81,13 @@ grant truncate on table "public"."markup" to "service_role";
 grant update on table "public"."markup" to "service_role";
 
 create policy "Markup is viewable based on the organization's visibility." on markup
-  for select using (true);
+  for select to anon, authenticated using (true);
 
 create policy "Markup can be inserted by those in the organization." on markup
-  for insert with check (true);
+  for insert to anon, authenticated with check (true);
 
 create policy "Markup can be updated by those in the organization." on markup
-  for update using (true);
+  for update to anon, authenticated using (true);
 
 alter
   publication supabase_realtime add table "public"."markup";
@@ -171,15 +171,6 @@ create table "public"."profiles" (
 
 alter table "public"."profiles" enable row level security;
 
-create policy "People are viewable by everyone." on profiles
-  for select using (true);
-
-create policy "Users can insert their own person record." on profiles
-  for insert with check (true);
-
-create policy "Users can update own person record." on profiles
-  for update using (true);
-
 grant delete on table "public"."profiles" to "anon";
 grant insert on table "public"."profiles" to "anon";
 grant references on table "public"."profiles" to "anon";
@@ -204,25 +195,13 @@ grant trigger on table "public"."profiles" to "service_role";
 grant truncate on table "public"."profiles" to "service_role";
 grant update on table "public"."profiles" to "service_role";
 
-create policy "Public profiles are viewable by everyone."
-on "public"."profiles"
-as permissive
-for select
-to public
+create policy "Public profiles are viewable by everyone." on profiles for select to anon, authenticated
 using (true);
 
-create policy "Users can insert their own profile."
-on "public"."profiles"
-as permissive
-for insert
-to public
+create policy "Users can insert their own profile." on profiles for insert to anon, authenticated
 with check (true);
 
-create policy "Users can update own profile."
-on "public"."profiles"
-as permissive
-for update
-to public
+create policy "Users can update own profile." on profiles for update to anon, authenticated
 with check (true);
 
 -- Define a function to check if someone is a member of an organization
@@ -301,16 +280,16 @@ grant truncate on table "public"."teams" to "service_role";
 grant update on table "public"."teams" to "service_role";
 
 create policy "Teams are viewable based on organization's policy." on teams
-  for select to public using (getVisibility(orgid) = 'public' or isMember(orgid));
+  for select to anon, authenticated using (getVisibility(orgid) = 'public' or isMember(orgid));
 
 create policy "Admins can create teams." on teams
-  for insert to public with check (isAdmin(orgid));
+  for insert to anon, authenticated with check (isAdmin(orgid));
 
 create policy "Admins can update teams." on teams
-  for update to public using (isAdmin(orgid));
+  for update to anon, authenticated using (isAdmin(orgid));
 
   create policy "Admins can delete teams." on teams
-  for delete to public using (isAdmin(orgid));
+  for delete to anon, authenticated using (isAdmin(orgid));
 
 -- Enable realtime updates on the teams table.
 alter
@@ -319,16 +298,16 @@ alter
 
 -- Now that we've defined both orgs and profiles, we can define org policies based on profiles.
 create policy "If public or no one is added to an organization, anyone can view an organization's metadata. Otherwise any member can view." on orgs
-for select to public using (visibility = 'public' or isMember(id) or not exists(select * from profiles where orgid = id));
+for select to anon, authenticated using (visibility = 'public' or isMember(id) or not exists(select * from profiles where orgid = id));
 
 create policy "Anyone can create organizations." on orgs
-for insert to public with check (true);
+for insert to anon, authenticated with check (true);
 
 create policy "Only admins can update an organization." on orgs
-for update to public using (isAdmin(id));
+for update to anon, authenticated using (isAdmin(id));
 
 create policy "Only admins can delete an organization." on orgs
-for delete to public using (isAdmin(id));
+for delete to anon, authenticated using (isAdmin(id));
 
 -- Define the roles table and configuration.
 create table "public"."roles" (
@@ -345,16 +324,16 @@ create table "public"."roles" (
 alter table "public"."roles" enable row level security;
 
 create policy "Roles are viewable by everyone if public, by members otherwise." on roles
-  for select using (getVisibility(orgid) = 'public' or isMember(orgid));
+  for select to anon, authenticated using (getVisibility(orgid) = 'public' or isMember(orgid));
 
 create policy "Admins can insert." on roles
-  for insert with check (isAdmin(orgid));
+  for insert to anon, authenticated with check (isAdmin(orgid));
 
 create policy "Admins can update" on roles
-  for update using (isAdmin(orgid));
+  for update to anon, authenticated using (isAdmin(orgid));
 
 create policy "Admins can delete" on roles
-  for delete using (isAdmin(orgid));
+  for delete to anon, authenticated using (isAdmin(orgid));
 
 
 alter table "public"."roles" add constraint "public_roles_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;
@@ -433,16 +412,16 @@ alter
 
 
 create policy "Roles are viewable by everyone." on assignments
-  for select using (true);
+  for select to anon, authenticated using (true);
 
 create policy "Admins can insert." on assignments
-  for insert with check (true);
+  for insert to anon, authenticated with check (true);
 
 create policy "Admins can update" on assignments
-  for update using (true);
+  for update to anon, authenticated using (true);
 
 create policy "Admins can delete" on assignments
-  for delete using (true);
+  for delete to anon, authenticated using (true);
 
 
 
@@ -484,16 +463,16 @@ create table "public"."hows" (
 alter table "public"."hows" enable row level security;
 
 create policy "Hows are viewable by everyone with access to the process." on hows
-  for select using (true);
+  for select to anon, authenticated using (true);
 
 create policy "Anyone in the org can insert." on hows
-  for insert with check (true);
+  for insert to anon, authenticated with check (true);
 
 create policy "Anyone with the role can update" on hows
-  for update using (true);
+  for update to anon, authenticated using (true);
 
 create policy "Anyone with the role can delete" on hows
-  for delete using (true);
+  for delete to anon, authenticated using (true);
 
 alter table "public"."hows" add constraint "public_hows_orgid_fkey" FOREIGN KEY (orgid) REFERENCES orgs(id) ON DELETE CASCADE not valid;
 
@@ -554,13 +533,13 @@ create table "public"."processes" (
 alter table "public"."processes" enable row level security;
 
 create policy "Processes are readable by everyone in an organization and anyone if the organization is public." on processes
-  for select using (getVisibility(orgid) = 'public' or isMember(orgid));
+  for select to anon, authenticated using (getVisibility(orgid) = 'public' or isMember(orgid));
 
 create policy "Anyone in the organization can insert new processes." on processes
-  for insert with check (isMember(orgid));
+  for insert to anon, authenticated with check (isMember(orgid));
 
 create policy "Any admin, anyone in the organization if no one is accountable, or anyone in the organization with a role that is accountable or responsible for the process." on processes
-  for update using (
+  for update to anon, authenticated using (
     isAdmin(orgid)
     -- If no one is accountable, anyone in the org can update it.
     or (accountable = null and isMember(orgid))
@@ -576,7 +555,7 @@ create policy "Any admin, anyone in the organization if no one is accountable, o
   );
 
 create policy "Any admin, or any person in the org if no one is accountable, or the person accountable." on processes
-  for delete using (
+  for delete to anon, authenticated using (
     isAdmin(orgid)
     -- If no one is accountable, anyone in the org can update it.
     or (accountable = null and isMember(orgid))
