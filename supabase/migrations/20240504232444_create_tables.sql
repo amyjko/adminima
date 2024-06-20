@@ -195,14 +195,21 @@ grant trigger on table "public"."profiles" to "service_role";
 grant truncate on table "public"."profiles" to "service_role";
 grant update on table "public"."profiles" to "service_role";
 
-create policy "Public profiles are viewable by everyone." on profiles for select to anon, authenticated
-using (true);
+create policy "Public profiles are viewable by everyone." on profiles 
+for select to anon, authenticated
+using (isMember(orgid) or getVisibility(orgid) = 'public' or auth.uid() = personid);
 
-create policy "Users can insert their own profile." on profiles for insert to anon, authenticated
-with check (true);
+create policy "Admins can insert profiles." on profiles 
+for insert to anon, authenticated
+with check (isAdmin(orgid));
 
-create policy "Users can update own profile." on profiles for update to anon, authenticated
-with check (true);
+create policy "Admins can update a user's profile, as can a user of their own profile." on profiles 
+for update to anon, authenticated
+with check (auth.uid() = personid or isAdmin(orgid));
+
+create policy "Admins and users can remove a profile.." on profiles 
+for update to anon, authenticated
+with check (auth.uid() = personid or isAdmin(orgid));
 
 -- Define a function to check if someone is a member of an organization
 create function isMember("_orgid" uuid) 
