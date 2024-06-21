@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Organizations from '$database/OrganizationsDB';
 	import { type CommentID } from '$types/Organization';
 	import CommentView from './CommentView.svelte';
 	import Loading from './Loading.svelte';
