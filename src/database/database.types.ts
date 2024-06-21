@@ -611,6 +611,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      iseditablehow: {
+        Args: {
+          _orgid: string
+          _processid: string
+        }
+        Returns: boolean
+      }
       ismember: {
         Args: {
           _orgid: string
