@@ -670,8 +670,31 @@ grant truncate on table "public"."suggestions" to "service_role";
 grant update on table "public"."suggestions" to "service_role";
 
 -- Enable realtime updates on the suggestions table.
-alter
-  publication supabase_realtime add table "public"."suggestions";
+alter publication supabase_realtime add table "public"."suggestions";
+
+alter table "public"."suggestions" enable row level security;
+
+create policy "Suggestions can be viewed by anyone in the org, or anyone if public." 
+on suggestions
+  for select to anon, authenticated using 
+  (
+    visibility = 'public' or 
+    (visibility = 'org' and isMember(orgid)) or 
+    (visibility = 'admin' and isAdmin(orgid)) or 
+    (visibility = 'roles' and (select roleid from assignments where profileid = getProfileID(orgid)) = ANY(authorized))
+  );
+
+create policy "Anyone can insert new suggestions." 
+on suggestions
+for insert to anon, authenticated with check (true);
+
+create policy "Any admin or the person who reported it can update a suggestion." 
+on suggestions
+for update to anon, authenticated using (isAdmin(orgid) or who = auth.uid());
+
+create policy "Any admin or the person who reported it can delete a suggestion." 
+on suggestions
+for delete to anon, authenticated using (isAdmin(orgid) or who = auth.uid());
 
 
 create table "public"."comments" (

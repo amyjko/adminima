@@ -29,7 +29,7 @@
 	const Statuses = { triage: 'Triage', active: 'Active', done: 'Done', backlog: 'Backlog' };
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
-	$: editable = $user && isAdmin && suggestion.who === $user.id;
+	$: editable = $user && (isAdmin || suggestion.who === $user.id);
 	$: unselectedRoles = $org.getRoles().filter((r) => !suggestion.roles.includes(r.id));
 	$: unselectedProcesses = $org.getProcesses().filter((p) => !suggestion.processes.includes(p.id));
 </script>
@@ -133,7 +133,7 @@
 	{/if}
 </div>
 
-<Admin>
+{#if editable}
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
 	<Button
 		action={async () => {
@@ -148,7 +148,7 @@
 		warning>Delete this suggestion</Button
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
-</Admin>
+{/if}
 
 <CommentsView comments={suggestion.comments} />
 

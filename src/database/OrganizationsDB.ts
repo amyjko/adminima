@@ -886,28 +886,20 @@ class OrganizationsDB {
 
 	async createSuggestion(
 		who: PersonID,
-		organization: OrganizationID,
+		orgid: OrganizationID,
 		what: string,
 		description: Markup,
 		processes: ProcessID[],
 		roles: RoleID[]
 	) {
-		// Make some markup
-		const { data } = await this.supabase
-			.from('markup')
-			.insert({ text: description })
-			.select()
-			.single();
-
-		if (data === null) return;
 		// Insert
 		const { data: suggestion } = await this.supabase
 			.from('suggestions')
 			.insert({
 				who,
 				what,
-				description: data.id,
-				orgid: organization,
+				description,
+				orgid: orgid,
 				roles,
 				processes,
 				comments: []
