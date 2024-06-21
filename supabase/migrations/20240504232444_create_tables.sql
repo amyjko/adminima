@@ -737,3 +737,21 @@ grant update on table "public"."comments" to "service_role";
 -- Enable realtime updates on the comments table.
 alter
   publication supabase_realtime add table "public"."comments";
+
+alter table "public"."comments" enable row level security;
+
+create policy "Comments can be viewed by anyone in the org, or anyone if public." 
+on comments
+for select to anon, authenticated using (getVisibility(orgid) = 'public' or isMember(orgid));
+
+create policy "Anyone can insert comments if a member of the org, or if the org is public" 
+on comments
+for insert to anon, authenticated with check (getVisibility(orgid) = 'public' or  isMember(orgid));
+
+create policy "Any admin or the person who reported it can update a comment." 
+on comments
+for update to anon, authenticated using (isAdmin(orgid) or who = auth.uid());
+
+create policy "Any admin or the person who reported it can delete a comment." 
+on comments
+for delete to anon, authenticated using (isAdmin(orgid) or who = auth.uid());
