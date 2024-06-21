@@ -95,7 +95,7 @@
 
 	{#if how}
 		<MarkupView
-			text={how.what}
+			markup={how.what}
 			unset="No description yet."
 			edit={editable ? (text) => $db.updateHowText(how, text) : undefined}
 		/>

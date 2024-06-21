@@ -2,7 +2,6 @@ import ReactiveMap from './ReactiveMap';
 import Organization, {
 	type SuggestionID,
 	type CommentID,
-	type MarkupID,
 	type OrganizationID,
 	type PersonID,
 	type ProcessID,
@@ -275,25 +274,17 @@ class OrganizationsDB {
 		if (channel) this.supabase.removeChannel(channel);
 	}
 
-	/** Get markup from the database on demand */
-	async getMarkup(id: MarkupID) {
-		const { data } = await this.supabase.from('markup').select().eq('id', id).single();
-		return data?.text;
-	}
-
 	/** Update an organization's description. Rely on Realtime to refresh. */
 	async updateOrgDescription(
 		org: Organization,
 		text: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		const markupError = await this.addOrCreateMarkup(
-			org.getDescription(),
-			text,
-			'orgs',
-			org.getID()
-		);
-		if (markupError) return markupError;
+		const { error } = await this.supabase
+			.from('orgs')
+			.update({ description: text })
+			.eq('id', org.getID());
+		if (error) return error;
 		const commentError = await this.addComment(
 			org.getID(),
 			who,
@@ -311,15 +302,11 @@ class OrganizationsDB {
 		text: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		const markupError = await this.addOrCreateMarkup(
-			org.getPrompt(),
-			text,
-			'orgs',
-			org.getID(),
-			'id',
-			'prompt'
-		);
-		if (markupError) return markupError;
+		const { error } = await this.supabase
+			.from('orgs')
+			.update({ prompt: text })
+			.eq('id', org.getID());
+		if (error) return error;
 		const commentError = await this.addComment(
 			org.getID(),
 			who,
@@ -376,11 +363,6 @@ class OrganizationsDB {
 		const { data } = await this.supabase.from('markup').insert({ text }).select().single();
 
 		return data?.id ?? null;
-	}
-
-	async updateMarkup(id: MarkupID, text: string) {
-		const { error } = await this.supabase.from('markup').update({ text }).eq('id', id);
-		return error;
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */
@@ -485,7 +467,8 @@ class OrganizationsDB {
 	}
 
 	async updateRoleDescription(role: RoleRow, description: string, who: PersonID) {
-		this.addOrCreateMarkup(role.description, description, 'roles', role.id);
+		const { error } = await this.supabase.from('roles').update({ description }).eq('id', role.id);
+		if (error) return error;
 		this.addComment(role.orgid, who, 'Updated role description', 'roles', role.id, role.comments);
 
 		return null;
@@ -517,48 +500,12 @@ class OrganizationsDB {
 	}
 
 	async updateProfileDescription(profile: ProfileRow, text: string) {
-		const markupID = profile.bio;
-		// If we do, update it's text.
-		if (markupID) {
-			const error = await this.updateMarkup(markupID, text);
-			if (error) return error;
-		}
-		// Otherwise, create new markup and then update the org to point to it.
-		else {
-			const newMarkupID = await this.createMarkup(text);
-			if (newMarkupID === null) return null;
-			const { error } = await this.supabase
-				.from('profiles')
-				.update({ bio: newMarkupID })
-				.eq('email', profile.email)
-				.eq('orgid', profile.orgid);
-			if (error) return error;
-		}
-		return null;
-	}
-
-	async addOrCreateMarkup(
-		markupID: MarkupID | null,
-		text: string,
-		table: 'roles' | 'orgs' | 'profiles' | 'teams' | 'processes',
-		id: string,
-		idName: string = 'id',
-		field: string = 'description'
-	) {
-		// If we do, update it's text.
-		if (markupID) {
-			const error = await this.updateMarkup(markupID, text);
-			if (error) return error;
-		}
-		// Otherwise, create new markup and then update the org to point to it.
-		else {
-			const newMarkupID = await this.createMarkup(text);
-			if (newMarkupID === null) return null;
-			const fields: Record<string, string> = {};
-			fields[field] = newMarkupID;
-			const { error } = await this.supabase.from(table).update(fields).eq(idName, id);
-			if (error) return error;
-		}
+		const { error } = await this.supabase
+			.from('profiles')
+			.update({ bio: text })
+			.eq('email', profile.email)
+			.eq('orgid', profile.orgid);
+		return error;
 	}
 
 	async addComment(
@@ -613,7 +560,11 @@ class OrganizationsDB {
 		text: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		this.addOrCreateMarkup(team.description, text, 'teams', team.id);
+		const { error } = await this.supabase
+			.from('teams')
+			.update({ description: text })
+			.eq('id', team.id);
+		if (error) return error;
 		this.addComment(team.orgid, who, 'Updated team description', 'teams', team.id, team.comments);
 
 		return null;
@@ -656,8 +607,7 @@ class OrganizationsDB {
 		const { data: org, error: orgError } = await this.supabase
 			.from('orgs')
 			.insert({
-				name: organizationName,
-				description: null
+				name: organizationName
 			})
 			.select()
 			.single();
@@ -973,6 +923,16 @@ class OrganizationsDB {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ what })
+			.eq('id', suggestion.id);
+		if (error) return error;
+		else return null;
+	}
+
+	async updateSuggestionDescription(suggestion: SuggestionRow, description: string) {
+		if (suggestion.description === description) return null;
+		const { error } = await this.supabase
+			.from('suggestions')
+			.update({ description })
 			.eq('id', suggestion.id);
 		if (error) return error;
 		else return null;

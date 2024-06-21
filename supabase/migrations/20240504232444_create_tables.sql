@@ -54,60 +54,15 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_person();
 
--- Define the markup table, storing all long form text that is loaded on demand.
-create table "public"."markup" (
-    "id" uuid not null default uuid_generate_v1() primary key,
-    "text" text not null default '',
-    "editor" uuid default null references people(id) on delete set null
-);
-
-alter table "public"."markup" enable row level security;
-
-grant delete on table "public"."markup" to "anon";
-grant insert on table "public"."markup" to "anon";
-grant references on table "public"."markup" to "anon";
-grant select on table "public"."markup" to "anon";
-grant trigger on table "public"."markup" to "anon";
-grant truncate on table "public"."markup" to "anon";
-grant update on table "public"."markup" to "anon";
-
-grant delete on table "public"."markup" to "authenticated";
-grant insert on table "public"."markup" to "authenticated";
-grant references on table "public"."markup" to "authenticated";
-grant select on table "public"."markup" to "authenticated";
-grant trigger on table "public"."markup" to "authenticated";
-grant truncate on table "public"."markup" to "authenticated";
-grant update on table "public"."markup" to "authenticated";
-
-grant delete on table "public"."markup" to "service_role";
-grant insert on table "public"."markup" to "service_role";
-grant references on table "public"."markup" to "service_role";
-grant select on table "public"."markup" to "service_role";
-grant trigger on table "public"."markup" to "service_role";
-grant truncate on table "public"."markup" to "service_role";
-grant update on table "public"."markup" to "service_role";
-
-create policy "Markup is viewable based on the organization's visibility." on markup
-  for select to anon, authenticated using (true);
-
-create policy "Markup can be inserted by those in the organization." on markup
-  for insert to anon, authenticated with check (true);
-
-create policy "Markup can be updated by those in the organization." on markup
-  for update to anon, authenticated using (true);
-
-alter
-  publication supabase_realtime add table "public"."markup";
-
-
 -- Define orgs table
 create table "public"."orgs" (
     "id" uuid not null default uuid_generate_v1(),
     "when" timestamp with time zone not null default now(),
     "name" text not null default ''::text,
-    "description" uuid default null references markup(id) on delete set null,
+    -- The description of the organization
+    "description" text not null default ''::text,
     -- The suggestion prompt
-    "prompt" uuid default null references markup(id) on delete set null,
+    "prompt" text not null default ''::text,
     -- Visibility of the org
     "visibility" visibility not null default 'org',
     -- Which roles are authorized to view, if not public, org, or admin
@@ -168,9 +123,9 @@ create table "public"."profiles" (
     "orgid" uuid not null references orgs(id) on delete cascade,
     -- An optional link to the person this corresponds to in auth
     "personid" uuid null default null references people(id) on delete cascade,
-    "name" text not null,
-    "email" text not null,
-    "bio" uuid default null references markup(id) on delete set null,
+    "name" text not null default ''::text,
+    "email" text not null default ''::text,
+    "bio" text not null default ''::text,
     "admin" boolean not null,
     "supervisor" uuid default null references profiles(id) on delete set null
 );
@@ -262,7 +217,7 @@ create table "public"."teams" (
     "when" timestamp with time zone not null default now(),
     "orgid" uuid not null references orgs(id) on delete cascade,
     "name" text not null default ''::text,
-    "description" uuid default null references markup(id) on delete set null,
+    "description" text not null default ''::text,
     -- Comments describing changes to the team
     "comments" uuid[] not null default '{}'
 );
@@ -329,7 +284,7 @@ create table "public"."roles" (
     "when" timestamp with time zone not null default now(),
     "orgid" uuid not null references orgs(id) on delete cascade,
     "title" text not null,
-    "description" uuid default null references markup(id) on delete set null,
+    "description" text not null default ''::text,
     "team" uuid references teams(id) on delete set null,
     -- Comments describing changes to the role
     "comments" uuid[] not null default '{}'
@@ -667,11 +622,11 @@ create table "public"."suggestions" (
     -- Person who reported it
     "who" uuid not null references people(id) on delete set null,
     -- Title of the change
-    "what" text not null,
+    "what" text not null default ''::text,
     -- Timestamp of creation time
     "when" timestamp with time zone not null default now(),
     -- A description of the problem it concerns
-    "description" uuid default null references markup(id),
+    "description" text not null default ''::text,
     -- Status of the change
     "status" status not null default 'triage',
     -- Who the change is visible to

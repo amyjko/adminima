@@ -1,21 +1,15 @@
 <script lang="ts">
 	import { parse } from '../markup/parser';
-	import { type MarkupID } from '$types/Organization';
 	import Button from './Button.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
-	import Loading from './Loading.svelte';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
 	import Error from './Error.svelte';
 	import { getDB } from './contexts';
 
-	const db = getDB();
-
 	/** The markup's text */
-	export let text: string | undefined = undefined;
-	/** The id to optionally load to set the text */
-	export let markup: MarkupID | null = null;
-	/** What to show if the text isn't set */
+	export let markup: string;
+	/** Placeholder text */
 	export let unset: string;
 	/** If given, allows the markup to edited. Returns an error */
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null> | null) =
@@ -27,15 +21,13 @@
 	let input: HTMLTextAreaElement;
 	let error: PostgrestError | null = null;
 
-	$: scrollHeight = text ? input?.scrollHeight ?? height : height;
-
-	$: if (markup) $db.getMarkup(markup).then((m) => (text = m));
+	$: scrollHeight = markup ? input?.scrollHeight ?? height : height;
 
 	// Not an edit function, just a text field? Update the text immediately.
-	$: if (edit === undefined) text = revisedText;
+	$: if (edit === undefined) markup = revisedText;
 
 	async function startEditing() {
-		revisedText = text ?? '';
+		revisedText = markup ?? '';
 		editing = true;
 		await tick();
 		input?.focus();
@@ -46,7 +38,7 @@
 			error = await edit(revisedText ?? '');
 			if (error) return;
 			editing = false;
-			text = revisedText;
+			markup = revisedText;
 		}
 	}
 </script>
@@ -86,15 +78,9 @@
 				style:height="{editing ? scrollHeight : height}px"
 			/>
 		</div>
-	{:else}
+	{:else if markup === ''}<em>{unset}</em>{:else}
 		<div class="blocks" bind:clientHeight={height} on:pointerdown|preventDefault={startEditing}>
-			{#if !text || text.length === 0}
-				<BlocksView blocks={parse(`_${unset}_`).blocks} />
-			{:else if text === undefined}
-				<Loading />
-			{:else}
-				<BlocksView blocks={parse(text).blocks} />
-			{/if}
+			<BlocksView blocks={parse(markup).blocks} />
 		</div>
 	{/if}
 </div>

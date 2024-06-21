@@ -187,79 +187,38 @@ export type Database = {
           },
         ]
       }
-      markup: {
-        Row: {
-          editor: string | null
-          id: string
-          text: string
-        }
-        Insert: {
-          editor?: string | null
-          id?: string
-          text?: string
-        }
-        Update: {
-          editor?: string | null
-          id?: string
-          text?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "markup_editor_fkey"
-            columns: ["editor"]
-            isOneToOne: false
-            referencedRelation: "people"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       orgs: {
         Row: {
           authorized: string[]
           comments: string[]
-          description: string | null
+          description: string
           id: string
           name: string
-          prompt: string | null
+          prompt: string
           visibility: Database["public"]["Enums"]["visibility"]
           when: string
         }
         Insert: {
           authorized?: string[]
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           name?: string
-          prompt?: string | null
+          prompt?: string
           visibility?: Database["public"]["Enums"]["visibility"]
           when?: string
         }
         Update: {
           authorized?: string[]
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           name?: string
-          prompt?: string | null
+          prompt?: string
           visibility?: Database["public"]["Enums"]["visibility"]
           when?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "orgs_description_fkey"
-            columns: ["description"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orgs_prompt_fkey"
-            columns: ["prompt"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       people: {
         Row: {
@@ -358,7 +317,7 @@ export type Database = {
       profiles: {
         Row: {
           admin: boolean
-          bio: string | null
+          bio: string
           email: string
           id: string
           name: string
@@ -368,17 +327,17 @@ export type Database = {
         }
         Insert: {
           admin: boolean
-          bio?: string | null
-          email: string
+          bio?: string
+          email?: string
           id?: string
-          name: string
+          name?: string
           orgid: string
           personid?: string | null
           supervisor?: string | null
         }
         Update: {
           admin?: boolean
-          bio?: string | null
+          bio?: string
           email?: string
           id?: string
           name?: string
@@ -387,13 +346,6 @@ export type Database = {
           supervisor?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "profiles_bio_fkey"
-            columns: ["bio"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "profiles_orgid_fkey"
             columns: ["orgid"]
@@ -420,7 +372,7 @@ export type Database = {
       roles: {
         Row: {
           comments: string[]
-          description: string | null
+          description: string
           id: string
           orgid: string
           team: string | null
@@ -429,7 +381,7 @@ export type Database = {
         }
         Insert: {
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           orgid: string
           team?: string | null
@@ -438,7 +390,7 @@ export type Database = {
         }
         Update: {
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           orgid?: string
           team?: string | null
@@ -451,13 +403,6 @@ export type Database = {
             columns: ["orgid"]
             isOneToOne: false
             referencedRelation: "orgs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "roles_description_fkey"
-            columns: ["description"]
-            isOneToOne: false
-            referencedRelation: "markup"
             referencedColumns: ["id"]
           },
           {
@@ -480,7 +425,7 @@ export type Database = {
         Row: {
           authorized: string[]
           comments: string[]
-          description: string | null
+          description: string
           id: string
           orgid: string
           processes: string[]
@@ -495,7 +440,7 @@ export type Database = {
         Insert: {
           authorized?: string[]
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           orgid: string
           processes?: string[]
@@ -503,14 +448,14 @@ export type Database = {
           status?: Database["public"]["Enums"]["status"]
           visibility?: Database["public"]["Enums"]["visibility"]
           watchers?: string[]
-          what: string
+          what?: string
           when?: string
           who: string
         }
         Update: {
           authorized?: string[]
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           orgid?: string
           processes?: string[]
@@ -523,13 +468,6 @@ export type Database = {
           who?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "suggestions_description_fkey"
-            columns: ["description"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "suggestions_orgid_fkey"
             columns: ["orgid"]
@@ -549,7 +487,7 @@ export type Database = {
       teams: {
         Row: {
           comments: string[]
-          description: string | null
+          description: string
           id: string
           name: string
           orgid: string
@@ -557,7 +495,7 @@ export type Database = {
         }
         Insert: {
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           name?: string
           orgid: string
@@ -565,20 +503,13 @@ export type Database = {
         }
         Update: {
           comments?: string[]
-          description?: string | null
+          description?: string
           id?: string
           name?: string
           orgid?: string
           when?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "teams_description_fkey"
-            columns: ["description"]
-            isOneToOne: false
-            referencedRelation: "markup"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "teams_orgid_fkey"
             columns: ["orgid"]

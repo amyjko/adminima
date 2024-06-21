@@ -49,7 +49,7 @@
 	<Labeled
 		label="Describe the problem you're experiencing and any ideas you have for addressing it."
 	>
-		<MarkupView bind:text={newRequestProblem} editing unset="Detail your suggestion" />
+		<MarkupView bind:markup={newRequestProblem} editing unset="Detail your suggestion" />
 	</Labeled>
 	<Labeled label="Affected Roles">
 		<Select

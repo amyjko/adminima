@@ -7,7 +7,6 @@
 	import { getDB, getUser } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
-	import Oops from './Oops.svelte';
 
 	export let organization: Organization;
 

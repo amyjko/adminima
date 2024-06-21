@@ -64,9 +64,7 @@
 	><MarkupView
 		markup={suggestion.description}
 		unset="No description"
-		edit={editable && suggestion.description
-			? (text) => (suggestion.description ? $db.updateMarkup(suggestion.description, text) : null)
-			: undefined}
+		edit={editable ? (text) => $db.updateSuggestionDescription(suggestion, text) : undefined}
 	/></Quote
 >
 

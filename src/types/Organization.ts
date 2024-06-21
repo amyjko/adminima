@@ -20,7 +20,6 @@ export type HowID = string;
 export type SuggestionID = string;
 export type CommentID = string;
 export type Markup = string;
-export type MarkupID = string;
 
 /** A wrapper class to provide utility functions on an organization payload from the database. Simplifies the interface for accessing and manipulating organization data. */
 export default class Organization {
