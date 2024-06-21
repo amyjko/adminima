@@ -18,6 +18,7 @@
 	import CommentsView from './CommentsView.svelte';
 	import Choice from './Choice.svelte';
 	import Select from './Select.svelte';
+	import Notice from './Notice.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -68,8 +69,8 @@
 	/></Quote
 >
 
+<Paragraph>This affects these roles:</Paragraph>
 <div class="row">
-	<Paragraph>This affects these roles:</Paragraph>
 	{#each suggestion.roles as role}
 		<RoleLink roleID={role} />
 		<Button
@@ -81,6 +82,8 @@
 		>
 			x</Button
 		>
+	{:else}
+		<Notice>No processes listed as affected.</Notice>
 	{/each}
 	{#if unselectedRoles.length > 0}
 		<Select
@@ -99,8 +102,8 @@
 	{/if}
 </div>
 
+<Paragraph>This affects these processes:</Paragraph>
 <div class="row">
-	<Paragraph>This affects these processes:</Paragraph>
 	{#each suggestion.processes as process}
 		<ProcessLink processID={process} />
 		<Button
@@ -112,6 +115,8 @@
 		>
 			x</Button
 		>
+	{:else}
+		<Notice>No processes listed as affected.</Notice>
 	{/each}
 	{#if unselectedProcesses.length > 0}
 		<Select
