@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HowRow, ProcessRow } from '$database/Organizations';
+	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
 	import { getContext, tick } from 'svelte';
 	import Visibility from './Visibility.svelte';
 	import { getDB, getOrg } from './contexts';

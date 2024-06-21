@@ -2,7 +2,7 @@
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
 	import { getOrg } from './contexts';
-	import type { ProfileRow } from '$database/Organizations';
+	import type { ProfileRow } from '$database/OrganizationsDB';
 
 	export let profile: ProfileRow | null;
 	export let short = false;

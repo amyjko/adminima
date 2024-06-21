@@ -2,7 +2,7 @@
 	import Subheader from './Subheader.svelte';
 	import Flow from './Flow.svelte';
 	import ProcessLink from './ProcessLink.svelte';
-	import type { HowRow, ProcessRow, RoleRow } from '$database/Organizations';
+	import type { HowRow, ProcessRow, RoleRow } from '$database/OrganizationsDB';
 	import { getOrg } from './contexts';
 
 	export let role: RoleRow;

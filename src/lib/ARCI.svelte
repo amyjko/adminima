@@ -1,6 +1,6 @@
-<!-- Represents ARCH for a processes's how to -->
+<!-- Represents ARCI for a processes's how to -->
 <script lang="ts">
-	import type { HowRow, ProcessRow } from '$database/Organizations';
+	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
 	import Button from './Button.svelte';
 	import Level from './Level.svelte';
 	import RoleLink from './RoleLink.svelte';

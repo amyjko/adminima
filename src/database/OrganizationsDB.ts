@@ -46,7 +46,7 @@ export type OrganizationPayload = {
 };
 
 /** A front end interface to the backing store, caching data loaded from the database and offering operations for modifying the database. */
-class Organizations {
+class OrganizationsDB {
 	private supabase: SupabaseClient;
 
 	/** A collection of organization stores, kept in sync with the database for use by client */
@@ -1028,4 +1028,4 @@ class Organizations {
 	}
 }
 
-export default Organizations;
+export default OrganizationsDB;

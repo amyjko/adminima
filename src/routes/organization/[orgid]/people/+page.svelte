@@ -8,7 +8,7 @@
 	import Title from '$lib/Title.svelte';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
-	import { type PersonRow } from '$database/Organizations';
+	import { type PersonRow } from '$database/OrganizationsDB';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Select from '$lib/Select.svelte';
 	import Subheader from '$lib/Subheader.svelte';

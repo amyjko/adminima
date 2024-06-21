@@ -8,7 +8,7 @@ import type {
 	ProfileRow,
 	RoleRow,
 	TeamRow
-} from '$database/Organizations';
+} from '$database/OrganizationsDB';
 
 export type OrganizationID = string;
 export type ProcessID = string;

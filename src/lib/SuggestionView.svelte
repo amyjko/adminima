@@ -5,7 +5,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import { type SuggestionRow } from '../database/Organizations';
+	import { type SuggestionRow } from '../database/OrganizationsDB';
 	import Oops from './Oops.svelte';
 	import Button from './Button.svelte';
 	import { goto } from '$app/navigation';

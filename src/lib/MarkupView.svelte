@@ -3,7 +3,6 @@
 	import { type MarkupID } from '$types/Organization';
 	import Button from './Button.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
-	import Organizations from '$database/Organizations';
 	import Loading from './Loading.svelte';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';

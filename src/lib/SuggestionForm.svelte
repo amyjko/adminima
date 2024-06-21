@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Organizations from '../database/Organizations';
 	import Form from './Form.svelte';
 	import Oops from './Oops.svelte';
 	import { getDB, getOrg, getUser } from './contexts';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CommentRow } from '$database/Organizations';
+	import type { CommentRow } from '$database/OrganizationsDB';
 	import timestampToDate from '$database/timestampToDate';
 	import PersonLink from './PersonLink.svelte';
 	import Quote from './Quote.svelte';

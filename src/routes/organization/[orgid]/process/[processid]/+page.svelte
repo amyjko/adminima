@@ -2,7 +2,7 @@
 	import MarkupView from '$lib/MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
 	import HowView from '$lib/HowView.svelte';
-	import Organizations from '$database/Organizations';
+	import Organizations from '$database/OrganizationsDB';
 	import Oops from '$lib/Oops.svelte';
 	import Button from '$lib/Button.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';

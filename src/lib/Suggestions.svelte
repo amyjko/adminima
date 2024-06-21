@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type SuggestionRow } from '$database/Organizations';
+	import { type SuggestionRow } from '$database/OrganizationsDB';
 	import timestampToDate from '$database/timestampToDate';
 	import SuggestionLink from './SuggestionLink.svelte';
 	import PersonLink from './PersonLink.svelte';

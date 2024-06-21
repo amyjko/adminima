@@ -5,7 +5,7 @@
 	import Paragraph from './Paragraph.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
 	import Subheader from './Subheader.svelte';
-	import type { ProcessRow, RoleRow } from '$database/Organizations';
+	import type { ProcessRow, RoleRow } from '$database/OrganizationsDB';
 
 	export let role: RoleRow;
 	export let processes: ProcessRow[];

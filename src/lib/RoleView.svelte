@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Timeline from '$lib/Timeline.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import Organizations, { type RoleRow } from '../database/Organizations';
+	import Organizations, { type RoleRow } from '../database/OrganizationsDB';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import ChangeForm from './SuggestionForm.svelte';

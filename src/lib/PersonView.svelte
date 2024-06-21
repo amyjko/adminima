@@ -6,9 +6,8 @@
 	import RoleProcesses from './RoleProcesses.svelte';
 	import { getDB, getOrg, getUser } from './contexts';
 	import MarkupView from './MarkupView.svelte';
-	import type { ProcessRow, ProfileRow } from '$database/Organizations';
+	import type { ProcessRow, ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';
-	import Organizations from '$database/Organizations';
 
 	export let profile: ProfileRow;
 

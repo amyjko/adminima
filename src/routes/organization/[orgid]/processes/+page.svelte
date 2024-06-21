@@ -6,7 +6,7 @@
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Level from '$lib/Level.svelte';
 	import Subheader from '$lib/Subheader.svelte';
-	import type { ProcessRow, RoleRow } from '$database/Organizations';
+	import type { ProcessRow, RoleRow } from '$database/OrganizationsDB';
 	import type { RoleID } from '$types/Organization';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import Field from '$lib/Field.svelte';

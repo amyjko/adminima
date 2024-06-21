@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ProcessRow } from '$database/Organizations';
+	import type { ProcessRow } from '$database/OrganizationsDB';
 	import Link from './Link.svelte';
 
 	export let process: ProcessRow;

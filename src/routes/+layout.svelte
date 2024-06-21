@@ -4,7 +4,7 @@
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { DBSymbol, UserSymbol, type DBContext, type UserContext } from '$lib/contexts';
-	import Organizations from '$database/Organizations.js';
+	import Organizations from '$database/OrganizationsDB.js';
 	import { goto } from '$app/navigation';
 
 	export let data;
