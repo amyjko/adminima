@@ -33,7 +33,7 @@
 		>
 			<slot />
 			<Actions
-				><Button tip="Dismiss this dialog." end action={() => (show = false)}>cancel</Button><Button
+				><Button tip="Dismiss this dialog." end action={() => (show = false)}>Cancel</Button><Button
 					tip={submitTip}
 					end
 					submit

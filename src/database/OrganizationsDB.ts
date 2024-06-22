@@ -910,7 +910,7 @@ class OrganizationsDB {
 		const { error: parentError } = await this.supabase
 			.from('hows')
 			.update({ how: parent.how.filter((howid) => howid !== how.id) })
-			.eq('id', how.id);
+			.eq('id', parent.id);
 		if (parentError) return parentError;
 		// Remove the how
 		const { error: deleteError } = await this.supabase.from('hows').delete().eq('id', how.id);
