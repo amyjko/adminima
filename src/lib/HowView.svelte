@@ -2,7 +2,7 @@
 	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
 	import { getContext, tick } from 'svelte';
 	import Visibility from './Visibility.svelte';
-	import { getDB, getOrg } from './contexts';
+	import { addError, getDB, getErrors, getOrg, queryOrError } from './contexts';
 	import type { HowID } from '$types/Organization';
 	import Button from './Button.svelte';
 	import type { Writable } from 'svelte/store';
@@ -14,6 +14,8 @@
 
 	const org = getOrg();
 	const db = getDB();
+	const errors = getErrors();
+
 	const focusID = getContext<Writable<string | undefined>>('focusID');
 
 	let input: HTMLTextAreaElement;
@@ -33,14 +35,14 @@
 		// See if this how has a parent, and if so, insert after this how.
 		const parent = $org.getHowParent(how.id);
 		if (parent) {
-			const { id } = await $db.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
-			if (id) {
-				focusID.set(id);
-			}
+			const { error, id } = await $db.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
+			if (error) addError(errors, 'Unable to insert how.', error);
+			else if (id) focusID.set(id);
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
-			const { id } = await $db.insertHow(process, how, 0);
+			const { error, id } = await $db.insertHow(process, how, 0);
+			if (error) addError(errors, 'Unable to insert how.', error);
 			if (id) focusID.set(id);
 		}
 	}
@@ -62,7 +64,8 @@
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
 
-			await $db.deleteHow(parent, how);
+			const error = await queryOrError(errors, $db.deleteHow(parent, how), "Couldn't delete how.");
+			if (error) return;
 
 			focusID.set(newFocusID);
 		}
@@ -86,7 +89,12 @@
 		if (result) {
 			const [parent, previousHow] = result;
 			deleted = true;
-			await $db.moveHow(how, parent, previousHow, previousHow.how.length);
+			const error = await queryOrError(
+				errors,
+				$db.moveHow(how, parent, previousHow, previousHow.how.length),
+				"Couldn't indent how."
+			);
+			if (error) return;
 			await tick();
 			if (focus) focusID.set(how.id);
 		}
@@ -108,7 +116,12 @@
 		if (result) {
 			const [parent, grandparent] = result;
 			deleted = true;
-			await $db.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1);
+			const error = await queryOrError(
+				errors,
+				$db.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1),
+				"Couldn't unindent how."
+			);
+			if (error) return;
 			await tick();
 			if (focus) focusID.set(how.id);
 		}

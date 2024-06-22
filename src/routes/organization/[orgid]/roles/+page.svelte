@@ -4,7 +4,7 @@
 	import Field from '$lib/Field.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Admin from '$lib/Admin.svelte';
-	import { getDB, getOrg } from '$lib/contexts';
+	import { addError, getDB, getErrors, getOrg } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
 	import Flow from '$lib/Flow.svelte';
 	import Header from '$lib/Header.svelte';
@@ -14,22 +14,22 @@
 
 	const org = getOrg();
 	const db = getDB();
+	const errors = getErrors();
 
 	let newRole: string = '';
-	let newRoleError: string | undefined = undefined;
 
 	async function createRole() {
-		const roleID = await $db.createRole($org.getID(), newRole);
-		if (roleID) goto(`/organization/${$org.getID()}/role/${roleID}`);
-		else newRoleError = "We couldn't create the new role.";
+		const { data, error } = await $db.createRole($org.getID(), newRole);
+		if (data) goto(`/organization/${$org.getID()}/role/${data.id}`);
+		else if (error) addError(errors, "We couldn't create the new role.", error);
 	}
 
 	let newTeam = '';
-	let newTeamError: string | undefined = undefined;
 
 	async function createTeam() {
-		const teamID = await $db.createTeam($org.getID(), newTeam);
-		if (teamID === null) "We couldn't create the new team.";
+		const { data, error } = await $db.createTeam($org.getID(), newTeam);
+		if (error) addError(errors, "We couldn't create the new team.", error);
+		else if (data) goto(`/organization/${$org.getID()}/team/${data.id}`);
 	}
 </script>
 
@@ -75,7 +75,7 @@
 		submit="Create"
 		action={createRole}
 		valid={() => newRole.length >= 3}
-		error={newRoleError}
+		error={undefined}
 	>
 		<Field label="title of new role" bind:text={newRole} />
 	</FormDialog>
@@ -87,7 +87,7 @@
 		submit="Create"
 		action={createTeam}
 		valid={() => newTeam.length >= 3}
-		error={newTeamError}
+		error={undefined}
 	>
 		<Field label="name of new team" bind:text={newTeam} />
 	</FormDialog>

@@ -27,15 +27,15 @@
 <Title title="You" />
 
 {#await $db.getPersonsOrganizations($page.params.personid) then orgs}
-	{#if orgs === null}
+	{#if orgs.data === null}
 		<Oops text="Couldn't load organizations" />
 	{:else if $user}
 		<Paragraph>Hi <strong>{$user.email}</strong>.</Paragraph>
 
-		{#if orgs.length}
+		{#if orgs.data.length}
 			<Paragraph>Here are the organizations you're part of:</Paragraph>
 			<ul>
-				{#each orgs as org}
+				{#each orgs.data as org}
 					<li><Link to={`/organization/${org.id}`}>{org.name}</Link></li>
 				{/each}
 			</ul>

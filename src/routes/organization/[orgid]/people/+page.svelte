@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getDB, getOrg, getUser } from '$lib/contexts';
+	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import Field from '$lib/Field.svelte';
@@ -20,6 +20,7 @@
 	const organization = getOrg();
 	const user = getUser();
 	const db = getDB();
+	const errors = getErrors();
 
 	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
 
@@ -31,9 +32,17 @@
 		match = undefined;
 		match = await $db.getPersonWithEmail(newPersonEmail);
 		await (match === null
-			? $db.addPersonByEmail($organization.getID(), newPersonEmail)
+			? queryOrError(
+					errors,
+					$db.addPersonByEmail($organization.getID(), newPersonEmail),
+					"Couldn't add person."
+			  )
 			: match !== null && match !== undefined
-			? $db.addPersonByID($organization.getID(), match.id)
+			? queryOrError(
+					errors,
+					$db.addPersonByID($organization.getID(), match.id),
+					"Couldn't add person."
+			  )
 			: undefined);
 		newPersonEmail = '';
 	}
@@ -88,11 +97,22 @@
 										return { value: role.id, label: role.title };
 									})
 								]}
-								change={(roleID) => {
-									for (const role of roles)
-										$db.unassignPerson($organization.getID(), profile.id, role.id);
+								change={async (roleID) => {
+									for (const role of roles) {
+										const error = await queryOrError(
+											errors,
+											$db.unassignPerson($organization.getID(), profile.id, role.id),
+											'Could not unassign role.'
+										);
+										if (error) return;
+									}
+
 									if (roleID !== undefined)
-										$db.assignPerson($organization.getID(), profile.id, roleID);
+										await queryOrError(
+											errors,
+											$db.assignPerson($organization.getID(), profile.id, roleID),
+											'Could not assign role.'
+										);
 								}}
 							/>
 						{/if}
@@ -121,7 +141,11 @@
 							]}
 							selection={profile.supervisor ?? undefined}
 							change={(personID) => {
-								$db.updateProfileSupervisor($organization.getID(), profile.id, personID ?? null);
+								queryOrError(
+									errors,
+									$db.updateProfileSupervisor($organization.getID(), profile.id, personID ?? null),
+									"Couldn't update supervisor."
+								);
 							}}
 						/>
 					{:else if profile.supervisor}<PersonLink
@@ -134,7 +158,12 @@
 							on={$organization.hasAdminProfile(profile.id)}
 							enabled={isAdmin &&
 								($organization.getAdminCount() > 1 || !$organization.hasAdminProfile(profile.id))}
-							change={(on) => $db.updateAdmin($organization.getID(), profile.id, on)}
+							change={(on) =>
+								queryOrError(
+									errors,
+									$db.updateAdmin($organization.getID(), profile.id, on),
+									"Couldn't update admin status."
+								)}
 						/>
 					{:else if $organization.hasAdminProfile(profile.id)}&check;{/if}
 				</td>
@@ -142,7 +171,8 @@
 				{#if isAdmin}
 					<td>
 						<Button
-							action={() => $db.removeProfile(profile.id)}
+							action={() =>
+								queryOrError(errors, $db.removeProfile(profile.id), "Couldn't remove person.")}
 							active={profile.personid !== null && !$organization.hasAdminProfile(profile.id)}
 							>&times;</Button
 						>

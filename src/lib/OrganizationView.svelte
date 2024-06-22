@@ -4,7 +4,7 @@
 	import Title from './Title.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import type Organization from '$types/Organization';
-	import { getDB, getUser } from './contexts';
+	import { getDB, getErrors, getUser, queryOrError } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 
@@ -12,6 +12,7 @@
 
 	const user = getUser();
 	const db = getDB();
+	const errors = getErrors();
 
 	$: isAdmin = $user && organization.hasAdminPerson($user.id);
 	$: editable = isAdmin;
@@ -20,26 +21,29 @@
 <Title
 	title={organization.getName()}
 	kind="organization"
-	edit={$user && isAdmin ? (text) => $db.updateOrgName(organization, text, $user.id) : undefined}
+	edit={$user && isAdmin
+		? (text) =>
+				queryOrError(
+					errors,
+					$db.updateOrgName(organization, text, $user.id),
+					"Couldn't update organization name."
+				)
+		: undefined}
 >
 	<Visibility
 		level={organization.getVisibility()}
 		edit={$user && editable
 			? (vis) =>
 					vis === 'org' || vis === 'admin' || vis === 'public'
-						? $db.updateOrgVisibility(organization, vis, $user.id)
+						? queryOrError(
+								errors,
+								$db.updateOrgVisibility(organization, vis, $user.id),
+								"Couldn't update organization visibility."
+						  )
 						: undefined
 			: undefined}
 	/>
 </Title>
-
-<MarkupView
-	markup={organization.getDescription()}
-	unset="No description"
-	edit={editable && $user
-		? (text) => $db.updateOrgDescription(organization, text, $user.id)
-		: undefined}
-/>
 
 <Paragraph>
 	See the <strong>{organization.getRoles().length}</strong>
@@ -71,5 +75,15 @@
 		>Suggestion{organization.getSuggestions().length !== 1 ? 's' : ''}</Link
 	> proposed.</Paragraph
 >
+
+<hr />
+
+<MarkupView
+	markup={organization.getDescription()}
+	unset="No description"
+	edit={editable && $user
+		? (text) => $db.updateOrgDescription(organization, text, $user.id)
+		: undefined}
+/>
 
 <CommentsView comments={organization.getComments()} />

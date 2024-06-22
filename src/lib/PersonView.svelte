@@ -4,7 +4,7 @@
 	import Title from './Title.svelte';
 	import Flow from './Flow.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
-	import { getDB, getOrg, getUser } from './contexts';
+	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import MarkupView from './MarkupView.svelte';
 	import type { ProcessRow, ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';
@@ -14,6 +14,7 @@
 	const user = getUser();
 	const org = getOrg();
 	const db = getDB();
+	const errors = getErrors();
 
 	$: roles = $org.getProfileRoles(profile.id);
 	$: allProcesses = roles.reduce(
@@ -26,7 +27,7 @@
 	title={profile.name.length === 0 ? '(no name)' : profile.name}
 	kind="person"
 	edit={$user && profile.personid === $user.id
-		? (text) => $db.updateProfileName(profile, text)
+		? (text) => queryOrError(errors, $db.updateProfileName(profile, text), "Couldn't update name")
 		: undefined}
 >
 	{profile.email}
@@ -41,7 +42,10 @@
 <MarkupView
 	markup={profile.bio}
 	unset="No bio"
-	edit={$user ? (text) => $db.updateProfileDescription(profile, text) : undefined}
+	edit={$user
+		? (text) =>
+				queryOrError(errors, $db.updateProfileBio(profile, text), "Coudln't update profile bio.")
+		: undefined}
 />
 
 <Header>Roles</Header>

@@ -10,7 +10,7 @@
 	import Admin from '$lib/Admin.svelte';
 	import Title from '$lib/Title.svelte';
 	import Level from '$lib/Level.svelte';
-	import { getDB, getOrg, getUser } from '$lib/contexts';
+	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import { page } from '$app/stores';
 	import Notice from '$lib/Notice.svelte';
@@ -31,6 +31,7 @@
 	const org = getOrg();
 	const user = getUser();
 	const db = getDB();
+	const errors = getErrors();
 
 	$: process = $org.getProcess($page.params.processid);
 	$: how = process && process.howid ? $org.getHow(process.howid) : undefined;
@@ -84,7 +85,14 @@
 	<Title
 		title={process.title}
 		kind="process"
-		edit={$user && editable ? (text) => $db.updateProcessTitle(process, text, $user.id) : undefined}
+		edit={$user && editable
+			? (text) =>
+					queryOrError(
+						errors,
+						$db.updateProcessTitle(process, text, $user.id),
+						"Couldn't update process title."
+					)
+			: undefined}
 	/>
 
 	<Tip
@@ -184,7 +192,12 @@
 	{#if editable && $user}
 		{#if process.concern === ''}<em>no concern</em>{:else}
 			<Choice
-				edit={(text) => $db.updateProcessConcern(process, text, $user.id)}
+				edit={(text) =>
+					queryOrError(
+						errors,
+						$db.updateProcessConcern(process, text, $user.id),
+						"Couldn't update concern."
+					)}
 				choice={process.concern}
 				choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}
 				>{process.concern}</Choice
@@ -198,7 +211,11 @@
 			valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
 			error={undefined}
 			action={() => {
-				$db.updateProcessConcern(process, newConcern, $user.id);
+				queryOrError(
+					errors,
+					$db.updateProcessConcern(process, newConcern, $user.id),
+					"Couldn't update concern."
+				);
 				newConcern = '';
 			}}
 		>
@@ -227,8 +244,9 @@
 			action={async () => {
 				try {
 					const org = process.orgid;
-					await $db.deleteProcess(process.id);
-					goto(`/organization/${org}/processes`);
+					const { error } = await $db.deleteProcess(process.id);
+					if (error) addError(errors, "Couldn't delete this", error);
+					else goto(`/organization/${org}/processes`);
 				} catch (_) {
 					deleteError = "We couldn't delete this";
 				}

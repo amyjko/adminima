@@ -1,22 +1,20 @@
 <script lang="ts">
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import Button from './Button.svelte';
-	import Error from './Error.svelte';
 
 	export let text: string;
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
 	let editing = false;
 	let revision = '';
-	let error: PostgrestError | null = null;
 
 	async function save() {
 		if (editing) {
 			if (edit) {
-				error = await edit(revision);
-				if (error) return;
-				text = revision;
+				const error = await edit(revision);
 				editing = false;
+				if (error) return;
+				else text = revision;
 			}
 		} else {
 			editing = true;
@@ -41,7 +39,6 @@
 			>{/if}
 	</form>
 {:else}{text}{/if}
-{#if error}<Error {error} inline={false} />{/if}
 
 <style>
 	.editable {

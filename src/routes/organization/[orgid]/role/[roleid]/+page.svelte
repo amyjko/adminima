@@ -1,6 +1,6 @@
 <script lang="ts">
 	import RoleView from '$lib/RoleView.svelte';
-	import Error from '$lib/Oops.svelte';
+	import Oops from '$lib/Oops.svelte';
 	import { page } from '$app/stores';
 	import { getOrg } from '$lib/contexts';
 
@@ -9,7 +9,7 @@
 </script>
 
 {#if role === null}
-	<Error text={(locale) => locale.error.noRoleProcesses} />
+	<Oops text={(locale) => locale.error.noRoleProcesses} />
 {:else}
 	<RoleView {role} />
 {/if}

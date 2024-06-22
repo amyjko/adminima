@@ -70,6 +70,91 @@ class OrganizationsDB {
 		return `orgs:${orgid}`;
 	}
 
+	updateOrg(org: OrganizationPayload) {
+		return this.organizations.set(org.organization.id, new Organization(org));
+	}
+
+	/** Reload an entire organization. Needed because Supabase realtime doesn't guarantee eventual message delivery. */
+	async refresh(orgid: OrganizationID) {
+		const payload = await this.getPayload(orgid);
+		if (payload) this.updateOrg(payload);
+	}
+
+	async getPayload(orgid: string): Promise<OrganizationPayload | null> {
+		// Load all of the organization metadata from the database
+		const { data: organization, error: orgError } = await this.supabase
+			.from('orgs')
+			.select()
+			.eq('id', orgid)
+			.single();
+		const { data: profiles, error: profileError } = await this.supabase
+			.from('profiles')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: roles, error: rolesError } = await this.supabase
+			.from('roles')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: assignments, error: assignmentsError } = await this.supabase
+			.from('assignments')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: processes, error: processesError } = await this.supabase
+			.from('processes')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: hows, error: howError } = await this.supabase
+			.from('hows')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: teams, error: teamsError } = await this.supabase
+			.from('teams')
+			.select(`*`)
+			.eq('orgid', orgid);
+		const { data: suggestions, error: suggestionsError } = await this.supabase
+			.from('suggestions')
+			.select(`*`)
+			.eq('orgid', orgid);
+
+		// If we didn't receive any of it, return null.
+		if (
+			organization === null ||
+			profiles === null ||
+			roles === null ||
+			assignments === null ||
+			processes === null ||
+			hows === null ||
+			teams === null ||
+			suggestions === null
+		) {
+			console.log('Missing something');
+			console.log(
+				orgError,
+				rolesError,
+				profileError,
+				assignmentsError,
+				processesError,
+				howError,
+				teamsError,
+				suggestionsError
+			);
+
+			return null;
+		}
+
+		// Otherwise, return the payload.
+		else
+			return {
+				organization,
+				profiles,
+				roles,
+				assignments,
+				processes,
+				hows,
+				teams,
+				suggestions
+			};
+	}
 	/** Subscribe to an organization-specific channel, listening to all modifications to organization-related tables  */
 	subscribe(orgid: OrganizationID) {
 		// See if there's a channel already.
@@ -296,7 +381,6 @@ class OrganizationsDB {
 		return commentError;
 	}
 
-	/** Update an organization's description. Rely on Realtime to refresh. */
 	async updateOrgPrompt(
 		org: Organization,
 		text: string,
@@ -324,7 +408,7 @@ class OrganizationsDB {
 		who: PersonID
 	): Promise<PostgrestError | null> {
 		if (org.getName() === name) return null;
-		const { error } = await this.supabase.from('orgs').update({ name: name }).eq('id', org.getID());
+		const { error } = await this.supabase.from('orgs').update({ name }).eq('id', org.getID());
 		if (error) return error;
 
 		this.addComment(
@@ -347,7 +431,7 @@ class OrganizationsDB {
 		const { error } = await this.supabase.from('orgs').update({ visibility }).eq('id', org.getID());
 		if (error) return error;
 
-		this.addComment(
+		return await this.addComment(
 			org.getID(),
 			who,
 			`Updated organization visibility to ${visibility}`,
@@ -355,48 +439,50 @@ class OrganizationsDB {
 			org.getID(),
 			org?.getComments()
 		);
-
-		return null;
-	}
-
-	async createMarkup(text: string) {
-		const { data } = await this.supabase.from('markup').insert({ text }).select().single();
-
-		return data?.id ?? null;
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */
 	async updateAdmin(orgid: OrganizationID, profileid: ProfileID, admin: boolean) {
-		await this.supabase.from('profiles').update({ admin }).eq('orgid', orgid).eq('id', profileid);
+		const { error } = await this.supabase
+			.from('profiles')
+			.update({ admin })
+			.eq('orgid', orgid)
+			.eq('id', profileid);
+		return error;
 	}
 
 	/** Add a person to the organization's profiles if not already added. Rely on Realtime notification for update. */
 	async addPersonByID(orgid: OrganizationID, person: PersonID | PersonRow) {
-		const data = typeof person === 'string' ? await this.getPerson(person) : person;
-		if (!data) return null;
-		await this.supabase
+		const { data, error } =
+			typeof person === 'string' ? await this.getPerson(person) : { data: person, error: null };
+		if (error) return error;
+		const { error: insertError } = await this.supabase
 			.from('profiles')
 			.insert({ orgid, personid: data.id, name: '', email: data.email, admin: false });
+		return insertError;
 	}
 
 	/** Add a person to the organization's profiles by email. Rely on Realtime notification for update. */
 	async addPersonByEmail(orgid: OrganizationID, email: string) {
-		await this.supabase
+		const { error } = await this.supabase
 			.from('profiles')
 			.insert({ orgid, personid: null, name: '', email, admin: false });
+		return error;
 	}
 
 	async assignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
-		await this.supabase.from('assignments').insert({ orgid, profileid, roleid });
+		const { error } = await this.supabase.from('assignments').insert({ orgid, profileid, roleid });
+		return error;
 	}
 
 	async unassignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
-		await this.supabase
+		const { error } = await this.supabase
 			.from('assignments')
 			.delete()
 			.eq('orgid', orgid)
 			.eq('profileid', profileid)
 			.eq('roleid', roleid);
+		return error;
 	}
 
 	async getPersonWithEmail(email: string) {
@@ -409,30 +495,22 @@ class OrganizationsDB {
 		profileid: ProfileID,
 		supervisor: PersonID | null
 	) {
-		await this.supabase
+		const { error } = await this.supabase
 			.from('profiles')
 			.update({ supervisor })
 			.eq('orgid', orgid)
 			.eq('personid', profileid);
+		return error;
 	}
 
 	/** Remove a perosn from the organization's profiles if included. Rely on Realtime notification for update. */
 	async removeProfile(profileid: ProfileID) {
-		await this.supabase.from('profiles').delete().eq('id', profileid);
+		const { error } = await this.supabase.from('profiles').delete().eq('id', profileid);
+		return error;
 	}
 
-	updateOrg(org: OrganizationPayload) {
-		return this.organizations.set(org.organization.id, new Organization(org));
-	}
-
-	/** Reload an entire organization. Needed because Supabase realtime doesn't guarantee eventual message delivery. */
-	async refresh(orgid: OrganizationID) {
-		const payload = await this.getPayload(orgid);
-		if (payload) this.updateOrg(payload);
-	}
-
-	async createRole(orgid: OrganizationID, title: string): Promise<RoleID | null> {
-		const { data } = await this.supabase
+	async createRole(orgid: OrganizationID, title: string) {
+		return await this.supabase
 			.from('roles')
 			.insert({
 				orgid: orgid,
@@ -440,10 +518,6 @@ class OrganizationsDB {
 			})
 			.select()
 			.single();
-
-		await this.refresh(orgid);
-
-		return data?.id ?? null;
 	}
 
 	async updateRoleTitle(
@@ -454,7 +528,7 @@ class OrganizationsDB {
 		const { error } = await this.supabase.from('roles').update({ title: title }).eq('id', role.id);
 		if (error) return error;
 
-		this.addComment(
+		return this.addComment(
 			role.orgid,
 			who,
 			`Updated role title to ${title}`,
@@ -462,23 +536,26 @@ class OrganizationsDB {
 			role.id,
 			role.comments
 		);
-
-		return null;
 	}
 
 	async updateRoleDescription(role: RoleRow, description: string, who: PersonID) {
 		const { error } = await this.supabase.from('roles').update({ description }).eq('id', role.id);
 		if (error) return error;
-		this.addComment(role.orgid, who, 'Updated role description', 'roles', role.id, role.comments);
-
-		return null;
+		return this.addComment(
+			role.orgid,
+			who,
+			'Updated role description',
+			'roles',
+			role.id,
+			role.comments
+		);
 	}
 
 	async updateRoleTeam(role: RoleRow, team: TeamRow, who: PersonID) {
 		const { error } = await this.supabase.from('roles').update({ team: team.id }).eq('id', role.id);
 		if (error) return error;
 
-		this.addComment(
+		return this.addComment(
 			role.orgid,
 			who,
 			`Updated role team to ${team.name}`,
@@ -486,8 +563,6 @@ class OrganizationsDB {
 			role.id,
 			role.comments
 		);
-
-		return null;
 	}
 
 	async updateProfileName(profile: ProfileRow, name: string): Promise<PostgrestError | null> {
@@ -499,7 +574,7 @@ class OrganizationsDB {
 		return error;
 	}
 
-	async updateProfileDescription(profile: ProfileRow, text: string) {
+	async updateProfileBio(profile: ProfileRow, text: string) {
 		const { error } = await this.supabase
 			.from('profiles')
 			.update({ bio: text })
@@ -531,9 +606,8 @@ class OrganizationsDB {
 				.from(table)
 				.update({ comments: [...comments, commentID] })
 				.eq('id', id);
-			if (updateError) return updateError;
-		}
-		return null;
+			return updateError;
+		} else return null;
 	}
 
 	async deleteRole(id: RoleID): Promise<PostgrestError | null> {
@@ -541,8 +615,8 @@ class OrganizationsDB {
 		return error;
 	}
 
-	async createTeam(orgid: OrganizationID, name: string): Promise<TeamID | null> {
-		const { data } = await this.supabase
+	async createTeam(orgid: OrganizationID, name: string) {
+		return await this.supabase
 			.from('teams')
 			.insert({
 				orgid: orgid,
@@ -550,8 +624,6 @@ class OrganizationsDB {
 			})
 			.select()
 			.single();
-
-		return data?.id ?? null;
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
@@ -565,16 +637,21 @@ class OrganizationsDB {
 			.update({ description: text })
 			.eq('id', team.id);
 		if (error) return error;
-		this.addComment(team.orgid, who, 'Updated team description', 'teams', team.id, team.comments);
-
-		return null;
+		return this.addComment(
+			team.orgid,
+			who,
+			'Updated team description',
+			'teams',
+			team.id,
+			team.comments
+		);
 	}
 
 	async updateTeamName(team: TeamRow, name: string, who: PersonID): Promise<PostgrestError | null> {
 		const { error } = await this.supabase.from('teams').update({ name }).eq('id', team.id);
 		if (error) return error;
 
-		this.addComment(
+		return this.addComment(
 			team.orgid,
 			who,
 			`Updated team name to ${name}`,
@@ -582,19 +659,15 @@ class OrganizationsDB {
 			team.id,
 			team.comments
 		);
-
-		return null;
 	}
 
 	async deleteTeam(id: TeamID): Promise<PostgrestError | null> {
 		const { error } = await this.supabase.from('teams').delete().eq('id', id);
-
 		return error;
 	}
 
-	async getPerson(id: PersonID): Promise<PersonRow | null> {
-		const { data } = await this.supabase.from('people').select().eq('id', id).single();
-		return data;
+	async getPerson(id: PersonID) {
+		return await this.supabase.from('people').select().eq('id', id).single();
 	}
 
 	async createOrganization(
@@ -627,91 +700,12 @@ class OrganizationsDB {
 		return { error: null, id: org.id };
 	}
 
-	async getPayload(orgid: string): Promise<OrganizationPayload | null> {
-		// Load all of the organization metadata from the database
-		const { data: organization, error: orgError } = await this.supabase
-			.from('orgs')
-			.select()
-			.eq('id', orgid)
-			.single();
-		const { data: profiles, error: profileError } = await this.supabase
-			.from('profiles')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: roles, error: rolesError } = await this.supabase
-			.from('roles')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: assignments, error: assignmentsError } = await this.supabase
-			.from('assignments')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: processes, error: processesError } = await this.supabase
-			.from('processes')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: hows, error: howError } = await this.supabase
-			.from('hows')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: teams, error: teamsError } = await this.supabase
-			.from('teams')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: suggestions, error: suggestionsError } = await this.supabase
-			.from('suggestions')
-			.select(`*`)
-			.eq('orgid', orgid);
-
-		// If we didn't receive any of it, return null.
-		if (
-			organization === null ||
-			profiles === null ||
-			roles === null ||
-			assignments === null ||
-			processes === null ||
-			hows === null ||
-			teams === null ||
-			suggestions === null
-		) {
-			console.log('Missing something');
-			console.log(
-				orgError,
-				rolesError,
-				profileError,
-				assignmentsError,
-				processesError,
-				howError,
-				teamsError,
-				suggestionsError
-			);
-
-			return null;
-		}
-
-		// Otherwise, return the payload.
-		else
-			return {
-				organization,
-				profiles,
-				roles,
-				assignments,
-				processes,
-				hows,
-				teams,
-				suggestions
-			};
-	}
-
-	async getPersonsOrganizations(
-		personid: PersonID
-	): Promise<{ id: string; name: string }[] | null> {
-		const { data } = await this.supabase
+	async getPersonsOrganizations(personid: PersonID) {
+		return await this.supabase
 			.from('orgs')
 			.select(`id, name, profiles!profiles_orgid_fkey(personid)`)
 			.not('profiles', 'is', null)
 			.eq('profiles.personid', personid);
-		return data ?? [];
 	}
 
 	/** Create a new process, relying on Realtime for refresh */
@@ -740,7 +734,11 @@ class OrganizationsDB {
 
 		if (rootError) return { error: rootError, id: null };
 
-		await this.supabase.from('processes').update({ howid: rootHow.id }).eq('id', processData.id);
+		const { error: updateError } = await this.supabase
+			.from('processes')
+			.update({ howid: rootHow.id })
+			.eq('id', processData.id);
+		if (updateError) return { error: updateError, id: null };
 		return { error, id: processData.id };
 	}
 
@@ -748,7 +746,7 @@ class OrganizationsDB {
 		const { error } = await this.supabase.from('processes').update({ title }).eq('id', process.id);
 		if (error) return error;
 
-		this.addComment(
+		return this.addComment(
 			process.orgid,
 			who,
 			`Updated process title to ${title}`,
@@ -756,8 +754,6 @@ class OrganizationsDB {
 			process.id,
 			process.comments
 		);
-
-		return null;
 	}
 
 	async updateProcessConcern(process: ProcessRow, concern: string, who: PersonID) {
@@ -767,7 +763,7 @@ class OrganizationsDB {
 			.eq('id', process.id);
 		if (error) return error;
 
-		this.addComment(
+		return this.addComment(
 			process.orgid,
 			who,
 			`Updated concern to ${concern}`,
@@ -775,8 +771,6 @@ class OrganizationsDB {
 			process.id,
 			process.comments
 		);
-
-		return null;
 	}
 
 	async createHow(process: ProcessRow) {
@@ -881,7 +875,7 @@ class OrganizationsDB {
 
 	/** Delete this process, relying on Realtime for refresh. */
 	async deleteProcess(id: ProcessID) {
-		await this.supabase.from('processes').delete().eq('id', id);
+		return await this.supabase.from('processes').delete().eq('id', id);
 	}
 
 	async createSuggestion(
@@ -893,7 +887,7 @@ class OrganizationsDB {
 		roles: RoleID[]
 	) {
 		// Insert
-		const { data: suggestion } = await this.supabase
+		return await this.supabase
 			.from('suggestions')
 			.insert({
 				who,
@@ -906,8 +900,6 @@ class OrganizationsDB {
 			})
 			.select()
 			.single();
-
-		return suggestion;
 	}
 
 	async updateSuggestionWhat(suggestion: SuggestionRow, what: string) {
@@ -916,8 +908,7 @@ class OrganizationsDB {
 			.from('suggestions')
 			.update({ what })
 			.eq('id', suggestion.id);
-		if (error) return error;
-		else return null;
+		return error;
 	}
 
 	async updateSuggestionDescription(suggestion: SuggestionRow, description: string) {
@@ -926,8 +917,7 @@ class OrganizationsDB {
 			.from('suggestions')
 			.update({ description })
 			.eq('id', suggestion.id);
-		if (error) return error;
-		else return null;
+		return error;
 	}
 
 	async updateSuggestionStatus(suggestion: SuggestionRow, status: Status, who: PersonID) {
@@ -938,7 +928,7 @@ class OrganizationsDB {
 			.eq('id', suggestion.id);
 		if (error) return error;
 
-		this.addComment(
+		return this.addComment(
 			suggestion.orgid,
 			who,
 			`Updated status to ${status}`,
@@ -946,8 +936,6 @@ class OrganizationsDB {
 			suggestion.id,
 			suggestion.comments
 		);
-
-		return null;
 	}
 
 	async updateSuggestionRoles(suggestion: SuggestionRow, roles: RoleID[]) {
@@ -955,9 +943,7 @@ class OrganizationsDB {
 			.from('suggestions')
 			.update({ roles })
 			.eq('id', suggestion.id);
-		if (error) return error;
-
-		return null;
+		return error;
 	}
 
 	async updateSuggestionProcesses(suggestion: SuggestionRow, processes: ProcessID[]) {
@@ -965,18 +951,15 @@ class OrganizationsDB {
 			.from('suggestions')
 			.update({ processes })
 			.eq('id', suggestion.id);
-		if (error) return error;
-
-		return null;
+		return error;
 	}
 
 	async deleteChange(id: SuggestionID) {
-		await this.supabase.from('suggestions').delete().eq('id', id);
+		return await this.supabase.from('suggestions').delete().eq('id', id);
 	}
 
 	async getComments(ids: CommentID[]) {
-		const { data } = await this.supabase.from('comments').select().in('id', ids);
-		return data ?? [];
+		return await this.supabase.from('comments').select().in('id', ids);
 	}
 }
 

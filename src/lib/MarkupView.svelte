@@ -4,8 +4,7 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
-	import Error from './Error.svelte';
-	import { getDB } from './contexts';
+	import { addError, getErrors } from './contexts';
 
 	/** The markup's text */
 	export let markup: string;
@@ -19,7 +18,8 @@
 	let height = 0;
 	let revisedText = '';
 	let input: HTMLTextAreaElement;
-	let error: PostgrestError | null = null;
+
+	const errors = getErrors();
 
 	$: scrollHeight = markup ? input?.scrollHeight ?? height : height;
 
@@ -35,9 +35,12 @@
 
 	async function save() {
 		if (edit) {
-			error = await edit(revisedText ?? '');
-			if (error) return;
+			const error = await edit(revisedText ?? '');
 			editing = false;
+			if (error) {
+				addError(errors, 'Unable to save markup.', error);
+				return;
+			}
 			markup = revisedText;
 		}
 	}
@@ -59,9 +62,6 @@
 	{/if}
 	{#if editing}
 		<div class="text">
-			{#if error}
-				<Error {error} />
-			{/if}
 			<!-- svelte-ignore a11y-autofocus -->
 			<textarea
 				bind:value={revisedText}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
-	import { getDB, getOrg, getUser } from '$lib/contexts';
+	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
 	import { page } from '$app/stores';
 	import MarkupView from '$lib/MarkupView.svelte';
@@ -14,8 +14,7 @@
 	const user = getUser();
 	const org = getOrg();
 	const db = getDB();
-
-	let error: string | undefined = undefined;
+	const errors = getErrors();
 
 	$: teamID = $page.params.teamid;
 	$: team = $org.getTeam(teamID);
@@ -26,13 +25,27 @@
 	<Title
 		title={team.name}
 		kind="team"
-		edit={$user && isAdmin ? (text) => $db.updateTeamName(team, text, $user.id) : undefined}
+		edit={$user && isAdmin
+			? (text) =>
+					queryOrError(
+						errors,
+						$db.updateTeamName(team, text, $user.id),
+						"We couldn't update the team's name."
+					)
+			: undefined}
 	/>
 
 	<MarkupView
 		markup={team.description}
 		unset="No description"
-		edit={isAdmin && $user ? (text) => $db.updateTeamDescription(team, text, $user.id) : undefined}
+		edit={isAdmin && $user
+			? (text) =>
+					queryOrError(
+						errors,
+						$db.updateTeamDescription(team, text, $user.id),
+						"We couldn't update the team's description."
+					)
+			: undefined}
 	/>
 
 	{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
@@ -48,11 +61,9 @@
 	<Paragraph>If you delete this team, the roles on it will be without a team.</Paragraph>
 	<Button
 		action={async () => {
-			const err = await $db.deleteTeam(teamID);
-			if (err) error = err.message;
-			else goto(`/organization/${$org.getID()}/roles`);
+			const error = await queryOrError(errors, $db.deleteTeam(teamID), "Couldn't delete the team.");
+			if (error === null) goto(`/organization/${$org.getID()}/roles`);
 		}}
 		warning>Delete this team</Button
 	>
-	{#if error}<Oops text={error} />{/if}
 </Admin>

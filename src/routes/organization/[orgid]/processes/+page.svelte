@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getDB, getOrg, getUser } from '$lib/contexts';
+	import { addError, getDB, getErrors, getOrg, getUser } from '$lib/contexts';
 	import ProcessLink from '$lib/ProcessLink.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
@@ -17,6 +17,7 @@
 	const organization = getOrg();
 	const user = getUser();
 	const db = getDB();
+	const errors = getErrors();
 
 	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
 		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
@@ -74,10 +75,9 @@
 	}
 
 	let title = '';
-	let message: string | undefined = undefined;
 	async function newProcess() {
 		const { error, id } = await $db.addProcess($organization.getID(), title);
-		if (error) message = error.message;
+		if (error) addError(errors, "Coudln't add new process", error);
 		else goto(`/organization/${$organization.getID()}/process/${id}`);
 	}
 </script>
@@ -100,13 +100,10 @@
 			submit="Create"
 			action={newProcess}
 			valid={() => title.length > 0}
-			error={message}
+			error={undefined}
 		>
 			<Field active={true} label="title" bind:text={title} />
 		</FormDialog>
-	{/if}
-	{#if message}
-		<Oops text={message} />
 	{/if}
 
 	{#each Array.from(new Set($organization

@@ -5,19 +5,24 @@
 	export let inline = false;
 </script>
 
-<div class:inline>{typeof text === 'string' ? text : $locale ? text($locale) : '-'}</div>
+<div class:inline>
+	<span>{typeof text === 'string' ? text : $locale ? text($locale) : '-'}</span>
+	<span class="sub"><slot /></span>
+</div>
 
 <style>
 	div {
-		display: block;
+		display: flex;
+		flex-direction: column;
 		background: var(--error);
 		text-transform: none;
 		font-size: var(--normal-size);
 		color: var(--background);
-		padding: var(--padding);
+		padding: calc(2 * var(--padding));
 		border-spacing: var(--radius);
-		margin-block-start: var(--spacing);
-		margin-block-end: var(--spacing);
+		max-width: 30em;
+		text-align: left;
+		border-radius: var(--radius);
 	}
 
 	.inline {
@@ -25,5 +30,9 @@
 		margin: 0;
 		padding-inline-start: calc(var(--spacing) / 2);
 		padding-inline-end: calc(var(--spacing) / 2);
+	}
+
+	.sub {
+		font-size: var(--small-size);
 	}
 </style>

@@ -1,17 +1,14 @@
 <script lang="ts">
 	import Timeline from '$lib/Timeline.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import Organizations, { type RoleRow } from '../database/OrganizationsDB';
+	import { type RoleRow } from '../database/OrganizationsDB';
 	import PersonLink from './PersonLink.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import ChangeForm from './SuggestionForm.svelte';
 	import Button from './Button.svelte';
-	import Oops from './Oops.svelte';
 	import { goto } from '$app/navigation';
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
-	import { locale } from '$types/Locales';
-	import { getDB, getOrg, getUser } from './contexts';
+	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
@@ -22,11 +19,10 @@
 
 	export let role: RoleRow;
 
-	let deleteError: string | undefined = undefined;
-
 	const user = getUser();
 	const org = getOrg();
 	const db = getDB();
+	const errors = getErrors();
 
 	$: profiles = $org.getRoleProfiles(role.id);
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
@@ -35,7 +31,14 @@
 <Title
 	title={role.title}
 	kind="role"
-	edit={isAdmin && $user ? (text) => $db.updateRoleTitle(role, text, $user.id) : undefined}
+	edit={isAdmin && $user
+		? (text) =>
+				queryOrError(
+					errors,
+					$db.updateRoleTitle(role, text, $user.id),
+					"Couldn't update role title"
+				)
+		: undefined}
 >
 	<Choice
 		choice={role.team ? $org.getTeam(role.team)?.name ?? '' : '—'}
@@ -46,7 +49,11 @@
 			if (isAdmin && $user) {
 				const team = $org.getTeams().find((team) => team.name === name);
 				if (team) {
-					return await $db.updateRoleTeam(role, team, $user.id);
+					return await queryOrError(
+						errors,
+						$db.updateRoleTeam(role, team, $user.id),
+						"Couldn't update role team"
+					);
 				}
 			}
 			return null;
@@ -58,7 +65,14 @@
 <MarkupView
 	markup={role.description}
 	unset="No description yet."
-	edit={$user ? (text) => $db.updateRoleDescription(role, text, $user.id) : undefined}
+	edit={$user
+		? (text) =>
+				queryOrError(
+					errors,
+					$db.updateRoleDescription(role, text, $user.id),
+					"Couldn't update role description."
+				)
+		: undefined}
 />
 
 <Header>Who</Header>
@@ -92,18 +106,14 @@
 	>
 	<Button
 		action={async () => {
-			try {
-				const org = role.orgid;
-				const error = await $db.deleteRole(role.id);
-				if (error) deleteError = error.message;
-				else goto(`/organization/${org}/roles`);
-			} catch (_) {
-				deleteError = "We couldn't delete this";
-			}
+			const org = role.orgid;
+			const error = await $db.deleteRole(role.id);
+			if (error) {
+				addError(errors, "We couldn't delete this role.", error);
+			} else goto(`/organization/${org}/roles`);
 		}}
 		warning>Delete this role</Button
 	>
-	{#if deleteError}<Oops text={deleteError} />{/if}
 </Admin>
 
 <Header>History</Header>

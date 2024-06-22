@@ -1,24 +1,35 @@
 <script lang="ts">
+	import { type CommentRow } from '$database/OrganizationsDB';
 	import { type CommentID } from '$types/Organization';
 	import CommentView from './CommentView.svelte';
 	import Loading from './Loading.svelte';
-	import { getDB } from './contexts';
+	import { addError, getDB, getErrors } from './contexts';
 
 	export let comments: CommentID[];
 
 	const db = getDB();
+	const errors = getErrors();
+
+	let data: CommentRow[] | undefined = undefined;
+	$: {
+		$db.getComments(comments).then((d) => {
+			const { data: newComments, error } = d;
+			if (error) addError(errors, 'Unable to get comments.', error);
+			else data = newComments;
+		});
+	}
 </script>
 
-{#await $db.getComments(comments)}
+{#if data === undefined}
 	<Loading />
-{:then comments}
+{:else}
 	<table>
 		<tbody>
-			{#each comments.reverse() as comment}
+			{#each data.reverse() as comment}
 				<CommentView {comment} />
 			{:else}
 				No changes yet.
 			{/each}
 		</tbody>
 	</table>
-{/await}
+{/if}

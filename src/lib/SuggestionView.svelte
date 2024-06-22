@@ -13,7 +13,7 @@
 	import Title from './Title.svelte';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
-	import { getDB, getOrg, getUser } from './contexts';
+	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
 	import CommentsView from './CommentsView.svelte';
 	import Choice from './Choice.svelte';
@@ -27,6 +27,8 @@
 	const org = getOrg();
 	const user = getUser();
 	const db = getDB();
+	const errors = getErrors();
+
 	const Statuses = { triage: 'Triage', active: 'Active', done: 'Done', backlog: 'Backlog' };
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
@@ -39,7 +41,12 @@
 	title={suggestion.what}
 	kind="suggestion"
 	edit={$user && isAdmin && suggestion.who === $user.id
-		? (text) => $db.updateSuggestionWhat(suggestion, text)
+		? (text) =>
+				queryOrError(
+					errors,
+					$db.updateSuggestionWhat(suggestion, text),
+					"Couldn't update the suggestion's title"
+				)
 		: undefined}
 >
 	<Choice
@@ -50,7 +57,11 @@
 				$user &&
 				(status === 'triage' || status === 'active' || status === 'done' || status === 'backlog')
 			)
-				return await $db.updateSuggestionStatus(suggestion, status, $user.id);
+				return await queryOrError(
+					errors,
+					$db.updateSuggestionStatus(suggestion, status, $user.id),
+					"Couldn't update the suggestion's status."
+				);
 			else return null;
 		}}><Status status={suggestion.status} /></Choice
 	>
@@ -65,7 +76,14 @@
 	><MarkupView
 		markup={suggestion.description}
 		unset="No description"
-		edit={editable ? (text) => $db.updateSuggestionDescription(suggestion, text) : undefined}
+		edit={editable
+			? (text) =>
+					queryOrError(
+						errors,
+						$db.updateSuggestionDescription(suggestion, text),
+						"Couldn't update suggestion description."
+					)
+			: undefined}
 	/></Quote
 >
 
@@ -75,9 +93,13 @@
 		<RoleLink roleID={role} />
 		<Button
 			action={() =>
-				$db.updateSuggestionRoles(
-					suggestion,
-					suggestion.roles.filter((r) => r !== role)
+				queryOrError(
+					errors,
+					$db.updateSuggestionRoles(
+						suggestion,
+						suggestion.roles.filter((r) => r !== role)
+					),
+					"Couldn't update suggestion roles."
 				)}
 		>
 			x</Button
@@ -96,7 +118,11 @@
 			selection={undefined}
 			change={(r) =>
 				r !== undefined
-					? $db.updateSuggestionRoles(suggestion, Array.from(new Set([...suggestion.roles, r])))
+					? queryOrError(
+							errors,
+							$db.updateSuggestionRoles(suggestion, Array.from(new Set([...suggestion.roles, r]))),
+							"Couldn't update suggestion roles."
+					  )
 					: undefined}
 		/>
 	{/if}
@@ -108,9 +134,13 @@
 		<ProcessLink processID={process} />
 		<Button
 			action={() =>
-				$db.updateSuggestionProcesses(
-					suggestion,
-					suggestion.processes.filter((p) => p !== process)
+				queryOrError(
+					errors,
+					$db.updateSuggestionProcesses(
+						suggestion,
+						suggestion.processes.filter((p) => p !== process)
+					),
+					"Couldn't update suggestion processes."
 				)}
 		>
 			x</Button
@@ -129,9 +159,13 @@
 			selection={undefined}
 			change={(p) =>
 				p !== undefined
-					? $db.updateSuggestionProcesses(
-							suggestion,
-							Array.from(new Set([...suggestion.processes, p]))
+					? queryOrError(
+							errors,
+							$db.updateSuggestionProcesses(
+								suggestion,
+								Array.from(new Set([...suggestion.processes, p]))
+							),
+							"Couldn't update suggestion processes."
 					  )
 					: undefined}
 		/>
@@ -142,13 +176,10 @@
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
 	<Button
 		action={async () => {
-			try {
-				const org = suggestion.orgid;
-				await $db.deleteChange(suggestion.id);
-				goto(`/organization/${org}`);
-			} catch (_) {
-				deleteError = "We couldn't delete this";
-			}
+			const org = suggestion.orgid;
+			const { error } = await $db.deleteChange(suggestion.id);
+			if (error) addError(errors, "Couldn't delete this suggestion.", error);
+			else goto(`/organization/${org}`);
 		}}
 		warning>Delete this suggestion</Button
 	>

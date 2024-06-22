@@ -3,8 +3,16 @@
 	import { locale } from '$types/Locales';
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { DBSymbol, UserSymbol, type DBContext, type UserContext } from '$lib/contexts';
+	import {
+		DBSymbol,
+		ErrorsSymbol,
+		UserSymbol,
+		type DBContext,
+		type ErrorsContext,
+		type UserContext
+	} from '$lib/contexts';
 	import Organizations from '$database/OrganizationsDB.js';
+	import Error from '$lib/Error.svelte';
 	import { goto } from '$app/navigation';
 
 	export let data;
@@ -15,6 +23,9 @@
 
 	const user: UserContext = writable(data.user);
 	setContext(UserSymbol, user);
+
+	const errors: ErrorsContext = writable([]);
+	setContext(ErrorsSymbol, errors);
 
 	$: ({ strings, supabase } = data);
 	$: locale.set(strings);
@@ -40,6 +51,11 @@
 	});
 </script>
 
+<div class="errors">
+	{#each $errors as error}
+		<Error {error} />
+	{/each}
+</div>
 <Page>
 	<slot />
 </Page>
@@ -208,6 +224,12 @@
 		font-style: italic;
 	}
 
+	:global(hr) {
+		border: none;
+		border-top: var(--thickness) solid var(--separator);
+		width: 100%;
+	}
+
 	:global(table) {
 		width: 100%;
 		border-collapse: collapse;
@@ -237,5 +259,19 @@
 	@font-face {
 		font-family: 'Rokkitt';
 		src: url(/fonts/Rokkitt.ttf) format('truetype');
+	}
+
+	.errors {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--padding);
+		position: fixed;
+		top: var(--padding);
+		left: var(--padding);
+		right: var(--padding);
+		padding: var(--padding);
+		background-color: transparent;
+		text-align: center;
 	}
 </style>

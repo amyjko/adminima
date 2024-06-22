@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import Form from './Form.svelte';
 	import Oops from './Oops.svelte';
-	import { getDB, getOrg, getUser } from './contexts';
+	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import type { ProcessID, RoleID } from '$types/Organization';
 	import Field from './Field.svelte';
 	import Button from './Button.svelte';
@@ -20,11 +20,12 @@
 	const organization = getOrg();
 	const user = getUser();
 	const db = getDB();
+	const errors = getErrors();
 
 	async function createRequest() {
 		if ($user === null) return;
 		try {
-			const suggestion = await $db.createSuggestion(
+			const { data: suggestion, error } = await $db.createSuggestion(
 				$user.id,
 				$organization.getID(),
 				newRequestTitle,
@@ -32,7 +33,9 @@
 				process ? [process] : [],
 				role ? [role] : []
 			);
-			if (suggestion) goto(`/organization/${$organization.getID()}/suggestion/${suggestion.id}`);
+			if (error) addError(errors, "Couldn't create the suggestion.", error);
+			else if (suggestion)
+				goto(`/organization/${$organization.getID()}/suggestion/${suggestion.id}`);
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}
@@ -43,7 +46,14 @@
 	<MarkupView
 		markup={$organization.getPrompt()}
 		unset="What is your suggestion?"
-		edit={$user ? (text) => $db.updateOrgPrompt($organization, text, $user.id) : undefined}
+		edit={$user
+			? (text) =>
+					queryOrError(
+						errors,
+						$db.updateOrgPrompt($organization, text, $user.id),
+						"Couldn't update prompt"
+					)
+			: undefined}
 	/>
 	<Field label="Title" bind:text={newRequestTitle} />
 	<Labeled
