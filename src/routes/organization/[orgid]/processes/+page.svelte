@@ -19,6 +19,8 @@
 	const db = getDB();
 	const errors = getErrors();
 
+	$: personRoles = $user ? $organization.getPersonRoles($user.id) : [];
+
 	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
 		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
 
@@ -133,8 +135,9 @@
 		<div class="processes">
 			<table>
 				<thead>
-					<th />{#each roles as role}<th class="role"><RoleLink roleID={role.id} /></th>{:else}<th
-						/>{/each}
+					<th />{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
+							><RoleLink roleID={role.id} /></th
+						>{:else}<th />{/each}
 				</thead>
 				<tbody>
 					{#each processes as process}
@@ -142,7 +145,7 @@
 						<tr>
 							<td><ProcessLink processID={process.id} /></td>
 							{#each roles as role}
-								<td class="level"
+								<td class="level" class:me={personRoles.includes(role.id)}
 									><Level
 										level={process?.accountable === role.id
 											? 'accountable'
@@ -187,5 +190,9 @@
 
 	tr:nth-child(odd) {
 		background-color: var(--separator);
+	}
+
+	.me {
+		background: var(--warning-background);
 	}
 </style>
