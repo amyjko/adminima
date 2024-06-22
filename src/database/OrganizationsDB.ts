@@ -947,6 +947,14 @@ class OrganizationsDB {
 			.single();
 	}
 
+	async updateSuggestionVisibility(how: SuggestionRow, vis: string) {
+		const { error } = await this.supabase
+			.from('suggestions')
+			.update({ visibility: vis })
+			.eq('id', how.id);
+		return error;
+	}
+
 	async updateSuggestionWhat(suggestion: SuggestionRow, what: string) {
 		if (suggestion.what === what) return null;
 		const { error } = await this.supabase

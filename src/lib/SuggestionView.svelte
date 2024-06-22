@@ -20,6 +20,7 @@
 	import CommentView from './CommentView.svelte';
 	import Header from './Header.svelte';
 	import FormDialog from './FormDialog.svelte';
+	import Visibility from './Visibility.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -70,6 +71,12 @@
 					);
 				else return null;
 			}}
+		/>
+
+		<Visibility
+			level={suggestion.visibility}
+			tip="Edit this suggestion's visibility"
+			edit={(vis) => $db.updateSuggestionVisibility(suggestion, vis)}
 		/>
 	{/if}
 </Title>
