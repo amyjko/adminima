@@ -9,16 +9,15 @@
 	import Oops from './Oops.svelte';
 	import Button from './Button.svelte';
 	import { goto } from '$app/navigation';
-	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
 	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
 	import CommentsView from './CommentsView.svelte';
-	import Choice from './Choice.svelte';
 	import Select from './Select.svelte';
 	import Notice from './Notice.svelte';
+	import Tip from './Tip.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -29,7 +28,7 @@
 	const db = getDB();
 	const errors = getErrors();
 
-	const Statuses = { triage: 'Triage', active: 'Active', done: 'Done', backlog: 'Backlog' };
+	const Statuses = { triage: 'Triage', backlog: 'Backlog', active: 'Active', done: 'Done' };
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 	$: editable = $user && (isAdmin || suggestion.who === $user.id);
@@ -70,6 +69,8 @@
 		/>
 	{/if}
 </Title>
+
+<Tip>Use suggestions as a place to capture progress on a change and to document decisions.</Tip>
 
 <Paragraph
 	>On <TimeView date={timestampToDate(suggestion.when)} />

@@ -12,12 +12,11 @@
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
-	import Choice from './Choice.svelte';
 	import Notice from './Notice.svelte';
-	import Link from './Link.svelte';
 	import Suggestions from './Suggestions.svelte';
 	import SuggestionLink from './SuggestionLink.svelte';
 	import Select from './Select.svelte';
+	import Tip from './Tip.svelte';
 
 	export let role: RoleRow;
 
@@ -69,6 +68,10 @@
 			}}
 		/>{/if}
 </Title>
+
+<Tip
+	>This is a role in the organization. <strong>Admins</strong> can update it's description and team.</Tip
+>
 
 <MarkupView
 	markup={role.description}

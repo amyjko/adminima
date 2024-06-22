@@ -11,6 +11,7 @@
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Notice from '$lib/Notice.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
+	import Tip from '$lib/Tip.svelte';
 
 	const org = getOrg();
 	const db = getDB();
@@ -34,9 +35,9 @@
 </script>
 
 <Title title="roles" kind="role" />
-<Paragraph
+<Tip
 	>These are the roles held in this organization. Each one is responsible for particular processes
-	in this organization.</Paragraph
+	in this organization.</Tip
 >
 
 {#if $org.getRoles().length === 0 && $org.getTeams().length === 0}

@@ -14,7 +14,6 @@
 		gap: var(--padding);
 		font-style: italic;
 		padding: var(--padding);
-		border-top: 1px var(--border) solid;
-		border-bottom: 1px var(--border) solid;
+		border-left: var(--thickness) var(--border) solid;
 	}
 </style>

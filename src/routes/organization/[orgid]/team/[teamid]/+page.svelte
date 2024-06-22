@@ -10,6 +10,7 @@
 	import Button from '$lib/Button.svelte';
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
+	import Tip from '$lib/Tip.svelte';
 
 	const user = getUser();
 	const org = getOrg();
@@ -34,6 +35,11 @@
 					)
 			: undefined}
 	/>
+
+	<Tip
+		>Teams are helpful ways of organizing roles. <strong>Admins</strong> can update their names and which
+		roles are in them.</Tip
+	>
 
 	<MarkupView
 		markup={team.description}

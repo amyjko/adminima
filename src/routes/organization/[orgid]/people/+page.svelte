@@ -16,6 +16,7 @@
 	import Form from '$lib/Form.svelte';
 	import Notice from '$lib/Notice.svelte';
 	import Link from '$lib/Link.svelte';
+	import Tip from '$lib/Tip.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -50,10 +51,10 @@
 
 <Title title="people" kind="person" />
 
-<Paragraph
+<Tip
 	>This is the list of people in this organization. <strong>Admins</strong> have permission to add and
 	remove people from the organization, promote or demote people from admin status, and create and delete
-	roles. Select a person to see the roles they have.</Paragraph
+	roles. Select a person to see the roles they have.</Tip
 >
 
 {#if isAdmin && $organization.getRoles().length === 0}
@@ -138,7 +139,10 @@
 									.getProfiles()
 									.filter((prof) => prof.id !== profile.id)
 									.map((prof) => {
-										return { value: prof.id, label: prof.name };
+										return {
+											value: prof.id,
+											label: prof.name.length === 0 ? prof.email : prof.name
+										};
 									})
 							]}
 							selection={profile.supervisor ?? undefined}

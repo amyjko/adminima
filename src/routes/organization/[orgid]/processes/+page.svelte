@@ -14,6 +14,7 @@
 	import Notice from '$lib/Notice.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import Concern from '$lib/Concern.svelte';
+	import Tip from '$lib/Tip.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -89,10 +90,10 @@
 {#if ($user === null && $organization.getVisibility() !== 'public') || ($user !== null && !$organization.hasPerson($user.id))}
 	<Oops text="This organization's processes are not public." />
 {:else}
-	<Paragraph
+	<Tip
 		>These are all of the processes in this organization and which roles are involved in them.
 		Select one to see how it works, who's responsible for it, or to suggest a change.
-	</Paragraph>
+	</Tip>
 
 	{#if $user && $organization.hasPerson($user.id)}
 		<FormDialog

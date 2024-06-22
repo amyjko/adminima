@@ -8,6 +8,7 @@
 	import MarkupView from './MarkupView.svelte';
 	import type { ProcessRow, ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';
+	import Tip from './Tip.svelte';
 
 	export let profile: ProfileRow;
 
@@ -32,6 +33,8 @@
 >
 	{profile.email}
 </Title>
+
+<Tip>People have unique profiles for each organization they are in.</Tip>
 
 {#if profile.personid === null}
 	<Notice

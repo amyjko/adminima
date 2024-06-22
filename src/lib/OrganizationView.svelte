@@ -8,6 +8,7 @@
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Note from './Note.svelte';
+	import Tip from './Tip.svelte';
 
 	export let organization: Organization;
 
@@ -52,6 +53,11 @@
 			see this organization's details.{/if}</Note
 	>
 </Title>
+
+<Tip
+	>This is an organization's dashboard. Learn about the organization, or edit it if you have
+	permissions.</Tip
+>
 
 <Paragraph>
 	See the <strong>{organization.getRoles().length}</strong>

@@ -5,12 +5,15 @@
 	import PersonLink from './PersonLink.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
+	import Tip from './Tip.svelte';
 
 	export let suggestions: SuggestionRow[];
 
 	const org = getOrg();
 	const Levels = { triage: 0, active: 1, done: 3, backlog: 2 };
 </script>
+
+<Tip>These are suggestions people have made about how to change the organization.</Tip>
 
 {#if suggestions.length > 0}
 	<table>
