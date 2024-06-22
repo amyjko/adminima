@@ -10,6 +10,7 @@
 	let editing = false;
 
 	$: levels = Object.keys(choices) as [keyof typeof choices];
+	$: editable = levels.length > 0;
 
 	function choose(newChoice: string) {
 		if (edit) {
@@ -21,7 +22,9 @@
 </script>
 
 <div class="row" class:editable={edit !== undefined}>
-	{#if edit}<Button tip="Edit this choice" action={() => (editing = !editing)}>✎</Button>{/if}
+	{#if edit}<Button tip="Edit this choice" active={editable} action={() => (editing = !editing)}
+			>✎</Button
+		>{/if}
 	{#if editing}
 		<div class="choices" role="radiogroup">
 			{#each levels as key}

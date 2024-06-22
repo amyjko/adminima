@@ -16,6 +16,7 @@
 	import Notice from './Notice.svelte';
 	import Link from './Link.svelte';
 	import Suggestions from './Suggestions.svelte';
+	import SuggestionLink from './SuggestionLink.svelte';
 
 	export let role: RoleRow;
 
@@ -90,7 +91,7 @@
 
 <Header>Pending changes</Header>
 
-<Link to="/organization/{$org.getID()}/suggestions/new?role={role.id}">Suggest a change</Link>
+<SuggestionLink id={null} role={role.id} />
 
 <Suggestions
 	suggestions={$org

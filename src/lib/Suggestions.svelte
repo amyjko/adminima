@@ -29,7 +29,7 @@
 					<td><Status status={suggestion.status} /></td>
 
 					<td><PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /></td>
-					<td><SuggestionLink changeID={suggestion.id} /></td></tr
+					<td><SuggestionLink id={suggestion.id} /></td></tr
 				>
 			{/each}
 		</tbody>

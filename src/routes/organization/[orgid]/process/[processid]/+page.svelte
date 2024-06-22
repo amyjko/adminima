@@ -25,6 +25,7 @@
 	import Suggestions from '$lib/Suggestions.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Tip from '$lib/Tip.svelte';
+	import SuggestionLink from '$lib/SuggestionLink.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -228,9 +229,7 @@
 
 	<Header>Changes</Header>
 
-	<Link to="/organization/{$org.getID()}/suggestions/new?process={process.id}"
-		>Suggest a change</Link
-	>
+	<SuggestionLink id={null} process={process.id} />
 
 	<Suggestions
 		suggestions={$org

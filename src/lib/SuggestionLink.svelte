@@ -1,16 +1,22 @@
 <script lang="ts">
-	import type { SuggestionID } from '$types/Organization';
+	import type { ProcessID, RoleID, SuggestionID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
 	import { getOrg } from './contexts';
 
-	export let changeID: SuggestionID;
+	export let id: SuggestionID | null;
+	export let role: RoleID | null = null;
+	export let process: ProcessID | null = null;
 
 	const org = getOrg();
 
-	$: change = $org.getSuggestion(changeID);
+	$: change = id ? $org.getSuggestion(id) : null;
 </script>
 
-{#if change === null}<Oops inline text={(locale) => locale.error.noPerson} />{:else}<Link
-		to="/organization/{$org.getID()}/suggestion/{changeID}">{change.what}</Link
+{#if id !== null && change === null}<Oops inline text="Unknown suggestion" />{:else}<Link
+		kind="suggestion"
+		to="/organization/{$org.getID()}/{id ? 'suggestion' : 'suggestions'}/{id ?? 'new'}{role
+			? `?role=${role}`
+			: ''}{process ? `?process=${process}` : ''}"
+		>{change ? change.what : 'Suggest a change...'}</Link
 	>{/if}
