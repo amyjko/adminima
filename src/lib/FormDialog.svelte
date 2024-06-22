@@ -8,6 +8,8 @@
 	import Oops from './Oops.svelte';
 
 	export let button: string;
+	export let showTip: string;
+	export let submitTip: string;
 	export let submit: string;
 	export let header: string;
 	export let error: string | undefined;
@@ -18,7 +20,7 @@
 	let show = false;
 </script>
 
-<Button tip="Show this form" action={() => (show = true)}>{button}</Button>
+<Button tip={showTip} action={() => (show = true)}>{button}</Button>
 {#if show}
 	<Dialog close={() => (show = false)}>
 		<Header>{header}</Header>
@@ -32,7 +34,7 @@
 			<slot />
 			<Actions
 				><Button tip="Dismiss this dialog." end action={() => (show = false)}>cancel</Button><Button
-					tip="Submit this form."
+					tip={submitTip}
 					end
 					submit
 					active={valid()}

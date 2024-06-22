@@ -26,6 +26,8 @@
 
 <FormDialog
 	button="Create organization …"
+	showTip={'Create a new organization'}
+	submitTip={'Create this new organization.'}
 	header="New organization"
 	explanation="We need a few things"
 	submit="Create"

@@ -95,6 +95,8 @@
 	{#if $user && $organization.hasPerson($user.id)}
 		<FormDialog
 			button="Create process …"
+			showTip="Create a new process."
+			submitTip="Create this new process."
 			header="New process"
 			explanation="Let's give the process a name."
 			submit="Create"

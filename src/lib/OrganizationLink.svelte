@@ -1,8 +1,9 @@
 <script lang="ts">
 	import Link from './Link.svelte';
-	import type Organization from '$types/Organization';
+	import { type OrganizationID } from '$types/Organization';
 
-	export let org: Organization;
+	export let id: OrganizationID;
+	export let name: string;
 </script>
 
-<Link to="/organization/{org.getID()}" kind="org">{org.getName()}</Link>
+<Link to="/organization/{id}" kind="org">{name}</Link>

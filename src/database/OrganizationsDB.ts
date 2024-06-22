@@ -470,6 +470,17 @@ class OrganizationsDB {
 		return error;
 	}
 
+	async getPersonProfile(orgid: OrganizationID, personid: PersonID) {
+		const { data } = await this.supabase
+			.from('profiles')
+			.select()
+			.eq('orgid', orgid)
+			.eq('personid', personid)
+			.single();
+
+		return data;
+	}
+
 	async assignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
 		const { error } = await this.supabase.from('assignments').insert({ orgid, profileid, roleid });
 		return error;

@@ -206,6 +206,8 @@
 		{/if}
 		<FormDialog
 			submit="Set concern"
+			showTip="Set a new concern."
+			submitTip="Set this new concern."
 			button="Set concern..."
 			header="Set a new concern"
 			explanation="Set a new concern to group processes."

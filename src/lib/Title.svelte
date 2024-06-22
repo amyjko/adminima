@@ -29,7 +29,7 @@
 
 <div class="title {kind}">
 	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
-		<div class="breadcrumbs"><OrganizationLink org={$org} /></div>
+		<div class="breadcrumbs"><OrganizationLink id={$org.getID()} name={$org.getName()} /></div>
 	{/if}
 	{#if kind}
 		<div class="kind">

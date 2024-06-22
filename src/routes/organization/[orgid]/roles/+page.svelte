@@ -70,6 +70,8 @@
 <Admin>
 	<FormDialog
 		button="Create role …"
+		showTip="Create a new role."
+		submitTip="Create this new role."
 		header="New role"
 		explanation="Create a new role for this organization"
 		submit="Create"
@@ -82,6 +84,8 @@
 
 	<FormDialog
 		button="Create team …"
+		showTip="Create a new team."
+		submitTip="Create this new team."
 		header="New team"
 		explanation="Create a new team for this organization"
 		submit="Create"

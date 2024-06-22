@@ -10,6 +10,8 @@
 	import Title from '$lib/Title.svelte';
 	import { getDB, getUser } from '$lib/contexts';
 	import { page } from '$app/stores';
+	import OrganizationLink from '$lib/OrganizationLink.svelte';
+	import PersonLink from '$lib/PersonLink.svelte';
 
 	let user = getUser();
 	let db = getDB();
@@ -33,12 +35,15 @@
 		<Paragraph>Hi <strong>{$user.email}</strong>.</Paragraph>
 
 		{#if orgs.data.length}
-			<Paragraph>Here are the organizations you're part of:</Paragraph>
-			<ul>
-				{#each orgs.data as org}
-					<li><Link to={`/organization/${org.id}`}>{org.name}</Link></li>
-				{/each}
-			</ul>
+			<Paragraph>Here are the organizations you're part of and your profiles for each:</Paragraph>
+			{#each orgs.data as org}
+				<div>
+					<OrganizationLink id={org.id} name={org.name} />
+					{#await $db.getPersonProfile(org.id, $user.id) then profile}
+						<PersonLink {profile} />
+					{/await}
+				</div>
+			{/each}
 		{:else}
 			<Notice
 				>You're not part of any organizations.
