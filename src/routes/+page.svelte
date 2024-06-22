@@ -2,7 +2,7 @@
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Lead from '$lib/Lead.svelte';
 	import Title from '$lib/Title.svelte';
-	import NewOrganization from '$lib/NewOrganization.svelte';
+	import Link from '$lib/Link.svelte';
 </script>
 
 <Title title="Adminima" />
@@ -15,4 +15,7 @@
 	is accountable and responsible.</Paragraph
 >
 
-<NewOrganization />
+<Paragraph>
+	Want to create an organization? Ask <Link to="mailto:ajko@uw.edu">Amy</Link> for an invite code, then
+	<Link to="/login">log in</Link>.
+</Paragraph>

@@ -54,6 +54,62 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_person();
 
+-- Define invite code table to store invite codes.
+create table "public"."invites" (
+  -- Generate a primary key that doubles as the invite code.
+  "id" uuid not null default uuid_generate_v1() primary key,
+  -- Keep track of when the code was used.
+  "when" timestamp with time zone not null default now(),
+  -- Whether the invite is used
+  "used" boolean not null default false,
+  -- Keep track of who used the invite code.
+  "who" uuid default uuid_nil()
+);
+
+grant delete on table "public"."invites" to "anon";
+grant insert on table "public"."invites" to "anon";
+grant references on table "public"."invites" to "anon";
+grant select on table "public"."invites" to "anon";
+grant trigger on table "public"."invites" to "anon";
+grant truncate on table "public"."invites" to "anon";
+grant update on table "public"."invites" to "anon";
+
+grant delete on table "public"."invites" to "authenticated";
+grant insert on table "public"."invites" to "authenticated";
+grant references on table "public"."invites" to "authenticated";
+grant select on table "public"."invites" to "authenticated";
+grant trigger on table "public"."invites" to "authenticated";
+grant truncate on table "public"."invites" to "authenticated";
+grant update on table "public"."invites" to "authenticated";
+
+grant delete on table "public"."invites" to "service_role";
+grant insert on table "public"."invites" to "service_role";
+grant references on table "public"."invites" to "service_role";
+grant select on table "public"."invites" to "service_role";
+grant trigger on table "public"."invites" to "service_role";
+grant truncate on table "public"."invites" to "service_role";
+grant update on table "public"."invites" to "service_role";
+
+alter table "public"."invites" enable row level security;
+
+create policy "No one can read these but superusers." on invites 
+for select to anon, authenticated
+using (true);
+
+create policy "No one can insert these but super users." on invites 
+for insert to anon, authenticated
+with check (false);
+
+create policy "People creating an org can update it" on invites 
+for update to anon, authenticated
+using (true)
+with check (auth.uid() = who);
+
+create policy "Only super users can delete." on invites 
+for delete to anon, authenticated
+using (false);
+
+
 -- Define orgs table
 create table "public"."orgs" (
     "id" uuid not null default uuid_generate_v1(),

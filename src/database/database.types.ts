@@ -187,6 +187,27 @@ export type Database = {
           },
         ]
       }
+      invites: {
+        Row: {
+          id: string
+          used: boolean
+          when: string
+          who: string | null
+        }
+        Insert: {
+          id?: string
+          used?: boolean
+          when?: string
+          who?: string | null
+        }
+        Update: {
+          id?: string
+          used?: boolean
+          when?: string
+          who?: string | null
+        }
+        Relationships: []
+      }
       orgs: {
         Row: {
           authorized: string[]

@@ -2,6 +2,8 @@
 	import { goto } from '$app/navigation';
 	import Field from './Field.svelte';
 	import FormDialog from './FormDialog.svelte';
+	import Link from './Link.svelte';
+	import Paragraph from './Paragraph.svelte';
 	import { addError, getDB, getErrors, getUser } from './contexts';
 
 	const db = getDB();
@@ -14,26 +16,41 @@
 		if ($user === null || $user.email === undefined) return;
 		submitting = false;
 
-		const { error, id } = await $db.createOrganization(orgName, $user.id, $user.email, name);
+		const { error, id } = await $db.createOrganization(
+			orgName,
+			$user.id,
+			$user.email,
+			name,
+			invite
+		);
 
 		if (error) addError(errors, "Couldn't create a new organization", error);
+		else if (id === null) addError(errors, 'Invalid invite code');
 		else goto(`/organization/${id}`);
 	}
 
 	let name = '';
 	let orgName = '';
+	let invite = '';
 </script>
 
-<FormDialog
-	button="Create organization …"
-	showTip={'Create a new organization'}
-	submitTip={'Create this new organization.'}
-	header="New organization"
-	explanation="Let's get your name and your organization's name."
-	submit="Create"
-	action={create}
-	valid={() => name.length > 0 && orgName.length > 0}
->
-	<Field active={!submitting} label="your name" bind:text={name} />
-	<Field active={!submitting} label="organization name" bind:text={orgName} />
-</FormDialog>
+{#if $user === null}
+	<Paragraph>
+		Want to create an organization? <Link to="/login">log in</Link>.
+	</Paragraph>
+{:else}
+	<FormDialog
+		button="Create organization …"
+		showTip={'Create a new organization'}
+		submitTip={'Create this new organization.'}
+		header="New organization"
+		explanation="Let's get your name and your organization's name."
+		submit="Create"
+		action={create}
+		valid={() => name.length > 0 && orgName.length > 0}
+	>
+		<Field active={!submitting} label="your name" bind:text={name} />
+		<Field active={!submitting} label="organization name" bind:text={orgName} />
+		<Field active={!submitting} label="invite code" bind:text={invite} />
+	</FormDialog>
+{/if}

@@ -11,6 +11,9 @@
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
 	import Loading from '$lib/Loading.svelte';
+	import NewOrganization from '$lib/NewOrganization.svelte';
+	import Tip from '$lib/Tip.svelte';
+	import Link from '$lib/Link.svelte';
 
 	let user = getUser();
 	let db = getDB();
@@ -33,7 +36,7 @@
 	{#if orgs.data === null}
 		<Oops text="Couldn't load organizations" />
 	{:else if $user}
-		<Paragraph>Hi <strong>{$user.email}</strong>.</Paragraph>
+		<Paragraph>Hi <strong>{$user.email}</strong>!</Paragraph>
 
 		{#if orgs.data.length}
 			<Paragraph>Here are the organizations you're part of and your profiles for each:</Paragraph>
@@ -62,6 +65,14 @@
 				</ul></Notice
 			>
 		{/if}
+
+		<Tip
+			>Want to create an organization? Make sure you've got an invite code from <Link
+				to="mailto:ajko@uw.edu">Amy</Link
+			>.</Tip
+		>
+
+		<NewOrganization />
 
 		<Button action={logout} tip="Log out of the application.">Log out</Button>
 	{/if}

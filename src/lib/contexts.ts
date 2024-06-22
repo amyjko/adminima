@@ -33,14 +33,14 @@ export function getDB(): DBContext {
 }
 
 export const ErrorsSymbol = Symbol('errors');
-export type DBError = { message: string; error: PostgrestError };
+export type DBError = { message: string; error: PostgrestError | undefined };
 export type ErrorsContext = Writable<DBError[]>;
 
 export function getErrors(): ErrorsContext {
 	return getContext<ErrorsContext>(ErrorsSymbol);
 }
 
-export function addError(errors: ErrorsContext, message: string, error: PostgrestError) {
+export function addError(errors: ErrorsContext, message: string, error?: PostgrestError) {
 	return errors.set([...get(errors), { message, error }]);
 }
 

@@ -14,7 +14,7 @@
 	>
 	<div class="messages">
 		<span>{error.message}</span>
-		<span class="sub">{error.error.message}</span>
+		{#if error.error}<span class="sub">{error.error.message}</span>{/if}
 	</div>
 </div>
 

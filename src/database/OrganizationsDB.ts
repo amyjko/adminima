@@ -719,8 +719,27 @@ class OrganizationsDB {
 		organizationName: string,
 		adminID: PersonID,
 		email: string,
-		adminName: string
+		adminName: string,
+		code: string
 	) {
+		// See if the invite code isn't used.
+		const { data: invite, error: inviteError } = await this.supabase
+			.from('invites')
+			.select()
+			.eq('id', code)
+			.eq('used', false)
+			.single();
+		if (inviteError) return { error: inviteError, id: null };
+		if (invite === null) return { error: null, id: null };
+
+		// If we did find it, update the invite with the person.
+		const { error: useInviteError } = await this.supabase
+			.from('invites')
+			.update({ who: adminID, used: true })
+			.eq('id', code);
+
+		if (useInviteError) return { error: useInviteError, id: null };
+
 		// Create the new organization.
 		const { data: org, error: orgError } = await this.supabase
 			.from('orgs')
