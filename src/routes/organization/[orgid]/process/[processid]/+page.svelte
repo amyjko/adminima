@@ -115,10 +115,12 @@
 	<Visibility
 		tip="Change visibility of this process"
 		level={how.visibility}
-		edit={(vis) =>
-			vis === 'public' || vis === 'org' || vis === 'admin'
-				? $db.updateHowVisibility(how, vis)
-				: undefined}
+		edit={editable
+			? (vis) =>
+					vis === 'public' || vis === 'org' || vis === 'admin'
+						? $db.updateHowVisibility(how, vis)
+						: undefined
+			: undefined}
 	/>
 
 	<Header>Who</Header>
