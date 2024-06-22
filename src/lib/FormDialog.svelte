@@ -12,7 +12,6 @@
 	export let submitTip: string;
 	export let submit: string;
 	export let header: string;
-	export let error: string | undefined;
 	export let explanation: string;
 	export let action: () => void;
 	export let valid: () => boolean;
@@ -41,9 +40,6 @@
 					action={() => {}}>{submit}</Button
 				>
 			</Actions>
-			{#if error}
-				<Oops text={error} />
-			{/if}
 		</Form>
 	</Dialog>
 {/if}

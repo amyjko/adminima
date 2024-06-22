@@ -260,6 +260,17 @@
 		font-family: var(--font);
 	}
 
+	:global(textarea) {
+		font-size: inherit;
+		font-style: inherit;
+		font-family: inherit;
+		border: none;
+		padding: var(--padding);
+		outline: var(--border) solid var(--thickness);
+		min-height: 1em;
+		border-radius: var(--radius);
+	}
+
 	@font-face {
 		font-family: 'Rokkitt';
 		src: url(/fonts/Rokkitt.ttf) format('truetype');

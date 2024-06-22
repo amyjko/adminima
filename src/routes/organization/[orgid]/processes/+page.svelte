@@ -105,7 +105,6 @@
 			submit="Create"
 			action={newProcess}
 			valid={() => title.length > 0}
-			error={undefined}
 		>
 			<Field active={true} label="title" bind:text={title} />
 		</FormDialog>

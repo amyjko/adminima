@@ -78,7 +78,6 @@
 		submit="Create"
 		action={createRole}
 		valid={() => newRole.length >= 3}
-		error={undefined}
 	>
 		<Field label="title of new role" bind:text={newRole} />
 	</FormDialog>
@@ -92,7 +91,6 @@
 		submit="Create"
 		action={createTeam}
 		valid={() => newTeam.length >= 3}
-		error={undefined}
 	>
 		<Field label="name of new team" bind:text={newTeam} />
 	</FormDialog>

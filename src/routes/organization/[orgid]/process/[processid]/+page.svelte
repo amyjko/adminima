@@ -207,7 +207,6 @@
 			header="Set a new concern"
 			explanation="Set a new concern to group processes."
 			valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
-			error={undefined}
 			action={() => {
 				queryOrError(
 					errors,

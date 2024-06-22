@@ -11,8 +11,8 @@
 </script>
 
 {#if suggestion === null}
-	<Title title="Oops" kind="error" />
-	<Oops text={(locale) => locale.error.noSuggestion} />
+	<Title title="Oops" kind="suggestion" />
+	<Oops text="Couldn't find this suggestion." />
 {:else}
 	<SuggestionView {suggestion} />
 {/if}

@@ -19,6 +19,7 @@
 	import Loading from './Loading.svelte';
 	import CommentView from './CommentView.svelte';
 	import Header from './Header.svelte';
+	import FormDialog from './FormDialog.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -35,6 +36,8 @@
 	$: editable = $user && (isAdmin || suggestion.who === $user.id);
 	$: unselectedRoles = $org.getRoles().filter((r) => !suggestion.roles.includes(r.id));
 	$: unselectedProcesses = $org.getProcesses().filter((p) => !suggestion.processes.includes(p.id));
+
+	let newComment: string = '';
 </script>
 
 <Title
@@ -188,6 +191,37 @@
 	<Loading />
 {:then comments}
 	{#if comments.data}
+		{#if $user}
+			<FormDialog
+				button="New comment…"
+				showTip="Add a new comment on this suggestion."
+				submit="Post"
+				submitTip="Add this comment."
+				header="Comment"
+				explanation="What do you want to say?"
+				valid={() => newComment.length > 0}
+				action={() => {
+					const result = $db.addComment(
+						$org.getID(),
+						$user.id,
+						newComment,
+						'suggestions',
+						suggestion.id,
+						comments.data.map((c) => c.id)
+					);
+					newComment = '';
+					return result;
+				}}
+			>
+				<textarea
+					style:width="20em"
+					style:height="8em"
+					cols="20"
+					bind:value={newComment}
+				/></FormDialog
+			>
+		{/if}
+
 		<table>
 			<tbody>
 				{#each comments.data.reverse() as comment}

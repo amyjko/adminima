@@ -33,7 +33,6 @@
 	submit="Create"
 	action={create}
 	valid={() => name.length > 0 && orgName.length > 0}
-	error={undefined}
 >
 	<Field active={!submitting} label="your name" bind:text={name} />
 	<Field active={!submitting} label="organization name" bind:text={orgName} />
