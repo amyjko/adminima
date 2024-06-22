@@ -155,6 +155,18 @@
 <div class="how">
 	{#if process.howid !== how.id}
 		<div class="main">
+			<Button
+				tip="Unindent this step"
+				action={() => unindentHow(false)}
+				active={getUnindent() !== undefined}>&lt;</Button
+			>
+			<Button
+				tip="Indent this step"
+				action={() => indentHow(false)}
+				active={getIndent() !== undefined}>&gt;</Button
+			>
+			<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
+			<Button tip="Delete this step" action={deleteHow} active={canDelete()}>×</Button>
 			<div
 				role="checkbox"
 				class="complete"
@@ -219,19 +231,7 @@
 					? $db.updateHowVisibility(how, vis)
 					: undefined}
 		/>
-		<Button
-			tip="Unindent this step"
-			action={() => unindentHow(false)}
-			active={getUnindent() !== undefined}>&lt;</Button
-		>
-		<Button
-			tip="Indent this step"
-			action={() => indentHow(false)}
-			active={getIndent() !== undefined}>&gt;</Button
-		>
 		<ARCI {how} {process} />
-		<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
-		<Button tip="Delete this step" action={deleteHow} active={canDelete()}>×</Button>
 	</div>
 	<ol>
 		{#each how.how

@@ -35,72 +35,78 @@
 </script>
 
 <div class="arci">
-	<Level level="responsible" />
-	{#each how.responsible as responsible}
-		<RoleLink roleID={responsible} />
-		<Button
-			tip="Remove this role from the responsible list."
-			action={() => $db.removeHowRCI(how, responsible, 'responsible')}>×</Button
-		>
-	{/each}
-	{#if options.length > 0}
-		<Select
-			tip="Add a role to be responsible for completing this step."
-			{options}
-			fit={false}
-			bind:selection={responsible}
-			change={(value) => {
-				if (value) {
-					$db.addHowRCI(how, value, 'responsible');
-					responsible = undefined;
-				}
-			}}
-		/>
-	{/if}
-	<Level level="consulted" />
-	{#each how.consulted as consulted}
-		<RoleLink roleID={consulted} />
-		<Button
-			tip="Remove this role from the consulted list."
-			action={() => $db.removeHowRCI(how, consulted, 'consulted')}>×</Button
-		>
-	{/each}
-	{#if options.length > 0}
-		<Select
-			tip="Add a role to be consulted in this step."
-			{options}
-			bind:selection={consulted}
-			fit={false}
-			change={(value) => {
-				if (value) {
-					$db.addHowRCI(how, value, 'consulted');
-					consulted = undefined;
-				}
-			}}
-		/>
-	{/if}
-	<Level level="informed" />
-	{#each how.informed as informed}
-		<RoleLink roleID={informed} />
-		<Button
-			tip="Remove this role from the informed list"
-			action={() => $db.removeHowRCI(how, informed, 'informed')}>×</Button
-		>
-	{/each}
-	{#if options.length > 0}
-		<Select
-			tip="Add a role to be informed in this step."
-			{options}
-			bind:selection={informed}
-			fit={false}
-			change={(value) => {
-				if (value) {
-					$db.addHowRCI(how, value, 'informed');
-					informed = undefined;
-				}
-			}}
-		/>
-	{/if}
+	<div class="slot">
+		<Level level="responsible" />
+		{#each how.responsible as responsible}
+			<RoleLink roleID={responsible} />
+			<Button
+				tip="Remove this role from the responsible list."
+				action={() => $db.removeHowRCI(how, responsible, 'responsible')}>×</Button
+			>
+		{/each}
+		{#if options.length > 0}
+			<Select
+				tip="Add a role to be responsible for completing this step."
+				{options}
+				fit={false}
+				bind:selection={responsible}
+				change={(value) => {
+					if (value) {
+						$db.addHowRCI(how, value, 'responsible');
+						responsible = undefined;
+					}
+				}}
+			/>
+		{/if}
+	</div>
+	<div class="slot">
+		<Level level="consulted" />
+		{#each how.consulted as consulted}
+			<RoleLink roleID={consulted} />
+			<Button
+				tip="Remove this role from the consulted list."
+				action={() => $db.removeHowRCI(how, consulted, 'consulted')}>×</Button
+			>
+		{/each}
+		{#if options.length > 0}
+			<Select
+				tip="Add a role to be consulted in this step."
+				{options}
+				bind:selection={consulted}
+				fit={false}
+				change={(value) => {
+					if (value) {
+						$db.addHowRCI(how, value, 'consulted');
+						consulted = undefined;
+					}
+				}}
+			/>
+		{/if}
+	</div>
+	<div class="slot">
+		<Level level="informed" />
+		{#each how.informed as informed}
+			<RoleLink roleID={informed} />
+			<Button
+				tip="Remove this role from the informed list"
+				action={() => $db.removeHowRCI(how, informed, 'informed')}>×</Button
+			>
+		{/each}
+		{#if options.length > 0}
+			<Select
+				tip="Add a role to be informed in this step."
+				{options}
+				bind:selection={informed}
+				fit={false}
+				change={(value) => {
+					if (value) {
+						$db.addHowRCI(how, value, 'informed');
+						informed = undefined;
+					}
+				}}
+			/>
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -108,6 +114,12 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		gap: var(--spacing);
+	}
+
+	.slot {
+		display: flex;
+		flex-direction: row;
 		gap: var(--padding);
 	}
 </style>

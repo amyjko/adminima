@@ -9,16 +9,17 @@
 		undefined;
 </script>
 
-{level}
 {#if edit}
 	<Select
 		{tip}
 		selection={level}
 		options={[
 			{ value: 'public', label: 'public' },
-			{ value: 'org', label: 'members only' },
-			{ value: 'admin', label: 'administrators' }
+			{ value: 'org', label: 'org' },
+			{ value: 'admin', label: 'admins' }
 		]}
 		change={(value) => (value ? edit(value) : undefined)}
 	/>
+{:else}
+	{level}
 {/if}
