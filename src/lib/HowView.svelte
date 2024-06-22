@@ -192,7 +192,7 @@
 						if (e.key === 'Enter' && e.metaKey) {
 							e.preventDefault();
 							insertHow();
-						} else if (e.key === 'Backspace' && text === '') {
+						} else if (e.key === 'Backspace' && e.metaKey) {
 							e.preventDefault();
 							deleteHow();
 						} else if (e.key === 'ArrowRight' && e.metaKey) {
