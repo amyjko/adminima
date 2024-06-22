@@ -14,9 +14,11 @@
 	tabindex="-1"
 	on:keydown={(event) => (event.key === 'Escape' ? close() : undefined)}
 >
-	<Button tip="Close this dialog" action={close}>{Delete}</Button>
 	<div class="content">
 		<slot />
+	</div>
+	<div class="close">
+		<Button tip="Close this dialog" action={close}>{Delete}</Button>
 	</div>
 </dialog>
 
@@ -27,11 +29,18 @@
 		padding: 1em;
 		margin-left: auto;
 		margin-right: auto;
+		width: 80vw;
 		max-width: 40em;
 		height: max-content;
 		background-color: var(--background);
 		color: var(--foreground);
 		border: var(--thickness) solid var(--border);
+	}
+
+	.close {
+		position: absolute;
+		top: var(--spacing);
+		right: var(--spacing);
 	}
 
 	dialog::backdrop {
@@ -43,8 +52,6 @@
 		background: var(--background);
 		max-width: 40em;
 		min-height: 10em;
-		padding: 1em;
-		padding-top: 0;
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing);

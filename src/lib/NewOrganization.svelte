@@ -29,7 +29,7 @@
 	showTip={'Create a new organization'}
 	submitTip={'Create this new organization.'}
 	header="New organization"
-	explanation="We need a few things"
+	explanation="Let's get your name and your organization's name."
 	submit="Create"
 	action={create}
 	valid={() => name.length > 0 && orgName.length > 0}
