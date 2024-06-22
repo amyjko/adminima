@@ -17,6 +17,7 @@
 	import Link from './Link.svelte';
 	import Suggestions from './Suggestions.svelte';
 	import SuggestionLink from './SuggestionLink.svelte';
+	import Select from './Select.svelte';
 
 	export let role: RoleRow;
 
@@ -41,26 +42,32 @@
 				)
 		: undefined}
 >
-	<Choice
-		choice={role.team ? $org.getTeam(role.team)?.name ?? '' : '—'}
-		choices={Object.fromEntries(
-			$org.getTeams().map((team) => [team.name, `Change to team ${team.name}`])
-		)}
-		edit={async (name) => {
-			if (isAdmin && $user) {
-				const team = $org.getTeams().find((team) => team.name === name);
-				if (team) {
+	{#if role.team}<TeamLink id={role.team} />{:else}no team{/if}
+	{#if isAdmin}<Select
+			tip="Choose a team for this role"
+			selection={role.team ?? undefined}
+			options={[
+				{ value: undefined, label: 'No team' },
+				...$org.getTeams().map((team) => {
+					return { value: team.id, label: team.name };
+				})
+			]}
+			change={async (team) => {
+				if (isAdmin && $user) {
 					return await queryOrError(
 						errors,
-						$db.updateRoleTeam(role, team, $user.id),
+						$db.updateRoleTeam(
+							role,
+							team ?? null,
+							$org.getTeams().find((t) => t.id)?.name,
+							$user.id
+						),
 						"Couldn't update role team"
 					);
 				}
-			}
-			return null;
-		}}
-		>{#if role.team}<TeamLink id={role.team} />{:else}no team{/if}</Choice
-	>
+				return null;
+			}}
+		/>{/if}
 </Title>
 
 <MarkupView

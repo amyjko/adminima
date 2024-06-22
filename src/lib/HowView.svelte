@@ -212,6 +212,7 @@
 	{/if}
 	<div class="meta">
 		<Visibility
+			tip="Change visibility of this step"
 			level={how.visibility}
 			edit={(vis) =>
 				vis === 'public' || vis === 'org' || vis === 'admin'

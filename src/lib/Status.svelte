@@ -33,7 +33,7 @@
 	}
 
 	.active {
-		background: var(--salient);
+		background: var(--error);
 		color: var(--background);
 	}
 

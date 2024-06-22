@@ -49,22 +49,26 @@
 				)
 		: undefined}
 >
-	<Choice
-		choice={suggestion.status}
-		choices={Statuses}
-		edit={async (status) => {
-			if (
-				$user &&
-				(status === 'triage' || status === 'active' || status === 'done' || status === 'backlog')
-			)
-				return await queryOrError(
-					errors,
-					$db.updateSuggestionStatus(suggestion, status, $user.id),
-					"Couldn't update the suggestion's status."
-				);
-			else return null;
-		}}><Status status={suggestion.status} /></Choice
-	>
+	<Status status={suggestion.status} />
+	{#if editable}
+		<Select
+			tip="Change the status of this suggestion"
+			selection={suggestion.status}
+			options={Object.entries(Statuses).map(([key, value]) => ({ value: key, label: value }))}
+			change={async (status) => {
+				if (
+					$user &&
+					(status === 'triage' || status === 'active' || status === 'done' || status === 'backlog')
+				)
+					return await queryOrError(
+						errors,
+						$db.updateSuggestionStatus(suggestion, status, $user.id),
+						"Couldn't update the suggestion's status."
+					);
+				else return null;
+			}}
+		/>
+	{/if}
 </Title>
 
 <Paragraph

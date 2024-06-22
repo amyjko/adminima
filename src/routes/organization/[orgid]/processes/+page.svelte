@@ -13,6 +13,7 @@
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
 	import Oops from '$lib/Oops.svelte';
+	import Concern from '$lib/Concern.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -112,7 +113,7 @@
 	{#each Array.from(new Set($organization
 				.getProcesses()
 				.map((process) => process.concern))) as concern}
-		<Subheader>{concern}</Subheader>
+		<Subheader><Concern {concern} /></Subheader>
 
 		{@const processes = $organization
 			.getProcesses()

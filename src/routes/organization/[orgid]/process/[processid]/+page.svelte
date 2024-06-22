@@ -2,19 +2,17 @@
 	import MarkupView from '$lib/MarkupView.svelte';
 	import Header from '$lib/Header.svelte';
 	import HowView from '$lib/HowView.svelte';
-	import Organizations from '$database/OrganizationsDB';
 	import Oops from '$lib/Oops.svelte';
 	import Button from '$lib/Button.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import { goto } from '$app/navigation';
-	import Admin from '$lib/Admin.svelte';
 	import Title from '$lib/Title.svelte';
 	import Level from '$lib/Level.svelte';
 	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts';
 	import CommentsView from '$lib/CommentsView.svelte';
+	import Concern from '$lib/Concern.svelte';
 	import { page } from '$app/stores';
 	import Notice from '$lib/Notice.svelte';
-	import Choice from '$lib/Choice.svelte';
 	import Field from '$lib/Field.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import { setContext, tick } from 'svelte';
@@ -191,24 +189,28 @@
 
 	<Paragraph>Choose an area of concern to help group processes.</Paragraph>
 
-	{#if editable && $user}
-		{#if process.concern === ''}<em>no concern</em>{:else}
-			<Choice
-				edit={(text) =>
+	<div class="row">
+		<Concern concern={process.concern} />
+		{#if editable && $user}
+			<Select
+				tip="Change this process's concern"
+				selection={process.concern}
+				options={$org.getConcerns().map((c) => {
+					return { value: c, label: c };
+				})}
+				change={(concern) =>
 					queryOrError(
 						errors,
-						$db.updateProcessConcern(process, text, $user.id),
-						"Couldn't update concern."
+						$db.updateProcessConcern(process, concern ?? '', $user.id),
+						"Couldn't update process's concern"
 					)}
-				choice={process.concern}
-				choices={Object.fromEntries($org.getConcerns().map((c) => [c, c]))}
-				>{process.concern}</Choice
-			>
-		{/if}
+			/>{/if}
+	</div>
+	{#if editable && $user}
 		<FormDialog
-			submit="Set concern"
-			showTip="Set a new concern."
-			submitTip="Set this new concern."
+			submit="New concern"
+			showTip="Create a new concern."
+			submitTip="Create and select this new concern."
 			button="Set concern..."
 			header="Set a new concern"
 			explanation="Set a new concern to group processes."
@@ -263,3 +265,12 @@
 
 	<CommentsView comments={process.comments} />
 {/if}
+
+<style>
+	.row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: var(--spacing);
+	}
+</style>

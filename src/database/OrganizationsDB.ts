@@ -562,14 +562,19 @@ class OrganizationsDB {
 		);
 	}
 
-	async updateRoleTeam(role: RoleRow, team: TeamRow, who: PersonID) {
-		const { error } = await this.supabase.from('roles').update({ team: team.id }).eq('id', role.id);
+	async updateRoleTeam(
+		role: RoleRow,
+		team: TeamID | null,
+		name: string | undefined,
+		who: PersonID
+	) {
+		const { error } = await this.supabase.from('roles').update({ team }).eq('id', role.id);
 		if (error) return error;
 
 		return this.addComment(
 			role.orgid,
 			who,
-			`Updated role team to ${team.name}`,
+			name ? `Updated role team to ${name}` : `Removed role from team`,
 			'roles',
 			role.id,
 			role.comments

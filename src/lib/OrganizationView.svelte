@@ -32,6 +32,7 @@
 		: undefined}
 >
 	<Visibility
+		tip="Change the visibility of this organization"
 		level={organization.getVisibility()}
 		edit={$user && editable
 			? (vis) =>
