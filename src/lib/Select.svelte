@@ -8,7 +8,7 @@
 </script>
 
 <div class="select">
-	{#if fit}▾ {/if}<select
+	▾ <select
 		title={tip}
 		aria-label={tip}
 		bind:value={selection}

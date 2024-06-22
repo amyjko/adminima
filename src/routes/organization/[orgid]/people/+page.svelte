@@ -85,30 +85,40 @@
 				<td>
 					<PersonLink {profile} />
 				</td>
-				<td>
-					{#if isAdmin}
-						{#if $organization.getRoles().length === 0}
-							<em>&mdash;</em>
-						{:else}
-							<Select
-								tip="Choose a role for this person."
-								selection={roles[0]?.id}
-								options={[
-									{ value: undefined, label: '—' },
-									...$organization.getRoles().map((role) => {
-										return { value: role.id, label: role.title };
-									})
-								]}
-								change={async (roleID) => {
-									for (const role of roles) {
+				<td class="roles">
+					{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+						<span class="role"
+							><RoleLink roleID={role.id} />{#if isAdmin}<Button
+									tip="Unassign this role from this person"
+									action={async () => {
 										const error = await queryOrError(
 											errors,
 											$db.unassignPerson($organization.getID(), profile.id, role.id),
 											'Could not unassign role.'
 										);
 										if (error) return;
-									}
-
+									}}>x</Button
+								>{/if}</span
+						>
+					{/each}
+					{#if isAdmin}
+						{#if $organization.getRoles().length === 0}
+							<em>&mdash;</em>
+						{:else}
+							<Select
+								tip="Choose a role for this person."
+								selection={undefined}
+								fit={false}
+								options={[
+									{ value: undefined, label: '—' },
+									...$organization
+										.getRoles()
+										.filter((r) => !roles.some((currentRole) => currentRole.id === r.id))
+										.map((role) => {
+											return { value: role.id, label: role.title };
+										})
+								]}
+								change={async (roleID) => {
 									if (roleID !== undefined)
 										await queryOrError(
 											errors,
@@ -118,11 +128,6 @@
 								}}
 							/>
 						{/if}
-					{:else}
-						{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-							<span class="role"><RoleLink roleID={role.id} /></span>
-						{:else}<em>&mdash;</em>
-						{/each}
 					{/if}
 				</td>
 				<td class="team">
@@ -181,8 +186,7 @@
 							tip="Remove this person from the organization."
 							action={() =>
 								queryOrError(errors, $db.removeProfile(profile.id), "Couldn't remove person.")}
-							active={profile.personid !== null && !$organization.hasAdminProfile(profile.id)}
-							>&times;</Button
+							active={!$organization.hasAdminProfile(profile.id)}>&times;</Button
 						>
 					</td>
 				{/if}
@@ -220,5 +224,18 @@
 	.role,
 	.team {
 		font-size: var(--small-size);
+	}
+
+	.role {
+		display: flex;
+		flex-direction: row;
+		gap: var(--padding);
+	}
+
+	.roles {
+		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
+		gap: var(--padding);
 	}
 </style>
