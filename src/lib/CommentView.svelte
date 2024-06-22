@@ -4,7 +4,7 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import Button from './Button.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import PersonLink from './PersonLink.svelte';
+	import PersonLink from './ProfileLink.svelte';
 	import Quote from './Quote.svelte';
 	import TimeView from './TimeView.svelte';
 	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';

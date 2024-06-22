@@ -11,7 +11,7 @@
 	import { getDB, getUser } from '$lib/contexts';
 	import { page } from '$app/stores';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
-	import PersonLink from '$lib/PersonLink.svelte';
+	import PersonLink from '$lib/ProfileLink.svelte';
 
 	let user = getUser();
 	let db = getDB();

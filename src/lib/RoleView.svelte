@@ -2,7 +2,7 @@
 	import Timeline from '$lib/Timeline.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import { type RoleRow } from '../database/OrganizationsDB';
-	import PersonLink from './PersonLink.svelte';
+	import PersonLink from './ProfileLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import Button from './Button.svelte';
 	import { goto } from '$app/navigation';

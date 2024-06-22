@@ -4,7 +4,7 @@
 	import Admin from '$lib/Admin.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button from '$lib/Button.svelte';
-	import PersonLink from '$lib/PersonLink.svelte';
+	import PersonLink from '$lib/ProfileLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';

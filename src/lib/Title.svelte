@@ -5,7 +5,7 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
 	import RoleLink from './RoleLink.svelte';
-	import PersonLink from './PersonLink.svelte';
+	import PersonLink from './ProfileLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import SuggestionLink from './SuggestionLink.svelte';
 	import Link from './Link.svelte';

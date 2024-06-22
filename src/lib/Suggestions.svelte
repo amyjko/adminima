@@ -2,7 +2,7 @@
 	import { type SuggestionRow } from '$database/OrganizationsDB';
 	import timestampToDate from '$database/timestampToDate';
 	import SuggestionLink from './SuggestionLink.svelte';
-	import PersonLink from './PersonLink.svelte';
+	import PersonLink from './ProfileLink.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
 

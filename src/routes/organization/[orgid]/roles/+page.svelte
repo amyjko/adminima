@@ -12,6 +12,7 @@
 	import Notice from '$lib/Notice.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import Tip from '$lib/Tip.svelte';
+	import ProfileLink from '$lib/ProfileLink.svelte';
 
 	const org = getOrg();
 	const db = getDB();
@@ -59,12 +60,15 @@
 	{/each}
 
 	{#if teamless.length > 0}
-		<Header>Roles without a team</Header>
-		<Flow>
-			{#each teamless as role}
+		<Header>No team</Header>
+		{#each teamless as role}
+			<Flow>
 				<RoleLink roleID={role.id} />
-			{/each}
-		</Flow>
+				{#each $org.getRoleProfiles(role.id) as profile}
+					<ProfileLink {profile} />
+				{/each}
+			</Flow>
+		{/each}
 	{/if}
 {/if}
 

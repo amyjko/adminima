@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PersonLink from './PersonLink.svelte';
+	import PersonLink from './ProfileLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import RoleLink from './RoleLink.svelte';
