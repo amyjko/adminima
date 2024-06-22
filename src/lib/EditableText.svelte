@@ -46,7 +46,7 @@
 	.editable {
 		display: flex;
 		flex-direction: row;
-		align-items: center;
+		align-items: top;
 		gap: calc(2 * var(--padding));
 	}
 
@@ -59,6 +59,7 @@
 		padding: 0;
 		border: 0;
 		border-radius: 0;
+		max-width: 16ch;
 		height: 1em;
 		outline: var(--thickness) solid var(--border);
 	}

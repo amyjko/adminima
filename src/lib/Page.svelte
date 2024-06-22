@@ -25,7 +25,6 @@
 		margin: auto;
 		gap: calc(1.5 * var(--spacing));
 		max-width: 36em;
-		margin-block-start: 2vh;
 		align-items: flex-start;
 	}
 
