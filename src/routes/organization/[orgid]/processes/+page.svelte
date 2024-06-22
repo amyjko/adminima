@@ -77,7 +77,7 @@
 	let title = '';
 	async function newProcess() {
 		const { error, id } = await $db.addProcess($organization.getID(), title);
-		if (error) addError(errors, "Coudln't add new process", error);
+		if (error) addError(errors, "Couldn't add new process", error);
 		else goto(`/organization/${$organization.getID()}/process/${id}`);
 	}
 </script>
