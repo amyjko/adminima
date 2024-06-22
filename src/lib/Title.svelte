@@ -63,6 +63,9 @@
 		width: calc(100%);
 		margin-left: calc(-2 * var(--spacing));
 		padding: calc(2 * var(--spacing));
+		position: sticky;
+		top: 0;
+		z-index: 1;
 	}
 
 	h1 {
