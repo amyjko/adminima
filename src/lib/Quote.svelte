@@ -2,7 +2,8 @@
 
 <style>
 	.quote {
+		padding-left: var(--spacing);
+		border-inline-start: var(--thickness) solid var(--border);
 		font-style: italic;
-		font-size: var(--small-size);
 	}
 </style>

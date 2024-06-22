@@ -88,7 +88,7 @@
 		--inactive: #555555;
 		--foreground: #000000;
 		--border: var(--inactive);
-		--thickness: 2px;
+		--thickness: 3px;
 	}
 
 	:global(
@@ -247,6 +247,10 @@
 
 	:global(tr:last-child) {
 		border-bottom: var(--thickness) solid var(--border);
+	}
+
+	:global(tr:first-child) {
+		border-top: var(--thickness) solid var(--border);
 	}
 
 	:global(input[type='text']) {

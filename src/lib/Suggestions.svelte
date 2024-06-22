@@ -5,7 +5,6 @@
 	import PersonLink from './PersonLink.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
-	import Tip from './Tip.svelte';
 
 	export let suggestions: SuggestionRow[];
 
@@ -17,9 +16,9 @@
 	<table>
 		<thead>
 			<tr>
-				<th>status</th>
 				<th>reporter</th>
 				<th>title</th>
+				<th>status</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -27,11 +26,11 @@
 				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
 				.sort((a, b) => Levels[a.status] - Levels[b.status]) as suggestion}
 				<tr>
-					<td><Status status={suggestion.status} /></td>
-
 					<td><PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /></td>
-					<td><SuggestionLink id={suggestion.id} /></td></tr
-				>
+					<td><SuggestionLink id={suggestion.id} /></td><td
+						><Status status={suggestion.status} /></td
+					>
+				</tr>
 			{/each}
 		</tbody>
 	</table>

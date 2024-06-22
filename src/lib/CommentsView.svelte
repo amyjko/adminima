@@ -10,7 +10,6 @@
 	export let comments: CommentID[];
 
 	const db = getDB();
-	const errors = getErrors();
 
 	let show = false;
 </script>

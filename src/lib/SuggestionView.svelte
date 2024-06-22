@@ -14,10 +14,11 @@
 	import Status from './Status.svelte';
 	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
-	import CommentsView from './CommentsView.svelte';
 	import Select from './Select.svelte';
-	import Notice from './Notice.svelte';
 	import Tip from './Tip.svelte';
+	import Loading from './Loading.svelte';
+	import CommentView from './CommentView.svelte';
+	import Header from './Header.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -92,7 +93,7 @@
 	/></Quote
 >
 
-<Paragraph>This affects these roles:</Paragraph>
+<Header>Affected roles</Header>
 <div class="row">
 	{#each suggestion.roles as role}
 		<RoleLink roleID={role} />
@@ -111,7 +112,7 @@
 			x</Button
 		>
 	{:else}
-		<Notice>No processes listed as affected.</Notice>
+		&mdash;
 	{/each}
 	{#if unselectedRoles.length > 0}
 		<Select
@@ -135,7 +136,7 @@
 	{/if}
 </div>
 
-<Paragraph>This affects these processes:</Paragraph>
+<Header>Affected processes</Header>
 <div class="row">
 	{#each suggestion.processes as process}
 		<ProcessLink processID={process} />
@@ -154,7 +155,7 @@
 			x</Button
 		>
 	{:else}
-		<Notice>No processes listed as affected.</Notice>
+		&mdash;
 	{/each}
 	{#if unselectedProcesses.length > 0}
 		<Select
@@ -181,10 +182,30 @@
 	{/if}
 </div>
 
+<Header>Comments</Header>
+
+{#await $db.getComments(suggestion.comments)}
+	<Loading />
+{:then comments}
+	{#if comments.data}
+		<table>
+			<tbody>
+				{#each comments.data.reverse() as comment}
+					<CommentView {comment} />
+				{:else}
+					No changes yet.
+				{/each}
+			</tbody>
+		</table>
+	{:else}
+		Unable to load history.
+	{/if}
+{/await}
+
 {#if editable}
-	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
+	<Paragraph>Is this request no longer needed? You can permanently delete it.</Paragraph>
 	<Button
-		tip="Permantently delete this suggestion."
+		tip="Permanently delete this suggestion."
 		action={async () => {
 			const org = suggestion.orgid;
 			const { error } = await $db.deleteSuggestion(suggestion.id);
@@ -195,8 +216,6 @@
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 {/if}
-
-<CommentsView comments={suggestion.comments} />
 
 <style>
 	.row {

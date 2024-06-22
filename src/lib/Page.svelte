@@ -19,15 +19,13 @@
 
 <style>
 	.page {
-		padding: var(--spacing);
-		padding-left: calc(var(--spacing) * 2);
+		padding: calc(2 * var(--spacing));
 		display: flex;
 		flex-direction: column;
 		margin: auto;
 		gap: calc(1.5 * var(--spacing));
-		width: calc(100% - (4 * var(--spacing)));
 		max-width: 36em;
-		margin-block-start: 6vh;
+		margin-block-start: 2vh;
 		align-items: flex-start;
 	}
 
