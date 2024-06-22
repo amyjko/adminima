@@ -5,4 +5,4 @@
 	export let segment: MarkupLink;
 </script>
 
-<Link to={segment.url} external>{segment.text}</Link>
+<Link to={segment.url}>{segment.text}</Link>

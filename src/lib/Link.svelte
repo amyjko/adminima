@@ -2,10 +2,10 @@
 	import { page } from '$app/stores';
 
 	export let to: string;
-	export let external = false;
 	export let bland = false;
 	export let kind: 'person' | 'role' | 'process' | 'org' | 'team' | 'suggestion' | null = null;
 
+	$: external = to.startsWith('http');
 	$: inactive = to === $page.url.pathname;
 </script>
 
@@ -20,7 +20,7 @@
 		>{#if kind === 'person'}⍜{:else if kind === 'role'}☑{:else if kind === 'process'}⚙{:else if kind === 'org'}▦{:else if kind === 'suggestion'}𝚫{:else if kind === 'team'}𑗕{/if}</span
 	>
 	<slot /></a
->{#if external}<sup class="external">↗</sup>{/if}
+>{#if external}<sub class="external">↗</sub>{/if}
 
 <style>
 	a {

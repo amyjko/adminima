@@ -2,8 +2,6 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import Button from '$lib/Button.svelte';
-	import Link from '$lib/Link.svelte';
-	import NewOrganization from '$lib/NewOrganization.svelte';
 	import Notice from '$lib/Notice.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
@@ -53,8 +51,6 @@
 				</ul></Notice
 			>
 		{/if}
-
-		<NewOrganization />
 
 		<Button action={logout} tip="Log out of the application.">Log out</Button>
 	{/if}

@@ -14,6 +14,8 @@
 	import Organizations from '$database/OrganizationsDB.js';
 	import Error from '$lib/Error.svelte';
 	import { goto } from '$app/navigation';
+	import Note from '$lib/Note.svelte';
+	import Link from '$lib/Link.svelte';
 
 	export let data;
 
@@ -58,6 +60,14 @@
 </div>
 <Page>
 	<slot />
+
+	<hr />
+
+	<Note
+		><Link to="https://amyjko.phd">Amy</Link> built this. Have <Link
+			to="https://github.com/amyjko/adminima/issues/new/choose">Feedback</Link
+		>?
+	</Note>
 </Page>
 
 <style>
