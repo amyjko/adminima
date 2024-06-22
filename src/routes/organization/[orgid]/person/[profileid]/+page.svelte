@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Oops from '$lib/Oops.svelte';
-	import PersonView from '$lib/PersonView.svelte';
+	import ProfileView from '$lib/ProfileView.svelte';
 	import Title from '$lib/Title.svelte';
 	import { getOrg } from '$lib/contexts';
 
@@ -14,5 +14,5 @@
 	<Title title="oops" kind="error" />
 	<Oops text={(locale) => locale.error.noPerson} />
 {:else}
-	<PersonView {profile} />
+	<ProfileView {profile} />
 {/if}
