@@ -201,11 +201,11 @@ with check (isAdmin(orgid) or not exists(select * from profiles where orgid = id
 
 create policy "Admins can update a user's profile, as can a user of their own profile." on profiles 
 for update to anon, authenticated
-with check (auth.uid() = personid or isAdmin(orgid));
+using (auth.uid() = personid or isAdmin(orgid));
 
-create policy "Admins and users can remove a profile.." on profiles 
-for update to anon, authenticated
-with check (auth.uid() = personid or isAdmin(orgid));
+create policy "Admins can delete a profile, as can users of their own profile." on profiles 
+for delete to anon, authenticated
+using (auth.uid() = personid or isAdmin(orgid));
 
 -- Enable realtime updates on the profiles table.
 alter
