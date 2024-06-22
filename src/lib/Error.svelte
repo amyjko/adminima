@@ -30,6 +30,7 @@
 		max-width: 30em;
 		text-align: start;
 		align-items: start;
+		border: 1px solid var(--border);
 	}
 
 	.messages {

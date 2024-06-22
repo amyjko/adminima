@@ -1006,6 +1006,29 @@ class OrganizationsDB {
 	async getComments(ids: CommentID[]) {
 		return await this.supabase.from('comments').select().in('id', ids);
 	}
+
+	async updateComment(comment: CommentRow, text: string) {
+		const { error } = await this.supabase
+			.from('comments')
+			.update({ what: text })
+			.eq('id', comment.id);
+		return error;
+	}
+
+	async deleteComment(
+		process: SuggestionRow | ProcessRow | RoleRow | OrganizationRow,
+		table: 'processes' | 'suggestions' | 'roles' | 'orgs',
+		comment: CommentID
+	) {
+		// Remove the comment from the process's comment list.
+		const { error } = await this.supabase
+			.from(table)
+			.update({ comments: process.comments.filter((c) => c !== comment) })
+			.eq('id', process.id);
+		if (error) return error;
+		const { error: deleteError } = await this.supabase.from('comments').delete().eq('id', comment);
+		return deleteError;
+	}
 }
 
 export default OrganizationsDB;

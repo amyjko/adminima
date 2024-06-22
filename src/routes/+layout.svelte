@@ -277,5 +277,6 @@
 		padding: var(--padding);
 		background-color: transparent;
 		text-align: center;
+		z-index: 2;
 	}
 </style>

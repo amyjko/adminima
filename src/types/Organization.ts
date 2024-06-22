@@ -37,6 +37,10 @@ export default class Organization {
 		return this.data.organization.name;
 	}
 
+	getRow() {
+		return this.data.organization;
+	}
+
 	getVisibility() {
 		return this.data.organization.visibility;
 	}

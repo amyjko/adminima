@@ -191,7 +191,10 @@
 		<table>
 			<tbody>
 				{#each comments.data.reverse() as comment}
-					<CommentView {comment} />
+					<CommentView
+						{comment}
+						remove={(comment) => $db.deleteComment(suggestion, 'suggestions', comment)}
+					/>
 				{:else}
 					No changes yet.
 				{/each}

@@ -132,4 +132,7 @@
 
 <Header>History</Header>
 
-<CommentsView comments={role.comments} />
+<CommentsView
+	comments={role.comments}
+	remove={(comment) => $db.deleteComment(role, 'roles', comment)}
+/>

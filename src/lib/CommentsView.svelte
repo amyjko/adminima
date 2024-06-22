@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { type CommentID } from '$types/Organization';
+	import type { PostgrestError } from '@supabase/supabase-js';
 	import Button from './Button.svelte';
 	import CommentView from './CommentView.svelte';
 	import Dialog from './Dialog.svelte';
 	import Header from './Header.svelte';
 	import Loading from './Loading.svelte';
-	import { getDB, getErrors } from './contexts';
+	import { getDB } from './contexts';
 
 	export let comments: CommentID[];
+	export let remove: (id: CommentID) => Promise<PostgrestError | null>;
 
 	const db = getDB();
 
@@ -25,7 +27,7 @@
 				<table>
 					<tbody>
 						{#each comments.data.reverse() as comment}
-							<CommentView {comment} />
+							<CommentView {comment} {remove} />
 						{:else}
 							No changes yet.
 						{/each}

@@ -256,7 +256,10 @@
 
 	<Header>History</Header>
 
-	<CommentsView comments={process.comments} />
+	<CommentsView
+		comments={process.comments}
+		remove={(comment) => $db.deleteComment(process, 'processes', comment)}
+	/>
 {/if}
 
 <style>

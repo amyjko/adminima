@@ -100,4 +100,7 @@
 		: undefined}
 />
 
-<CommentsView comments={organization.getComments()} />
+<CommentsView
+	comments={organization.getComments()}
+	remove={(comment) => $db.deleteComment(organization.getRow(), 'orgs', comment)}
+/>
