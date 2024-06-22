@@ -64,7 +64,7 @@
 	<hr />
 
 	<Note
-		><Link to="https://amyjko.phd">Amy</Link> built this. Have <Link
+		><Link to="https://amyjko.phd">Amy</Link> built this. It's in <strong>beta</strong>. Have <Link
 			to="https://github.com/amyjko/adminima/issues/new/choose">Feedback</Link
 		>?
 	</Note>
