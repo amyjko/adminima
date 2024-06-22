@@ -928,6 +928,7 @@ class OrganizationsDB {
 		orgid: OrganizationID,
 		what: string,
 		description: Markup,
+		visibility: Visibility,
 		processes: ProcessID[],
 		roles: RoleID[]
 	) {
@@ -940,6 +941,7 @@ class OrganizationsDB {
 				description,
 				orgid: orgid,
 				roles,
+				visibility,
 				processes,
 				comments: []
 			})

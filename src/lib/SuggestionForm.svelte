@@ -30,6 +30,7 @@
 				$organization.getID(),
 				newRequestTitle,
 				newRequestProblem,
+				$organization.getVisibility(),
 				process ? [process] : [],
 				role ? [role] : []
 			);
