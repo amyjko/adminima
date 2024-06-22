@@ -109,7 +109,7 @@
 		tip="Permanently delete this role. All processes will remain, but without a role."
 		action={async () => {
 			const org = role.orgid;
-			const error = await $db.deleteRole(role.id);
+			const error = await $db.deleteRole(role.orgid, role.id);
 			if (error) {
 				addError(errors, "We couldn't delete this role.", error);
 			} else goto(`/organization/${org}/roles`);

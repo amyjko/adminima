@@ -621,7 +621,36 @@ class OrganizationsDB {
 		} else return null;
 	}
 
-	async deleteRole(id: RoleID): Promise<PostgrestError | null> {
+	async deleteRole(orgid: OrganizationID, id: RoleID): Promise<PostgrestError | null> {
+		// Remove role from any hows that reference them in responsible, consulted, or informed lists.
+
+		const { data, error: howError } = await this.supabase.from('hows').select().eq('orgid', orgid);
+		if (howError) return howError;
+
+		for (const how of data) {
+			if (how.responsible.includes(id)) {
+				const { error: updateError } = await this.supabase
+					.from('hows')
+					.update({ responsible: how.responsible.filter((r: string) => r !== id) })
+					.eq('id', how.id);
+				if (updateError) return updateError;
+			}
+			if (how.consulted.includes(id)) {
+				const { error: updateError } = await this.supabase
+					.from('hows')
+					.update({ consulted: how.consulted.filter((r: string) => r !== id) })
+					.eq('id', how.id);
+				if (updateError) return updateError;
+			}
+			if (how.informed.includes(id)) {
+				const { error: updateError } = await this.supabase
+					.from('hows')
+					.update({ informed: how.informed.filter((r: string) => r !== id) })
+					.eq('id', how.id);
+				if (updateError) return updateError;
+			}
+		}
+
 		const { error } = await this.supabase.from('roles').delete().eq('id', id);
 		return error;
 	}
