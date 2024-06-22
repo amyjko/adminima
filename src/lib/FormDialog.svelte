@@ -18,7 +18,7 @@
 	let show = false;
 </script>
 
-<Button action={() => (show = true)}>{button}</Button>
+<Button tip="Show this form" action={() => (show = true)}>{button}</Button>
 {#if show}
 	<Dialog close={() => (show = false)}>
 		<Header>{header}</Header>
@@ -31,7 +31,8 @@
 		>
 			<slot />
 			<Actions
-				><Button end action={() => (show = false)}>cancel</Button><Button
+				><Button tip="Dismiss this dialog." end action={() => (show = false)}>cancel</Button><Button
+					tip="Submit this form."
 					end
 					submit
 					active={valid()}

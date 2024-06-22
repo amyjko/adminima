@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let options: { value: string | undefined; label: string }[] = [];
+	export let tip: string;
 	export let change: (value: string | undefined) => any;
 	export let selection: string | undefined;
 	export let fit: boolean = true;
@@ -8,6 +9,8 @@
 
 <div class="select">
 	{#if fit}▾ {/if}<select
+		title={tip}
+		aria-label={tip}
 		bind:value={selection}
 		on:change={change(selection)}
 		class:fit

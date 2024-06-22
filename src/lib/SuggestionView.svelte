@@ -92,6 +92,7 @@
 	{#each suggestion.roles as role}
 		<RoleLink roleID={role} />
 		<Button
+			tip="Remove this role from the affected roles."
 			action={() =>
 				queryOrError(
 					errors,
@@ -109,6 +110,7 @@
 	{/each}
 	{#if unselectedRoles.length > 0}
 		<Select
+			tip="Add a role that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
 				...unselectedRoles.map((role) => {
@@ -133,6 +135,7 @@
 	{#each suggestion.processes as process}
 		<ProcessLink processID={process} />
 		<Button
+			tip="Remove this process from the affected processes."
 			action={() =>
 				queryOrError(
 					errors,
@@ -150,6 +153,7 @@
 	{/each}
 	{#if unselectedProcesses.length > 0}
 		<Select
+			tip="Add a process that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
 				...unselectedProcesses.map((process) => {
@@ -175,9 +179,10 @@
 {#if editable}
 	<Paragraph>Is this request no longer needed? You can delete it, but it is permanent.</Paragraph>
 	<Button
+		tip="Permantently delete this suggestion."
 		action={async () => {
 			const org = suggestion.orgid;
-			const { error } = await $db.deleteChange(suggestion.id);
+			const { error } = await $db.deleteSuggestion(suggestion.id);
 			if (error) addError(errors, "Couldn't delete this suggestion.", error);
 			else goto(`/organization/${org}`);
 		}}

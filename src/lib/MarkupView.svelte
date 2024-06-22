@@ -49,6 +49,7 @@
 <div class="markup" class:editable={edit !== undefined}>
 	{#if edit}<div class="control">
 			<Button
+				tip={editing ? 'Save your edits.' : 'Start editing this markup.'}
 				action={async () => {
 					if (editing) {
 						save();

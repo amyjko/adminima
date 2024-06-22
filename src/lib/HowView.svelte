@@ -218,11 +218,19 @@
 					? $db.updateHowVisibility(how, vis)
 					: undefined}
 		/>
-		<Button action={() => unindentHow(false)} active={getUnindent() !== undefined}>&lt;</Button>
-		<Button action={() => indentHow(false)} active={getIndent() !== undefined}>&gt;</Button>
+		<Button
+			tip="Unindent this step"
+			action={() => unindentHow(false)}
+			active={getUnindent() !== undefined}>&lt;</Button
+		>
+		<Button
+			tip="Indent this step"
+			action={() => indentHow(false)}
+			active={getIndent() !== undefined}>&gt;</Button
+		>
 		<ARCI {how} {process} />
-		<Button action={insertHow}>+</Button>
-		<Button action={deleteHow} active={canDelete()}>×</Button>
+		<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
+		<Button tip="Delete this step" action={deleteHow} active={canDelete()}>×</Button>
 	</div>
 	<ol>
 		{#each how.how

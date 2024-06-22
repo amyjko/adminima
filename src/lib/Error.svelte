@@ -9,7 +9,9 @@
 </script>
 
 <div class="columns">
-	<Button action={() => errors.set($errors.filter((e) => e !== error))}>×</Button>
+	<Button tip="Dismiss this alert" action={() => errors.set($errors.filter((e) => e !== error))}
+		>×</Button
+	>
 	<div class="messages">
 		<span>{error.message}</span>
 		<span class="sub">{error.error.message}</span>

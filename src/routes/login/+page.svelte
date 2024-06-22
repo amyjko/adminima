@@ -55,7 +55,9 @@
 			bind:text={email}
 			invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid email')}
 		/>
-		<Button active={validEmail(email)} action={sendCode} submit>Send code</Button>
+		<Button tip="Email the login code" active={validEmail(email)} action={sendCode} submit
+			>Send code</Button
+		>
 	</Form>
 {:else}
 	<Paragraph>We emailed you a code. It might take a minute to arrive.</Paragraph>
@@ -67,7 +69,9 @@
 			invalid={(text) =>
 				text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
 		/>
-		<Button active={code.length === 6} action={login} submit>Login</Button>
+		<Button tip="Send login code" active={code.length === 6} action={login} submit
+			>Send login code</Button
+		>
 	</Form>
 {/if}
 

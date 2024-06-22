@@ -114,6 +114,7 @@
 	<Paragraph>
 		{#if editable}
 			<Select
+				tip="Choose a role to be accountable for the processes outcomes."
 				options={[
 					{ value: undefined, label: '—' },
 					...$org.getRoles().map((role) => {
@@ -241,6 +242,7 @@
 		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
 		<Tip>Only admins and those role <Level level="accountable" />ccountable roles can delete.</Tip>
 		<Button
+			tip="Permantently delete this process and all of it's steps."
 			action={async () => {
 				try {
 					const org = process.orgid;

@@ -954,7 +954,7 @@ class OrganizationsDB {
 		return error;
 	}
 
-	async deleteChange(id: SuggestionID) {
+	async deleteSuggestion(id: SuggestionID) {
 		return await this.supabase.from('suggestions').delete().eq('id', id);
 	}
 

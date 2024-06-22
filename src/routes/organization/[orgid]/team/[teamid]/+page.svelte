@@ -60,6 +60,7 @@
 <Admin>
 	<Paragraph>If you delete this team, the roles on it will be without a team.</Paragraph>
 	<Button
+		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {
 			const error = await queryOrError(errors, $db.deleteTeam(teamID), "Couldn't delete the team.");
 			if (error === null) goto(`/organization/${$org.getID()}/roles`);

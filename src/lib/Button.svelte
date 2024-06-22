@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let action: () => void;
+	export let tip: string;
 	export let active = true;
 	export let submit = false;
 	export let warning = false;
@@ -20,6 +21,8 @@
 		class:end
 		type={submit ? 'submit' : 'button'}
 		disabled={!active}
+		title={tip}
+		aria-label={tip}
 		on:click={() => {
 			if (warning) confirm = true;
 			else action();

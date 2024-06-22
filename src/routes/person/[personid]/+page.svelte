@@ -51,7 +51,7 @@
 
 		<NewOrganization />
 
-		<Button action={logout}>Log out</Button>
+		<Button action={logout} tip="Log out of the application.">Log out</Button>
 	{/if}
 {/await}
 

@@ -105,6 +105,7 @@
 		role will remain, in case you want to assign them to a different role.</Paragraph
 	>
 	<Button
+		tip="Permanently delete this role. All processes will remain, but without a role."
 		action={async () => {
 			const org = role.orgid;
 			const error = await $db.deleteRole(role.id);

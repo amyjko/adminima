@@ -38,10 +38,14 @@
 	<Level level="responsible" />
 	{#each how.responsible as responsible}
 		<RoleLink roleID={responsible} />
-		<Button action={() => $db.removeHowRCI(how, responsible, 'responsible')}>×</Button>
+		<Button
+			tip="Remove this role from the responsible list."
+			action={() => $db.removeHowRCI(how, responsible, 'responsible')}>×</Button
+		>
 	{/each}
 	{#if options.length > 0}
 		<Select
+			tip="Add a role to be responsible for completing this step."
 			{options}
 			fit={false}
 			bind:selection={responsible}
@@ -56,10 +60,14 @@
 	<Level level="consulted" />
 	{#each how.consulted as consulted}
 		<RoleLink roleID={consulted} />
-		<Button action={() => $db.removeHowRCI(how, consulted, 'consulted')}>×</Button>
+		<Button
+			tip="Remove this role from the consulted list."
+			action={() => $db.removeHowRCI(how, consulted, 'consulted')}>×</Button
+		>
 	{/each}
 	{#if options.length > 0}
 		<Select
+			tip="Add a role to be consulted in this step."
 			{options}
 			bind:selection={consulted}
 			fit={false}
@@ -74,10 +82,14 @@
 	<Level level="informed" />
 	{#each how.informed as informed}
 		<RoleLink roleID={informed} />
-		<Button action={() => $db.removeHowRCI(how, informed, 'informed')}>×</Button>
+		<Button
+			tip="Remove this role from the informed list"
+			action={() => $db.removeHowRCI(how, informed, 'informed')}>×</Button
+		>
 	{/each}
 	{#if options.length > 0}
 		<Select
+			tip="Add a role to be informed in this step."
 			{options}
 			bind:selection={informed}
 			fit={false}

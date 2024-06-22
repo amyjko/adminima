@@ -25,7 +25,7 @@
 
 {#if edit}
 	<form class="editable">
-		<Button action={save}
+		<Button tip="Save this edit" action={save}
 			>{#if editing}&checkmark;{:else}✎{/if}</Button
 		>{#if editing}
 			<!-- svelte-ignore a11y-autofocus -->

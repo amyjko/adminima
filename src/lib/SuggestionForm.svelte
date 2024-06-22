@@ -22,7 +22,7 @@
 	const db = getDB();
 	const errors = getErrors();
 
-	async function createRequest() {
+	async function createSuggestion() {
 		if ($user === null) return;
 		try {
 			const { data: suggestion, error } = await $db.createSuggestion(
@@ -42,7 +42,7 @@
 	}
 </script>
 
-<Form action={createRequest}>
+<Form action={createSuggestion}>
 	<MarkupView
 		markup={$organization.getPrompt()}
 		unset="What is your suggestion?"
@@ -63,6 +63,7 @@
 	</Labeled>
 	<Labeled label="Affected Roles">
 		<Select
+			tip="Add a role that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
 				...$organization.getRoles().map((role) => {
@@ -75,6 +76,7 @@
 	</Labeled>
 	<Labeled label="Affected Processes">
 		<Select
+			tip="Add a process that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
 				...$organization.getProcesses().map((process) => {
@@ -86,6 +88,7 @@
 		/>
 	</Labeled>
 	<Button
+		tip="Submit the new suggestion."
 		submit
 		end
 		active={newRequestTitle.length > 0 && newRequestProblem.length > 0}

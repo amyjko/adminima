@@ -90,6 +90,7 @@
 							<em>&mdash;</em>
 						{:else}
 							<Select
+								tip="Choose a role for this person."
 								selection={roles[0]?.id}
 								options={[
 									{ value: undefined, label: '—' },
@@ -130,6 +131,7 @@
 				<td class="supervisor">
 					{#if isAdmin}
 						<Select
+							tip="Choose a supervisor for this person."
 							options={[
 								{ value: undefined, label: '—' },
 								...$organization
@@ -155,6 +157,7 @@
 				<td>
 					{#if isAdmin}
 						<Checkbox
+							tip={isAdmin ? "Remove this person's admin status" : 'Make this person an admin.'}
 							on={$organization.hasAdminProfile(profile.id)}
 							enabled={isAdmin &&
 								($organization.getAdminCount() > 1 || !$organization.hasAdminProfile(profile.id))}
@@ -171,6 +174,7 @@
 				{#if isAdmin}
 					<td>
 						<Button
+							tip="Remove this person from the organization."
 							action={() =>
 								queryOrError(errors, $db.removeProfile(profile.id), "Couldn't remove person.")}
 							active={profile.personid !== null && !$organization.hasAdminProfile(profile.id)}
@@ -196,8 +200,11 @@
 			bind:text={newPersonEmail}
 			invalid={(text) => (text.length === 0 || validEmail(text) ? undefined : 'Not a valid email')}
 		/>
-		<Button action={() => {}} active={!match && !existing && newPersonEmail.length > 0} submit
-			>Add</Button
+		<Button
+			tip="Add this person to the organization"
+			action={() => {}}
+			active={!match && !existing && newPersonEmail.length > 0}
+			submit>Add</Button
 		>
 		{#if existing}
 			<Paragraph>This person is already added.</Paragraph>
