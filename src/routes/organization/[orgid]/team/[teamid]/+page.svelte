@@ -7,7 +7,7 @@
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
-	import Button from '$lib/Button.svelte';
+	import Button, { Delete } from '$lib/Button.svelte';
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
 	import Tip from '$lib/Tip.svelte';
@@ -71,6 +71,6 @@
 			const error = await queryOrError(errors, $db.deleteTeam(teamID), "Couldn't delete the team.");
 			if (error === null) goto(`/organization/${$org.getID()}/roles`);
 		}}
-		warning>Delete this team</Button
+		warning>{Delete} Delete this team</Button
 	>
 </Admin>

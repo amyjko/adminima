@@ -1,7 +1,7 @@
 <!-- Represents ARCI for a processes's how to -->
 <script lang="ts">
 	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
-	import Button from './Button.svelte';
+	import Button, { Delete } from './Button.svelte';
 	import Level from './Level.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import Select from './Select.svelte';
@@ -41,7 +41,7 @@
 			<RoleLink roleID={responsible} />
 			<Button
 				tip="Remove this role from the responsible list."
-				action={() => $db.removeHowRCI(how, responsible, 'responsible')}>×</Button
+				action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
 			>
 		{/each}
 		{#if options.length > 0}
@@ -65,7 +65,7 @@
 			<RoleLink roleID={consulted} />
 			<Button
 				tip="Remove this role from the consulted list."
-				action={() => $db.removeHowRCI(how, consulted, 'consulted')}>×</Button
+				action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
 			>
 		{/each}
 		{#if options.length > 0}
@@ -89,7 +89,7 @@
 			<RoleLink roleID={informed} />
 			<Button
 				tip="Remove this role from the informed list"
-				action={() => $db.removeHowRCI(how, informed, 'informed')}>×</Button
+				action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
 			>
 		{/each}
 		{#if options.length > 0}

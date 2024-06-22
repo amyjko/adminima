@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from './Button.svelte';
+	import Button, { Delete } from './Button.svelte';
 
 	export let close: () => void;
 
@@ -14,7 +14,7 @@
 	tabindex="-1"
 	on:keydown={(event) => (event.key === 'Escape' ? close() : undefined)}
 >
-	<Button tip="Close this dialog" action={close}>✕</Button>
+	<Button tip="Close this dialog" action={close}>{Delete}</Button>
 	<div class="content">
 		<slot />
 	</div>

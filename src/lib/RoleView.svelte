@@ -4,7 +4,7 @@
 	import { type RoleRow } from '../database/OrganizationsDB';
 	import PersonLink from './ProfileLink.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import Button from './Button.svelte';
+	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
 	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
@@ -126,7 +126,7 @@
 				addError(errors, "We couldn't delete this role.", error);
 			} else goto(`/organization/${org}/roles`);
 		}}
-		warning>Delete this role</Button
+		warning>{Delete} Delete this role</Button
 	>
 </Admin>
 

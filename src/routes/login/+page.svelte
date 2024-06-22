@@ -56,7 +56,7 @@
 			invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid email')}
 		/>
 		<Button tip="Email the login code" active={validEmail(email)} action={sendCode} submit
-			>Send code</Button
+			>Send code…</Button
 		>
 	</Form>
 {:else}
@@ -70,7 +70,7 @@
 				text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
 		/>
 		<Button tip="Send login code" active={code.length === 6} action={login} submit
-			>Send login code</Button
+			>Send code…</Button
 		>
 	</Form>
 {/if}

@@ -3,7 +3,7 @@
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Admin from '$lib/Admin.svelte';
 	import Field from '$lib/Field.svelte';
-	import Button from '$lib/Button.svelte';
+	import Button, { Delete } from '$lib/Button.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import Checkbox from '$lib/Checkbox.svelte';
@@ -97,7 +97,7 @@
 											'Could not unassign role.'
 										);
 										if (error) return;
-									}}>x</Button
+									}}>{Delete}</Button
 								>{/if}</span
 						>
 					{/each}
@@ -186,7 +186,7 @@
 							tip="Remove this person from the organization."
 							action={() =>
 								queryOrError(errors, $db.removeProfile(profile.id), "Couldn't remove person.")}
-							active={!$organization.hasAdminProfile(profile.id)}>&times;</Button
+							active={!$organization.hasAdminProfile(profile.id)}>{Delete}</Button
 						>
 					</td>
 				{/if}

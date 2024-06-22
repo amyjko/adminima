@@ -2,7 +2,7 @@
 	import type { CommentRow } from '$database/OrganizationsDB';
 	import timestampToDate from '$database/timestampToDate';
 	import type { PostgrestError } from '@supabase/supabase-js';
-	import Button from './Button.svelte';
+	import Button, { Delete } from './Button.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import PersonLink from './ProfileLink.svelte';
 	import Quote from './Quote.svelte';
@@ -48,7 +48,7 @@
 				tip="Delete this comment"
 				warning
 				action={() => queryOrError(errors, remove(comment.id), 'Unable to delete comment.')}
-				>×</Button
+				>{Delete}</Button
 			>
 		</td>{/if}
 </tr>

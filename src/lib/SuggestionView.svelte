@@ -7,7 +7,7 @@
 	import TimeView from './TimeView.svelte';
 	import { type SuggestionRow } from '../database/OrganizationsDB';
 	import Oops from './Oops.svelte';
-	import Button from './Button.svelte';
+	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
 	import Quote from './Quote.svelte';
@@ -119,7 +119,7 @@
 					"Couldn't update suggestion roles."
 				)}
 		>
-			x</Button
+			{Delete}</Button
 		>
 	{:else}
 		&mdash;
@@ -162,7 +162,7 @@
 					"Couldn't update suggestion processes."
 				)}
 		>
-			x</Button
+			{Delete}</Button
 		>
 	{:else}
 		&mdash;
@@ -256,7 +256,7 @@
 			if (error) addError(errors, "Couldn't delete this suggestion.", error);
 			else goto(`/organization/${org}`);
 		}}
-		warning>Delete this suggestion</Button
+		warning>{Delete} Delete this suggestion</Button
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 {/if}

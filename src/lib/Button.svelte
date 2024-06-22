@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+	export const Delete = '×';
+</script>
+
 <script lang="ts">
 	export let action: () => void;
 	export let tip: string;

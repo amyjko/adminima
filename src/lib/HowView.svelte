@@ -4,7 +4,7 @@
 	import Visibility from './Visibility.svelte';
 	import { addError, getDB, getErrors, getOrg, queryOrError } from './contexts';
 	import type { HowID } from '$types/Organization';
-	import Button from './Button.svelte';
+	import Button, { Delete } from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
 	import MarkupView from './MarkupView.svelte';
@@ -169,7 +169,7 @@
 				active={getIndent() !== undefined}>&gt;</Button
 			>
 			<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
-			<Button tip="Delete this step" action={deleteHow} active={canDelete()}>×</Button>
+			<Button tip="Delete this step" action={deleteHow} active={canDelete()}>{Delete}</Button>
 			<div
 				role="checkbox"
 				class="complete"

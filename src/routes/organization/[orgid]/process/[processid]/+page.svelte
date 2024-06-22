@@ -3,7 +3,7 @@
 	import Header from '$lib/Header.svelte';
 	import HowView from '$lib/HowView.svelte';
 	import Oops from '$lib/Oops.svelte';
-	import Button from '$lib/Button.svelte';
+	import Button, { Delete } from '$lib/Button.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import { goto } from '$app/navigation';
 	import Title from '$lib/Title.svelte';
@@ -248,7 +248,7 @@
 					deleteError = "We couldn't delete this";
 				}
 			}}
-			warning>Delete this process</Button
+			warning>{Delete} Delete this process</Button
 		>
 		{#if deleteError}<Oops text={deleteError} />{/if}
 	{/if}

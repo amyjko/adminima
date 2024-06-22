@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from './Button.svelte';
+	import Button, { Delete } from './Button.svelte';
 	import Oops from './Oops.svelte';
 	import { getErrors, type DBError } from './contexts';
 
@@ -10,7 +10,7 @@
 
 <div class="columns">
 	<Button tip="Dismiss this alert" action={() => errors.set($errors.filter((e) => e !== error))}
-		>×</Button
+		>{Delete}</Button
 	>
 	<div class="messages">
 		<span>{error.message}</span>
