@@ -39,7 +39,8 @@
 		border: none;
 		cursor: pointer;
 		white-space: nowrap;
-		height: 1.25em;
+		display: inline-flex;
+		align-items: center;
 	}
 
 	.end {

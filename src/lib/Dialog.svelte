@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Button from './Button.svelte';
+
 	export let close: () => void;
 
 	let view: HTMLDialogElement | undefined = undefined;
@@ -12,6 +14,7 @@
 	tabindex="-1"
 	on:keydown={(event) => (event.key === 'Escape' ? close() : undefined)}
 >
+	<Button tip="Close this dialog" action={close}>✕</Button>
 	<div class="content">
 		<slot />
 	</div>
