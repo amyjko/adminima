@@ -229,10 +229,11 @@
 		</FormDialog>
 	{/if}
 
-	<Header>Changes</Header>
+	<Header>Suggestions</Header>
 
 	<SuggestionLink id={null} process={process.id} />
 
+	<Tip>These are suggestions people have made that might affect this process.</Tip>
 	<Suggestions
 		suggestions={$org
 			.getSuggestions()

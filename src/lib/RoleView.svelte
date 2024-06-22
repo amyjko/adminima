@@ -99,9 +99,11 @@
 
 <Timeline {role} processes={$org.getRoleProcesses(role.id)} />
 
-<Header>Pending changes</Header>
+<Header>Suggestions</Header>
 
 <SuggestionLink id={null} role={role.id} />
+
+<Tip>These are suggestions people have made that might affect this role.</Tip>
 
 <Suggestions
 	suggestions={$org

@@ -13,8 +13,6 @@
 	const Levels = { triage: 0, active: 1, done: 3, backlog: 2 };
 </script>
 
-<Tip>These are suggestions people have made about how to change the organization.</Tip>
-
 {#if suggestions.length > 0}
 	<table>
 		<thead>

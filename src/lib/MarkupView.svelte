@@ -75,7 +75,6 @@
 						save();
 					}
 				}}
-				on:blur={save}
 				style:height="{editing ? scrollHeight : height}px"
 			/>
 		</div>
@@ -89,7 +88,7 @@
 <style>
 	.markup {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 		flex-wrap: nowrap;
 		gap: calc(2 * var(--padding));
 		align-items: stretch;
@@ -100,10 +99,6 @@
 		flex-direction: column;
 		gap: var(--spacing);
 		flex: 1;
-	}
-
-	.editable {
-		margin-left: calc(-7 * var(--padding));
 	}
 
 	.control {
