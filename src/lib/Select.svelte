@@ -25,6 +25,7 @@
 <style>
 	.select {
 		display: inline-block;
+		white-space: nowrap;
 	}
 
 	select {
