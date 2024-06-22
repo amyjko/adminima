@@ -35,7 +35,7 @@
 		border-radius: var(--radius);
 		border: none;
 		width: 2em;
-		max-width: 10em;
+		max-width: 8em;
 		height: 1.25rem;
 	}
 

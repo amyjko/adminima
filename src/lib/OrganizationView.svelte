@@ -94,7 +94,7 @@
 
 <MarkupView
 	markup={organization.getDescription()}
-	unset="No description"
+	placeholder="No description"
 	edit={editable && $user
 		? (text) => $db.updateOrgDescription(organization, text, $user.id)
 		: undefined}

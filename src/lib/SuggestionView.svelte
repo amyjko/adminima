@@ -81,7 +81,7 @@
 <Quote
 	><MarkupView
 		markup={suggestion.description}
-		unset="No description"
+		placeholder="No description"
 		edit={editable
 			? (text) =>
 					queryOrError(

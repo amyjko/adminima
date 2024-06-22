@@ -7,6 +7,9 @@
 	import Button from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
+	import MarkupView from './MarkupView.svelte';
+	import BlocksView from './BlocksView.svelte';
+	import { parse } from '../markup/parser';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
@@ -24,7 +27,7 @@
 	let deleted = false;
 
 	function save() {
-		$db.updateHowText(how, text);
+		return queryOrError(errors, $db.updateHowText(how, text), "Couldn't update step text.");
 	}
 
 	function toggleDone() {
@@ -180,15 +183,11 @@
 				{#if how.done === 'no'}&nbsp;{:else if how.done === 'pending'}…{:else}✔{/if}
 			</div>
 			{#if editable}
-				<textarea
-					rows={text.split('\n').length}
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<div
+					style:width="100%"
 					class:done={how.done === 'yes'}
 					class:pending={how.done === 'pending'}
-					id={deleted ? '' : `how-${how.id}`}
-					placeholder="instructions …"
-					bind:value={text}
-					bind:this={input}
-					on:blur={save}
 					on:keydown={(e) => {
 						if (e.key === 'Enter' && e.metaKey) {
 							e.preventDefault();
@@ -216,9 +215,16 @@
 							}
 						}
 					}}
-				/>
+				>
+					<MarkupView
+						markup={text}
+						edit={save}
+						placeholder="Explain this step…"
+						id={deleted ? '' : `how-${how.id}`}
+					/>
+				</div>
 			{:else}
-				{text}
+				<BlocksView blocks={parse(text).blocks} />
 			{/if}
 		</div>
 	{/if}
@@ -247,6 +253,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--padding);
+	}
+
+	.main {
+		width: 100%;
 	}
 
 	.main,
@@ -279,31 +289,5 @@
 
 	.complete:focus {
 		outline: var(--focus) solid var(--thickness);
-	}
-
-	textarea {
-		flex: 1;
-		font-family: inherit;
-		font-size: inherit;
-		line-height: inherit;
-		border: none;
-		padding: var(--padding);
-		min-height: calc(1em);
-		resize: none;
-	}
-
-	textarea:focus {
-		outline: var(--focus) solid var(--thickness);
-		border-color: transparent;
-	}
-
-	textarea.done {
-		text-decoration: line-through;
-	}
-
-	textarea.pending {
-		font-style: italic;
-		background: var(--chrome);
-		border-radius: var(--radius);
 	}
 </style>

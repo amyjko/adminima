@@ -75,7 +75,7 @@
 
 <MarkupView
 	markup={role.description}
-	unset="No description yet."
+	placeholder="No description yet."
 	edit={$user
 		? (text) =>
 				queryOrError(

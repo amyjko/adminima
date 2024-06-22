@@ -45,7 +45,7 @@
 <Form action={createSuggestion}>
 	<MarkupView
 		markup={$organization.getPrompt()}
-		unset="What is your suggestion?"
+		placeholder="What is your suggestion?"
 		edit={$user
 			? (text) =>
 					queryOrError(
@@ -59,7 +59,7 @@
 	<Labeled
 		label="Describe the problem you're experiencing and any ideas you have for addressing it."
 	>
-		<MarkupView bind:markup={newRequestProblem} editing unset="Detail your suggestion" />
+		<MarkupView bind:markup={newRequestProblem} editing placeholder="Detail your suggestion" />
 	</Labeled>
 	<Labeled label="Affected Roles">
 		<Select

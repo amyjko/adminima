@@ -43,7 +43,7 @@
 
 	<MarkupView
 		markup={team.description}
-		unset="No description"
+		placeholder="No description"
 		edit={isAdmin && $user
 			? (text) =>
 					queryOrError(

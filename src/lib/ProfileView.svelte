@@ -44,7 +44,7 @@
 
 <MarkupView
 	markup={profile.bio}
-	unset="No bio"
+	placeholder="No bio"
 	edit={$user
 		? (text) =>
 				queryOrError(errors, $db.updateProfileBio(profile, text), "Coudln't update profile bio.")

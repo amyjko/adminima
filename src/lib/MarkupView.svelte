@@ -9,12 +9,15 @@
 	/** The markup's text */
 	export let markup: string;
 	/** Placeholder text */
-	export let unset: string;
+	export let placeholder: string;
 	/** If given, allows the markup to edited. Returns an error */
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null> | null) =
 		undefined;
 	/** Whether in editing state */
 	export let editing = false;
+	/** An HTML id to apply to the text area, if desired */
+	export let id: string | undefined = undefined;
+
 	let height = 0;
 	let revisedText = '';
 	let input: HTMLTextAreaElement;
@@ -67,6 +70,7 @@
 			<textarea
 				bind:value={revisedText}
 				bind:this={input}
+				{id}
 				autofocus
 				on:keydown={(e) => {
 					// Shortcut to submit without using button.
@@ -78,9 +82,11 @@
 				style:height="{editing ? scrollHeight : height}px"
 			/>
 		</div>
-	{:else if markup === ''}<em>{unset}</em>{:else}
+	{:else}
 		<div class="blocks" bind:clientHeight={height} on:pointerdown|preventDefault={startEditing}>
-			<BlocksView blocks={parse(markup).blocks} />
+			{#if markup === ''}<em>{placeholder}</em>{:else}<BlocksView
+					blocks={parse(markup).blocks}
+				/>{/if}
 		</div>
 	{/if}
 </div>
@@ -88,7 +94,7 @@
 <style>
 	.markup {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		flex-wrap: nowrap;
 		gap: calc(2 * var(--padding));
 		align-items: stretch;
@@ -108,6 +114,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing);
+		width: 100%;
 	}
 
 	textarea {

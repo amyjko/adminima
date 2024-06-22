@@ -103,7 +103,7 @@
 	{#if how}
 		<MarkupView
 			markup={how.what}
-			unset="No description yet."
+			placeholder="No description yet."
 			edit={editable ? (text) => $db.updateHowText(how, text) : undefined}
 		/>
 	{/if}
@@ -176,7 +176,7 @@
 	{#if how === undefined}
 		<Notice>No one has defined to do this process yet.</Notice>
 	{:else}
-		<ol>
+		<ol style:width="100%">
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
 				{#if subHow}
 					<li><HowView how={subHow} {process} {editable} /></li>
