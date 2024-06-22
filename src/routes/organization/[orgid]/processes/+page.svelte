@@ -23,16 +23,15 @@
 		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
 
 		for (const process of processes) {
-			const how = $organization.getHow(process.id);
-			if (how) {
-				if (process.accountable && !roles.has(process.accountable)) {
-					roles.set(process.accountable, { a: 0, r: 0, c: 0, i: 0 });
-				}
-				let tally = process.accountable
-					? roles.get(process.accountable)
-					: { a: 0, r: 0, c: 0, i: 0 };
-				if (tally) tally.a++;
+			const hows = $organization.getProcessHows(process.id);
 
+			if (process.accountable && !roles.has(process.accountable))
+				roles.set(process.accountable, { a: 0, r: 0, c: 0, i: 0 });
+
+			let tally = process.accountable ? roles.get(process.accountable) : { a: 0, r: 0, c: 0, i: 0 };
+			if (tally) tally.a++;
+
+			for (const how of hows) {
 				for (const role of how.responsible) {
 					if (!roles.has(role)) roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
 					tally = roles.get(role);
@@ -139,18 +138,19 @@
 				</thead>
 				<tbody>
 					{#each processes as process}
-						{@const how = $organization.getHow(process.id)}
+						{@const hows = $organization.getProcessHows(process.id)}
 						<tr>
 							<td><ProcessLink processID={process.id} /></td>
-							{#each roles as role}<td class="level"
+							{#each roles as role}
+								<td class="level"
 									><Level
 										level={process?.accountable === role.id
 											? 'accountable'
-											: how?.responsible.includes(role.id)
+											: hows.some((how) => how.responsible.includes(role.id))
 											? 'responsible'
-											: how?.consulted.includes(role.id)
+											: hows.some((how) => how.consulted.includes(role.id))
 											? 'consulted'
-											: how?.informed.includes(role.id)
+											: hows.some((how) => how.informed.includes(role.id))
 											? 'informed'
 											: ''}
 									/></td
