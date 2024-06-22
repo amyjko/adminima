@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { format } from 'date-fns';
-
-	export let time: number;
+	export let date: Date;
 </script>
 
-<span class="time">{format(new Date(time), 'MM/dd/yyyy MM:ss')}</span>
+<span class="time">{date.toLocaleString()}</span>
 
 <style>
 	.time {

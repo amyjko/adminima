@@ -68,7 +68,7 @@
 </Title>
 
 <Paragraph
-	>On <TimeView time={timestampToDate(suggestion.when).getTime()} />
+	>On <TimeView date={timestampToDate(suggestion.when)} />
 	<PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /> reported:</Paragraph
 >
 

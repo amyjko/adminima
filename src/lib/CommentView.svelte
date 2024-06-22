@@ -15,7 +15,7 @@
 	<td>
 		<div class="meta">
 			<PersonLink profile={$org.getProfileWithPersonID(comment.who)} />
-			<TimeView time={timestampToDate(comment.when).getTime()} />
+			<TimeView date={timestampToDate(comment.when)} />
 		</div>
 	</td>
 	<td
