@@ -5,12 +5,11 @@
 	import { page } from '$app/stores';
 	import MarkupView from '$lib/MarkupView.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
-	import Admin from '$lib/Admin.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
 	import { goto } from '$app/navigation';
 	import Notice from '$lib/Notice.svelte';
 	import Tip from '$lib/Tip.svelte';
+	import Header from '$lib/Header.svelte';
 
 	const user = getUser();
 	const org = getOrg();
@@ -63,8 +62,9 @@
 	<Oops text="No team" />
 {/if}
 
-<Admin>
-	<Paragraph>If you delete this team, the roles on it will be without a team.</Paragraph>
+{#if isAdmin}
+	<Header>Delete</Header>
+	<Tip>Deleting this team will not delete the roles on the team.</Tip>
 	<Button
 		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {
@@ -73,4 +73,4 @@
 		}}
 		warning>{Delete} Delete this team</Button
 	>
-</Admin>
+{/if}

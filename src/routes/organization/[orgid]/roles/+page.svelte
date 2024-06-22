@@ -2,9 +2,7 @@
 	import { goto } from '$app/navigation';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Field from '$lib/Field.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
-	import Admin from '$lib/Admin.svelte';
-	import { addError, getDB, getErrors, getOrg } from '$lib/contexts';
+	import { addError, getDB, getErrors, getOrg, getUser } from '$lib/contexts';
 	import Title from '$lib/Title.svelte';
 	import Flow from '$lib/Flow.svelte';
 	import Header from '$lib/Header.svelte';
@@ -17,6 +15,7 @@
 	const org = getOrg();
 	const db = getDB();
 	const errors = getErrors();
+	const user = getUser();
 
 	let newRole: string = '';
 
@@ -72,7 +71,9 @@
 	{/if}
 {/if}
 
-<Admin>
+{#if $user && $org.hasAdminPerson($user.id)}
+	<Header>Admins</Header>
+
 	<FormDialog
 		button="Create role …"
 		showTip="Create a new role."
@@ -98,4 +99,4 @@
 	>
 		<Field label="name of new team" bind:text={newTeam} />
 	</FormDialog>
-</Admin>
+{/if}

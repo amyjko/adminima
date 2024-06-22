@@ -6,7 +6,6 @@
 	import Paragraph from './Paragraph.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
-	import Admin from './Admin.svelte';
 	import Title from './Title.svelte';
 	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import Header from './Header.svelte';
@@ -112,10 +111,18 @@
 	><Paragraph>There are no active changes suggested for this role.</Paragraph></Suggestions
 >
 
-<Admin>
-	<Paragraph
+<Header>History</Header>
+
+<CommentsView
+	comments={role.comments}
+	remove={(comment) => $db.deleteComment(role, 'roles', comment)}
+/>
+
+<Header>Delete</Header>
+{#if isAdmin}
+	<Tip
 		>Is this role obsolete? You can delete it, but it is permanent. All of the processes for this
-		role will remain, in case you want to assign them to a different role.</Paragraph
+		role will remain, in case you want to assign them to a different role.</Tip
 	>
 	<Button
 		tip="Permanently delete this role. All processes will remain, but without a role."
@@ -128,11 +135,4 @@
 		}}
 		warning>{Delete} Delete this role</Button
 	>
-</Admin>
-
-<Header>History</Header>
-
-<CommentsView
-	comments={role.comments}
-	remove={(comment) => $db.deleteComment(role, 'roles', comment)}
-/>
+{/if}

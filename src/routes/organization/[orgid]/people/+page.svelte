@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts';
 	import Paragraph from '$lib/Paragraph.svelte';
-	import Admin from '$lib/Admin.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
@@ -11,12 +10,12 @@
 	import { type PersonRow } from '$database/OrganizationsDB';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Select from '$lib/Select.svelte';
-	import Subheader from '$lib/Subheader.svelte';
 	import validEmail from '../../../validEmail';
 	import Form from '$lib/Form.svelte';
 	import Notice from '$lib/Notice.svelte';
 	import Link from '$lib/Link.svelte';
 	import Tip from '$lib/Tip.svelte';
+	import Header from '$lib/Header.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -195,13 +194,9 @@
 	</tbody>
 </table>
 
-<Admin>
-	<Subheader>Add people</Subheader>
-	<Paragraph
-		>Enter the email of the person to add. <em
-			>This will not send an invitation; they can create an account at any time</em
-		>.</Paragraph
-	>
+{#if isAdmin}
+	<Header>Add people</Header>
+	<Paragraph>Enter the email of the person to add. <em /></Paragraph>
 	<Form action={addEmail}>
 		<Field
 			label="email"
@@ -218,7 +213,8 @@
 			<Paragraph>This person is already added.</Paragraph>
 		{/if}
 	</Form>
-</Admin>
+	<Tip>This will not send an invitation; they can create an account at any time.</Tip>
+{/if}
 
 <style>
 	.role,
