@@ -24,6 +24,7 @@
 	import Tip from '$lib/Tip.svelte';
 	import SuggestionLink from '$lib/SuggestionLink.svelte';
 	import Visibility from '$lib/Visibility.svelte';
+	import Note from '$lib/Note.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -165,9 +166,11 @@
 	{:else}
 		<ol style:width="100%">
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
-				{#if subHow}
-					<li><HowView how={subHow} {process} {editable} /></li>
-				{/if}
+				<li>
+					{#if subHow}<HowView how={subHow} {process} {editable} />{:else}<Note
+							>This step is not visible to you. {how.how[index]}</Note
+						>{/if}
+				</li>
 			{/each}
 		</ol>
 	{/if}
