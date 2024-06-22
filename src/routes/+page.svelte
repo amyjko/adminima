@@ -3,6 +3,12 @@
 	import Lead from '$lib/Lead.svelte';
 	import Title from '$lib/Title.svelte';
 	import Link from '$lib/Link.svelte';
+	import OrganizationLink from '$lib/OrganizationLink.svelte';
+	import Notice from '$lib/Notice.svelte';
+	import Flow from '$lib/Flow.svelte';
+	import Tip from '$lib/Tip.svelte';
+
+	export let data;
 </script>
 
 <Title title="Adminima" />
@@ -15,7 +21,17 @@
 	is accountable and responsible.</Paragraph
 >
 
-<Paragraph>
+<Tip>
 	Want to create an organization? Ask <Link to="mailto:ajko@uw.edu">Amy</Link> for an invite code, then
-	<Link to="/login">log in</Link>.
-</Paragraph>
+	<Link to="/login">log in</Link>. Or, browse some public organizations to explore the platform.
+</Tip>
+
+{#if data.orgs}
+	<Flow>
+		{#each data.orgs as org}
+			<OrganizationLink id={org.id} name={org.name} />
+		{:else}
+			<Notice>No public organizations yet.</Notice>
+		{/each}
+	</Flow>
+{/if}
