@@ -19,7 +19,8 @@
 
 <style>
 	.page {
-		padding: calc(2 * var(--spacing));
+		padding-left: calc(2 * var(--spacing));
+		padding-right: calc(2 * var(--spacing));
 		display: flex;
 		flex-direction: column;
 		margin: auto;

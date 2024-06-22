@@ -60,8 +60,9 @@
 
 <style>
 	.title {
-		width: 100%;
-		padding: var(--padding);
+		width: calc(100%);
+		margin-left: calc(-2 * var(--spacing));
+		padding: calc(2 * var(--spacing));
 	}
 
 	h1 {
