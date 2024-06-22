@@ -19,11 +19,11 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { browser } from '$app/environment';
 	import Select from '$lib/Select.svelte';
-	import Link from '$lib/Link.svelte';
 	import Suggestions from '$lib/Suggestions.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import SuggestionLink from '$lib/SuggestionLink.svelte';
+	import Visibility from '$lib/Visibility.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -80,6 +80,9 @@
 {:else if process === null}
 	<Title title={$org.getName()} />
 	<Oops text={(locale) => locale.error.noProcess} />
+{:else if how === undefined}
+	<Title title="Oops" kind="process" />
+	<Oops text="This process isn't visible to you." />
 {:else}
 	<Title
 		title={process.title}
@@ -100,13 +103,22 @@
 		/>esponsible can edit a process. If no one is accountable, anyone in the organization can edit.</Tip
 	>
 
-	{#if how}
-		<MarkupView
-			markup={how.what}
-			placeholder="No description yet."
-			edit={editable ? (text) => $db.updateHowText(how, text) : undefined}
-		/>
-	{/if}
+	<MarkupView
+		markup={how.what}
+		placeholder="No description yet."
+		edit={editable ? (text) => $db.updateHowText(how, text) : undefined}
+	/>
+
+	<Header>Visibility</Header>
+
+	<Visibility
+		tip="Change visibility of this process"
+		level={how.visibility}
+		edit={(vis) =>
+			vis === 'public' || vis === 'org' || vis === 'admin'
+				? $db.updateHowVisibility(how, vis)
+				: undefined}
+	/>
 
 	<Header>Who</Header>
 
@@ -125,31 +137,6 @@
 			/>{:else if process.accountable}<RoleLink roleID={process.accountable} />{:else}No one{/if} is
 		<Level level="accountable" /><strong>ccountable</strong> for this processes outcomes.
 	</Paragraph>
-
-	<!-- {#if how}
-		{#if how.responsible.length > 0}
-			<Paragraph>
-				<Level level="responsible" /><strong>esponsible</strong> for completing this process: <RoleContribution
-					roles={how.responsible}
-				/>
-			</Paragraph>
-		{/if}
-		{#if how.consulted.length > 0}
-			<Paragraph>
-				<Level level="consulted" /><strong>onsulted</strong> in this process: <RoleContribution
-					roles={how.consulted}
-				/>
-			</Paragraph>
-		{/if}
-		{#if how.informed.length > 0}
-			<Paragraph>
-				<Level level="informed" /><strong>nformed</strong> that this process is happening and of its
-				outcome: <RoleContribution roles={how.informed} />
-			</Paragraph>
-		{/if}
-	{:else}
-		<Notice>No one is involved in this process yet. Define how to do it.</Notice>
-	{/if} -->
 
 	<Header>When</Header>
 
