@@ -10,6 +10,7 @@
 	import { page } from '$app/stores';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
+	import Loading from '$lib/Loading.svelte';
 
 	let user = getUser();
 	let db = getDB();
@@ -26,7 +27,9 @@
 
 <Title title="You" />
 
-{#await $db.getPersonsOrganizations($page.params.personid) then orgs}
+{#await $db.getPersonsOrganizations($page.params.personid)}
+	<Loading />
+{:then orgs}
 	{#if orgs.data === null}
 		<Oops text="Couldn't load organizations" />
 	{:else if $user}
@@ -34,14 +37,22 @@
 
 		{#if orgs.data.length}
 			<Paragraph>Here are the organizations you're part of and your profiles for each:</Paragraph>
-			{#each orgs.data as org}
-				<div>
-					<OrganizationLink id={org.id} name={org.name} />
-					{#await $db.getPersonProfile(org.id, $user.id) then profile}
-						<PersonLink {profile} />
-					{/await}
-				</div>
-			{/each}
+			<table>
+				<tr>
+					<th>Organization</th>
+					<th>Profile</th>
+				</tr>
+				{#each orgs.data as org}
+					<tr>
+						<td> <OrganizationLink id={org.id} name={org.name} /></td>
+						<td
+							>{#await $db.getPersonProfile(org.id, $user.id) then profile}
+								<PersonLink {profile} />
+							{/await}
+						</td>
+					</tr>
+				{/each}
+			</table>
 		{:else}
 			<Notice
 				>You're not part of any organizations.
