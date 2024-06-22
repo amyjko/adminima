@@ -2,9 +2,12 @@
 	export let concern: string;
 </script>
 
-<div>
-	{concern}
-</div>
+{#if concern.length === 0}<em>no concern</em>
+{:else}
+	<div>
+		{concern}
+	</div>
+{/if}
 
 <style>
 	div {

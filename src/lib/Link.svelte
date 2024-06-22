@@ -60,10 +60,11 @@
 
 	.kinded {
 		color: var(--background);
-		text-decoration: none;
 		white-space: nowrap;
 		padding-inline-start: var(--padding);
 		padding-inline-end: var(--padding);
+		text-decoration: none;
+		text-shadow: 1px 1px black;
 	}
 
 	.person {
@@ -72,6 +73,7 @@
 		font-weight: bold;
 		padding-inline-start: 0;
 		padding-inline-end: 0;
+		text-shadow: none;
 	}
 
 	.role {

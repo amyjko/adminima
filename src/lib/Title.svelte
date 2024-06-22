@@ -4,6 +4,11 @@
 	import { page } from '$app/stores';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
+	import RoleLink from './RoleLink.svelte';
+	import PersonLink from './PersonLink.svelte';
+	import ProcessLink from './ProcessLink.svelte';
+	import SuggestionLink from './SuggestionLink.svelte';
+	import Link from './Link.svelte';
 
 	// The title to show in the header
 	export let title: string;
@@ -29,7 +34,16 @@
 
 <div class="title {kind}">
 	{#if $org && $page.url.pathname !== `/organization/${$org.getID()}`}
-		<div class="breadcrumbs"><OrganizationLink id={$org.getID()} name={$org.getName()} /></div>
+		<div class="breadcrumbs">
+			<OrganizationLink id={$org.getID()} name={$org.getName()} />
+			{#if $page.url.pathname.includes('/role/')} &gt;<RoleLink roleID={null} /> {/if}
+			{#if $page.url.pathname.includes('/process/')} &gt;<ProcessLink processID={null} /> {/if}
+			{#if $page.url.pathname.includes('/suggestion/')}
+				&gt;<Link to="/organization/{$org.getID()}/suggestions" kind="suggestion">Suggestions</Link
+				>{/if}
+			{#if $page.url.pathname.includes('/person/')}
+				&gt; <Link to="/organization/{$org.getID()}/people" kind="person">People</Link>{/if}
+		</div>
 	{/if}
 	{#if kind}
 		<div class="kind">

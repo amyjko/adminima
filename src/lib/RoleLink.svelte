@@ -4,14 +4,16 @@
 	import Oops from './Oops.svelte';
 	import { getOrg } from './contexts';
 
-	export let roleID: RoleID;
+	export let roleID: RoleID | null;
 
 	const org = getOrg();
 
-	$: role = $org.getRole(roleID);
+	$: role = roleID ? $org.getRole(roleID) : undefined;
 </script>
 
 {#if role === null}<Oops inline text={(locale) => locale.error.noRole} />{:else}<Link
-		to="/organization/{$org.getID()}/role/{roleID}"
-		kind="role">{role.title}</Link
+		to={roleID
+			? `/organization/${$org.getID()}/role/${roleID}`
+			: `/organization/${$org.getID()}/roles`}
+		kind="role">{role ? role.title : 'roles'}</Link
 	>{/if}
