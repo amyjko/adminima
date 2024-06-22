@@ -7,6 +7,7 @@
 	import { getDB, getErrors, getUser, queryOrError } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
+	import Note from './Note.svelte';
 
 	export let organization: Organization;
 
@@ -43,6 +44,12 @@
 						: undefined
 			: undefined}
 	/>
+	<Note
+		>{#if organization.getVisibility() === 'public'}Everyone on the internet can see this
+			organization's details.{:else if organization.getVisibility() === 'org'}Only members can see
+			this organization's detail.{:else if organization.getVisibility() === 'admin'}Only admins can
+			see this organization's details.{/if}</Note
+	>
 </Title>
 
 <Paragraph>
