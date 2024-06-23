@@ -6,4 +6,4 @@
 	export let name: string;
 </script>
 
-<Link to="/organization/{id}" kind="org">{name}</Link>
+<Link to="/org/{id}" kind="org">{name}</Link>

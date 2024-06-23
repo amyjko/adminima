@@ -131,7 +131,7 @@
 			const error = await $db.deleteRole(role.orgid, role.id);
 			if (error) {
 				addError(errors, "We couldn't delete this role.", error);
-			} else goto(`/organization/${org}/roles`);
+			} else goto(`/org/${org}/roles`);
 		}}
 		warning>{Delete} Delete this role</Button
 	>

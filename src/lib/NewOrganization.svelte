@@ -18,7 +18,7 @@
 
 		const id = await $db.createOrganization(orgName, name, invite, $user.id, $user.email);
 
-		if (typeof id === 'string') goto(`/organization/${id}`);
+		if (typeof id === 'string') goto(`/org/${id}`);
 		else
 			addError(errors, "Couldn't create a new organization with this invite code", id ?? undefined);
 	}

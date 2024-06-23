@@ -61,7 +61,7 @@
 
 <Paragraph>
 	See the <strong>{organization.getRoles().length}</strong>
-	<Link kind="role" to="/organization/{organization.getID()}/roles"
+	<Link kind="role" to="/org/{organization.getID()}/roles"
 		>Role{organization.getRoles().length === 1 ? '' : 's'}</Link
 	> and <strong>{organization.getTeams().length}</strong> team{organization.getTeams().length === 1
 		? ''
@@ -70,14 +70,14 @@
 
 <Paragraph
 	>See the <strong>{organization.getProfiles().length} </strong>
-	<Link kind="person" to="/organization/{organization.getID()}/people"
+	<Link kind="person" to="/org/{organization.getID()}/people"
 		>{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
 	> in this organization.</Paragraph
 >
 
 <Paragraph
 	>See the <strong>{organization.getProcesses().length}</strong>
-	<Link kind="process" to="/organization/{organization.getID()}/processes"
+	<Link kind="process" to="/org/{organization.getID()}/processes"
 		>Process{organization.getProcesses().length !== 1 ? 'es' : ''}</Link
 	>
 	that make this organization work.</Paragraph
@@ -85,7 +85,7 @@
 
 <Paragraph
 	>See the <strong>{organization.getSuggestions().length}</strong>
-	<Link kind="suggestion" to="/organization/{organization.getID()}/suggestions"
+	<Link kind="suggestion" to="/org/{organization.getID()}/suggestions"
 		>Suggestion{organization.getSuggestions().length !== 1 ? 's' : ''}</Link
 	> proposed.</Paragraph
 >

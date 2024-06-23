@@ -58,8 +58,8 @@
 
 {#if isAdmin && $organization.getRoles().length === 0}
 	<Notice
-		>Want to give people roles? First you'll need to <Link
-			to="/organization/{$organization.getID()}/roles">define some</Link
+		>Want to give people roles? First you'll need to <Link to="/org/{$organization.getID()}/roles"
+			>define some</Link
 		>.</Notice
 	>
 {/if}

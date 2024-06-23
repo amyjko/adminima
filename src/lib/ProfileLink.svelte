@@ -8,7 +8,7 @@
 </script>
 
 {#if profile}
-	<Link to="/organization/{profile.orgid}/person/{profile.id}" kind="person"
+	<Link to="/org/{profile.orgid}/person/{profile.id}" kind="person"
 		>{profile.name === '' ? profile.email : short ? profile.name.split(' ')[0] : profile.name}</Link
 	>
 {:else}

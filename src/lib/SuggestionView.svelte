@@ -254,7 +254,7 @@
 			const org = suggestion.orgid;
 			const { error } = await $db.deleteSuggestion(suggestion.id);
 			if (error) addError(errors, "Couldn't delete this suggestion.", error);
-			else goto(`/organization/${org}`);
+			else goto(`/org/${org}`);
 		}}
 		warning>{Delete} Delete this suggestion</Button
 	>

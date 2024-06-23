@@ -21,7 +21,7 @@
 
 	async function createRole() {
 		const { data, error } = await $db.createRole($org.getID(), newRole);
-		if (data) goto(`/organization/${$org.getID()}/role/${data.id}`);
+		if (data) goto(`/org/${$org.getID()}/role/${data.id}`);
 		else if (error) addError(errors, "We couldn't create the new role.", error);
 	}
 
@@ -30,7 +30,7 @@
 	async function createTeam() {
 		const { data, error } = await $db.createTeam($org.getID(), newTeam);
 		if (error) addError(errors, "We couldn't create the new team.", error);
-		else if (data) goto(`/organization/${$org.getID()}/team/${data.id}`);
+		else if (data) goto(`/org/${$org.getID()}/team/${data.id}`);
 	}
 </script>
 

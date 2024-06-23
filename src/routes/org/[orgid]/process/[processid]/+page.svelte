@@ -269,7 +269,7 @@
 					const org = process.orgid;
 					const { error } = await $db.deleteProcess(process.id);
 					if (error) addError(errors, "Couldn't delete this", error);
-					else goto(`/organization/${org}/processes`);
+					else goto(`/org/${org}/processes`);
 				} catch (_) {
 					deleteError = "We couldn't delete this";
 				}
