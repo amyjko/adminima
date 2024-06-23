@@ -716,52 +716,21 @@ class OrganizationsDB {
 	}
 
 	async createOrganization(
-		organizationName: string,
-		adminID: PersonID,
-		email: string,
+		orgName: string,
 		adminName: string,
-		code: string
+		invite: string,
+		uid: string,
+		email: string
 	) {
-		// See if the invite code isn't used.
-		const { data: invite, error: inviteError } = await this.supabase
-			.from('invites')
-			.select()
-			.eq('id', code)
-			.eq('used', false)
-			.single();
-		if (inviteError) return { error: inviteError, id: null };
-		if (invite === null) return { error: null, id: null };
-
-		// If we did find it, update the invite with the person.
-		const { error: useInviteError } = await this.supabase
-			.from('invites')
-			.update({ who: adminID, used: true })
-			.eq('id', code);
-
-		if (useInviteError) return { error: useInviteError, id: null };
-
-		// Create the new organization.
-		const { data: org, error: orgError } = await this.supabase
-			.from('orgs')
-			.insert({
-				name: organizationName
-			})
-			.select()
-			.single();
-
-		if (orgError) return { error: orgError, id: null };
-
-		// Insert the new user profile
-		const { error } = await this.supabase.from('profiles').insert({
-			orgid: org.id,
-			personid: adminID,
-			email: email,
-			name: adminName,
-			admin: true
+		const { data, error } = await this.supabase.rpc('create_org', {
+			adminname: adminName,
+			orgname: orgName,
+			invite: invite,
+			uid,
+			email
 		});
-		if (error) return { error, id: null };
-
-		return { error: null, id: org.id };
+		if (data) return data;
+		else return error;
 	}
 
 	async getPersonsOrganizations(personid: PersonID) {

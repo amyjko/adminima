@@ -545,6 +545,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_org: {
+        Args: {
+          adminname: string
+          orgname: string
+          invite: string
+        }
+        Returns: string
+      }
       getprofileid: {
         Args: {
           _orgid: string

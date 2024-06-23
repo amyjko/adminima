@@ -94,16 +94,15 @@ alter table "public"."invites" enable row level security;
 
 create policy "No one can read these but superusers." on invites 
 for select to anon, authenticated
-using (true);
+using (false);
 
 create policy "No one can insert these but super users." on invites 
 for insert to anon, authenticated
 with check (false);
 
-create policy "People creating an org can update it" on invites 
+create policy "No one can update except super users" on invites 
 for update to anon, authenticated
-using (true)
-with check (auth.uid() = who);
+using (false);
 
 create policy "Only super users can delete." on invites 
 for delete to anon, authenticated
@@ -129,9 +128,13 @@ create table "public"."orgs" (
 
 alter table "public"."orgs" enable row level security;
 
-CREATE UNIQUE INDEX orgs_pkey ON public.orgs USING btree (id);
+create unique index orgs_pkey ON public.orgs USING btree (id);
 
 alter table "public"."orgs" add constraint "orgs_pkey" PRIMARY KEY using index "orgs_pkey";
+
+-- Enable realtime updates on the orgs table.
+alter
+  publication supabase_realtime add table "public"."orgs";
 
 grant delete on table "public"."orgs" to "anon";
 grant insert on table "public"."orgs" to "anon";
@@ -166,11 +169,29 @@ as $$
   select visibility from orgs where id = _orgid;
 $$;
 
-
--- Enable realtime updates on the orgs table.
-alter
-  publication supabase_realtime add table "public"."orgs";
-
+-- Create a new organization 
+create or replace function create_org(adminName text, orgName text, invite uuid, uid uuid, email text)
+returns uuid
+language plpgsql
+security definer set search_path = public, pg_temp
+as $$
+declare
+  orgid uuid;
+begin
+  -- Invite already used? Return null;
+  if not exists (select * from invites where id = invite and used = false) then
+     return null;
+  end if;
+  -- Use the invite
+  update invites set used = true, who = uid where id = invite;
+  -- Create the organization
+  insert into orgs (name) values (orgName) returning id into orgid;
+  -- Add the user into the profiles for the organization
+  insert into profiles (orgid, personid, name, email, admin) values (orgid, uid, adminName, email, true);
+  -- Return the org id
+  return orgid;
+end;
+$$;
 
 
 -- A table to store people's name, bio, profiles, and status per organization.

@@ -16,17 +16,11 @@
 		if ($user === null || $user.email === undefined) return;
 		submitting = false;
 
-		const { error, id } = await $db.createOrganization(
-			orgName,
-			$user.id,
-			$user.email,
-			name,
-			invite
-		);
+		const id = await $db.createOrganization(orgName, name, invite, $user.id, $user.email);
 
-		if (error) addError(errors, "Couldn't create a new organization", error);
-		else if (id === null) addError(errors, 'Invalid invite code');
-		else goto(`/organization/${id}`);
+		if (typeof id === 'string') goto(`/organization/${id}`);
+		else
+			addError(errors, "Couldn't create a new organization with this invite code", id ?? undefined);
 	}
 
 	let name = '';
