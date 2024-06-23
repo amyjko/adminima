@@ -29,7 +29,9 @@
 		display: inline-block;
 		border-radius: var(--padding);
 		line-height: 1.2;
-		text-decoration: underline var(--thickness) var(--salient);
+		text-decoration: underline;
+		text-decoration-color: var(--salient);
+		text-decoration-thickness: var(--thickness);
 	}
 
 	a.inactive {
