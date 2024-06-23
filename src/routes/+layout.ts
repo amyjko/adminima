@@ -1,6 +1,6 @@
 import { type Locale } from '$types/Locales';
 import { createBrowserClient, createServerClient, isBrowser, parse } from '@supabase/ssr';
-import { PUBLIC_SUPABASE_ACCESS_TOKEN, PUBLIC_SUPABASE_API_URL } from '$env/static/public';
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_API_URL } from '$env/static/public';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ fetch, data, depends }) {
@@ -14,7 +14,7 @@ export async function load({ fetch, data, depends }) {
 	depends('supabase:auth');
 
 	const supabase = isBrowser()
-		? createBrowserClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ACCESS_TOKEN, {
+		? createBrowserClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {
 				global: {
 					fetch
 				},
@@ -25,7 +25,7 @@ export async function load({ fetch, data, depends }) {
 					}
 				}
 		  })
-		: createServerClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ACCESS_TOKEN, {
+		: createServerClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {
 				global: {
 					fetch
 				},
