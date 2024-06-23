@@ -2,8 +2,6 @@
 	import type Text from '../markup/Text';
 
 	export let segment: Text;
-
-	$: console.log(segment.text);
 </script>
 
 {#if segment.format === '*'}
