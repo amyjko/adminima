@@ -26,8 +26,8 @@
 	// Helps us keep track of whether to give this an HTML ID for purposes of focusing.
 	let deleted = false;
 
-	function save() {
-		return queryOrError(errors, $db.updateHowText(how, text), "Couldn't update step text.");
+	function save(newText: string) {
+		return queryOrError(errors, $db.updateHowText(how, newText), "Couldn't update step text.");
 	}
 
 	function toggleDone() {
@@ -55,7 +55,7 @@
 		return (
 			parent &&
 			process.howid !== how.id &&
-			!(parent.id === process.howid && parent.how.length === 1)
+			!(parent.id === process.howid && parent.how.length === 0)
 		);
 	}
 
@@ -158,18 +158,6 @@
 <div class="how">
 	{#if process.howid !== how.id}
 		<div class="main">
-			<Button
-				tip="Unindent this step"
-				action={() => unindentHow(false)}
-				active={getUnindent() !== undefined}>&lt;</Button
-			>
-			<Button
-				tip="Indent this step"
-				action={() => indentHow(false)}
-				active={getIndent() !== undefined}>&gt;</Button
-			>
-			<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
-			<Button tip="Delete this step" action={deleteHow} active={canDelete()}>{Delete}</Button>
 			<div
 				role="checkbox"
 				class="complete"
@@ -180,7 +168,7 @@
 					editable && (event.key === 'Enter' || event.key === ' ') ? toggleDone() : undefined}
 				on:pointerdown={editable ? toggleDone : undefined}
 			>
-				{#if how.done === 'no'}&nbsp;{:else if how.done === 'pending'}…{:else}✔{/if}
+				{#if how.done === 'no'}&nbsp;{:else if how.done === 'pending'}…{:else}✓{/if}
 			</div>
 			{#if editable}
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -226,6 +214,18 @@
 			{:else}
 				<BlocksView blocks={parse(text).blocks} />
 			{/if}
+			<Button
+				tip="Unindent this step"
+				action={() => unindentHow(false)}
+				active={getUnindent() !== undefined}>&lt;</Button
+			>
+			<Button
+				tip="Indent this step"
+				action={() => indentHow(false)}
+				active={getIndent() !== undefined}>&gt;</Button
+			>
+			<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
+			<Button tip="Delete this step" action={deleteHow} active={canDelete()}>{Delete}</Button>
 		</div>
 	{/if}
 	<div class="meta">
@@ -271,8 +271,6 @@
 		width: 1em;
 		height: 1em;
 		background: var(--chrome);
-		padding: var(--padding);
-		border-radius: 50%;
 		font-size: var(--font-size);
 		display: flex;
 		flex-direction: row;

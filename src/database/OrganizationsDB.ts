@@ -790,17 +790,9 @@ class OrganizationsDB {
 
 		if (howError) return { error: howError, id: null };
 
-		const { data: rootHow, error: rootError } = await this.supabase
-			.from('hows')
-			.insert({ orgid, processid: processData.id, how: [newHow.id], what: '' })
-			.select()
-			.single();
-
-		if (rootError) return { error: rootError, id: null };
-
 		const { error: updateError } = await this.supabase
 			.from('processes')
-			.update({ howid: rootHow.id })
+			.update({ howid: newHow.id })
 			.eq('id', processData.id);
 		if (updateError) return { error: updateError, id: null };
 		return { error, id: processData.id };

@@ -25,6 +25,8 @@
 	import SuggestionLink from '$lib/SuggestionLink.svelte';
 	import Visibility from '$lib/Visibility.svelte';
 	import Note from '$lib/Note.svelte';
+	import ARCI from '$lib/ARCI.svelte';
+	import type { HowRow } from '$database/OrganizationsDB';
 
 	let deleteError: string | undefined = undefined;
 
@@ -67,6 +69,13 @@
 				focusID.set(undefined);
 			}
 		});
+	}
+
+	async function createFirstSubtask(how: HowRow) {
+		if (process === null) return;
+		const { error, id } = await $db.insertHow(process, how, 0);
+		if (error) addError(errors, 'Unable to insert how.', error);
+		else if (id) focusID.set(id);
 	}
 </script>
 
@@ -141,6 +150,10 @@
 		<Level level="accountable" /><strong>ccountable</strong> for this processes outcomes.
 	</Paragraph>
 
+	<Paragraph />
+
+	<ARCI {how} {process} />
+
 	<Header>When</Header>
 
 	{#if process.repeat}
@@ -159,12 +172,17 @@
 	<Header>How</Header>
 
 	<Tip
-		>This is how to do this process, who is <Level level="responsible" />esponsible for doing it,
+		>If you want to provide more detail about how to do this process, you can add a list of tasks
+		and subtasks, and specify for each, who is <Level level="responsible" />esponsible for doing it,
 		and who is <Level level="consulted" />onsulted and <Level level="informed" />nformed about it.
+		Adding this level of detail will let you track progress and make sure everyone knows who is
+		responsible for what.
 	</Tip>
 
-	{#if how === undefined}
-		<Notice>No one has defined to do this process yet.</Notice>
+	{#if how.how.length === 0}
+		<Button tip="Create a subtask for this process." action={() => createFirstSubtask(how)}
+			>Create a subtask...</Button
+		>
 	{:else}
 		<ol style:width="100%">
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}

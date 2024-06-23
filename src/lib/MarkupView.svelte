@@ -24,7 +24,7 @@
 
 	const errors = getErrors();
 
-	$: scrollHeight = markup ? input?.scrollHeight ?? height : height;
+	$: scrollHeight = input?.scrollHeight ?? height;
 
 	// Not an edit function, just a text field? Update the text immediately.
 	$: if (edit === undefined) markup = revisedText;
@@ -65,23 +65,22 @@
 		</div>
 	{/if}
 	{#if editing}
-		<div class="text">
-			<!-- svelte-ignore a11y-autofocus -->
-			<textarea
-				bind:value={revisedText}
-				bind:this={input}
-				{id}
-				autofocus
-				on:keydown={(e) => {
-					// Shortcut to submit without using button.
-					if (e.key === 'Enter' && e.metaKey) {
-						e.preventDefault();
-						save();
-					}
-				}}
-				style:height="{editing ? scrollHeight : height}px"
-			/>
-		</div>
+		<!-- svelte-ignore a11y-autofocus -->
+		<textarea
+			bind:value={revisedText}
+			bind:this={input}
+			{id}
+			autofocus
+			on:keydown={(e) => {
+				// Shortcut to submit without using button.
+				if (e.key === 'Enter' && e.metaKey) {
+					e.preventDefault();
+					e.stopPropagation();
+					save();
+				}
+			}}
+			style:height="{editing ? scrollHeight : height}px"
+		/>
 	{:else}
 		<div class="blocks" bind:clientHeight={height} on:pointerdown|preventDefault={startEditing}>
 			{#if markup === ''}<em>{placeholder}</em>{:else}<BlocksView
@@ -98,13 +97,7 @@
 		flex-wrap: nowrap;
 		gap: calc(2 * var(--padding));
 		align-items: stretch;
-	}
-
-	.text {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing);
-		flex: 1;
+		width: 100%;
 	}
 
 	.control {
@@ -123,7 +116,7 @@
 		font-size: inherit;
 		line-height: inherit;
 		border: none;
-		padding: var(--padding);
+		padding: 0;
 		outline: var(--border) solid var(--thickness);
 		min-height: 1em;
 		border-radius: var(--radius);
