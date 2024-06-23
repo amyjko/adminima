@@ -19,18 +19,22 @@
 	let message: string | null = null;
 	/** True if waiting for a code */
 	let submitted = false;
+	let submitting = false;
 
 	let user = getUser();
 
 	async function sendCode() {
+		submitting = true;
 		const { error } = await supabase.auth.signInWithOtp({
 			email
 		});
 		if (error) message = error.code ?? error.message;
 		else submitted = true;
+		submitting = false;
 	}
 
 	async function login() {
+		submitting = true;
 		const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
 
 		if (error) message = error.code ?? error.message;
@@ -38,6 +42,7 @@
 			submitted = false;
 			message = null;
 		}
+		submitting = false;
 	}
 
 	$: if (browser && $user) goto(`/person/${$user.id}`);
@@ -55,8 +60,11 @@
 			bind:text={email}
 			invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid email')}
 		/>
-		<Button tip="Email the login code" active={validEmail(email)} action={sendCode} submit
-			>Send code …</Button
+		<Button
+			tip="Email the login code"
+			active={!submitting && validEmail(email)}
+			action={sendCode}
+			submit>Send code …</Button
 		>
 	</Form>
 {:else}
@@ -69,7 +77,9 @@
 			invalid={(text) =>
 				text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
 		/>
-		<Button tip="Send login code" active={code.length === 6} action={login} submit>Login …</Button>
+		<Button tip="Send login code" active={!submitting && code.length === 6} action={login} submit
+			>Login …</Button
+		>
 	</Form>
 {/if}
 
