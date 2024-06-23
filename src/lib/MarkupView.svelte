@@ -51,20 +51,6 @@
 </script>
 
 <div class="markup" class:editable={edit !== undefined}>
-	{#if edit}<div class="control">
-			<Button
-				tip={editing ? 'Save your edits.' : 'Start editing this markup.'}
-				action={async () => {
-					if (editing) {
-						save();
-					} else {
-						startEditing();
-					}
-				}}
-				>{#if editing}&checkmark;{:else}✎{/if}</Button
-			>
-		</div>
-	{/if}
 	{#if editing}
 		<div class="editor">
 			<!-- svelte-ignore a11y-autofocus -->
@@ -93,6 +79,20 @@
 			{#if markup === ''}<em>{placeholder}</em>{:else}<BlocksView
 					blocks={parse(markup).blocks}
 				/>{/if}
+		</div>
+	{/if}
+	{#if edit}<div class="control">
+			<Button
+				tip={editing ? 'Save your edits.' : 'Start editing this markup.'}
+				action={async () => {
+					if (editing) {
+						save();
+					} else {
+						startEditing();
+					}
+				}}
+				>{#if editing}&checkmark;{:else}✎{/if}</Button
+			>
 		</div>
 	{/if}
 </div>
