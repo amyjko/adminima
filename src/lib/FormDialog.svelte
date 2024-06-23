@@ -5,7 +5,7 @@
 	import Header from './Header.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import Actions from './Actions.svelte';
-	import Oops from './Oops.svelte';
+	import Loading from './Loading.svelte';
 
 	export let button: string;
 	export let showTip: string;
@@ -13,10 +13,11 @@
 	export let submit: string;
 	export let header: string;
 	export let explanation: string;
-	export let action: () => void;
+	export let action: () => Promise<boolean>;
 	export let valid: () => boolean;
 
 	let show = false;
+	let submitting = false;
 </script>
 
 <Button tip={showTip} action={() => (show = true)}>{button}</Button>
@@ -25,9 +26,11 @@
 		<Header>{header}</Header>
 		<Paragraph>{explanation}</Paragraph>
 		<Form
-			action={() => {
-				action();
-				show = false;
+			action={async () => {
+				submitting = true;
+				const result = await action();
+				submitting = false;
+				if (result) show = false;
 			}}
 		>
 			<slot />
@@ -36,10 +39,11 @@
 					tip={submitTip}
 					end
 					submit
-					active={valid()}
+					active={!submitting && valid()}
 					action={() => {}}>{submit}</Button
 				>
 			</Actions>
+			{#if submitting}<Loading />{/if}
 		</Form>
 	</Dialog>
 {/if}

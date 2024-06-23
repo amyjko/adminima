@@ -207,8 +207,8 @@
 				header="Comment"
 				explanation="What do you want to say?"
 				valid={() => newComment.length > 0}
-				action={() => {
-					const result = $db.addComment(
+				action={async () => {
+					const result = await $db.addComment(
 						$org.getID(),
 						$user.id,
 						newComment,
@@ -216,8 +216,9 @@
 						suggestion.id,
 						comments.data.map((c) => c.id)
 					);
+					if (result) return false;
 					newComment = '';
-					return result;
+					return true;
 				}}
 			>
 				<textarea

@@ -13,22 +13,20 @@
 	let submitting = false;
 
 	async function create() {
-		if ($user === null || $user.email === undefined) return;
+		if ($user === null || $user.email === undefined) {
+			addError(errors, "You're not logged in.");
+			return false;
+		}
 		submitting = false;
 
-		try {
-			const id = await $db.createOrganization(orgName, name, invite, $user.id, $user.email);
+		const id = await $db.createOrganization(orgName, name, invite, $user.id, $user.email);
 
-			if (typeof id === 'string') goto(`/org/${id}`);
-			else
-				addError(
-					errors,
-					"Couldn't create a new organization with this invite code",
-					id ?? undefined
-				);
-		} catch (e) {
-			console.log(e);
-			addError(errors, "Couldn't create a new organization", undefined);
+		if (typeof id === 'string') {
+			goto(`/org/${id}`);
+			return true;
+		} else {
+			addError(errors, "Couldn't create a new organization with this invite code", id ?? undefined);
+			return false;
 		}
 	}
 

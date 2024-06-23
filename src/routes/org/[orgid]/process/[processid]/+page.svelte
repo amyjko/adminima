@@ -226,13 +226,15 @@
 			header="Set a new concern"
 			explanation="Set a new concern to group processes."
 			valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
-			action={() => {
-				queryOrError(
+			action={async () => {
+				const error = await queryOrError(
 					errors,
 					$db.updateProcessConcern(process, newConcern, $user.id),
 					"Couldn't update concern."
 				);
+				if (error) return false;
 				newConcern = '';
+				return true;
 			}}
 		>
 			<Field label="new concern" bind:text={newConcern} />

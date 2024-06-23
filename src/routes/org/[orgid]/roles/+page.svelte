@@ -21,16 +21,27 @@
 
 	async function createRole() {
 		const { data, error } = await $db.createRole($org.getID(), newRole);
-		if (data) goto(`/org/${$org.getID()}/role/${data.id}`);
-		else if (error) addError(errors, "We couldn't create the new role.", error);
+		if (data) {
+			goto(`/org/${$org.getID()}/role/${data.id}`);
+			return true;
+		} else if (error) {
+			addError(errors, "We couldn't create the new role.", error);
+			return false;
+		} else return false;
 	}
 
 	let newTeam = '';
 
 	async function createTeam() {
 		const { data, error } = await $db.createTeam($org.getID(), newTeam);
-		if (error) addError(errors, "We couldn't create the new team.", error);
-		else if (data) goto(`/org/${$org.getID()}/team/${data.id}`);
+		if (error) {
+			addError(errors, "We couldn't create the new team.", error);
+			return false;
+		} else if (data) {
+			goto(`/org/${$org.getID()}/team/${data.id}`);
+			return true;
+		}
+		return false;
 	}
 </script>
 
