@@ -119,19 +119,6 @@
 		edit={editable ? (text) => $db.updateHowText(how, text) : undefined}
 	/>
 
-	<Header>Visibility</Header>
-
-	<Visibility
-		tip="Change visibility of this process"
-		level={how.visibility}
-		edit={editable
-			? (vis) =>
-					vis === 'public' || vis === 'org' || vis === 'admin'
-						? $db.updateHowVisibility(how, vis)
-						: undefined
-			: undefined}
-	/>
-
 	<Header>Who</Header>
 
 	<Paragraph>
@@ -151,6 +138,22 @@
 	</Paragraph>
 
 	<ARCI {how} {process} verbose />
+
+	<Tip
+		>This determines who can see this process. You can also control the visibility of individual
+		steps below.</Tip
+	>
+
+	<Visibility
+		tip="Change visibility of this process"
+		level={how.visibility}
+		edit={editable
+			? (vis) =>
+					vis === 'public' || vis === 'org' || vis === 'admin'
+						? $db.updateHowVisibility(how, vis)
+						: undefined
+			: undefined}
+	/>
 
 	<Header>When</Header>
 
@@ -248,6 +251,13 @@
 		><Paragraph>There are no active changes suggested for this process.</Paragraph></Suggestions
 	>
 
+	<Header>History</Header>
+
+	<CommentsView
+		comments={process.comments}
+		remove={(comment) => $db.deleteComment(process, 'processes', comment)}
+	/>
+
 	{#if admin || accountable}
 		<Header>Delete</Header>
 		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
@@ -268,13 +278,6 @@
 		>
 		{#if deleteError}<Oops text={deleteError} />{/if}
 	{/if}
-
-	<Header>History</Header>
-
-	<CommentsView
-		comments={process.comments}
-		remove={(comment) => $db.deleteComment(process, 'processes', comment)}
-	/>
 {/if}
 
 <style>
