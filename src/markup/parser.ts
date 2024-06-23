@@ -1,6 +1,6 @@
 import type Block from './Block';
 import Bullets from './Bullets';
-import Characters from './Characters';
+import Characters from './Text';
 import Link from './Link';
 import Markup from './Markup';
 import Numbered from './Numbered';
@@ -14,7 +14,7 @@ export function parse(markup: string): Markup {
 }
 
 export function parseBlock(line: string): Block {
-	return line.startsWith('*')
+	return line.startsWith('* ')
 		? parseBullets(line)
 		: /^[0-9]+\./.test(line)
 		? parseNumbers(line)

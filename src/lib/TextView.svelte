@@ -1,7 +1,9 @@
 <script lang="ts">
-	import type Characters from '../markup/Characters';
+	import type Text from '../markup/Text';
 
-	export let segment: Characters;
+	export let segment: Text;
+
+	$: console.log(segment.text);
 </script>
 
 {#if segment.format === '*'}

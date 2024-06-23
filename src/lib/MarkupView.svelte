@@ -5,6 +5,7 @@
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
 	import { addError, getErrors } from './contexts';
+	import Note from './Note.svelte';
 
 	/** The markup's text */
 	export let markup: string;
@@ -65,22 +66,28 @@
 		</div>
 	{/if}
 	{#if editing}
-		<!-- svelte-ignore a11y-autofocus -->
-		<textarea
-			bind:value={revisedText}
-			bind:this={input}
-			{id}
-			autofocus
-			on:keydown={(e) => {
-				// Shortcut to submit without using button.
-				if (e.key === 'Enter' && e.metaKey) {
-					e.preventDefault();
-					e.stopPropagation();
-					save();
-				}
-			}}
-			style:height="{editing ? scrollHeight : height}px"
-		/>
+		<div class="editor">
+			<!-- svelte-ignore a11y-autofocus -->
+			<textarea
+				bind:value={revisedText}
+				bind:this={input}
+				{id}
+				autofocus
+				on:keydown={(e) => {
+					// Shortcut to submit without using button.
+					if (e.key === 'Enter' && e.metaKey) {
+						e.preventDefault();
+						e.stopPropagation();
+						save();
+					}
+				}}
+				style:height="{editing ? scrollHeight : height}px"
+			/>
+			<Note
+				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@url&gt;</code>,
+				<code>* bullets</code>, <code>1. lists</code></Note
+			>
+		</div>
 	{:else}
 		<div class="blocks" bind:clientHeight={height} on:pointerdown|preventDefault={startEditing}>
 			{#if markup === ''}<em>{placeholder}</em>{:else}<BlocksView
@@ -97,6 +104,11 @@
 		flex-wrap: nowrap;
 		gap: calc(2 * var(--padding));
 		align-items: stretch;
+		width: 100%;
+	}
+
+	.editor {
+		display: block;
 		width: 100%;
 	}
 
@@ -120,9 +132,15 @@
 		outline: var(--border) solid var(--thickness);
 		min-height: 1em;
 		border-radius: var(--radius);
+		width: 100%;
 	}
 
 	textarea:focus {
 		outline: var(--focus) solid var(--thickness);
+	}
+
+	code {
+		font-family: monospace;
+		font-size: 10pt;
 	}
 </style>

@@ -6,5 +6,7 @@
 </script>
 
 <ul>
-	{#each block.items as segment}<li><SegmentView {segment} /></li>{/each}
+	{#each block.items as segments}<li>
+			{#each segments as segment}<SegmentView {segment} />{/each}
+		</li>{/each}
 </ul>
