@@ -22,6 +22,7 @@
 	let height = 0;
 	let revisedText = '';
 	let input: HTMLTextAreaElement;
+	let saving = false;
 
 	const errors = getErrors();
 
@@ -39,13 +40,15 @@
 
 	async function save() {
 		if (edit) {
+			saving = true;
 			const error = await edit(revisedText ?? '');
-			editing = false;
 			if (error) {
 				addError(errors, 'Unable to save markup.', error);
-				return;
+			} else {
+				markup = revisedText;
+				editing = false;
 			}
-			markup = revisedText;
+			saving = false;
 		}
 	}
 </script>
@@ -59,6 +62,7 @@
 				bind:this={input}
 				{id}
 				autofocus
+				disabled={saving}
 				on:keydown={(e) => {
 					// Shortcut to submit without using button.
 					if (e.key === 'Enter' && e.metaKey) {
