@@ -1,5 +1,4 @@
 <script>
-	import { dev } from '$app/environment';
 	import Link from './Link.svelte';
 	import Logo from './Logo';
 	import { getUser } from './contexts';
