@@ -9,7 +9,7 @@
 
 <div class="header">
 	<Link to="/">{Logo}</Link><span class="account"
-		>{#if $user}<Link to="/login">{$user.email}</Link>{:else if dev}<Link to="/login">Login</Link
+		>{#if $user}<Link to="/login">{$user.email}</Link>{:else}<Link to="/login">Login</Link
 			>{/if}</span
 	>
 </div>
