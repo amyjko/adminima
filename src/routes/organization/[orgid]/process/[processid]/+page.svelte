@@ -150,9 +150,7 @@
 		<Level level="accountable" /><strong>ccountable</strong> for this processes outcomes.
 	</Paragraph>
 
-	<Paragraph />
-
-	<ARCI {how} {process} />
+	<ARCI {how} {process} verbose />
 
 	<Header>When</Header>
 

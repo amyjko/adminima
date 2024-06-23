@@ -9,12 +9,13 @@
 
 	export let how: HowRow;
 	export let process: ProcessRow;
+	export let verbose: boolean;
 
 	const org = getOrg();
 	const db = getDB();
 
 	$: options = [
-		{ value: undefined, label: '▼' },
+		{ value: undefined, label: '—' },
 		...$org
 			.getRoles()
 			.filter(
@@ -34,16 +35,11 @@
 	let informed: string | undefined = undefined;
 </script>
 
-<div class="arci">
+<div class="arci" class:verbose>
 	<div class="slot">
-		<Level level="responsible" />
-		{#each how.responsible as responsible}
-			<RoleLink roleID={responsible} />
-			<Button
-				tip="Remove this role from the responsible list."
-				action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
-			>
-		{/each}
+		{#if !verbose}
+			<Level level="responsible" />
+		{/if}
 		{#if options.length > 0}
 			<Select
 				tip="Add a role to be responsible for completing this step."
@@ -58,16 +54,21 @@
 				}}
 			/>
 		{/if}
-	</div>
-	<div class="slot">
-		<Level level="consulted" />
-		{#each how.consulted as consulted}
-			<RoleLink roleID={consulted} />
+		{#each how.responsible as responsible}
+			<RoleLink roleID={responsible} />
 			<Button
-				tip="Remove this role from the consulted list."
-				action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
+				tip="Remove this role from the responsible list."
+				action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
 			>
 		{/each}
+		{#if verbose}
+			is <Level level="responsible" /> for completing this process.
+		{/if}
+	</div>
+	<div class="slot">
+		{#if !verbose}
+			<Level level="consulted" />
+		{/if}
 		{#if options.length > 0}
 			<Select
 				tip="Add a role to be consulted in this step."
@@ -82,16 +83,21 @@
 				}}
 			/>
 		{/if}
-	</div>
-	<div class="slot">
-		<Level level="informed" />
-		{#each how.informed as informed}
-			<RoleLink roleID={informed} />
+		{#each how.consulted as consulted}
+			<RoleLink roleID={consulted} />
 			<Button
-				tip="Remove this role from the informed list"
-				action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
+				tip="Remove this role from the consulted list."
+				action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
 			>
 		{/each}
+		{#if verbose}
+			is <Level level="consulted" /> to complete this process.
+		{/if}
+	</div>
+	<div class="slot">
+		{#if !verbose}
+			<Level level="informed" />
+		{/if}
 		{#if options.length > 0}
 			<Select
 				tip="Add a role to be informed in this step."
@@ -105,6 +111,16 @@
 					}
 				}}
 			/>
+		{/if}
+		{#each how.informed as informed}
+			<RoleLink roleID={informed} />
+			<Button
+				tip="Remove this role from the informed list"
+				action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
+			>
+		{/each}
+		{#if verbose}
+			is <Level level="informed" /> informed about this process and its outcomes.
 		{/if}
 	</div>
 </div>
@@ -121,5 +137,11 @@
 		display: flex;
 		flex-direction: row;
 		gap: var(--padding);
+	}
+
+	.verbose {
+		flex-direction: column;
+		align-items: start;
+		gap: calc(1.5 * var(--spacing));
 	}
 </style>
