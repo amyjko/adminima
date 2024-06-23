@@ -7,14 +7,19 @@
 
 	let editing = false;
 	let revision = '';
+	let saving = false;
 
 	async function save() {
 		if (editing) {
 			if (edit) {
+				saving = true;
 				const error = await edit(revision);
-				editing = false;
+				saving = false;
 				if (error) return;
-				else text = revision;
+				else {
+					text = revision;
+					editing = false;
+				}
 			}
 		} else {
 			editing = true;
@@ -30,6 +35,7 @@
 			<input
 				type="text"
 				bind:value={revision}
+				disabled={saving}
 				style:width={revision.length + 2 + 'ch'}
 				on:keydown={(event) => (event.key === 'Enter' ? save() : undefined)}
 				autofocus
