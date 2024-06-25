@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { locale } from '../types/Locales';
 	import Text from './Text.svelte';
+	import Logo from './Logo';
 
 	export let inline = true;
 
@@ -10,7 +11,7 @@
 	onMount(() => {
 		const timer = setInterval(() => {
 			count = (count + 1) % 5;
-		}, 1000);
+		}, 100);
 		return () => {
 			clearInterval(timer);
 		};
@@ -18,7 +19,7 @@
 </script>
 
 <div class:inline>
-	<span class="dots"><Text text={$locale?.term.loading} /> {'⎋'.repeat(count)}</span>
+	<span class="dots"><Text text={$locale?.term.loading} /> {Logo.repeat(count)}</span>
 </div>
 
 <style>
