@@ -56,12 +56,10 @@
 <div class="markup" class:editable={edit !== undefined}>
 	{#if editing}
 		<div class="editor">
-			<!-- svelte-ignore a11y-autofocus -->
 			<textarea
 				bind:value={revisedText}
 				bind:this={input}
 				{id}
-				autofocus
 				disabled={saving}
 				on:keydown={(e) => {
 					// Shortcut to submit without using button.
@@ -79,7 +77,7 @@
 			>
 		</div>
 	{:else}
-		<div class="blocks" bind:clientHeight={height} on:pointerdown|preventDefault={startEditing}>
+		<div class="blocks" bind:clientHeight={height}>
 			{#if markup === ''}<em>{placeholder}</em>{:else}<BlocksView
 					blocks={parse(markup).blocks}
 				/>{/if}
