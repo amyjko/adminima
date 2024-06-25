@@ -93,13 +93,13 @@ class OrganizationsDB {
 			{ data: suggestions, error: suggestionsError }
 		] = await Promise.all([
 			this.supabase.from('orgs').select().eq('id', orgid).single(),
-			await this.supabase.from('profiles').select(`*`).eq('orgid', orgid),
-			await this.supabase.from('roles').select(`*`).eq('orgid', orgid),
-			await this.supabase.from('assignments').select(`*`).eq('orgid', orgid),
-			await this.supabase.from('processes').select(`*`).eq('orgid', orgid),
-			await this.supabase.from('hows').select(`*`).eq('orgid', orgid),
-			await this.supabase.from('teams').select(`*`).eq('orgid', orgid),
-			await this.supabase.from('suggestions').select(`*`).eq('orgid', orgid)
+			this.supabase.from('profiles').select(`*`).eq('orgid', orgid),
+			this.supabase.from('roles').select(`*`).eq('orgid', orgid),
+			this.supabase.from('assignments').select(`*`).eq('orgid', orgid),
+			this.supabase.from('processes').select(`*`).eq('orgid', orgid),
+			this.supabase.from('hows').select(`*`).eq('orgid', orgid),
+			this.supabase.from('teams').select(`*`).eq('orgid', orgid),
+			this.supabase.from('suggestions').select(`*`).eq('orgid', orgid)
 		]);
 
 		// If we didn't receive any of it, return null.
