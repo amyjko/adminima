@@ -82,39 +82,25 @@ class OrganizationsDB {
 
 	async getPayload(orgid: string): Promise<OrganizationPayload | null> {
 		// Load all of the organization metadata from the database
-		const { data: organization, error: orgError } = await this.supabase
-			.from('orgs')
-			.select()
-			.eq('id', orgid)
-			.single();
-		const { data: profiles, error: profileError } = await this.supabase
-			.from('profiles')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: roles, error: rolesError } = await this.supabase
-			.from('roles')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: assignments, error: assignmentsError } = await this.supabase
-			.from('assignments')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: processes, error: processesError } = await this.supabase
-			.from('processes')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: hows, error: howError } = await this.supabase
-			.from('hows')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: teams, error: teamsError } = await this.supabase
-			.from('teams')
-			.select(`*`)
-			.eq('orgid', orgid);
-		const { data: suggestions, error: suggestionsError } = await this.supabase
-			.from('suggestions')
-			.select(`*`)
-			.eq('orgid', orgid);
+		const [
+			{ data: organization, error: orgError },
+			{ data: profiles, error: profileError },
+			{ data: roles, error: rolesError },
+			{ data: assignments, error: assignmentsError },
+			{ data: processes, error: processesError },
+			{ data: hows, error: howError },
+			{ data: teams, error: teamsError },
+			{ data: suggestions, error: suggestionsError }
+		] = await Promise.all([
+			this.supabase.from('orgs').select().eq('id', orgid).single(),
+			await this.supabase.from('profiles').select(`*`).eq('orgid', orgid),
+			await this.supabase.from('roles').select(`*`).eq('orgid', orgid),
+			await this.supabase.from('assignments').select(`*`).eq('orgid', orgid),
+			await this.supabase.from('processes').select(`*`).eq('orgid', orgid),
+			await this.supabase.from('hows').select(`*`).eq('orgid', orgid),
+			await this.supabase.from('teams').select(`*`).eq('orgid', orgid),
+			await this.supabase.from('suggestions').select(`*`).eq('orgid', orgid)
+		]);
 
 		// If we didn't receive any of it, return null.
 		if (
