@@ -58,7 +58,8 @@
 		<Field
 			label="email"
 			bind:text={email}
-			invalid={(text) => (text.length === 0 || validEmail(email) ? undefined : 'Not a valid email')}
+			invalid={(text) =>
+				text.length === 0 || validEmail(email) ? undefined : 'Not yet a valid email'}
 		/>
 		<Button
 			tip="Email the login code"

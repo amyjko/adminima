@@ -4,8 +4,10 @@
 </script>
 
 <label
-	><span>{label}</span>
-	{#if message}<span class="invalid">{message}</span>{/if}
+	><span
+		>{label}
+		{#if message}<span class="invalid">{message}</span>{/if}</span
+	>
 	<slot /></label
 >
 

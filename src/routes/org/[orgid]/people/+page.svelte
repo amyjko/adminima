@@ -213,7 +213,10 @@
 			<Paragraph>This person is already added.</Paragraph>
 		{/if}
 	</Form>
-	<Tip>This will not send an invitation; they can create an account at any time.</Tip>
+	<Tip
+		>Adding an email address not send an invitation. They can log in at any time to claim and update
+		their profile.</Tip
+	>
 {/if}
 
 <style>
