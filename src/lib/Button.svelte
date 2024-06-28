@@ -41,6 +41,7 @@
 		font-family: var(--font);
 		font-weight: normal;
 		font-size: var(--normal-size);
+		color: var(--foreground);
 		border: none;
 		cursor: pointer;
 		white-space: nowrap;
@@ -50,7 +51,8 @@
 	}
 
 	button:active {
-		transform: scale(0.9, 0.9);
+		transform: scale(0.95, 0.95);
+		color: var(--foreground);
 	}
 
 	.end {
