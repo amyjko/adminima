@@ -17,6 +17,7 @@
 	const db = getDB();
 	const errors = getErrors();
 
+	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 	$: roles = $org.getProfileRoles(profile.id);
 	$: allProcesses = roles.reduce(
 		(processes: ProcessRow[], role) => [...processes, ...$org.getRoleProcesses(role.id)],
@@ -27,7 +28,7 @@
 <Title
 	title={profile.name.length === 0 ? '(no name)' : profile.name}
 	kind="person"
-	edit={$user && profile.personid === $user.id
+	edit={$user && (profile.personid === $user.id || isAdmin)
 		? (text) => queryOrError(errors, $db.updateProfileName(profile, text), "Couldn't update name")
 		: undefined}
 >
@@ -47,7 +48,7 @@
 	placeholder="No bio"
 	edit={$user
 		? (text) =>
-				queryOrError(errors, $db.updateProfileBio(profile, text), "Coudln't update profile bio.")
+				queryOrError(errors, $db.updateProfileBio(profile, text), "Couldn't update profile bio.")
 		: undefined}
 />
 
