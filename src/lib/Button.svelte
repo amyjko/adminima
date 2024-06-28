@@ -39,6 +39,7 @@
 		border-radius: var(--radius);
 		background: var(--chrome);
 		font-family: var(--font);
+		font-weight: normal;
 		font-size: var(--normal-size);
 		border: none;
 		cursor: pointer;
@@ -46,6 +47,10 @@
 		display: inline-flex;
 		align-items: center;
 		min-width: 1em;
+	}
+
+	button:active {
+		transform: scale(0.9, 0.9);
 	}
 
 	.end {
