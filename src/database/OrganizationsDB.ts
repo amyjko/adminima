@@ -941,6 +941,15 @@ class OrganizationsDB {
 		return error;
 	}
 
+	async updateSuggestionProposal(suggestion: SuggestionRow, proposal: string) {
+		if (suggestion.proposal === proposal) return null;
+		const { error } = await this.supabase
+			.from('suggestions')
+			.update({ proposal })
+			.eq('id', suggestion.id);
+		return error;
+	}
+
 	async updateSuggestionStatus(suggestion: SuggestionRow, status: Status, who: PersonID) {
 		if (suggestion.status === status) return null;
 		const { error } = await this.supabase

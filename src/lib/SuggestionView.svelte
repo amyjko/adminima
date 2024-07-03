@@ -21,6 +21,7 @@
 	import Header from './Header.svelte';
 	import FormDialog from './FormDialog.svelte';
 	import Visibility from './Visibility.svelte';
+	import Subheader from './Subheader.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -83,25 +84,41 @@
 
 <Tip>Use suggestions as a place to capture progress on a change and to document decisions.</Tip>
 
-<Paragraph
-	>On <TimeView date={timestampToDate(suggestion.when)} />
-	<PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /> reported:</Paragraph
+<Paragraph>
+	<PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /> reported this problem on <TimeView
+		date={timestampToDate(suggestion.when)}
+	/>.</Paragraph
 >
 
-<Quote
-	><MarkupView
-		markup={suggestion.description}
-		placeholder="No description"
-		edit={editable
-			? (text) =>
-					queryOrError(
-						errors,
-						$db.updateSuggestionDescription(suggestion, text),
-						"Couldn't update suggestion description."
-					)
-			: undefined}
-	/></Quote
->
+<Header>Problem</Header>
+
+<MarkupView
+	markup={suggestion.description}
+	placeholder="No description"
+	edit={editable
+		? (text) =>
+				queryOrError(
+					errors,
+					$db.updateSuggestionDescription(suggestion, text),
+					"Couldn't update suggestion description."
+				)
+		: undefined}
+/>
+
+<Header>Proposal</Header>
+
+<MarkupView
+	markup={suggestion.proposal}
+	placeholder="No proposal"
+	edit={editable
+		? (text) =>
+				queryOrError(
+					errors,
+					$db.updateSuggestionProposal(suggestion, text),
+					"Couldn't update suggestion description."
+				)
+		: undefined}
+/>
 
 <Header>Affected roles</Header>
 <div class="row">
@@ -192,7 +209,7 @@
 	{/if}
 </div>
 
-<Header>Comments</Header>
+<Header>Discussion</Header>
 
 {#await $db.getComments(suggestion.comments)}
 	<Loading />

@@ -450,6 +450,7 @@ export type Database = {
           id: string
           orgid: string
           processes: string[]
+          proposal: string
           roles: string[]
           status: Database["public"]["Enums"]["status"]
           visibility: Database["public"]["Enums"]["visibility"]
@@ -465,6 +466,7 @@ export type Database = {
           id?: string
           orgid: string
           processes?: string[]
+          proposal?: string
           roles?: string[]
           status?: Database["public"]["Enums"]["status"]
           visibility?: Database["public"]["Enums"]["visibility"]
@@ -480,6 +482,7 @@ export type Database = {
           id?: string
           orgid?: string
           processes?: string[]
+          proposal?: string
           roles?: string[]
           status?: Database["public"]["Enums"]["status"]
           visibility?: Database["public"]["Enums"]["visibility"]
@@ -545,14 +548,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_org: {
-        Args: {
-          adminname: string
-          orgname: string
-          invite: string
-        }
-        Returns: string
-      }
+      create_org:
+        | {
+            Args: {
+              adminname: string
+              orgname: string
+              invite: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              adminname: string
+              orgname: string
+              invite: string
+              uid: string
+              email: string
+            }
+            Returns: string
+          }
       getprofileid: {
         Args: {
           _orgid: string
@@ -870,6 +884,10 @@ export type Database = {
           metadata: Json
           updated_at: string
         }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search: {
         Args: {

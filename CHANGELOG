@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## 0.5.2
 
+### Added
+
+- Added proposal field to suggestions, to capture draft changes.
+
 ### Fixed
 
 - Fixed rendering of numbered lists.
