@@ -92,6 +92,7 @@
 		header="New role"
 		explanation="Create a new role for this organization"
 		submit="Create"
+		inactive="Ensure your role name is at least three characters."
 		action={createRole}
 		valid={() => newRole.length >= 3}
 	>
@@ -104,6 +105,7 @@
 		submitTip="Create this new team."
 		header="New team"
 		explanation="Create a new team for this organization"
+		inactive="Make sure your team name is at least three characters."
 		submit="Create"
 		action={createTeam}
 		valid={() => newTeam.length >= 3}

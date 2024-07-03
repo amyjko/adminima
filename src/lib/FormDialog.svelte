@@ -15,9 +15,12 @@
 	export let explanation: string;
 	export let action: () => Promise<boolean>;
 	export let valid: () => boolean;
+	export let inactive: string;
 
 	let show = false;
 	let submitting = false;
+
+	$: active = !submitting && valid();
 </script>
 
 <Button tip={showTip} action={() => (show = true)}>{button}</Button>
@@ -26,7 +29,12 @@
 		<Header>{header}</Header>
 		<Paragraph>{explanation}</Paragraph>
 		<Form
+			{active}
+			{inactive}
 			action={async () => {
+				if (!active) {
+					return;
+				}
 				submitting = true;
 				const result = await action();
 				submitting = false;
@@ -39,7 +47,7 @@
 					tip={submitTip}
 					end
 					submit
-					active={!submitting && valid()}
+					{active}
 					action={() => {}}>{submit}</Button
 				>
 			</Actions>

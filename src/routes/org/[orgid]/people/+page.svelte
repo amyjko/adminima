@@ -46,6 +46,8 @@
 			: undefined);
 		newPersonEmail = '';
 	}
+
+	$: active = !match && !existing && newPersonEmail.length > 0;
 </script>
 
 <Title title="people" kind="person" />
@@ -197,18 +199,13 @@
 {#if isAdmin}
 	<Header>Add people</Header>
 	<Paragraph>Enter the email of the person to add. <em /></Paragraph>
-	<Form action={addEmail}>
+	<Form action={addEmail} {active} inactive="Make sure the email is valid.">
 		<Field
 			label="email"
 			bind:text={newPersonEmail}
 			invalid={(text) => (text.length === 0 || validEmail(text) ? undefined : 'Not a valid email')}
 		/>
-		<Button
-			tip="Add this person to the organization"
-			action={() => {}}
-			active={!match && !existing && newPersonEmail.length > 0}
-			submit>Add</Button
-		>
+		<Button tip="Add this person to the organization" action={() => {}} {active} submit>Add</Button>
 		{#if existing}
 			<Paragraph>This person is already added.</Paragraph>
 		{/if}

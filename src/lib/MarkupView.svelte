@@ -132,7 +132,7 @@
 		border: none;
 		padding: 0;
 		outline: var(--border) solid var(--thickness);
-		min-height: 1em;
+		min-height: 2em;
 		border-radius: var(--radius);
 		width: 100%;
 	}

@@ -13,6 +13,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Fixed rendering of numbered lists.
 - Autogrow markup box height.
+- Better disabled feedback on forms.
 
 ## 0.5.1
 

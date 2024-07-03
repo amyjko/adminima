@@ -46,6 +46,10 @@
 	}
 
 	$: if (browser && $user) goto(`/person/${$user.id}`);
+
+	$: emailActive = !submitting && validEmail(email);
+
+	$: codeActive = !submitting && code.length === 6;
 </script>
 
 <Title title="Login" />
@@ -54,23 +58,20 @@
 	<Paragraph>You're logged in as {$user.email}.</Paragraph>
 {:else if !submitted}
 	<p>We'll email you a one-time code each time you log in.</p>
-	<Form>
+	<Form active={emailActive} inactive="Make sure your email is valid.">
 		<Field
 			label="email"
 			bind:text={email}
 			invalid={(text) =>
 				text.length === 0 || validEmail(email) ? undefined : 'Not yet a valid email'}
 		/>
-		<Button
-			tip="Email the login code"
-			active={!submitting && validEmail(email)}
-			action={sendCode}
-			submit>Send code …</Button
+		<Button tip="Email the login code" active={emailActive} action={sendCode} submit
+			>Send code …</Button
 		>
 	</Form>
 {:else}
 	<Paragraph>We emailed you a code. It might take a minute to arrive.</Paragraph>
-	<Form>
+	<Form active={codeActive} inactive="Make sure your code is 6 digits.">
 		<Field
 			label="code"
 			bind:text={code}
@@ -78,9 +79,7 @@
 			invalid={(text) =>
 				text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
 		/>
-		<Button tip="Send login code" active={!submitting && code.length === 6} action={login} submit
-			>Login …</Button
-		>
+		<Button tip="Send login code" active={codeActive} action={login} submit>Login …</Button>
 	</Form>
 {/if}
 

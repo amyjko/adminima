@@ -46,6 +46,7 @@
 		submitTip={'Create this new organization.'}
 		header="New organization"
 		explanation="Let's get your name and your organization's name."
+		inactive="Make sure your name and organization name are filled in."
 		submit="Create"
 		action={create}
 		valid={() => name.length > 0 && orgName.length > 0}

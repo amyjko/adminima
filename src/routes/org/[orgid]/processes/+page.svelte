@@ -108,6 +108,7 @@
 			header="New process"
 			explanation="Let's give the process a name."
 			submit="Create"
+			inactive="Fill in a title."
 			action={newProcess}
 			valid={() => title.length > 0}
 		>

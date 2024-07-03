@@ -40,9 +40,11 @@
 			newRequestError = "We couldn't create the request.";
 		}
 	}
+
+	$: active = newRequestTitle.length > 0 && newRequestProblem.length > 0;
 </script>
 
-<Form action={createSuggestion}>
+<Form action={createSuggestion} {active} inactive="Add a title and problem.">
 	<MarkupView
 		markup={$organization.getPrompt()}
 		placeholder="What is your suggestion?"
@@ -87,13 +89,7 @@
 			change={(p) => (process = p)}
 		/>
 	</Labeled>
-	<Button
-		tip="Submit the new suggestion."
-		submit
-		end
-		active={newRequestTitle.length > 0 && newRequestProblem.length > 0}
-		action={() => {}}>create</Button
-	>
+	<Button tip="Submit the new suggestion." submit end {active} action={() => {}}>create</Button>
 
 	{#if newRequestError}
 		<Oops text={newRequestError} />

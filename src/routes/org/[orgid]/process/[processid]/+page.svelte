@@ -225,6 +225,7 @@
 			button="Set concern..."
 			header="Set a new concern"
 			explanation="Set a new concern to group processes."
+			inactive="Fill in a concern that doesn't exist yet."
 			valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
 			action={async () => {
 				const error = await queryOrError(

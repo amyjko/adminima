@@ -223,6 +223,7 @@
 				submitTip="Add this comment."
 				header="Comment"
 				explanation="What do you want to say?"
+				inactive="Add some text before you submit."
 				valid={() => newComment.length > 0}
 				action={async () => {
 					const result = await $db.addComment(

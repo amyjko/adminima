@@ -24,12 +24,12 @@
 		class:warning
 		class:end
 		type={submit ? 'submit' : 'button'}
-		disabled={!active}
+		aria-disabled={!active}
 		title={tip}
 		aria-label={tip}
 		on:click={() => {
 			if (warning) confirm = true;
-			else action();
+			else if (active) action();
 		}}><slot /></button
 	>
 {/if}
@@ -42,7 +42,7 @@
 		font-weight: normal;
 		font-size: var(--normal-size);
 		color: var(--foreground);
-		border: none;
+		border: var(--chrome) var(--thickness) solid;
 		cursor: pointer;
 		white-space: nowrap;
 		display: inline-flex;
@@ -64,13 +64,14 @@
 		color: var(--background);
 	}
 
-	button:not(:disabled):hover,
-	button:not(:disabled):focus {
+	button:not([aria-disabled='true']):hover,
+	button:not([aria-disabled='true']):focus {
 		transform: scale(1, 1.1);
 	}
 
-	button:disabled {
-		border-color: transparent;
+	button[aria-disabled='true'] {
+		background: transparent;
+		border: var(--chrome) var(--thickness) solid;
 		cursor: default;
 	}
 
