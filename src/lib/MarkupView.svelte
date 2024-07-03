@@ -26,7 +26,7 @@
 
 	const errors = getErrors();
 
-	$: scrollHeight = input?.scrollHeight ?? height;
+	$: scrollHeight = revisedText ? input?.scrollHeight ?? height : height;
 
 	// Not an edit function, just a text field? Update the text immediately.
 	$: if (edit === undefined) markup = revisedText;
