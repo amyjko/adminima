@@ -43,11 +43,6 @@
 		right: var(--spacing);
 	}
 
-	dialog::backdrop {
-		transition: backdrop-filter;
-		backdrop-filter: blur(10px);
-	}
-
 	.content {
 		background: var(--background);
 		max-width: 40em;
