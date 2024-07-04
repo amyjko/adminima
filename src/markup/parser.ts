@@ -8,39 +8,36 @@ import Paragraph from './Paragraph';
 import type Segment from './Segment';
 
 export function parse(markup: string): Markup {
-	const lines = markup.split('\n\n').map((line) => line.trim());
+	const lines = markup
+		.split('\n')
+		.filter((l) => l.trim() !== '')
+		.map((line) => line.trim());
 
-	return new Markup(lines.map((line) => parseBlock(line)));
-}
+	const blocks: Block[] = [];
+	let index = 0;
+	while (index < lines.length) {
+		const line = lines[index];
+		if (line.startsWith('* ')) {
+			const bulletLines = [];
+			while (index < lines.length && lines[index].startsWith('* ')) {
+				bulletLines.push(parseSegments(lines[index].slice(2)));
+				index++;
+			}
+			blocks.push(new Bullets(bulletLines));
+		} else if (/^[0-9]+\./.test(line)) {
+			const numberedLines = [];
+			while (index < lines.length && /^[0-9]+\./.test(lines[index])) {
+				numberedLines.push(parseSegments(lines[index].slice(line[index].indexOf('.') + 1)));
+				index++;
+			}
+			blocks.push(new Numbered(numberedLines));
+		} else {
+			blocks.push(new Paragraph(parseSegments(line)));
+			index++;
+		}
+	}
 
-export function parseBlock(line: string): Block {
-	return line.startsWith('* ')
-		? parseBullets(line)
-		: /^[0-9]+\./.test(line)
-		? parseNumbers(line)
-		: parseParagraph(line);
-}
-
-export function parseParagraph(line: string): Paragraph {
-	return new Paragraph(parseSegments(line));
-}
-
-export function parseBullets(line: string): Bullets {
-	return new Bullets(
-		line
-			.split('* ')
-			.slice(1)
-			.map((line) => parseSegments(line.trim()))
-	);
-}
-
-export function parseNumbers(line: string): Bullets {
-	return new Numbered(
-		line
-			.split(/[0-9]+. /)
-			.slice(1)
-			.map((line) => parseSegments(line.trim()))
-	);
+	return new Markup(blocks);
 }
 
 export function parseSegments(line: string): Segment[] {
