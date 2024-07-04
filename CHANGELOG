@@ -18,6 +18,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Don't show role drop down if empty.
 - Cleaned up landing page.
 - Don't blur dialog background so that errors are visible.
+- Moved navigation feedback to the header.
 
 ## v0.5.2
 
