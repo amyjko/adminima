@@ -11,6 +11,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Spelled out ARCI words in process.
 - Added implicit responsibility to accountable.
 - Fixed bug in bullet and numbered list parsing.
+- Don't show role drop down if empty.
 
 ## v0.5.2
 

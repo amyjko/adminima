@@ -103,21 +103,21 @@
 						>
 					{/each}
 					{#if isAdmin}
+						{@const remainingRoles = $organization
+							.getRoles()
+							.filter((r) => !roles.some((currentRole) => currentRole.id === r.id))}
 						{#if $organization.getRoles().length === 0}
 							<em>&mdash;</em>
-						{:else}
+						{:else if remainingRoles.length > 0}
 							<Select
 								tip="Choose a role for this person."
 								selection={undefined}
 								fit={false}
 								options={[
 									{ value: undefined, label: '—' },
-									...$organization
-										.getRoles()
-										.filter((r) => !roles.some((currentRole) => currentRole.id === r.id))
-										.map((role) => {
-											return { value: role.id, label: role.title };
-										})
+									...remainingRoles.map((role) => {
+										return { value: role.id, label: role.title };
+									})
 								]}
 								change={async (roleID) => {
 									if (roleID !== undefined)
