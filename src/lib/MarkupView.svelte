@@ -39,12 +39,18 @@
 	async function save() {
 		if (edit) {
 			saving = true;
-			const error = await edit(revisedText);
-			if (error) {
-				addError(errors, 'Unable to save markup.', error);
-			} else {
-				markup = revisedText;
+			try {
+				const error = await edit(revisedText);
+				if (error) {
+					addError(errors, 'Unable to save markup.', error);
+				} else {
+					markup = revisedText;
+					editing = false;
+				}
+			} catch (err) {
 				editing = false;
+				addError(errors, '' + err);
+				saving = false;
 			}
 			saving = false;
 		} else markup = revisedText;
