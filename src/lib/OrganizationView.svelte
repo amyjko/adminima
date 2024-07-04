@@ -107,6 +107,7 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
+		align-items: baseline;
 		gap: var(--spacing);
 	}
 </style>
