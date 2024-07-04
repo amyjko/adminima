@@ -6,6 +6,7 @@ import Markup from './Markup';
 import Numbered from './Numbered';
 import Paragraph from './Paragraph';
 import type Segment from './Segment';
+import Heading from './Heading';
 
 export function parse(markup: string): Markup {
 	const lines = markup
@@ -27,10 +28,15 @@ export function parse(markup: string): Markup {
 		} else if (/^[0-9]+\./.test(line)) {
 			const numberedLines = [];
 			while (index < lines.length && /^[0-9]+\./.test(lines[index])) {
-				numberedLines.push(parseSegments(lines[index].slice(line[index].indexOf('.') + 1)));
+				numberedLines.push(parseSegments(lines[index].slice(lines[index].indexOf('.') + 1)));
 				index++;
 			}
 			blocks.push(new Numbered(numberedLines));
+		} else if (line.startsWith('#')) {
+			let count = 0;
+			while (count < line.length && line.charAt(count) === '#') count++;
+			blocks.push(new Heading(count === 1 ? 1 : 2, parseSegments(line.slice(count))));
+			index++;
 		} else {
 			blocks.push(new Paragraph(parseSegments(line)));
 			index++;

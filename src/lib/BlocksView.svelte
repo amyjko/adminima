@@ -6,6 +6,8 @@
 	import ParagraphView from './ParagraphView.svelte';
 	import BulletsView from './BulletsView.svelte';
 	import NumberedView from './NumberedView.svelte';
+	import Heading from '../markup/Heading';
+	import HeaderView from './HeadingView.svelte';
 
 	export let blocks: Block[];
 </script>
@@ -17,5 +19,7 @@
 		<BulletsView {block} />
 	{:else if block instanceof Numbered}
 		<NumberedView {block} />
+	{:else if block instanceof Heading}
+		<HeaderView {block} />
 	{/if}
 {/each}
