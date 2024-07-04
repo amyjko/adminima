@@ -108,9 +108,10 @@
 	/>
 
 	<Tip
-		>Admins and anyone <Level level="accountable" />ccountable or <Level
+		>Admins and anyone <Level level="accountable" verbose /> or <Level
 			level="responsible"
-		/>esponsible can edit a process. If no one is accountable, anyone in the organization can edit.</Tip
+			verbose
+		/> can edit a process. If no one is accountable, anyone in the organization can edit.</Tip
 	>
 
 	<MarkupView
@@ -134,7 +135,8 @@
 				selection={process.accountable ?? undefined}
 				change={(value) => $db.updateProcessAccountable(process, value ?? null)}
 			/>{:else if process.accountable}<RoleLink roleID={process.accountable} />{:else}No one{/if} is
-		<Level level="accountable" /><strong>ccountable</strong> for this processes outcomes.
+		<Level level="accountable" verbose /> for this processes outcomes{#if how.responsible.length === 0}
+			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible){/if}.
 	</Paragraph>
 
 	<ARCI {how} {process} verbose />
@@ -174,10 +176,10 @@
 
 	<Tip
 		>If you want to provide more detail about how to do this process, you can add a list of tasks
-		and subtasks, and specify for each, who is <Level level="responsible" />esponsible for doing it,
-		and who is <Level level="consulted" />onsulted and <Level level="informed" />nformed about it.
-		Adding this level of detail will let you track progress and make sure everyone knows who is
-		responsible for what.
+		and subtasks, and specify for each, who is <Level level="responsible" verbose /> for doing it, and
+		who is <Level level="consulted" verbose /> and <Level level="informed" verbose /> about it. Adding
+		this level of detail will let you track progress and make sure everyone knows who is responsible
+		for what.
 	</Tip>
 
 	{#if how.how.length === 0}
@@ -264,7 +266,7 @@
 	{#if admin || accountable}
 		<Header>Delete</Header>
 		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
-		<Tip>Only admins and those role <Level level="accountable" />ccountable roles can delete.</Tip>
+		<Tip>Only admins and those role <Level level="accountable" verbose /> roles can delete.</Tip>
 		<Button
 			tip="Permantently delete this process and all of it's steps."
 			action={async () => {

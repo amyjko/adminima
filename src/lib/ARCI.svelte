@@ -62,7 +62,7 @@
 			>
 		{/each}
 		{#if verbose}
-			is <strong><Level level="responsible" />esponsible</strong> for completing this process.
+			is <Level level="responsible" verbose /> for completing this process.
 		{/if}
 	</div>
 	<div class="slot">
@@ -91,7 +91,7 @@
 			>
 		{/each}
 		{#if verbose}
-			is <strong><Level level="consulted" />onsulted</strong> to complete this process.
+			is <Level level="consulted" verbose /> to complete this process.
 		{/if}
 	</div>
 	<div class="slot">
@@ -120,7 +120,7 @@
 			>
 		{/each}
 		{#if verbose}
-			is <strong><Level level="informed" />nformed</strong> about this process and its outcomes.
+			is <Level level="informed" verbose /> about this process and its outcomes.
 		{/if}
 	</div>
 </div>

@@ -1,8 +1,14 @@
 <script lang="ts">
 	export let level: 'accountable' | 'responsible' | 'consulted' | 'informed' | '';
+	export let verbose = false;
 </script>
 
-<span class="level {level}">{level.charAt(0).toUpperCase()}</span>
+<span class="level"
+	><strong
+		><span class="letter {level}">{level.charAt(0).toUpperCase()}</span
+		>{#if verbose}{level.substring(1)}{/if}</strong
+	></span
+>
 
 <style>
 	.level {
