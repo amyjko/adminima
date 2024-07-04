@@ -4,22 +4,10 @@
 
 	export let inline = true;
 	export let text: string = 'Loading...';
-
-	let count = 1;
-	const Increments = 5;
-
-	onMount(() => {
-		const timer = setInterval(() => {
-			count = (count + 1) % Increments;
-		}, 50);
-		return () => {
-			clearInterval(timer);
-		};
-	});
 </script>
 
 <div class:inline>
-	{text} <span class="dots" style:transform="rotate({360 * (count / Increments)}deg)">{Logo}</span>
+	{text} <span class="dots">{Logo}</span>
 </div>
 
 <style>
@@ -41,5 +29,15 @@
 		display: inline-block;
 		text-align: center;
 		transform-origin: center;
+		animation: spin 1s infinite linear;
+	}
+
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>
