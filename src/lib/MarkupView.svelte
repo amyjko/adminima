@@ -6,6 +6,7 @@
 	import { tick } from 'svelte';
 	import { addError, getErrors } from './contexts';
 	import Note from './Note.svelte';
+	import Loading from './Loading.svelte';
 
 	/** The markup's text */
 	export let markup: string;
@@ -32,7 +33,7 @@
 	$: if (edit === undefined) markup = revisedText;
 
 	async function startEditing() {
-		revisedText = markup ?? '';
+		revisedText = markup;
 		editing = true;
 		await tick();
 		input?.focus();
@@ -41,6 +42,7 @@
 	async function save() {
 		if (edit) {
 			saving = true;
+			await new Promise((resolve) => setTimeout(resolve, 2000));
 			const error = await edit(revisedText ?? '');
 			if (error) {
 				addError(errors, 'Unable to save markup.', error);
@@ -84,17 +86,21 @@
 		</div>
 	{/if}
 	{#if edit}<div class="control">
-			<Button
-				tip={editing ? 'Save your edits.' : 'Start editing this markup.'}
-				action={async () => {
-					if (editing) {
-						save();
-					} else {
-						startEditing();
-					}
-				}}
-				>{#if editing}&checkmark;{:else}✎{/if}</Button
-			>
+			{#if saving}<Loading text="" />
+			{:else}
+				<Button
+					tip={editing ? 'Save your edits.' : 'Start editing this markup.'}
+					action={async () => {
+						if (editing) {
+							save();
+						} else {
+							startEditing();
+						}
+					}}
+					active={!saving}
+					>{#if editing}&checkmark;{:else}✎{/if}</Button
+				>
+			{/if}
 		</div>
 	{/if}
 </div>

@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { locale } from '../types/Locales';
-	import Text from './Text.svelte';
 	import Logo from './Logo';
 
 	export let inline = true;
+	export let text: string = 'Loading...';
 
 	let count = 1;
+	const Increments = 5;
 
 	onMount(() => {
 		const timer = setInterval(() => {
-			count = (count + 1) % 5;
-		}, 100);
+			count = (count + 1) % Increments;
+		}, 50);
 		return () => {
 			clearInterval(timer);
 		};
@@ -19,7 +19,7 @@
 </script>
 
 <div class:inline>
-	<span class="dots"><Text text={$locale?.term.loading} /> {Logo.repeat(count)}</span>
+	{text} <span class="dots" style:transform="rotate({360 * (count / Increments)}deg)">{Logo}</span>
 </div>
 
 <style>
@@ -35,5 +35,11 @@
 	.inline {
 		display: inline;
 		width: auto;
+	}
+
+	.dots {
+		display: inline-block;
+		text-align: center;
+		transform-origin: center;
 	}
 </style>
