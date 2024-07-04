@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Improved styling of concerns.
+- Spelled out ARCI words in process.
 
 ## v0.5.2
 

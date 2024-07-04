@@ -22,6 +22,6 @@
 	}
 
 	.informed {
-		color: var(--foreground);
+		color: var(--person);
 	}
 </style>
