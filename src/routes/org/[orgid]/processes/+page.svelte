@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { addError, getDB, getErrors, getOrg, getUser } from '$lib/contexts';
 	import ProcessLink from '$lib/ProcessLink.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Level from '$lib/Level.svelte';
-	import Subheader from '$lib/Subheader.svelte';
 	import type { ProcessRow, RoleRow } from '$database/OrganizationsDB';
 	import type { RoleID } from '$types/Organization';
 	import FormDialog from '$lib/FormDialog.svelte';
@@ -15,6 +13,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import Concern from '$lib/Concern.svelte';
 	import Tip from '$lib/Tip.svelte';
+	import Header from '$lib/Header.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -97,7 +96,8 @@
 {:else}
 	<Tip
 		>These are all of the processes in this organization and which roles are involved in them.
-		Select one to see how it works, who's responsible for it, or to suggest a change.
+		Select one to see how it works, who's responsible for it, or to suggest a change. Change process
+		concerns in each process's page.
 	</Tip>
 
 	{#if $user && $organization.hasPerson($user.id)}
@@ -119,7 +119,7 @@
 	{#each Array.from(new Set($organization
 				.getProcesses()
 				.map((process) => process.concern))) as concern}
-		<Subheader><Concern {concern} /></Subheader>
+		<Header><Concern {concern} /></Header>
 
 		{@const processes = $organization
 			.getProcesses()

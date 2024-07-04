@@ -3,7 +3,13 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
-## 0.5.2
+## 2024-07-11 v0.5.3
+
+### Fixed
+
+- Improved styling of concerns.
+
+## v0.5.2
 
 ### Added
 
@@ -15,13 +21,13 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Autogrow markup box height.
 - Better disabled feedback on forms.
 
-## 0.5.1
+## v0.5.1
 
 ### Added
 
 - Allowed admins to change profile names.
 
-## 0.5.0
+## v0.5.0
 
 ### Added
 
