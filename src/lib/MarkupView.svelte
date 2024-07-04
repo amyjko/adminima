@@ -39,8 +39,7 @@
 	async function save() {
 		if (edit) {
 			saving = true;
-			await new Promise((resolve) => setTimeout(resolve, 2000));
-			const error = await edit(revisedText ?? '');
+			const error = await edit(revisedText);
 			if (error) {
 				addError(errors, 'Unable to save markup.', error);
 			} else {
@@ -87,7 +86,7 @@
 			{:else}
 				<Button
 					tip={editing ? 'Save your edits.' : 'Start editing this markup.'}
-					action={async () => {
+					action={() => {
 						if (editing) {
 							save();
 						} else {
