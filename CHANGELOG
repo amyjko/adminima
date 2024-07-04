@@ -16,6 +16,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Added implicit responsibility to accountable.
 - Fixed bug in bullet and numbered list parsing.
 - Don't show role drop down if empty.
+- Cleaned up landing page.
 
 ## v0.5.2
 
