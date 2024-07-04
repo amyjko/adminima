@@ -29,9 +29,6 @@
 
 	$: scrollHeight = revisedText ? input?.scrollHeight ?? height : height;
 
-	// Not an edit function, just a text field? Update the text immediately.
-	$: if (edit === undefined) markup = revisedText;
-
 	async function startEditing() {
 		revisedText = markup;
 		editing = true;
@@ -51,7 +48,7 @@
 				editing = false;
 			}
 			saving = false;
-		}
+		} else markup = revisedText;
 	}
 </script>
 
