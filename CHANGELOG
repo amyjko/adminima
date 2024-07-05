@@ -20,6 +20,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Don't blur dialog background so that errors are visible.
 - Moved navigation feedback to the header.
 - Better markup saving feedback.
+- Added poll interval of 10 minutes to force reload if updated.
 
 ## v0.5.2
 

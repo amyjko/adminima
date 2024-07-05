@@ -1,5 +1,5 @@
 <script>
-	import { navigating } from '$app/stores';
+	import { navigating, updated } from '$app/stores';
 	import Link from './Link.svelte';
 	import Loading from './Loading.svelte';
 	import Logo from './Logo';
@@ -16,9 +16,9 @@
 			>{/if}</span
 	>
 </div>
-<div class="page">
+<main class="page" data-sveltekit-reload={$updated ? '' : 'off'}>
 	<slot />
-</div>
+</main>
 
 <style>
 	.page {

@@ -12,6 +12,9 @@ const config = {
 		alias: {
 			$types: 'src/types',
 			$database: 'src/database'
+		},
+		version: {
+			pollInterval: 600
 		}
 	}
 };
