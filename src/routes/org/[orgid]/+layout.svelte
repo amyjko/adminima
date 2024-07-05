@@ -16,12 +16,12 @@
 	$: if (payload) setContext(OrgSymbol, org);
 	onMount(() => {
 		// When this layout mounts, listen to realtime changes on the organization payload.
-		const orgid = $page.params.orgid;
-		$db.subscribe(orgid);
+		const orgid = data.payload?.organization.id;
+		if (orgid) $db.subscribe(orgid);
 
 		return () => {
 			// When this layout unmounts, unsubscribe from the organization payload.
-			$db.unsubscribe(orgid);
+			if (orgid) $db.unsubscribe(orgid);
 		};
 	});
 </script>
