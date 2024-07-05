@@ -11,6 +11,7 @@
 	import FormDialog from '$lib/FormDialog.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import ProfileLink from '$lib/ProfileLink.svelte';
+	import { resolveRoute } from '$app/paths';
 
 	const org = getOrg();
 	const db = getDB();
@@ -60,13 +61,17 @@
 		.getTeams()
 		.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
 		<Header><TeamLink id={team.id} /></Header>
-		<Flow>
-			{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
-				<RoleLink roleID={role.id} />
-			{:else}
-				<Notice>This team has no roles.</Notice>
-			{/each}
-		</Flow>
+		{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
+			<Flow>
+				<RoleLink roleID={role.id} />{#each $org.getRoleProfiles(role.id) as profile}
+					<ProfileLink {profile} />
+				{:else}
+					&mdash;
+				{/each}
+			</Flow>
+		{:else}
+			<Notice>This team has no roles.</Notice>
+		{/each}
 	{/each}
 
 	{#if teamless.length > 0}
@@ -76,6 +81,8 @@
 				<RoleLink roleID={role.id} />
 				{#each $org.getRoleProfiles(role.id) as profile}
 					<ProfileLink {profile} />
+				{:else}
+					&mdash;
 				{/each}
 			</Flow>
 		{/each}
@@ -83,7 +90,7 @@
 {/if}
 
 {#if $user && $org.hasAdminPerson($user.id)}
-	<Header>Admins</Header>
+	<hr />
 
 	<FormDialog
 		button="Create role …"
