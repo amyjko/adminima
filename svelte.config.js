@@ -14,7 +14,7 @@ const config = {
 			$database: 'src/database'
 		},
 		version: {
-			pollInterval: 600
+			pollInterval: 600000
 		}
 	}
 };
