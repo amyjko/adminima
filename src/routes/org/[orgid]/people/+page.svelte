@@ -114,7 +114,7 @@
 								selection={undefined}
 								fit={false}
 								options={[
-									{ value: undefined, label: '—' },
+									{ value: undefined, label: '▼' },
 									...remainingRoles.map((role) => {
 										return { value: role.id, label: role.title };
 									})
