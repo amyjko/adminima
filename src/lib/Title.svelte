@@ -59,8 +59,7 @@
 
 <style>
 	.title {
-		width: calc(100%);
-		margin-left: calc(-2 * var(--spacing));
+		width: calc(100% - (4 * var(--spacing)));
 		padding: calc(2 * var(--spacing));
 		/* position: sticky;
 		top: 0; */
@@ -77,6 +76,7 @@
 		flex-direction: row;
 		justify-items: baseline;
 		gap: var(--padding);
+		word-break: break-word;
 	}
 
 	.kind {

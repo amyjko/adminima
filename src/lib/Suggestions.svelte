@@ -5,6 +5,7 @@
 	import PersonLink from './ProfileLink.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
+	import Table from './Table.svelte';
 
 	export let suggestions: SuggestionRow[];
 
@@ -13,7 +14,7 @@
 </script>
 
 {#if suggestions.length > 0}
-	<table>
+	<Table>
 		<thead>
 			<tr>
 				<th>reporter</th>
@@ -33,14 +34,7 @@
 				</tr>
 			{/each}
 		</tbody>
-	</table>
+	</Table>
 {:else}
 	<slot />
 {/if}
-
-<style>
-	table {
-		border-collapse: collapse;
-		padding: var(--padding);
-	}
-</style>

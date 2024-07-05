@@ -224,6 +224,8 @@
 	:global(table) {
 		border-collapse: collapse;
 		border-spacing: 0;
+		max-width: 100%;
+		overflow-x: scroll;
 	}
 
 	:global(strong) {

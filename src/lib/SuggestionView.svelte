@@ -22,6 +22,7 @@
 	import FormDialog from './FormDialog.svelte';
 	import Visibility from './Visibility.svelte';
 	import Subheader from './Subheader.svelte';
+	import Table from './Table.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -250,7 +251,7 @@
 			>
 		{/if}
 
-		<table>
+		<Table>
 			<tbody>
 				{#each comments.data.reverse() as comment}
 					<CommentView
@@ -261,7 +262,7 @@
 					No changes yet.
 				{/each}
 			</tbody>
-		</table>
+		</Table>
 	{:else}
 		Unable to load history.
 	{/if}

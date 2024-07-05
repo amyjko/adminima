@@ -7,6 +7,7 @@
 	import Header from './Header.svelte';
 	import Loading from './Loading.svelte';
 	import { getDB } from './contexts';
+	import Table from './Table.svelte';
 
 	export let comments: CommentID[];
 	export let remove: (id: CommentID) => Promise<PostgrestError | null>;
@@ -24,7 +25,7 @@
 			<Loading />
 		{:then comments}
 			{#if comments.data}
-				<table>
+				<Table>
 					<tbody>
 						{#each comments.data.reverse() as comment}
 							<CommentView {comment} {remove} />
@@ -32,7 +33,7 @@
 							No changes yet.
 						{/each}
 					</tbody>
-				</table>
+				</Table>
 			{:else}
 				Unable to load history.
 			{/if}

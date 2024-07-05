@@ -7,8 +7,8 @@
 	const user = getUser();
 	const org = getOrg();
 
-	$: isMember = $user && $org.hasPerson($user.id);
-	$: isAdmin = $user && $org.hasAdminPerson($user.id);
+	$: isMember = $user && $org?.hasPerson($user.id);
+	$: isAdmin = $user && $org?.hasAdminPerson($user.id);
 </script>
 
 {#if (admin === false && member === false) || (admin && isAdmin) || (member && isMember)}

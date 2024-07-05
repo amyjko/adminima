@@ -16,6 +16,7 @@
 	import Link from '$lib/Link.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import Header from '$lib/Header.svelte';
+	import Table from '$lib/Table.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -66,7 +67,7 @@
 	>
 {/if}
 
-<table>
+<Table>
 	<thead>
 		<tr>
 			<th style:width="20%">person</th>
@@ -194,7 +195,7 @@
 			</tr>
 		{/each}
 	</tbody>
-</table>
+</Table>
 
 {#if isAdmin}
 	<Header>Add people</Header>

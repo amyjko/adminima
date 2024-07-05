@@ -14,6 +14,7 @@
 	import Concern from '$lib/Concern.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import Header from '$lib/Header.svelte';
+	import Table from '$lib/Table.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -140,7 +141,7 @@
 		{@const roles = getRolesByAccountability(processes)}
 
 		<div class="processes">
-			<table>
+			<Table>
 				<thead>
 					<th />{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
 							><RoleLink roleID={role.id} /></th
@@ -168,7 +169,7 @@
 						</tr>
 					{/each}
 				</tbody>
-			</table>
+			</Table>
 		</div>
 	{:else}
 		<Notice>This organization has no processes.</Notice>

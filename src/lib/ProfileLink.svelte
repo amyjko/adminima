@@ -11,7 +11,7 @@
 </script>
 
 {#if profile}
-	<Link to="/org/{$org.getPath()}/person/{profile.id}" kind="person"
+	<Link to="/org/{$org?.getPath() ?? profile.orgid}/person/{profile.id}" kind="person"
 		>{profile.name === '' ? profile.email : short ? profile.name.split(' ')[0] : profile.name}</Link
 	>
 {:else}

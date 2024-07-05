@@ -13,6 +13,7 @@
 	import NewOrganization from '$lib/NewOrganization.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import Link from '$lib/Link.svelte';
+	import Table from '$lib/Table.svelte';
 
 	let user = getUser();
 	let db = getDB();
@@ -37,7 +38,7 @@
 
 		{#if orgs.data.length}
 			<Paragraph>Here are the organizations you're part of and your profiles for each:</Paragraph>
-			<table>
+			<Table>
 				<tr>
 					<th>Organization</th>
 					<th>Profile</th>
@@ -52,7 +53,7 @@
 						</td>
 					</tr>
 				{/each}
-			</table>
+			</Table>
 		{:else}
 			<Notice
 				>You're not part of any organizations.

@@ -22,6 +22,7 @@
 
 <style>
 	.page {
+		width: calc(100vw - 4 * var(--spacing));
 		padding: calc(2 * var(--spacing));
 		padding-top: 0;
 		display: flex;
