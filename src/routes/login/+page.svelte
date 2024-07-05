@@ -45,6 +45,7 @@
 		submitting = false;
 	}
 
+	// Already signed in? Go to the profile.
 	$: if (browser && $user) goto(`/person/${$user.id}`);
 
 	$: emailActive = !submitting && validEmail(email);
@@ -57,7 +58,7 @@
 {#if $user}
 	<Paragraph>You're logged in as {$user.email}.</Paragraph>
 {:else if !submitted}
-	<p>We'll email you a one-time code each time you log in.</p>
+	<Paragraph>We'll email you a one-time code each time you log in.</Paragraph>
 	<Form
 		active={emailActive}
 		inactiveMessage={submitting ? undefined : 'Make sure your email is valid.'}

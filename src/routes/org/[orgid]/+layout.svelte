@@ -1,14 +1,15 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
 	import Title from '$lib/Title.svelte';
-	import { OrgSymbol, getDB } from '$lib/contexts';
+	import { OrgSymbol, getDB, getUser } from '$lib/contexts';
 	import { onMount, setContext } from 'svelte';
 
 	export let data;
 
-	$: ({ payload, user } = data);
+	$: ({ payload } = data);
 
 	const db = getDB();
+	const user = getUser();
 
 	// Save the payload in the database cache.
 	$: org = data.payload ? $db.updateOrg(data.payload) : undefined;
@@ -26,7 +27,7 @@
 </script>
 
 {#if $org}
-	{#if $org.getVisibility() === 'public' || (user && (($org.getVisibility() === 'org' && $org.hasPerson(user.id)) || ($org.getVisibility() === 'admin' && $org.hasAdminPerson(user.id))))}
+	{#if $org.getVisibility() === 'public' || ($user && (($org.getVisibility() === 'org' && $org.hasPerson($user.id)) || ($org.getVisibility() === 'admin' && $org.hasAdminPerson($user.id))))}
 		<slot />
 	{:else}
 		<Title title="Oops" kind="organization" />
