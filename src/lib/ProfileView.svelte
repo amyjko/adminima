@@ -35,7 +35,7 @@
 	{profile.email}
 </Title>
 
-<Tip>People have unique profiles for each organization they are in.</Tip>
+<Tip admin>People have unique profiles for each organization they are in.</Tip>
 
 {#if profile.personid === null}
 	<Notice

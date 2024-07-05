@@ -14,7 +14,6 @@
 	import Button from './Button.svelte';
 	import Header from './Header.svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	export let organization: Organization;
 
@@ -112,7 +111,7 @@
 	<hr />
 
 	<Header>Path</Header>
-	<Tip
+	<Tip admin
 		>Want to use a custom URL for this organization? Set a path. You can override an existing path,
 		and previous links will continue to work.</Tip
 	>

@@ -35,7 +35,7 @@
 			: undefined}
 	/>
 
-	<Tip
+	<Tip admin
 		>Teams are helpful ways of organizing roles. <strong>Admins</strong> can update their names and which
 		roles are in them.</Tip
 	>
@@ -64,7 +64,7 @@
 
 {#if isAdmin}
 	<Header>Delete</Header>
-	<Tip>Deleting this team will not delete the roles on the team.</Tip>
+	<Tip admin>Deleting this team will not delete the roles on the team.</Tip>
 	<Button
 		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {

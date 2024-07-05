@@ -1,10 +1,22 @@
 <script lang="ts">
+	import { getOrg, getUser } from './contexts';
+
+	export let admin = false;
+	export let member = false;
+
+	const user = getUser();
+	const org = getOrg();
+
+	$: isMember = $user && $org.hasPerson($user.id);
+	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 </script>
 
-<div class="tip">
-	<div>💡</div>
-	<div><slot /></div>
-</div>
+{#if (admin === false && member === false) || (admin && isAdmin) || (member && isMember)}
+	<div class="tip">
+		<div>💡</div>
+		<div><slot /></div>
+	</div>
+{/if}
 
 <style>
 	.tip {

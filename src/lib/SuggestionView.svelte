@@ -82,7 +82,9 @@
 	{/if}
 </Title>
 
-<Tip>Use suggestions as a place to capture progress on a change and to document decisions.</Tip>
+<Tip admin
+	>Use suggestions as a place to capture progress on a change and to document decisions.</Tip
+>
 
 <Paragraph>
 	<PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /> reported this problem on <TimeView

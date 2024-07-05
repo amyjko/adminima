@@ -68,7 +68,7 @@
 		/>{/if}
 </Title>
 
-<Tip
+<Tip admin
 	>This is a role in the organization. <strong>Admins</strong> can update it's description and team.</Tip
 >
 
@@ -120,7 +120,7 @@
 
 <Header>Delete</Header>
 {#if isAdmin}
-	<Tip
+	<Tip admin
 		>Is this role obsolete? You can delete it, but it is permanent. All of the processes for this
 		role will remain, in case you want to assign them to a different role.</Tip
 	>

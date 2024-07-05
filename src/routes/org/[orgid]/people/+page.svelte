@@ -52,7 +52,7 @@
 
 <Title title="people" kind="person" />
 
-<Tip
+<Tip member
 	>This is the list of people in this organization. <strong>Admins</strong> have permission to add and
 	remove people from the organization, promote or demote people from admin status, and create and delete
 	roles. Select a person to see the roles they have.</Tip
@@ -210,7 +210,7 @@
 			<Paragraph>This person is already added.</Paragraph>
 		{/if}
 	</Form>
-	<Tip
+	<Tip admin
 		>Adding an email address not send an invitation. They can log in at any time to claim and update
 		their profile.</Tip
 	>

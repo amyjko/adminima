@@ -107,7 +107,7 @@
 			: undefined}
 	/>
 
-	<Tip
+	<Tip member
 		>Admins and anyone <Level level="accountable" verbose /> or <Level
 			level="responsible"
 			verbose
@@ -141,7 +141,7 @@
 
 	<ARCI {how} {process} verbose />
 
-	<Tip
+	<Tip member
 		>This determines who can see this process. You can also control the visibility of individual
 		steps below.</Tip
 	>
@@ -174,7 +174,7 @@
 
 	<Header>How</Header>
 
-	<Tip
+	<Tip member
 		>If you want to provide more detail about how to do this process, you can add a list of tasks
 		and subtasks, and specify for each, who is <Level level="responsible" verbose /> for doing it, and
 		who is <Level level="consulted" verbose /> and <Level level="informed" verbose /> about it. Adding
@@ -248,7 +248,7 @@
 
 	<SuggestionLink id={null} process={process.id} />
 
-	<Tip>These are suggestions people have made that might affect this process.</Tip>
+	<Tip member>These are suggestions people have made that might affect this process.</Tip>
 	<Suggestions
 		suggestions={$org
 			.getSuggestions()
@@ -266,7 +266,9 @@
 	{#if admin || accountable}
 		<Header>Delete</Header>
 		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
-		<Tip>Only admins and those role <Level level="accountable" verbose /> roles can delete.</Tip>
+		<Tip admin
+			>Only admins and those role <Level level="accountable" verbose /> roles can delete.</Tip
+		>
 		<Button
 			tip="Permantently delete this process and all of it's steps."
 			action={async () => {

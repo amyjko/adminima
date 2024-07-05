@@ -94,7 +94,7 @@
 {#if ($user === null && $organization.getVisibility() !== 'public') || ($user !== null && !$organization.hasPerson($user.id))}
 	<Oops text="This organization's processes are not public." />
 {:else}
-	<Tip
+	<Tip member
 		>These are all of the processes in this organization and which roles are involved in them.
 		Select one to see how it works, who's responsible for it, or to suggest a change. Change process
 		concerns in each process's page.
