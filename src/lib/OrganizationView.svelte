@@ -14,6 +14,7 @@
 	import Button from './Button.svelte';
 	import Header from './Header.svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	export let organization: Organization;
 
@@ -137,8 +138,13 @@
 
 	{#if paths.length > 0}
 		<Paragraph
-			>Existing paths: <code>https://adminima.app/org/[{paths.join(', ')}]</code>
-		</Paragraph>
+			>Current path: <Link to="https://adminima.app/org/{paths[0]}"
+				>https://adminima.app/org/{paths[0]}</Link
+			></Paragraph
+		>
+		{#if paths.length > 1}<Paragraph
+				>Previous paths: <code>{paths.slice(1).join(', ')}</code></Paragraph
+			>{/if}
 	{/if}
 {/if}
 

@@ -3,7 +3,6 @@
 	import Title from '$lib/Title.svelte';
 	import { OrgSymbol, getDB } from '$lib/contexts';
 	import { onMount, setContext } from 'svelte';
-	import { page } from '$app/stores';
 
 	export let data;
 
