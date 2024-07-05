@@ -226,6 +226,7 @@
 		display: flex;
 		flex-direction: row;
 		gap: var(--padding);
+		align-items: baseline;
 	}
 
 	.roles {
