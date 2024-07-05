@@ -134,9 +134,7 @@
 	}
 
 	.slot {
-		display: flex;
-		flex-direction: row;
-		gap: var(--padding);
+		display: inline;
 	}
 
 	.verbose {
