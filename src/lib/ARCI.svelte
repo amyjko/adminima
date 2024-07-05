@@ -15,7 +15,7 @@
 	const db = getDB();
 
 	$: options = [
-		{ value: undefined, label: '—' },
+		{ value: undefined, label: '▼' },
 		...$org
 			.getRoles()
 			.filter(
