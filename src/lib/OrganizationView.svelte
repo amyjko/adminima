@@ -120,13 +120,13 @@
 		active={!submitting && validPath}
 		inactiveMessage={submitting ? undefined : 'Paths must be one or more a-z or A-Z characters.'}
 		action={async () => {
-			const result = await $db.addOrgPath(organization, newPath);
+			const available = await $db.pathIsAvailable(newPath);
 
-			if (result === null) {
-				// goto(`/org/${newPath}`);
+			if (available) {
+				await queryOrError(errors, $db.addOrgPath(organization, newPath), "Couldn't update path.");
+				goto(`/org/${newPath}`);
 				newPath = '';
-			} else if (typeof result === 'string') addError(errors, result);
-			else addError(errors, result.message, result);
+			} else addError(errors, 'This path is not available');
 			submitting = false;
 		}}
 		><Field label="path" bind:text={newPath} /><code>https://adminima.app/org/{newPath}</code

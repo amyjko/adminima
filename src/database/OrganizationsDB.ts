@@ -390,15 +390,7 @@ class OrganizationsDB {
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
-	async addOrgPath(org: Organization, path: string): Promise<PostgrestError | null | string> {
-		// First, ensure the path isn't already taken by another org.
-		const { data: existingOrg, error: existingError } = await this.supabase
-			.from('orgs')
-			.select()
-			.contains('paths', [path]);
-		if (existingError) return existingError;
-		if (existingOrg && existingOrg.length > 0) return `The path ${path} is already in use.`;
-
+	async addOrgPath(org: Organization, path: string): Promise<PostgrestError | null> {
 		const { error } = await this.supabase
 			.from('orgs')
 			.update({ paths: [path, ...org.getPaths()] })
@@ -756,6 +748,15 @@ class OrganizationsDB {
 		});
 		if (data) return data;
 		else return error;
+	}
+
+	async pathIsAvailable(path: string): Promise<boolean> {
+		const { data, error } = await this.supabase.rpc('path_available', {
+			_path: path
+		});
+		if (error) return false;
+		if (data) return data as boolean;
+		else return false;
 	}
 
 	async getPersonsOrganizations(personid: PersonID) {
