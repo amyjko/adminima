@@ -271,10 +271,9 @@
 			tip="Permantently delete this process and all of it's steps."
 			action={async () => {
 				try {
-					const org = process.orgid;
 					const { error } = await $db.deleteProcess(process.id);
 					if (error) addError(errors, "Couldn't delete this", error);
-					else goto(`/org/${org}/processes`);
+					else goto(`/org/${$org.getPath()}/processes`);
 				} catch (_) {
 					deleteError = "We couldn't delete this";
 				}

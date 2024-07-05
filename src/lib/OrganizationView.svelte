@@ -68,25 +68,25 @@
 		<div class="links">
 			<span class="link">
 				<strong>{organization.getRoles().length}</strong>
-				<Link kind="role" to="/org/{organization.getID()}/roles"
+				<Link kind="role" to="/org/{organization.getPath()}/roles"
 					>Role{organization.getRoles().length === 1 ? '' : 's'}</Link
 				>
 			</span>
 			<span class="link">
 				<strong>{organization.getProfiles().length} </strong>
-				<Link kind="person" to="/org/{organization.getID()}/people"
+				<Link kind="person" to="/org/{organization.getPath()}/people"
 					>{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
 				>
 			</span>
 			<span class="link">
 				<strong>{organization.getProcesses().length}</strong>
-				<Link kind="process" to="/org/{organization.getID()}/processes"
+				<Link kind="process" to="/org/{organization.getPath()}/processes"
 					>Process{organization.getProcesses().length !== 1 ? 'es' : ''}</Link
 				>
 			</span>
 			<span class="link">
 				<strong>{organization.getSuggestions().length}</strong>
-				<Link kind="suggestion" to="/org/{organization.getID()}/suggestions"
+				<Link kind="suggestion" to="/org/{organization.getPath()}/suggestions"
 					>Suggestion{organization.getSuggestions().length !== 1 ? 's' : ''}</Link
 				>
 			</span>

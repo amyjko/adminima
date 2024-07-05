@@ -33,15 +33,15 @@
 </svelte:head>
 
 <div class="title {kind}">
-	{#if $org && $page.url.pathname !== `/org/${$org.getID()}`}
+	{#if $org && $page.url.pathname !== `/org/${$org.getPath()}`}
 		<div class="breadcrumbs">
 			<OrganizationLink id={$org.getPaths()[0] ?? $org.getID()} name={$org.getName()} />
 			{#if $page.url.pathname.includes('/role/')} &gt;<RoleLink roleID={null} /> {/if}
 			{#if $page.url.pathname.includes('/process/')} &gt;<ProcessLink processID={null} /> {/if}
 			{#if $page.url.pathname.includes('/suggestion/')}
-				&gt;<Link to="/org/{$org.getID()}/suggestions" kind="suggestion">Suggestions</Link>{/if}
+				&gt;<Link to="/org/{$org.getPath()}/suggestions" kind="suggestion">Suggestions</Link>{/if}
 			{#if $page.url.pathname.includes('/person/')}
-				&gt; <Link to="/org/{$org.getID()}/people" kind="person">People</Link>{/if}
+				&gt; <Link to="/org/{$org.getPath()}/people" kind="person">People</Link>{/if}
 		</div>
 	{/if}
 	{#if kind}

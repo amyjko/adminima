@@ -35,7 +35,7 @@
 				role ? [role] : []
 			);
 			if (error) addError(errors, "Couldn't create the suggestion.", error);
-			else if (suggestion) goto(`/org/${$organization.getID()}/suggestion/${suggestion.id}`);
+			else if (suggestion) goto(`/org/${$organization.getPath()}/suggestion/${suggestion.id}`);
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}

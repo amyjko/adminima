@@ -13,7 +13,7 @@
 
 {#if process === null}<Oops inline text={(locale) => locale.error.noProcess} />{:else}<Link
 		to={processID
-			? `/org/${$organization.getID()}/process/${processID}`
-			: `/org/${$organization.getID()}/processes`}
+			? `/org/${$organization.getPath()}/process/${processID}`
+			: `/org/${$organization.getPath()}/processes`}
 		kind="process">{process ? process.title : 'Processes'}</Link
 	>{/if}

@@ -1,13 +1,16 @@
 <script lang="ts">
 	import type { ProcessRow } from '$database/OrganizationsDB';
+	import { getOrg } from './contexts';
 	import Link from './Link.svelte';
 
 	export let process: ProcessRow;
 	export let left: number | undefined = undefined;
+
+	const org = getOrg();
 </script>
 
 <div class="process" style:left="{left}px">
-	<Link bland to="/org/{process.orgid}/process/{process.id}">{process.title}</Link>
+	<Link bland to="/org/{$org.getPath()}/process/{process.id}">{process.title}</Link>
 </div>
 
 <style>

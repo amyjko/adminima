@@ -270,10 +270,9 @@
 	<Button
 		tip="Permanently delete this suggestion."
 		action={async () => {
-			const org = suggestion.orgid;
 			const { error } = await $db.deleteSuggestion(suggestion.id);
 			if (error) addError(errors, "Couldn't delete this suggestion.", error);
-			else goto(`/org/${org}`);
+			else goto(`/org/${$org.getPath()}`);
 		}}
 		warning>{Delete} Delete this suggestion</Button
 	>

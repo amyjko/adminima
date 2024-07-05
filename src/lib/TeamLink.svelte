@@ -11,6 +11,6 @@
 </script>
 
 {#if team === null}<Oops inline text={(locale) => locale.error.noTeam} />{:else}<Link
-		to="/org/{$org.getID()}/team/{id}"
+		to="/org/{$org.getPath()}/team/{id}"
 		kind="team">{team.name}</Link
 	>{/if}

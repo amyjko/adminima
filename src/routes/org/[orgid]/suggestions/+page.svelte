@@ -11,7 +11,7 @@
 
 <Title title="Suggestions" kind="suggestion" />
 
-<Link to="/org/{$organization.getID()}/suggestions/new">Make a suggestion…</Link>
+<Link to="/org/{$organization.getPath()}/suggestions/new">Make a suggestion…</Link>
 
 <Tip>These are suggestions people have made to change this organization</Tip>
 <Suggestions suggestions={$organization.getSuggestions()}

@@ -83,7 +83,7 @@
 			addError(errors, "Couldn't add new process", error);
 			return false;
 		} else {
-			goto(`/org/${$organization.getID()}/process/${id}`);
+			goto(`/org/${$organization.getPath()}/process/${id}`);
 			return true;
 		}
 	}

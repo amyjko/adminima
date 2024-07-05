@@ -23,7 +23,7 @@
 	async function createRole() {
 		const { data, error } = await $db.createRole($org.getID(), newRole);
 		if (data) {
-			goto(`/org/${$org.getID()}/role/${data.id}`);
+			goto(`/org/${$org.getPath()}/role/${data.id}`);
 			return true;
 		} else if (error) {
 			addError(errors, "We couldn't create the new role.", error);
@@ -39,7 +39,7 @@
 			addError(errors, "We couldn't create the new team.", error);
 			return false;
 		} else if (data) {
-			goto(`/org/${$org.getID()}/team/${data.id}`);
+			goto(`/org/${$org.getPath()}/team/${data.id}`);
 			return true;
 		}
 		return false;

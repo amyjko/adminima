@@ -15,7 +15,7 @@
 
 {#if id !== null && change === null}<Oops inline text="Unknown suggestion" />{:else}<Link
 		kind="suggestion"
-		to="/org/{$org.getID()}/{id ? 'suggestion' : 'suggestions'}/{id ?? 'new'}{role
+		to="/org/{$org.getPath()}/{id ? 'suggestion' : 'suggestions'}/{id ?? 'new'}{role
 			? `?role=${role}`
 			: ''}{process ? `?process=${process}` : ''}"
 		>{change ? change.what : 'Suggest a change...'}</Link
