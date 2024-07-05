@@ -145,7 +145,7 @@
 		<Select
 			tip="Add a role that is affected by this suggestion."
 			options={[
-				{ value: undefined, label: '—' },
+				{ value: undefined, label: '▼' },
 				...unselectedRoles.map((role) => {
 					return { value: role.id, label: role.title };
 				})
@@ -188,7 +188,7 @@
 		<Select
 			tip="Add a process that is affected by this suggestion."
 			options={[
-				{ value: undefined, label: '—' },
+				{ value: undefined, label: '▼' },
 				...unselectedProcesses.map((process) => {
 					return { value: process.id, label: process.title };
 				})
