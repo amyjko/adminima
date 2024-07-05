@@ -12,17 +12,19 @@ const supabase: Handle = async ({ event, resolve }) => {
 	 */
 	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		cookies: {
-			get: (key) => event.cookies.get(key),
-			/**
-			 * SvelteKit's cookies API requires `path` to be explicitly set in
-			 * the cookie options. Setting `path` to `/` replicates previous/
-			 * standard behavior.
-			 */
-			set: (key, value, options) => {
-				event.cookies.set(key, value, { ...options, path: '/' });
+			getAll() {
+				return event.cookies.getAll();
 			},
-			remove: (key, options) => {
-				event.cookies.delete(key, { ...options, path: '/' });
+			setAll(cookiesToSet) {
+				/**
+				 * Note: You have to add the `path` variable to the
+				 * set and remove method due to sveltekit's cookie API
+				 * requiring this to be set, setting the path to an empty string
+				 * will replicate previous/standard behavior (https://kit.svelte.dev/docs/types#public-types-cookies)
+				 */
+				cookiesToSet.forEach(({ name, value, options }) =>
+					event.cookies.set(name, value, { ...options, path: '/' })
+				);
 			}
 		}
 	});
@@ -37,7 +39,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 			data: { session }
 		} = await event.locals.supabase.auth.getSession();
 		if (!session) {
-			return { user: null };
+			return { session: null, user: null };
 		}
 
 		const {
@@ -46,18 +48,14 @@ const supabase: Handle = async ({ event, resolve }) => {
 		} = await event.locals.supabase.auth.getUser();
 		if (error) {
 			// JWT validation has failed
-			return { user: null };
+			return { session: null, user: null };
 		}
 
-		return { user };
+		return { session, user };
 	};
 
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {
-			/**
-			 * Supabase libraries use the `content-range` and `x-supabase-api-version`
-			 * headers, so we need to tell SvelteKit to pass it through.
-			 */
 			return name === 'content-range' || name === 'x-supabase-api-version';
 		}
 	});

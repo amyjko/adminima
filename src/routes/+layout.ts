@@ -1,5 +1,5 @@
 import { type Locale } from '$types/Locales';
-import { createBrowserClient, createServerClient, isBrowser, parse } from '@supabase/ssr';
+import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_API_URL } from '$env/static/public';
 
 /** @type {import('./$types').LayoutLoad} */
@@ -17,12 +17,6 @@ export async function load({ fetch, data, depends }) {
 		? createBrowserClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {
 				global: {
 					fetch
-				},
-				cookies: {
-					get(key) {
-						const cookie = parse(document.cookie);
-						return cookie[key];
-					}
 				}
 		  })
 		: createServerClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {
@@ -30,8 +24,8 @@ export async function load({ fetch, data, depends }) {
 					fetch
 				},
 				cookies: {
-					get() {
-						return JSON.stringify(data.session);
+					getAll() {
+						return data.cookies;
 					}
 				}
 		  });
