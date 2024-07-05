@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import Button from '$lib/Button.svelte';
 	import Notice from '$lib/Notice.svelte';
@@ -24,8 +23,6 @@
 		if (error) message = error.code ?? error.message;
 		else goto(`/login`);
 	}
-
-	$: if (browser && $user === null) goto(`/login`);
 </script>
 
 <Title title="You" />
@@ -73,11 +70,11 @@
 		>
 
 		<NewOrganization />
-
-		<Button action={logout} tip="Log out of the application.">Log out</Button>
 	{/if}
 {/await}
 
 {#if message}
 	<Oops text={message} />
 {/if}
+
+<Button action={logout} tip="Log out of the application.">Log out</Button>
