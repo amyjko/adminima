@@ -65,6 +65,7 @@
 		<Field
 			label="email"
 			bind:text={email}
+			active={!submitting}
 			invalid={(text) =>
 				text.length === 0 || validEmail(email) ? undefined : 'Not yet a valid email'}
 		/>
@@ -81,6 +82,7 @@
 		<Field
 			label="code"
 			bind:text={code}
+			active={!submitting}
 			placeholder="012345"
 			invalid={(text) =>
 				text.length === 0 || text.length === 6 ? undefined : 'Codes are 6 characters'}
