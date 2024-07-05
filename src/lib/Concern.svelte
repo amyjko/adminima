@@ -2,10 +2,14 @@
 	export let concern: string;
 </script>
 
-<div class="row">
-	<span class="dot" />
-	{#if concern.length === 0}<em>no concern</em>{:else}{concern}{/if}
-</div>
+{#if concern.length === 0}
+	<em>no concern</em>
+{:else}
+	<div class="row">
+		<span class="dot" />
+		{concern}
+	</div>
+{/if}
 
 <style>
 	.dot {
