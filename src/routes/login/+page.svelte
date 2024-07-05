@@ -58,7 +58,10 @@
 	<Paragraph>You're logged in as {$user.email}.</Paragraph>
 {:else if !submitted}
 	<p>We'll email you a one-time code each time you log in.</p>
-	<Form active={emailActive} inactive="Make sure your email is valid.">
+	<Form
+		active={emailActive}
+		inactiveMessage={submitting ? undefined : 'Make sure your email is valid.'}
+	>
 		<Field
 			label="email"
 			bind:text={email}
@@ -71,7 +74,10 @@
 	</Form>
 {:else}
 	<Paragraph>We emailed you a code. It might take a minute to arrive.</Paragraph>
-	<Form active={codeActive} inactive="Make sure your code is 6 digits.">
+	<Form
+		active={codeActive}
+		inactiveMessage={submitting ? undefined : 'Make sure your code is 6 digits.'}
+	>
 		<Field
 			label="code"
 			bind:text={code}

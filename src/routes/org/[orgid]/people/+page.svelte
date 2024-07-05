@@ -199,7 +199,7 @@
 {#if isAdmin}
 	<Header>Add people</Header>
 	<Paragraph>Enter the email of the person to add. <em /></Paragraph>
-	<Form action={addEmail} {active} inactive="Make sure the email is valid.">
+	<Form action={addEmail} {active} inactiveMessage="Make sure the email is valid.">
 		<Field
 			label="email"
 			bind:text={newPersonEmail}

@@ -30,7 +30,7 @@
 		<Paragraph>{explanation}</Paragraph>
 		<Form
 			{active}
-			{inactive}
+			inactiveMessage={inactive}
 			action={async () => {
 				if (!active) {
 					return;

@@ -44,7 +44,7 @@
 	$: active = newRequestTitle.length > 0 && newRequestProblem.length > 0;
 </script>
 
-<Form action={createSuggestion} {active} inactive="Add a title and problem.">
+<Form action={createSuggestion} {active} inactiveMessage="Add a title and problem.">
 	<MarkupView
 		markup={$organization.getPrompt()}
 		placeholder="What is your suggestion?"

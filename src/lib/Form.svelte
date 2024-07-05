@@ -5,7 +5,7 @@
 	export let borders = false;
 	export let inline = false;
 	export let active: boolean;
-	export let inactive: string;
+	export let inactiveMessage: string | undefined;
 
 	let form: HTMLFormElement;
 
@@ -24,9 +24,9 @@
 	class:inline
 >
 	<slot />
-	{#if showInactive}
+	{#if showInactive && inactiveMessage}
 		<div class="row">
-			<Oops text={inactive} />
+			<Oops text={inactiveMessage} />
 		</div>{/if}
 </form>
 
