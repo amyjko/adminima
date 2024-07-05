@@ -123,7 +123,7 @@
 			const result = await $db.addOrgPath(organization, newPath);
 
 			if (result === null) {
-				goto(`/org/${newPath}`);
+				// goto(`/org/${newPath}`);
 				newPath = '';
 			} else if (typeof result === 'string') addError(errors, result);
 			else addError(errors, result.message, result);
