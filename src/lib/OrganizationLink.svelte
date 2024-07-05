@@ -1,8 +1,8 @@
 <script lang="ts">
+	import type Organization from '$types/Organization';
 	import Link from './Link.svelte';
-	import { type OrganizationID } from '$types/Organization';
 
-	export let id: OrganizationID;
+	export let id: string;
 	export let name: string;
 </script>
 

@@ -47,7 +47,7 @@
 				</tr>
 				{#each orgs.data as org}
 					<tr>
-						<td> <OrganizationLink id={org.id} name={org.name} /></td>
+						<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
 						<td
 							>{#await $db.getPersonProfile(org.id, $user.id) then profile}
 								<PersonLink {profile} />

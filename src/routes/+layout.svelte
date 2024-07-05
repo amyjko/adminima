@@ -300,4 +300,9 @@
 		text-align: center;
 		z-index: 2;
 	}
+
+	:global(code) {
+		font-family: monospace;
+		font-size: var(--small-size);
+	}
 </style>

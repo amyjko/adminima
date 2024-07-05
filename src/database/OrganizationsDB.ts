@@ -81,9 +81,33 @@ class OrganizationsDB {
 	}
 
 	async getPayload(orgid: string): Promise<OrganizationPayload | null> {
+		// First find the org that has the id or the path.
+		const result = await this.supabase.from('orgs').select().eq('id', orgid).single();
+
+		let { data: organization } = result;
+
+		if (organization === null) {
+			const { data: pathOrganization, error: pathError } = await this.supabase
+				.from('orgs')
+				.select()
+				.contains('paths', [orgid])
+				.single();
+
+			if (pathError) {
+				console.log(pathError);
+				return null;
+			}
+
+			organization = pathOrganization;
+		}
+
+		if (organization === null) return null;
+
+		// Did we match on a path and not an id? Update the orgid to the actual id.
+		if (organization.id !== orgid) orgid = organization.id;
+
 		// Load all of the organization metadata from the database
 		const [
-			{ data: organization, error: orgError },
 			{ data: profiles, error: profileError },
 			{ data: roles, error: rolesError },
 			{ data: assignments, error: assignmentsError },
@@ -92,7 +116,6 @@ class OrganizationsDB {
 			{ data: teams, error: teamsError },
 			{ data: suggestions, error: suggestionsError }
 		] = await Promise.all([
-			this.supabase.from('orgs').select().eq('id', orgid).single(),
 			this.supabase.from('profiles').select(`*`).eq('orgid', orgid),
 			this.supabase.from('roles').select(`*`).eq('orgid', orgid),
 			this.supabase.from('assignments').select(`*`).eq('orgid', orgid),
@@ -115,14 +138,13 @@ class OrganizationsDB {
 		) {
 			console.log('Missing something');
 			console.log(
-				orgError,
-				rolesError,
-				profileError,
-				assignmentsError,
-				processesError,
-				howError,
-				teamsError,
-				suggestionsError
+				rolesError ??
+					profileError ??
+					assignmentsError ??
+					processesError ??
+					howError ??
+					teamsError ??
+					suggestionsError
 			);
 
 			return null;
@@ -365,6 +387,23 @@ class OrganizationsDB {
 			org.getComments()
 		);
 		return commentError;
+	}
+
+	/** Update an organization's description. Rely on Realtime to refresh. */
+	async addOrgPath(org: Organization, path: string): Promise<PostgrestError | null | string> {
+		// First, ensure the path isn't already taken by another org.
+		const { data: existingOrg, error: existingError } = await this.supabase
+			.from('orgs')
+			.select()
+			.contains('paths', [path]);
+		if (existingError) return existingError;
+		if (existingOrg && existingOrg.length > 0) return `The path ${path} is already in use.`;
+
+		const { error } = await this.supabase
+			.from('orgs')
+			.update({ paths: [path, ...org.getPaths()] })
+			.eq('id', org.getID());
+		return error;
 	}
 
 	async updateOrgPrompt(
@@ -722,7 +761,7 @@ class OrganizationsDB {
 	async getPersonsOrganizations(personid: PersonID) {
 		return await this.supabase
 			.from('orgs')
-			.select(`id, name, profiles!profiles_orgid_fkey(personid)`)
+			.select(`id, name, paths, profiles!profiles_orgid_fkey(personid)`)
 			.not('profiles', 'is', null)
 			.eq('profiles.personid', personid);
 	}

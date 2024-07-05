@@ -37,6 +37,14 @@ export default class Organization {
 		return this.data.organization.name;
 	}
 
+	getPath() {
+		return this.getPaths()[0] ?? this.getID();
+	}
+
+	getPaths() {
+		return this.data.organization.paths;
+	}
+
 	getRow() {
 		return this.data.organization;
 	}

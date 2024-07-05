@@ -4,11 +4,16 @@
 	import Title from './Title.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import type Organization from '$types/Organization';
-	import { getDB, getErrors, getUser, queryOrError } from './contexts';
+	import { addError, getDB, getErrors, getUser, queryOrError } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Note from './Note.svelte';
 	import Tip from './Tip.svelte';
+	import Form from './Form.svelte';
+	import Field from './Field.svelte';
+	import Button from './Button.svelte';
+	import Header from './Header.svelte';
+	import { goto } from '$app/navigation';
 
 	export let organization: Organization;
 
@@ -18,6 +23,10 @@
 
 	$: isAdmin = $user && organization.hasAdminPerson($user.id);
 	$: editable = isAdmin;
+
+	let newPath = '';
+	let submitting = false;
+	$: validPath = /[a-zA-Z]+/.test(newPath);
 </script>
 
 <Title
@@ -96,6 +105,42 @@
 	comments={organization.getComments()}
 	remove={(comment) => $db.deleteComment(organization.getRow(), 'orgs', comment)}
 />
+
+{#if isAdmin && $user}
+	{@const paths = organization.getPaths()}
+	<hr />
+
+	<Header>Path</Header>
+	<Tip
+		>Want to use a custom URL for this organization? Set a path. You can override an existing path,
+		and previous links will continue to work.</Tip
+	>
+
+	<Form
+		active={!submitting && validPath}
+		inactiveMessage={submitting ? undefined : 'Paths must be one or more a-z or A-Z characters.'}
+		action={async () => {
+			const result = await $db.addOrgPath(organization, newPath);
+
+			if (result === null) {
+				goto(`/org/${newPath}`);
+				newPath = '';
+			} else if (typeof result === 'string') addError(errors, result);
+			else addError(errors, result.message, result);
+			submitting = false;
+		}}
+		><Field label="path" bind:text={newPath} /><code>https://adminima.app/org/{newPath}</code
+		><Button submit active={!submitting && validPath} action={() => {}} tip="Update this path"
+			>{paths.length === 0 ? 'Set' : 'Update'} path</Button
+		></Form
+	>
+
+	{#if paths.length > 0}
+		<Paragraph
+			>Existing paths: <code>https://adminima.app/org/[{paths.join(', ')}]</code>
+		</Paragraph>
+	{/if}
+{/if}
 
 <style>
 	.meta {

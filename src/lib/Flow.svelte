@@ -8,5 +8,6 @@
 		row-gap: var(--spacing);
 		flex-wrap: wrap;
 		justify-content: left;
+		align-items: baseline;
 	}
 </style>

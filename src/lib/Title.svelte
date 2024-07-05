@@ -35,7 +35,7 @@
 <div class="title {kind}">
 	{#if $org && $page.url.pathname !== `/org/${$org.getID()}`}
 		<div class="breadcrumbs">
-			<OrganizationLink id={$org.getID()} name={$org.getName()} />
+			<OrganizationLink id={$org.getPaths()[0] ?? $org.getID()} name={$org.getName()} />
 			{#if $page.url.pathname.includes('/role/')} &gt;<RoleLink roleID={null} /> {/if}
 			{#if $page.url.pathname.includes('/process/')} &gt;<ProcessLink processID={null} /> {/if}
 			{#if $page.url.pathname.includes('/suggestion/')}

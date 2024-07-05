@@ -215,6 +215,7 @@ export type Database = {
           description: string
           id: string
           name: string
+          paths: string[]
           prompt: string
           visibility: Database["public"]["Enums"]["visibility"]
           when: string
@@ -225,6 +226,7 @@ export type Database = {
           description?: string
           id?: string
           name?: string
+          paths?: string[]
           prompt?: string
           visibility?: Database["public"]["Enums"]["visibility"]
           when?: string
@@ -235,6 +237,7 @@ export type Database = {
           description?: string
           id?: string
           name?: string
+          paths?: string[]
           prompt?: string
           visibility?: Database["public"]["Enums"]["visibility"]
           when?: string
