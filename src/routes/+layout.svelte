@@ -23,7 +23,7 @@
 	setContext(DBSymbol, db);
 	$: $db.setSupabaseClient(data.supabase);
 
-	const user: UserContext = writable(data.user);
+	const user: UserContext = writable(null);
 	setContext(UserSymbol, user);
 
 	const errors: ErrorsContext = writable([]);

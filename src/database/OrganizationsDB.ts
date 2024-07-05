@@ -58,6 +58,10 @@ class OrganizationsDB {
 		this.supabase = supabase;
 	}
 
+	async getUser() {
+		return this.supabase.auth.getUser();
+	}
+
 	signOut() {
 		return this.supabase.auth.signOut();
 	}
