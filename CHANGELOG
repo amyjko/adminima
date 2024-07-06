@@ -9,6 +9,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Support for other bullet markers.
 
+### Fixed
+
+- Cleaned up suggestion form.
+
 ## 2024-07-4 v0.5.3
 
 ### Added
