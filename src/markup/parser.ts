@@ -8,6 +8,12 @@ import Paragraph from './Paragraph';
 import type Segment from './Segment';
 import Heading from './Heading';
 
+const BulletPrefixes = ['* ', '• ', '- '];
+
+function isBullets(line: string): boolean {
+	return BulletPrefixes.some((b) => line.startsWith(b));
+}
+
 export function parse(markup: string): Markup {
 	const lines = markup
 		.split('\n')
@@ -18,9 +24,9 @@ export function parse(markup: string): Markup {
 	let index = 0;
 	while (index < lines.length) {
 		const line = lines[index];
-		if (line.startsWith('* ')) {
+		if (isBullets(line)) {
 			const bulletLines = [];
-			while (index < lines.length && lines[index].startsWith('* ')) {
+			while (index < lines.length && isBullets(lines[index])) {
 				bulletLines.push(parseSegments(lines[index].slice(2)));
 				index++;
 			}
@@ -28,7 +34,7 @@ export function parse(markup: string): Markup {
 		} else if (/^[0-9]+\./.test(line)) {
 			const numberedLines = [];
 			while (index < lines.length && /^[0-9]+\./.test(lines[index])) {
-				numberedLines.push(parseSegments(lines[index].slice(lines[index].indexOf('.') + 1)));
+				numberedLines.push(parseSegments(lines[index].slice(lines[index].indexOf('.') + 1).trim()));
 				index++;
 			}
 			blocks.push(new Numbered(numberedLines));

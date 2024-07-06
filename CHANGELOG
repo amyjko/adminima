@@ -3,7 +3,13 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
-## 2024-07-11 v0.5.3
+## 2024-07-5 v0.6.0
+
+### Added
+
+- Support for other bullet markers.
+
+## 2024-07-4 v0.5.3
 
 ### Added
 
