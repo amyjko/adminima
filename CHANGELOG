@@ -12,6 +12,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Cleaned up suggestion form design.
+- Cleaned up header styling.
 
 ## 2024-07-4 v0.5.3
 

@@ -7,9 +7,9 @@
 	export let block: Heading;
 </script>
 
-{#if block.level === 1}<Header>
+{#if block.level === 1}<h3>
 		{#each block.text as segment}<SegmentView {segment} />{/each}
-	</Header>
-{:else}<Subheader>
+	</h3>
+{:else}<h4>
 		{#each block.text as segment}<SegmentView {segment} />{/each}
-	</Subheader>{/if}
+	</h4>{/if}

@@ -307,4 +307,14 @@
 		font-family: monospace;
 		font-size: var(--small-size);
 	}
+
+	:global(h3) {
+		font-size: 20pt;
+		font-weight: bold;
+	}
+
+	:global(h4) {
+		font-size: 18pt;
+		font-style: italic;
+	}
 </style>

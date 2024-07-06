@@ -6,7 +6,7 @@
 
 <style>
 	h3 {
-		font-size: 18pt;
+		font-size: 20pt;
 		font-weight: bold;
 		font-style: italic;
 	}
