@@ -21,13 +21,16 @@
 	export let id: string | undefined = undefined;
 
 	let height = 0;
-	let revisedText = '';
+	let revisedText = markup;
 	let input: HTMLTextAreaElement;
 	let saving = false;
 
 	const errors = getErrors();
 
 	$: scrollHeight = revisedText ? input?.scrollHeight ?? height : height;
+
+	// No edit function? Immediately update the markup.
+	$: if (edit === undefined) markup = revisedText;
 
 	async function startEditing() {
 		revisedText = markup;
@@ -115,6 +118,7 @@
 		gap: calc(2 * var(--padding));
 		align-items: stretch;
 		width: 100%;
+		font-size: var(--normal-size);
 	}
 
 	.editor {
