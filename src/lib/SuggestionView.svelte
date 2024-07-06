@@ -40,6 +40,9 @@
 	$: unselectedRoles = $org.getRoles().filter((r) => !suggestion.roles.includes(r.id));
 	$: unselectedProcesses = $org.getProcesses().filter((p) => !suggestion.processes.includes(p.id));
 
+	let processSelection: string | undefined = undefined;
+	let roleSelection: string | undefined = undefined;
+
 	let newComment: string = '';
 </script>
 
@@ -153,15 +156,17 @@
 					return { value: role.id, label: role.title };
 				})
 			]}
-			selection={undefined}
-			change={(r) =>
-				r !== undefined
-					? queryOrError(
-							errors,
-							$db.updateSuggestionRoles(suggestion, Array.from(new Set([...suggestion.roles, r]))),
-							"Couldn't update suggestion roles."
-					  )
-					: undefined}
+			selection={roleSelection}
+			change={(r) => {
+				if (r !== undefined) {
+					queryOrError(
+						errors,
+						$db.updateSuggestionRoles(suggestion, Array.from(new Set([...suggestion.roles, r]))),
+						"Couldn't update suggestion roles."
+					);
+					roleSelection = undefined;
+				}
+			}}
 		/>
 	{/if}
 </div>
@@ -196,18 +201,20 @@
 					return { value: process.id, label: process.title };
 				})
 			]}
-			selection={undefined}
-			change={(p) =>
-				p !== undefined
-					? queryOrError(
-							errors,
-							$db.updateSuggestionProcesses(
-								suggestion,
-								Array.from(new Set([...suggestion.processes, p]))
-							),
-							"Couldn't update suggestion processes."
-					  )
-					: undefined}
+			selection={processSelection}
+			change={(p) => {
+				if (p !== undefined) {
+					queryOrError(
+						errors,
+						$db.updateSuggestionProcesses(
+							suggestion,
+							Array.from(new Set([...suggestion.processes, p]))
+						),
+						"Couldn't update suggestion processes."
+					);
+					processSelection = undefined;
+				}
+			}}
 		/>
 	{/if}
 </div>
