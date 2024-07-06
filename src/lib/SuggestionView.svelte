@@ -10,7 +10,6 @@
 	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
-	import Quote from './Quote.svelte';
 	import Status from './Status.svelte';
 	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import timestampToDate from '$database/timestampToDate';
@@ -21,7 +20,6 @@
 	import Header from './Header.svelte';
 	import FormDialog from './FormDialog.svelte';
 	import Visibility from './Visibility.svelte';
-	import Subheader from './Subheader.svelte';
 	import Table from './Table.svelte';
 
 	export let suggestion: SuggestionRow;
@@ -37,8 +35,14 @@
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 	$: editable = $user && (isAdmin || suggestion.who === $user.id);
-	$: unselectedRoles = $org.getRoles().filter((r) => !suggestion.roles.includes(r.id));
-	$: unselectedProcesses = $org.getProcesses().filter((p) => !suggestion.processes.includes(p.id));
+	$: unselectedRoles = $org
+		.getRoles()
+		.filter((r) => !suggestion.roles.includes(r.id))
+		.sort((a, b) => a.title.localeCompare(b.title));
+	$: unselectedProcesses = $org
+		.getProcesses()
+		.filter((p) => !suggestion.processes.includes(p.id))
+		.sort((a, b) => a.title.localeCompare(b.title));
 
 	let processSelection: string | undefined = undefined;
 	let roleSelection: string | undefined = undefined;
