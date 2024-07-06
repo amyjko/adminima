@@ -23,7 +23,8 @@
 	setContext(DBSymbol, db);
 	$: $db.setSupabaseClient(data.supabase);
 
-	const user: UserContext = writable(null);
+	// Start with the user, unless we're on the browser, in which case we get a fresh token.
+	const user: UserContext = writable(data.session?.user ?? null);
 	setContext(UserSymbol, user);
 
 	const errors: ErrorsContext = writable([]);
