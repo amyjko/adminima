@@ -264,7 +264,7 @@
 
 		<Table>
 			<tbody>
-				{#each comments.data.reverse() as comment}
+				{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment}
 					<CommentView
 						{comment}
 						remove={(comment) => $db.deleteComment(suggestion, 'suggestions', comment)}
@@ -280,6 +280,8 @@
 {/await}
 
 {#if editable}
+	<hr />
+
 	<Paragraph>Is this request no longer needed? You can permanently delete it.</Paragraph>
 	<Button
 		tip="Permanently delete this suggestion."
