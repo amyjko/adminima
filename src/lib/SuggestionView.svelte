@@ -21,6 +21,7 @@
 	import FormDialog from './FormDialog.svelte';
 	import Visibility from './Visibility.svelte';
 	import Table from './Table.svelte';
+	import Labeled from './Labeled.svelte';
 
 	export let suggestion: SuggestionRow;
 
@@ -229,53 +230,45 @@
 	<Loading />
 {:then comments}
 	{#if comments.data}
-		{#if $user}
-			<FormDialog
-				button="New comment…"
-				showTip="Add a new comment on this suggestion."
-				submit="Post"
-				submitTip="Add this comment."
-				header="Comment"
-				explanation="What do you want to say?"
-				inactive="Add some text before you submit."
-				valid={() => newComment.length > 0}
-				action={async () => {
-					const result = await $db.addComment(
-						$org.getID(),
-						$user.id,
-						newComment,
-						'suggestions',
-						suggestion.id,
-						comments.data.map((c) => c.id)
-					);
-					if (result) return false;
-					newComment = '';
-					return true;
-				}}
-			>
-				<textarea
-					style:width="20em"
-					style:height="8em"
-					cols="20"
-					bind:value={newComment}
-				/></FormDialog
-			>
-		{/if}
+		<div class="comments">
+			{#if $user}
+				<Labeled label="Have a comment?">
+					<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
+				</Labeled>
+				<Button
+					end
+					tip="Add a comment to this suggestion."
+					action={async () => {
+						const result = await $db.addComment(
+							$org.getID(),
+							$user.id,
+							newComment,
+							'suggestions',
+							suggestion.id,
+							comments.data.map((c) => c.id)
+						);
+						if (result) return false;
+						newComment = '';
+						return true;
+					}}>Submit</Button
+				>
+			{/if}
 
-		<Table>
-			<tbody>
-				{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment}
-					<CommentView
-						{comment}
-						remove={(comment) => $db.deleteComment(suggestion, 'suggestions', comment)}
-					/>
-				{:else}
-					No changes yet.
-				{/each}
-			</tbody>
-		</Table>
+			<Table>
+				<tbody>
+					{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment}
+						<CommentView
+							{comment}
+							remove={(comment) => $db.deleteComment(suggestion, 'suggestions', comment)}
+						/>
+					{:else}
+						No changes yet.
+					{/each}
+				</tbody>
+			</Table>
+		</div>
 	{:else}
-		Unable to load history.
+		Unable to load comment history.
 	{/if}
 {/await}
 
@@ -301,5 +294,12 @@
 		flex-direction: row;
 		flex-wrap: wrap;
 		gap: var(--padding);
+	}
+
+	.comments {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing);
+		width: 100%;
 	}
 </style>

@@ -22,7 +22,7 @@
 </script>
 
 <tr class="comment">
-	<td>
+	<td width="20%">
 		<div class="meta">
 			<PersonLink profile={$org.getProfileWithPersonID(comment.who)} />
 			<TimeView date={timestampToDate(comment.when)} />
@@ -43,7 +43,7 @@
 		</Quote>
 	</td>
 	{#if remove}
-		<td>
+		<td width="10%">
 			<Button
 				tip="Delete this comment"
 				warning
