@@ -71,7 +71,6 @@
 		display: flex;
 		font-size: 42pt;
 		font-weight: bold;
-		text-transform: uppercase;
 		line-height: 1;
 		flex-direction: row;
 		justify-items: baseline;
