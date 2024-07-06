@@ -59,8 +59,8 @@
 
 <style>
 	.title {
-		width: calc(100% - (4 * var(--spacing)));
-		padding: calc(2 * var(--spacing));
+		width: calc(100% - (2 * var(--spacing)));
+		padding: calc(var(--spacing));
 		/* position: sticky;
 		top: 0; */
 		z-index: 1;

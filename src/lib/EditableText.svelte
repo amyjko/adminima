@@ -52,7 +52,7 @@
 	.editable {
 		display: flex;
 		flex-direction: row;
-		align-items: top;
+		align-items: center;
 		gap: calc(2 * var(--padding));
 	}
 
