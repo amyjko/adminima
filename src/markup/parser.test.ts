@@ -27,6 +27,10 @@ test.each([
 	[
 		'I am: \n\n1. bullet 1\n2. bullet 2\n3. bullet 3\n\nThen another paragraph.',
 		'Markup[Paragraph[Text[I am:]], Numbered[Text[bullet 1], Text[bullet 2], Text[bullet 3]], Paragraph[Text[Then another paragraph.]]]'
+	],
+	[
+		'I am a paragraph\n\n"I am a block quote"\n\nThen another paragraph.',
+		'Markup[Paragraph[Text[I am a paragraph]], Quote[Text[I am a block quote]], Paragraph[Text[Then another paragraph.]]]'
 	]
 ])('parse %s', (markup: string, debug: string) => {
 	expect(parse(markup).toString()).toBe(debug);

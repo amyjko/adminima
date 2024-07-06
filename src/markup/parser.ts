@@ -7,6 +7,7 @@ import Numbered from './Numbered';
 import Paragraph from './Paragraph';
 import type Segment from './Segment';
 import Heading from './Heading';
+import Quote from './Quote';
 
 const BulletPrefixes = ['* ', '• ', '- '];
 
@@ -24,7 +25,10 @@ export function parse(markup: string): Markup {
 	let index = 0;
 	while (index < lines.length) {
 		const line = lines[index];
-		if (isBullets(line)) {
+		if (line.startsWith('"') && line.endsWith('"')) {
+			blocks.push(new Quote(parseSegments(line.slice(1, -1))));
+			index++;
+		} else if (isBullets(line)) {
 			const bulletLines = [];
 			while (index < lines.length && isBullets(lines[index])) {
 				bulletLines.push(parseSegments(lines[index].slice(2)));
