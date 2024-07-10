@@ -80,7 +80,7 @@
 			/>
 			<Note
 				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@url&gt;</code>,
-				<code>*/-/• bullets</code>, <code>1. lists</code>, <code>"..." block quote</code></Note
+				<code>*/-/• bullets</code>, <code>1. lists</code>, <code>"block quote"</code></Note
 			>
 		</div>
 	{:else}
