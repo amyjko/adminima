@@ -128,9 +128,12 @@
 				tip="Choose a role to be accountable for the processes outcomes."
 				options={[
 					{ value: undefined, label: '—' },
-					...$org.getRoles().map((role) => {
-						return { value: role.id, label: role.title };
-					})
+					...$org
+						.getRoles()
+						.toSorted((a, b) => a.title.localeCompare(b.title))
+						.map((role) => {
+							return { value: role.id, label: role.title };
+						})
 				]}
 				selection={process.accountable ?? undefined}
 				change={(value) => $db.updateProcessAccountable(process, value ?? null)}
