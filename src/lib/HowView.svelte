@@ -237,7 +237,7 @@
 					? $db.updateHowVisibility(how, vis)
 					: undefined}
 		/>
-		<ARCI {how} {process} verbose={false} />
+		<ARCI {how} verbose={false} />
 	</div>
 	<ol>
 		{#each how.how

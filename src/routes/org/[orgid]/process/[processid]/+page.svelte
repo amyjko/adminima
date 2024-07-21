@@ -12,7 +12,6 @@
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Concern from '$lib/Concern.svelte';
 	import { page } from '$app/stores';
-	import Notice from '$lib/Notice.svelte';
 	import Field from '$lib/Field.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import { setContext, tick } from 'svelte';
@@ -143,7 +142,7 @@
 			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible){/if}.
 	</Paragraph>
 
-	<ARCI {how} {process} verbose />
+	<ARCI {how} verbose />
 
 	<Tip member
 		>This determines who can see this process. You can also control the visibility of individual

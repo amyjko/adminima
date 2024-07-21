@@ -8,7 +8,6 @@
 	import { getDB, getOrg } from './contexts';
 
 	export let how: HowRow;
-	export let process: ProcessRow;
 	export let verbose: boolean;
 
 	const org = getOrg();
@@ -22,8 +21,7 @@
 				(r) =>
 					!how.responsible.includes(r.id) &&
 					!how.consulted.includes(r.id) &&
-					!how.informed.includes(r.id) &&
-					r.id !== process.accountable
+					!how.informed.includes(r.id)
 			)
 			.map((role) => {
 				return { value: role.id, label: role.title };

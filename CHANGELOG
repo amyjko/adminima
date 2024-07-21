@@ -11,6 +11,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Improved styling of fields.
 - Sorted role titles on process page.
 - Fit accountable role to size of choice.
+- Permit accountable person to be responsible, consulted, and informed on subtasks.
 
 ## v0.6.0 2024-07-05
 
