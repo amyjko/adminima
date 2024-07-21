@@ -26,10 +26,10 @@
 
 	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
 
-	async function createSuggestion() {
+	async function createChange() {
 		if ($user === null) return;
 		try {
-			const { data: suggestion, error } = await $db.createSuggestion(
+			const { data: change, error } = await $db.createChange(
 				$user.id,
 				$organization.getID(),
 				newRequestTitle,
@@ -38,8 +38,8 @@
 				process ? [process] : [],
 				role ? [role] : []
 			);
-			if (error) addError(errors, "Couldn't create the suggestion.", error);
-			else if (suggestion) goto(`/org/${$organization.getPath()}/suggestion/${suggestion.id}`);
+			if (error) addError(errors, "Couldn't create the change.", error);
+			else if (change) goto(`/org/${$organization.getPath()}/change/${change.id}`);
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}
@@ -55,7 +55,11 @@
 			? defaultPrompt
 			: $organization.getPrompt()}
 	>
-		<MarkupView bind:markup={newRequestProblem} editing placeholder="Detail your suggestion" />
+		<MarkupView
+			bind:markup={newRequestProblem}
+			editing
+			placeholder="Detail your change suggestion"
+		/>
 	</Labeled>
 
 	<Labeled label="Affected Roles">
@@ -85,7 +89,7 @@
 		/>
 	</Labeled>
 
-	<Button tip="Submit the new suggestion." end {active} action={createSuggestion}>create</Button>
+	<Button tip="Submit the suggestion." end {active} action={createChange}>create</Button>
 </div>
 
 {#if newRequestError}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChangeForm from '$lib/SuggestionForm.svelte';
+	import ChangeForm from '$lib/ChangeForm.svelte';
 	import Header from '$lib/Header.svelte';
 	import Title from '$lib/Title.svelte';
 	import { page } from '$app/stores';
@@ -8,7 +8,7 @@
 	$: process = $page.url.searchParams.get('process') ?? undefined;
 </script>
 
-<Title title="New Suggestion" kind="suggestion" />
+<Title title="New change" kind="change" />
 
 <Header>Suggest a Change</Header>
 

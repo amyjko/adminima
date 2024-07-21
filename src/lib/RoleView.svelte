@@ -12,8 +12,8 @@
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Notice from './Notice.svelte';
-	import Suggestions from './Suggestions.svelte';
-	import SuggestionLink from './SuggestionLink.svelte';
+	import Changes from './Changes.svelte';
+	import ChangeLink from './ChangeLink.svelte';
 	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
 
@@ -98,17 +98,17 @@
 
 <Timeline {role} processes={$org.getRoleProcesses(role.id)} />
 
-<Header>Suggestions</Header>
+<Header>Changes</Header>
 
-<SuggestionLink id={null} role={role.id} />
+<ChangeLink id={null} role={role.id} />
 
-<Tip>These are suggestions people have made that might affect this role.</Tip>
+<Tip>These are changes people have made that might affect this role.</Tip>
 
-<Suggestions
-	suggestions={$org
-		.getSuggestions()
+<Changes
+	changes={$org
+		.getChanges()
 		.filter((change) => change.status === 'active' && change.roles.includes(role.id))}
-	><Paragraph>There are no active changes suggested for this role.</Paragraph></Suggestions
+	><Paragraph>There are no active changes suggested for this role.</Paragraph></Changes
 >
 
 <Header>History</Header>

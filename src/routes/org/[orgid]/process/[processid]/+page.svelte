@@ -18,10 +18,10 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { browser } from '$app/environment';
 	import Select from '$lib/Select.svelte';
-	import Suggestions from '$lib/Suggestions.svelte';
+	import Changes from '$lib/Changes.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Tip from '$lib/Tip.svelte';
-	import SuggestionLink from '$lib/SuggestionLink.svelte';
+	import ChangeLink from '$lib/ChangeLink.svelte';
 	import Visibility from '$lib/Visibility.svelte';
 	import Note from '$lib/Note.svelte';
 	import ARCI from '$lib/ARCI.svelte';
@@ -247,16 +247,16 @@
 		</FormDialog>
 	{/if}
 
-	<Header>Suggestions</Header>
+	<Header>Changes</Header>
 
-	<SuggestionLink id={null} process={process.id} />
+	<ChangeLink id={null} process={process.id} />
 
-	<Tip member>These are suggestions people have made that might affect this process.</Tip>
-	<Suggestions
-		suggestions={$org
-			.getSuggestions()
+	<Tip member>These are changes people have suggested that might affect this process.</Tip>
+	<Changes
+		changes={$org
+			.getChanges()
 			.filter((change) => change.status === 'active' && change.processes.includes(process.id))}
-		><Paragraph>There are no active changes suggested for this process.</Paragraph></Suggestions
+		><Paragraph>There are no active changes suggested for this process.</Paragraph></Changes
 	>
 
 	<Header>History</Header>

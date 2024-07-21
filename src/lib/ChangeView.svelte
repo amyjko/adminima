@@ -5,7 +5,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import { type SuggestionRow } from '../database/OrganizationsDB';
+	import { type ChangeRow } from '../database/OrganizationsDB';
 	import Oops from './Oops.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
@@ -18,12 +18,11 @@
 	import Loading from './Loading.svelte';
 	import CommentView from './CommentView.svelte';
 	import Header from './Header.svelte';
-	import FormDialog from './FormDialog.svelte';
 	import Visibility from './Visibility.svelte';
 	import Table from './Table.svelte';
 	import Labeled from './Labeled.svelte';
 
-	export let suggestion: SuggestionRow;
+	export let change: ChangeRow;
 
 	let deleteError: string | undefined = undefined;
 
@@ -35,14 +34,14 @@
 	const Statuses = { triage: 'Triage', backlog: 'Backlog', active: 'Active', done: 'Done' };
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
-	$: editable = $user && (isAdmin || suggestion.who === $user.id);
+	$: editable = $user && (isAdmin || change.who === $user.id);
 	$: unselectedRoles = $org
 		.getRoles()
-		.filter((r) => !suggestion.roles.includes(r.id))
+		.filter((r) => !change.roles.includes(r.id))
 		.sort((a, b) => a.title.localeCompare(b.title));
 	$: unselectedProcesses = $org
 		.getProcesses()
-		.filter((p) => !suggestion.processes.includes(p.id))
+		.filter((p) => !change.processes.includes(p.id))
 		.sort((a, b) => a.title.localeCompare(b.title));
 
 	let processSelection: string | undefined = undefined;
@@ -52,22 +51,22 @@
 </script>
 
 <Title
-	title={suggestion.what}
-	kind="suggestion"
-	edit={$user && isAdmin && suggestion.who === $user.id
+	title={change.what}
+	kind="change"
+	edit={$user && isAdmin && change.who === $user.id
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.updateSuggestionWhat(suggestion, text),
-					"Couldn't update the suggestion's title"
+					$db.udpateChangeWhat(change, text),
+					"Couldn't update the change's title"
 				)
 		: undefined}
 >
-	<Status status={suggestion.status} />
+	<Status status={change.status} />
 	{#if editable}
 		<Select
-			tip="Change the status of this suggestion"
-			selection={suggestion.status}
+			tip="Change the status of this change"
+			selection={change.status}
 			options={Object.entries(Statuses).map(([key, value]) => ({ value: key, label: value }))}
 			change={async (status) => {
 				if (
@@ -76,42 +75,40 @@
 				)
 					return await queryOrError(
 						errors,
-						$db.updateSuggestionStatus(suggestion, status, $user.id),
-						"Couldn't update the suggestion's status."
+						$db.updateChangeStatus(change, status, $user.id),
+						"Couldn't update the change's status."
 					);
 				else return null;
 			}}
 		/>
 
 		<Visibility
-			level={suggestion.visibility}
-			tip="Edit this suggestion's visibility"
-			edit={(vis) => $db.updateSuggestionVisibility(suggestion, vis)}
+			level={change.visibility}
+			tip="Edit this change's visibility"
+			edit={(vis) => $db.updateChangeVisibility(change, vis)}
 		/>
 	{/if}
 </Title>
 
-<Tip admin
-	>Use suggestions as a place to capture progress on a change and to document decisions.</Tip
->
+<Tip admin>Use changes as a place to capture progress on a change and to document decisions.</Tip>
 
 <Paragraph>
-	<PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /> reported this problem on <TimeView
-		date={timestampToDate(suggestion.when)}
+	<PersonLink profile={$org.getProfileWithPersonID(change.who)} /> reported this problem on <TimeView
+		date={timestampToDate(change.when)}
 	/>.</Paragraph
 >
 
 <Header>Problem</Header>
 
 <MarkupView
-	markup={suggestion.description}
+	markup={change.description}
 	placeholder="No description"
 	edit={editable
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.updateSuggestionDescription(suggestion, text),
-					"Couldn't update suggestion description."
+					$db.updateChangeDescription(change, text),
+					"Couldn't update change description."
 				)
 		: undefined}
 />
@@ -119,32 +116,32 @@
 <Header>Proposal</Header>
 
 <MarkupView
-	markup={suggestion.proposal}
+	markup={change.proposal}
 	placeholder="No proposal"
 	edit={editable
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.updateSuggestionProposal(suggestion, text),
-					"Couldn't update suggestion description."
+					$db.updateChangeProposal(change, text),
+					"Couldn't update change description."
 				)
 		: undefined}
 />
 
 <Header>Affected roles</Header>
 <div class="row">
-	{#each suggestion.roles as role}
+	{#each change.roles as role}
 		<RoleLink roleID={role} />
 		<Button
 			tip="Remove this role from the affected roles."
 			action={() =>
 				queryOrError(
 					errors,
-					$db.updateSuggestionRoles(
-						suggestion,
-						suggestion.roles.filter((r) => r !== role)
+					$db.updateChangeRoles(
+						change,
+						change.roles.filter((r) => r !== role)
 					),
-					"Couldn't update suggestion roles."
+					"Couldn't update change roles."
 				)}
 		>
 			{Delete}</Button
@@ -154,7 +151,7 @@
 	{/each}
 	{#if unselectedRoles.length > 0}
 		<Select
-			tip="Add a role that is affected by this suggestion."
+			tip="Add a role that is affected by this change."
 			options={[
 				{ value: undefined, label: '▼' },
 				...unselectedRoles.map((role) => {
@@ -166,8 +163,8 @@
 				if (r !== undefined) {
 					queryOrError(
 						errors,
-						$db.updateSuggestionRoles(suggestion, Array.from(new Set([...suggestion.roles, r]))),
-						"Couldn't update suggestion roles."
+						$db.updateChangeRoles(change, Array.from(new Set([...change.roles, r]))),
+						"Couldn't update change roles."
 					);
 					roleSelection = undefined;
 				}
@@ -178,18 +175,18 @@
 
 <Header>Affected processes</Header>
 <div class="row">
-	{#each suggestion.processes as process}
+	{#each change.processes as process}
 		<ProcessLink processID={process} />
 		<Button
 			tip="Remove this process from the affected processes."
 			action={() =>
 				queryOrError(
 					errors,
-					$db.updateSuggestionProcesses(
-						suggestion,
-						suggestion.processes.filter((p) => p !== process)
+					$db.updateChangeProcesses(
+						change,
+						change.processes.filter((p) => p !== process)
 					),
-					"Couldn't update suggestion processes."
+					"Couldn't update change processes."
 				)}
 		>
 			{Delete}</Button
@@ -199,7 +196,7 @@
 	{/each}
 	{#if unselectedProcesses.length > 0}
 		<Select
-			tip="Add a process that is affected by this suggestion."
+			tip="Add a process that is affected by this change."
 			options={[
 				{ value: undefined, label: '▼' },
 				...unselectedProcesses.map((process) => {
@@ -211,11 +208,8 @@
 				if (p !== undefined) {
 					queryOrError(
 						errors,
-						$db.updateSuggestionProcesses(
-							suggestion,
-							Array.from(new Set([...suggestion.processes, p]))
-						),
-						"Couldn't update suggestion processes."
+						$db.updateChangeProcesses(change, Array.from(new Set([...change.processes, p]))),
+						"Couldn't update change processes."
 					);
 					processSelection = undefined;
 				}
@@ -226,7 +220,7 @@
 
 <Header>Discussion</Header>
 
-{#await $db.getComments(suggestion.comments)}
+{#await $db.getComments(change.comments)}
 	<Loading />
 {:then comments}
 	{#if comments.data}
@@ -237,14 +231,14 @@
 				</Labeled>
 				<Button
 					end
-					tip="Add a comment to this suggestion."
+					tip="Add a comment to this change."
 					action={async () => {
 						const result = await $db.addComment(
 							$org.getID(),
 							$user.id,
 							newComment,
 							'suggestions',
-							suggestion.id,
+							change.id,
 							comments.data.map((c) => c.id)
 						);
 						if (result) return false;
@@ -259,7 +253,7 @@
 					{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment}
 						<CommentView
 							{comment}
-							remove={(comment) => $db.deleteComment(suggestion, 'suggestions', comment)}
+							remove={(comment) => $db.deleteComment(change, 'suggestions', comment)}
 						/>
 					{:else}
 						No changes yet.
@@ -277,13 +271,13 @@
 
 	<Paragraph>Is this request no longer needed? You can permanently delete it.</Paragraph>
 	<Button
-		tip="Permanently delete this suggestion."
+		tip="Permanently delete this change."
 		action={async () => {
-			const { error } = await $db.deleteSuggestion(suggestion.id);
-			if (error) addError(errors, "Couldn't delete this suggestion.", error);
+			const { error } = await $db.deleteChange(change.id);
+			if (error) addError(errors, "Couldn't delete this change.", error);
 			else goto(`/org/${$org.getPath()}`);
 		}}
-		warning>{Delete} Delete this suggestion</Button
+		warning>{Delete} Delete this change</Button
 	>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 {/if}

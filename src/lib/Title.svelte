@@ -5,9 +5,7 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
 	import RoleLink from './RoleLink.svelte';
-	import PersonLink from './ProfileLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
-	import SuggestionLink from './SuggestionLink.svelte';
 	import Link from './Link.svelte';
 
 	// The title to show in the header
@@ -15,7 +13,7 @@
 	// A descriptive label for what kind of page this is
 	export let kind:
 		| 'process'
-		| 'suggestion'
+		| 'change'
 		| 'team'
 		| 'person'
 		| 'role'
@@ -38,8 +36,8 @@
 			<OrganizationLink id={$org.getPaths()[0] ?? $org.getID()} name={$org.getName()} />
 			{#if $page.url.pathname.includes('/role/')} &gt;<RoleLink roleID={null} /> {/if}
 			{#if $page.url.pathname.includes('/process/')} &gt;<ProcessLink processID={null} /> {/if}
-			{#if $page.url.pathname.includes('/suggestion/')}
-				&gt;<Link to="/org/{$org.getPath()}/suggestions" kind="suggestion">Suggestions</Link>{/if}
+			{#if $page.url.pathname.includes('/change/')}
+				&gt;<Link to="/org/{$org.getPath()}/changes" kind="change">Changes</Link>{/if}
 			{#if $page.url.pathname.includes('/person/')}
 				&gt; <Link to="/org/{$org.getPath()}/people" kind="person">People</Link>{/if}
 		</div>
@@ -110,7 +108,7 @@
 		background-color: var(--foreground);
 		color: var(--background);
 	}
-	.suggestion {
+	.change {
 		background-color: var(--salient);
 		color: var(--background);
 	}

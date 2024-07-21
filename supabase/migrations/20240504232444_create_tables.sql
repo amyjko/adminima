@@ -116,7 +116,7 @@ create table "public"."orgs" (
     "name" text not null default ''::text,
     -- The description of the organization
     "description" text not null default ''::text,
-    -- The suggestion prompt
+    -- The change suggestion prompt
     "prompt" text not null default ''::text,
     -- Visibility of the org
     "visibility" visibility not null default 'org',

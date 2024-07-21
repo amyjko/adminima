@@ -1,6 +1,6 @@
 import type {
 	AssignmentRow,
-	SuggestionRow,
+	ChangeRow,
 	HowRow,
 	OrganizationPayload,
 	OrganizationRow,
@@ -17,7 +17,7 @@ export type RoleID = string;
 export type PersonID = string;
 export type ProfileID = string;
 export type HowID = string;
-export type SuggestionID = string;
+export type ChangeID = string;
 export type CommentID = string;
 export type Markup = string;
 
@@ -118,15 +118,15 @@ export default class Organization {
 		return this.data.profiles.some((profile) => profile.personid === personID);
 	}
 
-	getSuggestion(id: SuggestionID) {
+	getChange(id: ChangeID) {
 		return this.data.suggestions.find((change) => change.id === id) ?? null;
 	}
 
-	getSuggestions() {
+	getChanges() {
 		return this.data.suggestions;
 	}
 
-	withSuggestion(newChange: SuggestionRow) {
+	withChange(newChange: ChangeRow) {
 		return new Organization({
 			...this.data,
 			suggestions: this.data.suggestions.some((change) => change.id === newChange.id)
@@ -135,7 +135,7 @@ export default class Organization {
 		});
 	}
 
-	withoutChange(changeID: SuggestionID) {
+	withoutChange(changeID: ChangeID) {
 		return new Organization({
 			...this.data,
 			suggestions: this.data.suggestions.filter((change) => change.id !== changeID)

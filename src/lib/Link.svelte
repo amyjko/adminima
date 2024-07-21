@@ -3,7 +3,7 @@
 
 	export let to: string;
 	export let bland = false;
-	export let kind: 'person' | 'role' | 'process' | 'org' | 'team' | 'suggestion' | null = null;
+	export let kind: 'person' | 'role' | 'process' | 'org' | 'team' | 'change' | null = null;
 
 	$: external = to.startsWith('http');
 	$: inactive = to === $page.url.pathname;
@@ -18,7 +18,7 @@
 	href={inactive ? null : to}
 	target={external ? '_blank' : ''}
 	><span class="emoji"
-		>{#if kind === 'person'}⍜{:else if kind === 'role'}☑{:else if kind === 'process'}⚙{:else if kind === 'org'}▦{:else if kind === 'suggestion'}𝚫{:else if kind === 'team'}𑗕{/if}</span
+		>{#if kind === 'person'}⍜{:else if kind === 'role'}☑{:else if kind === 'process'}⚙{:else if kind === 'org'}▦{:else if kind === 'change'}𝚫{:else if kind === 'team'}𑗕{/if}</span
 	>
 	<slot /></a
 >
@@ -86,7 +86,8 @@
 	.org {
 		background-color: var(--foreground);
 	}
-	.suggestion {
+
+	.change {
 		background-color: var(--salient);
 	}
 

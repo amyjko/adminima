@@ -84,9 +84,9 @@
 				>
 			</span>
 			<span class="link">
-				<strong>{organization.getSuggestions().length}</strong>
-				<Link kind="suggestion" to="/org/{organization.getPath()}/suggestions"
-					>Suggestion{organization.getSuggestions().length !== 1 ? 's' : ''}</Link
+				<strong>{organization.getChanges().length}</strong>
+				<Link kind="change" to="/org/{organization.getPath()}/changes"
+					>Change{organization.getChanges().length !== 1 ? 's' : ''}</Link
 				>
 			</span>
 		</div>

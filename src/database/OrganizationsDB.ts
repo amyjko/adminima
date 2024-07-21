@@ -1,6 +1,6 @@
 import ReactiveMap from './ReactiveMap';
 import Organization, {
-	type SuggestionID,
+	type ChangeID,
 	type CommentID,
 	type OrganizationID,
 	type PersonID,
@@ -26,7 +26,7 @@ export type AssignmentRow = Tables<'assignments'>;
 export type ProcessRow = Tables<'processes'>;
 export type TeamRow = Tables<'teams'>;
 export type HowRow = Tables<'hows'>;
-export type SuggestionRow = Tables<'suggestions'>;
+export type ChangeRow = Tables<'suggestions'>;
 export type CommentRow = Tables<'comments'>;
 export type Visibility = Database['public']['Enums']['visibility'];
 export type Completion = Database['public']['Enums']['completion'];
@@ -41,7 +41,7 @@ export type OrganizationPayload = {
 	teams: TeamRow[];
 	processes: ProcessRow[];
 	hows: HowRow[];
-	suggestions: SuggestionRow[];
+	suggestions: ChangeRow[];
 };
 
 /** A front end interface to the backing store, caching data loaded from the database and offering operations for modifying the database. */
@@ -334,12 +334,12 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<SuggestionRow>) => {
+				(payload: RealtimePostgresChangesPayload<ChangeRow>) => {
 					this.synchronizeRow(
 						orgid,
 						payload,
-						(org, suggestion) => org.withSuggestion(suggestion),
-						(org, suggestion) => (suggestion.id ? org.withoutChange(suggestion.id) : org)
+						(org, change) => org.withChange(change),
+						(org, change) => (change.id ? org.withoutChange(change.id) : org)
 					);
 				}
 			)
@@ -415,7 +415,7 @@ class OrganizationsDB {
 		const commentError = await this.addComment(
 			org.getID(),
 			who,
-			'Updated organization suggestion prompt',
+			'Updated organization change prompt',
 			'orgs',
 			org.getID(),
 			org.getComments()
@@ -933,7 +933,7 @@ class OrganizationsDB {
 		return await this.supabase.from('processes').delete().eq('id', id);
 	}
 
-	async createSuggestion(
+	async createChange(
 		who: PersonID,
 		orgid: OrganizationID,
 		what: string,
@@ -959,7 +959,7 @@ class OrganizationsDB {
 			.single();
 	}
 
-	async updateSuggestionVisibility(how: SuggestionRow, vis: string) {
+	async updateChangeVisibility(how: ChangeRow, vis: string) {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ visibility: vis })
@@ -967,68 +967,62 @@ class OrganizationsDB {
 		return error;
 	}
 
-	async updateSuggestionWhat(suggestion: SuggestionRow, what: string) {
-		if (suggestion.what === what) return null;
-		const { error } = await this.supabase
-			.from('suggestions')
-			.update({ what })
-			.eq('id', suggestion.id);
+	async udpateChangeWhat(change: ChangeRow, what: string) {
+		if (change.what === what) return null;
+		const { error } = await this.supabase.from('suggestions').update({ what }).eq('id', change.id);
 		return error;
 	}
 
-	async updateSuggestionDescription(suggestion: SuggestionRow, description: string) {
-		if (suggestion.description === description) return null;
+	async updateChangeDescription(change: ChangeRow, description: string) {
+		if (change.description === description) return null;
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ description })
-			.eq('id', suggestion.id);
+			.eq('id', change.id);
 		return error;
 	}
 
-	async updateSuggestionProposal(suggestion: SuggestionRow, proposal: string) {
-		if (suggestion.proposal === proposal) return null;
+	async updateChangeProposal(change: ChangeRow, proposal: string) {
+		if (change.proposal === proposal) return null;
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ proposal })
-			.eq('id', suggestion.id);
+			.eq('id', change.id);
 		return error;
 	}
 
-	async updateSuggestionStatus(suggestion: SuggestionRow, status: Status, who: PersonID) {
-		if (suggestion.status === status) return null;
+	async updateChangeStatus(change: ChangeRow, status: Status, who: PersonID) {
+		if (change.status === status) return null;
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ status })
-			.eq('id', suggestion.id);
+			.eq('id', change.id);
 		if (error) return error;
 
 		return this.addComment(
-			suggestion.orgid,
+			change.orgid,
 			who,
 			`Updated status to ${status}`,
 			'suggestions',
-			suggestion.id,
-			suggestion.comments
+			change.id,
+			change.comments
 		);
 	}
 
-	async updateSuggestionRoles(suggestion: SuggestionRow, roles: RoleID[]) {
-		const { error } = await this.supabase
-			.from('suggestions')
-			.update({ roles })
-			.eq('id', suggestion.id);
+	async updateChangeRoles(change: ChangeRow, roles: RoleID[]) {
+		const { error } = await this.supabase.from('suggestions').update({ roles }).eq('id', change.id);
 		return error;
 	}
 
-	async updateSuggestionProcesses(suggestion: SuggestionRow, processes: ProcessID[]) {
+	async updateChangeProcesses(change: ChangeRow, processes: ProcessID[]) {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ processes })
-			.eq('id', suggestion.id);
+			.eq('id', change.id);
 		return error;
 	}
 
-	async deleteSuggestion(id: SuggestionID) {
+	async deleteChange(id: ChangeID) {
 		return await this.supabase.from('suggestions').delete().eq('id', id);
 	}
 
@@ -1045,7 +1039,7 @@ class OrganizationsDB {
 	}
 
 	async deleteComment(
-		process: SuggestionRow | ProcessRow | RoleRow | OrganizationRow,
+		process: ChangeRow | ProcessRow | RoleRow | OrganizationRow,
 		table: 'processes' | 'suggestions' | 'roles' | 'orgs',
 		comment: CommentID
 	) {

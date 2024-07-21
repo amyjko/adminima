@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { type SuggestionRow } from '$database/OrganizationsDB';
+	import { type ChangeRow } from '$database/OrganizationsDB';
 	import timestampToDate from '$database/timestampToDate';
-	import SuggestionLink from './SuggestionLink.svelte';
+	import ChangeLink from './ChangeLink.svelte';
 	import PersonLink from './ProfileLink.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from './contexts';
 	import Table from './Table.svelte';
 
-	export let suggestions: SuggestionRow[];
+	export let changes: ChangeRow[];
 
 	const org = getOrg();
 	const Levels = { triage: 0, active: 1, done: 3, backlog: 2 };
 </script>
 
-{#if suggestions.length > 0}
+{#if changes.length > 0}
 	<Table>
 		<thead>
 			<tr>
@@ -23,14 +23,12 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each suggestions
+			{#each changes
 				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
-				.sort((a, b) => Levels[a.status] - Levels[b.status]) as suggestion}
+				.sort((a, b) => Levels[a.status] - Levels[b.status]) as change}
 				<tr>
-					<td><PersonLink profile={$org.getProfileWithPersonID(suggestion.who)} /></td>
-					<td><SuggestionLink id={suggestion.id} /></td><td
-						><Status status={suggestion.status} /></td
-					>
+					<td><PersonLink profile={$org.getProfileWithPersonID(change.who)} /></td>
+					<td><ChangeLink id={change.id} /></td><td><Status status={change.status} /></td>
 				</tr>
 			{/each}
 		</tbody>
