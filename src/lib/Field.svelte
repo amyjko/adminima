@@ -29,5 +29,7 @@
 	input {
 		outline: var(--border) solid var(--thickness);
 		border: none;
+		font-family: var(--font);
+		font-size: var(--normal-size);
 	}
 </style>

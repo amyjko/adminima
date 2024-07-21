@@ -11,6 +11,268 @@
 
 		<meta name="viewport" content="width=device-width" />
 		%sveltekit.head%
+
+		<style>
+			/** CSS reset */
+
+			:root {
+				font-family: var(--font);
+				font-size: var(--normal-size);
+				line-height: 1.4;
+
+				--font: 'Rokkitt', sans-serif;
+				--spacing: 0.75rem;
+				--thickness: 3px;
+				--padding: 0.25rem;
+				--radius: 4px;
+				--normal-size: 18pt;
+				--small-size: 14pt;
+				--error: #e25f55;
+				--warning: #e28d1d;
+				--warning-background: #faecdc;
+				--other: #b349cb;
+				--salient: #d35088;
+				--person: #238427;
+				--focus: #784ada;
+				--background: #ffffff;
+				--chrome: #dfdfdf;
+				--separator: #eeeeee;
+				--inactive: #555555;
+				--foreground: #000000;
+				--border: var(--inactive);
+				--thickness: 3px;
+			}
+
+			html,
+			body,
+			div,
+			span,
+			applet,
+			object,
+			iframe,
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6,
+			p,
+			blockquote,
+			pre,
+			a,
+			abbr,
+			acronym,
+			address,
+			big,
+			cite,
+			code,
+			del,
+			dfn,
+			em,
+			img,
+			ins,
+			kbd,
+			q,
+			s,
+			samp,
+			small,
+			strike,
+			strong,
+			sub,
+			sup,
+			tt,
+			var,
+			b,
+			u,
+			i,
+			center,
+			dl,
+			dt,
+			dd,
+			ol,
+			ul,
+			li,
+			fieldset,
+			form,
+			label,
+			legend,
+			table,
+			caption,
+			tbody,
+			tfoot,
+			thead,
+			tr,
+			th,
+			td,
+			article,
+			aside,
+			canvas,
+			details,
+			embed,
+			figure,
+			figcaption,
+			footer,
+			header,
+			hgroup,
+			menu,
+			nav,
+			output,
+			ruby,
+			section,
+			summary,
+			time,
+			mark,
+			audio,
+			video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+			body {
+				padding: 0;
+				margin: 0;
+				background: var(--background);
+				color: var(--foreground);
+			}
+
+			/* HTML5 display-role reset for older browsers */
+
+			article,
+			aside,
+			details,
+			figcaption,
+			figure,
+			footer,
+			header,
+			hgroup,
+			menu,
+			nav,
+			section {
+				display: block;
+			}
+
+			ol,
+			ul {
+				list-style: square;
+				list-style-position: outside;
+				margin-inline-start: var(--spacing);
+			}
+
+			li {
+				margin-block-start: calc(var(--spacing) / 2);
+				margin-block-end: calc(var(--spacing) / 2);
+			}
+
+			blockquote,
+			q {
+				quotes: none;
+			}
+			blockquote:before,
+			blockquote:after,
+			q:before,
+			q:after {
+				content: '';
+				content: none;
+			}
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+				max-width: 100%;
+				overflow-x: scroll;
+			}
+
+			strong {
+				font-weight: bold;
+			}
+
+			em {
+				font-style: italic;
+			}
+
+			hr {
+				border: none;
+				border-top: var(--thickness) solid var(--separator);
+				width: 100%;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			th,
+			td {
+				text-align: left;
+				padding: var(--padding);
+			}
+
+			th {
+				font-style: italic;
+				border-bottom: var(--thickness) solid var(--border);
+			}
+
+			tr:last-child {
+				border-bottom: var(--thickness) solid var(--border);
+			}
+
+			tr:first-child {
+				border-top: var(--thickness) solid var(--border);
+			}
+
+			input[type='text'] {
+				border-radius: var(--radius);
+				border: 2px solid var(--border);
+			}
+
+			textarea {
+				font-size: inherit;
+				font-style: inherit;
+				font-family: inherit;
+				border: none;
+				padding: var(--padding);
+				outline: var(--border) solid var(--thickness);
+				min-height: 1em;
+				border-radius: var(--radius);
+			}
+
+			@font-face {
+				font-family: 'Rokkitt';
+				src: url(/fonts/Rokkitt.ttf) format('truetype');
+			}
+
+			.errors {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--padding);
+				position: fixed;
+				top: var(--padding);
+				left: var(--padding);
+				right: var(--padding);
+				padding: var(--padding);
+				background-color: transparent;
+				text-align: center;
+				z-index: 2;
+			}
+
+			code {
+				font-family: monospace;
+				font-size: var(--small-size);
+			}
+
+			h3 {
+				font-size: 20pt;
+				font-weight: bold;
+			}
+
+			h4 {
+				font-size: 18pt;
+				font-style: italic;
+			}
+		</style>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
