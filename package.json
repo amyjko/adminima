@@ -33,7 +33,7 @@
 		"eslint-plugin-svelte": "^2.30",
 		"prettier": "^2.8",
 		"prettier-plugin-svelte": "^2.10",
-		"supabase": "^1",
+		"supabase": "^1.183.5",
 		"svelte": "^4.2",
 		"svelte-check": "^3.4",
 		"tslib": "^2.6",
