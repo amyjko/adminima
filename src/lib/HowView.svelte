@@ -183,10 +183,10 @@
 						} else if (e.key === 'Backspace' && e.metaKey) {
 							e.preventDefault();
 							deleteHow();
-						} else if (e.key === 'ArrowRight' && e.metaKey) {
+						} else if (e.key === 'ArrowRight' && e.altKey) {
 							e.preventDefault();
 							indentHow(true);
-						} else if (e.key === 'ArrowLeft' && e.metaKey) {
+						} else if (e.key === 'ArrowLeft' && e.altKey) {
 							e.preventDefault();
 							unindentHow(true);
 						} else if (e.key === 'ArrowDown') {
