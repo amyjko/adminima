@@ -10,6 +10,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Resolved issue where Supabase client would become unresponsive after tab change.
 - Improved styling of fields.
 - Sorted role titles on process page.
+- Fit accountable role to size of choice.
 
 ## v0.6.0 2024-07-05
 

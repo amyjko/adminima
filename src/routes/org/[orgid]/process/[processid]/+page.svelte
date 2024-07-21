@@ -126,6 +126,7 @@
 		{#if editable}
 			<Select
 				tip="Choose a role to be accountable for the processes outcomes."
+				fit
 				options={[
 					{ value: undefined, label: '—' },
 					...$org
