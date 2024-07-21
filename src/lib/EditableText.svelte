@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import Button from './Button.svelte';
+	import Loading from './Loading.svelte';
 
 	export let text: string;
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
@@ -42,9 +43,9 @@
 			/>{:else}<span class="text"
 				>{#if text.length === 0}&mdash;{:else}{text}{/if}</span
 			>{/if}
-		<Button tip="Save this edit" action={save}
-			>{#if editing}&checkmark;{:else}✎{/if}</Button
-		>
+		{#if saving}<Loading text="" />{:else}<Button tip="Save this edit" action={save}
+				>{#if editing}&checkmark;{:else}✎{/if}</Button
+			>{/if}
 	</form>
 {:else}{text}{/if}
 

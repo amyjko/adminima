@@ -40,23 +40,31 @@
 	}
 
 	async function save() {
+		// Does this have an editing function? Try to edit.
 		if (edit) {
 			saving = true;
 			try {
+				// Request the edit from the database.
 				const error = await edit(revisedText);
+				// If there was an error, show the error.
 				if (error) {
 					addError(errors, 'Unable to save markup.', error);
-				} else {
+				}
+				// Otherwise, on success, show the revised text on the front end.
+				else {
 					markup = revisedText;
-					editing = false;
 				}
 			} catch (err) {
-				editing = false;
+				// If there was an error, show it.
 				addError(errors, '' + err);
+			} finally {
+				// No matter what happens, stop saving and stop editing.
+				editing = false;
 				saving = false;
 			}
-			saving = false;
-		} else markup = revisedText;
+		}
+		// Otherwise, it's probably just a form field.
+		else markup = revisedText;
 	}
 </script>
 

@@ -1,6 +1,6 @@
 import { get, type Writable } from 'svelte/store';
 import { getContext, setContext } from 'svelte';
-import type { PostgrestError, User } from '@supabase/supabase-js';
+import type { PostgrestError } from '@supabase/supabase-js';
 import type Organization from '$types/Organization';
 import type OrganizationsDB from '$database/OrganizationsDB';
 
@@ -16,7 +16,7 @@ export function getOrg(): OrgContext {
 }
 
 export const UserSymbol = Symbol('user');
-export type UserContext = Writable<User | null>;
+export type UserContext = Writable<{ id: string; email: string | undefined } | null>;
 
 export function getUser(): UserContext {
 	return getContext<UserContext>(UserSymbol);

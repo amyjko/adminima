@@ -3,7 +3,13 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
-## 2024-07-5 v0.6.0
+## v0.6.1 2024-07-21
+
+### Fixed
+
+- Resolved issue where Supabase client would become unresponsive after tab change.
+
+## v0.6.0 2024-07-05
 
 ### Added
 
@@ -19,7 +25,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Sort comments in reverse time.
 - Improved design of comment form.
 
-## 2024-07-4 v0.5.3
+## v0.5.3 2024-07-04
 
 ### Added
 

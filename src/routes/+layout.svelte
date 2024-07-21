@@ -13,9 +13,10 @@
 	} from '$lib/contexts';
 	import Organizations from '$database/OrganizationsDB.js';
 	import Error from '$lib/Error.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import Note from '$lib/Note.svelte';
 	import Link from '$lib/Link.svelte';
+	import type { User } from '@supabase/supabase-js';
 
 	export let data;
 
@@ -23,27 +24,32 @@
 	setContext(DBSymbol, db);
 	$: $db.setSupabaseClient(data.supabase);
 
+	function getUserMetadata(user: User | null) {
+		return user ? { id: user.id, email: user.email } : null;
+	}
+
 	// Start with the user, unless we're on the browser, in which case we get a fresh token.
-	const user: UserContext = writable(data.session?.user ?? null);
+	// Keep the store up to date if the user changes.
+	const user: UserContext = writable(data.session ? getUserMetadata(data.session.user) : null);
 	setContext(UserSymbol, user);
+	$: user.set(data.session ? getUserMetadata(data.session.user) : null);
 
 	const errors: ErrorsContext = writable([]);
 	setContext(ErrorsSymbol, errors);
 
-	$: ({ strings, supabase } = data);
+	$: ({ strings, supabase, session } = data);
 	$: locale.set(strings);
 
 	onMount(() => {
-		const subscription = supabase.auth.onAuthStateChange(async (newUser) => {
-			if (newUser === 'SIGNED_OUT') {
+		const subscription = supabase.auth.onAuthStateChange((newUser, newSession) => {
+			if (newSession?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			} else if (newUser === 'SIGNED_OUT') {
 				user.set(null);
 				goto('/login');
-			} else {
-				const {
-					data: { user: latestUser }
-				} = await supabase.auth.getUser();
+			} else if (newSession) {
 				// Update the user.
-				user.set(latestUser);
+				user.set(getUserMetadata(newSession.user));
 			}
 		});
 
@@ -269,8 +275,6 @@
 	:global(input[type='text']) {
 		border-radius: var(--radius);
 		border: 2px solid var(--border);
-		font-size: var(--normal-size);
-		font-family: var(--font);
 	}
 
 	:global(textarea) {
