@@ -14,6 +14,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Permit accountable person to be responsible, consulted, and informed on subtasks.
 - Avoid keyboard conflict in `HowView`.
 - Changed "suggestion" to "change"
+- Moved visibility of process to header.
 
 ## v0.6.0 2024-07-05
 

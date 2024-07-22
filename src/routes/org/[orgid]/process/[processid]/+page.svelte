@@ -104,7 +104,23 @@
 						"Couldn't update process title."
 					)
 			: undefined}
-	/>
+	>
+		<Visibility
+			tip="Change visibility of this process"
+			level={how.visibility}
+			edit={editable
+				? (vis) =>
+						vis === 'public' || vis === 'org' || vis === 'admin'
+							? $db.updateHowVisibility(how, vis)
+							: undefined
+				: undefined}
+		/>
+		<Note inline
+			>{#if how.visibility === 'public'}Everyone on the internet can see this process{:else if how.visibility === 'org'}Only
+				members can see this process.{:else if how.visibility === 'admin'}Only admins can see this
+				process.{/if}</Note
+		>
+	</Title>
 
 	<Tip member
 		>Admins and anyone <Level level="accountable" verbose /> or <Level
@@ -143,22 +159,6 @@
 	</Paragraph>
 
 	<ARCI {how} verbose />
-
-	<Tip member
-		>This determines who can see this process. You can also control the visibility of individual
-		steps below.</Tip
-	>
-
-	<Visibility
-		tip="Change visibility of this process"
-		level={how.visibility}
-		edit={editable
-			? (vis) =>
-					vis === 'public' || vis === 'org' || vis === 'admin'
-						? $db.updateHowVisibility(how, vis)
-						: undefined
-			: undefined}
-	/>
 
 	<Header>When</Header>
 
