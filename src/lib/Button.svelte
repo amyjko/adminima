@@ -87,7 +87,7 @@
 
 	button[aria-disabled='true'] {
 		background: transparent;
-		border: var(--chrome) var(--thickness) solid;
+		border: var(--chrome) var(--thickness) dotted;
 		cursor: default;
 	}
 

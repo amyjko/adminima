@@ -20,6 +20,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Persistent org navigation header.
 - Sorted processes and roles on new change form.
 - Removed dupliates from role processes.
+- Fixed add person button.
 
 ## v0.6.1 2024-07-21
 

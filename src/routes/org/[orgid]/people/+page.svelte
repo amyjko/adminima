@@ -208,7 +208,7 @@
 			bind:text={newPersonEmail}
 			invalid={(text) => (text.length === 0 || validEmail(text) ? undefined : 'Not a valid email')}
 		/>
-		<Button tip="Add this person to the organization" action={() => {}} {active} submit>Add</Button>
+		<Button tip="Add this person to the organization" action={addEmail} {active} submit>Add</Button>
 		{#if existing}
 			<Paragraph>This person is already added.</Paragraph>
 		{/if}
