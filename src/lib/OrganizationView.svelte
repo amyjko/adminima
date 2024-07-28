@@ -14,6 +14,7 @@
 	import Button from './Button.svelte';
 	import Header from './Header.svelte';
 	import { goto } from '$app/navigation';
+	import OrgNav from './OrgNav.svelte';
 
 	export let organization: Organization;
 
@@ -63,32 +64,6 @@
 					see this organization's detail.{:else if organization.getVisibility() === 'admin'}Only
 					admins can see this organization's details.{/if}</Note
 			>
-		</div>
-		<div class="links">
-			<span class="link">
-				<strong>{organization.getRoles().length}</strong>
-				<Link kind="role" to="/org/{organization.getPath()}/roles"
-					>Role{organization.getRoles().length === 1 ? '' : 's'}</Link
-				>
-			</span>
-			<span class="link">
-				<strong>{organization.getProfiles().length} </strong>
-				<Link kind="person" to="/org/{organization.getPath()}/people"
-					>{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
-				>
-			</span>
-			<span class="link">
-				<strong>{organization.getProcesses().length}</strong>
-				<Link kind="process" to="/org/{organization.getPath()}/processes"
-					>Process{organization.getProcesses().length !== 1 ? 'es' : ''}</Link
-				>
-			</span>
-			<span class="link">
-				<strong>{organization.getChanges().length}</strong>
-				<Link kind="change" to="/org/{organization.getPath()}/changes"
-					>Change{organization.getChanges().length !== 1 ? 's' : ''}</Link
-				>
-			</span>
 		</div>
 	</div></Title
 >

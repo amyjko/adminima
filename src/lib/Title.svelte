@@ -7,6 +7,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import Link from './Link.svelte';
+	import OrgNav from './OrgNav.svelte';
 
 	// The title to show in the header
 	export let title: string;
@@ -30,39 +31,52 @@
 	<title>{title}</title>
 </svelte:head>
 
-<div class="title {kind}">
-	{#if $org && $page.url.pathname !== `/org/${$org.getPath()}`}
-		<div class="breadcrumbs">
-			<OrganizationLink id={$org.getPaths()[0] ?? $org.getID()} name={$org.getName()} />
-			{#if $page.url.pathname.includes('/role/')} &gt;<RoleLink roleID={null} /> {/if}
-			{#if $page.url.pathname.includes('/process/')} &gt;<ProcessLink processID={null} /> {/if}
-			{#if $page.url.pathname.includes('/change/')}
-				&gt;<Link to="/org/{$org.getPath()}/changes" kind="change">Changes</Link>{/if}
-			{#if $page.url.pathname.includes('/person/')}
-				&gt; <Link to="/org/{$org.getPath()}/people" kind="person">People</Link>{/if}
-		</div>
+<div class="title">
+	{#if $org}
+		<OrgNav organization={$org} />
 	{/if}
-	{#if kind}
-		<div class="kind">
-			{kind}
+	<div class="background {kind}">
+		{#if $org && $page.url.pathname !== `/org/${$org.getPath()}`}
+			<div class="breadcrumbs">
+				{#if $page.url.pathname.includes('/role/')} &gt;<RoleLink roleID={null} /> {/if}
+				{#if $page.url.pathname.includes('/process/')} &gt;<ProcessLink processID={null} /> {/if}
+				{#if $page.url.pathname.includes('/change/')}
+					&gt;<Link to="/org/{$org.getPath()}/changes" kind="change">Changes</Link>{/if}
+				{#if $page.url.pathname.includes('/person/')}
+					&gt; <Link to="/org/{$org.getPath()}/people" kind="person">People</Link>{/if}
+			</div>
+		{/if}
+		<div>
+			{#if kind}
+				<div class="kind">
+					{kind}
+				</div>
+			{/if}
+			<h1>
+				<EditableText text={title} {edit} />
+			</h1>
 		</div>
-	{/if}
-	<h1>
-		<EditableText text={title} {edit} />
-	</h1>
-	{#if edit}
-		<div />{/if}
-	<slot />
+		<slot />
+	</div>
 </div>
 
 <style>
 	.title {
 		width: calc(100% - (2 * var(--spacing)));
-		padding: calc(var(--spacing));
 		/* position: sticky;
 		top: 0; */
 		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--spacing) / 2);
+	}
+
+	.background {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--spacing) / 2);
 		background: var(--background);
+		padding: calc(var(--spacing));
 	}
 
 	h1 {
@@ -97,7 +111,8 @@
 	}
 
 	.person {
-		color: var(--salient);
+		background: var(--person);
+		color: var(--background);
 	}
 
 	.person .kind {

@@ -29,16 +29,17 @@
 		transition: transform 200ms;
 		display: inline-block;
 		border-radius: var(--padding);
-		line-height: 1.2;
 		text-decoration: underline;
 		text-decoration-color: var(--salient);
 		text-decoration-thickness: var(--thickness);
 	}
 
 	a.inactive {
-		color: var(--inactive);
 		text-decoration: none;
+		cursor: default;
 		background: none;
+		color: var(--foreground);
+		font-weight: bold;
 	}
 
 	a.bland {
@@ -63,16 +64,11 @@
 		padding-inline-start: var(--padding);
 		padding-inline-end: var(--padding);
 		text-decoration: none;
-		text-shadow: 1px 1px black;
+		/* text-shadow: 1px 1px black; */
 	}
 
 	.person {
-		background-color: none;
-		color: var(--salient);
-		font-weight: bold;
-		padding-inline-start: 0;
-		padding-inline-end: 0;
-		text-shadow: none;
+		background-color: var(--person);
 	}
 
 	.role {

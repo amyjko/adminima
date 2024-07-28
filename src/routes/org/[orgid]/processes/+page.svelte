@@ -90,7 +90,7 @@
 	}
 </script>
 
-<Title title="processes" kind="process" />
+<Title title="Processes" kind="process" />
 
 {#if ($user === null && $organization.getVisibility() !== 'public') || ($user !== null && !$organization.hasPerson($user.id))}
 	<Oops text="This organization's processes are not public." />

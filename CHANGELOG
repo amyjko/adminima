@@ -15,6 +15,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Improved invisible step rendering.
 - Moved delete button into role links.
 - Better layout of RCI in how view.
+- Persistent org navigation header.
 
 ## v0.6.1 2024-07-21
 

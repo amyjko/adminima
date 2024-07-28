@@ -51,7 +51,7 @@
 	$: active = !match && !existing && newPersonEmail.length > 0;
 </script>
 
-<Title title="people" kind="person" />
+<Title title="People" kind="person" />
 
 <Tip member
 	>This is the list of people in this organization. <strong>Admins</strong> have permission to add and

@@ -46,7 +46,7 @@
 	}
 </script>
 
-<Title title="roles" kind="role" />
+<Title title="Roles" kind="role" />
 <Tip
 	>These are the roles held in this organization. Each one is responsible for particular processes
 	in this organization.</Tip
