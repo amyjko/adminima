@@ -282,16 +282,18 @@ export default class Organization {
 
 	getRoleProcesses(role: RoleID): ProcessRow[] {
 		return [
-			...this.data.hows
-				.filter(
-					(task) =>
-						task.responsible?.includes(role) ||
-						task.consulted?.includes(role) ||
-						task.informed?.includes(role)
-				)
-				.map((how) => this.data.processes.find((process) => process.id === how.processid))
-				.filter((process): process is ProcessRow => process !== undefined),
-			...this.data.processes.filter((p) => p.accountable === role)
+			...new Set([
+				...this.data.hows
+					.filter(
+						(task) =>
+							task.responsible?.includes(role) ||
+							task.consulted?.includes(role) ||
+							task.informed?.includes(role)
+					)
+					.map((how) => this.data.processes.find((process) => process.id === how.processid))
+					.filter((process): process is ProcessRow => process !== undefined),
+				...this.data.processes.filter((p) => p.accountable === role)
+			])
 		];
 	}
 
