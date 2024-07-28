@@ -3,6 +3,14 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.6.2 2024-07-28
+
+### Added
+
+### Fixed
+
+- Disabled keyboard shortcuts on how view to avoid conflicting with text editing shortcuts.
+
 ## v0.6.1 2024-07-21
 
 ### Fixed

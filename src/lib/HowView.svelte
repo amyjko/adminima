@@ -177,31 +177,31 @@
 					class:done={how.done === 'yes'}
 					class:pending={how.done === 'pending'}
 					on:keydown={(e) => {
-						if (e.key === 'Enter' && e.metaKey) {
-							e.preventDefault();
-							insertHow();
-						} else if (e.key === 'Backspace' && e.metaKey) {
-							e.preventDefault();
-							deleteHow();
-						} else if (e.key === 'ArrowRight' && e.altKey) {
-							e.preventDefault();
-							indentHow(true);
-						} else if (e.key === 'ArrowLeft' && e.altKey) {
-							e.preventDefault();
-							unindentHow(true);
-						} else if (e.key === 'ArrowDown') {
-							const lines = text.split('\n');
-							if (input && input.selectionEnd >= text.length - lines[lines.length - 1].length) {
-								e.preventDefault();
-								moveVertically(1);
-							}
-						} else if (e.key === 'ArrowUp') {
-							const lines = text.split('\n');
-							if (input && input.selectionEnd <= lines[0].length) {
-								e.preventDefault();
-								moveVertically(-1);
-							}
-						}
+						// if (e.key === 'Enter' && e.metaKey) {
+						// 	e.preventDefault();
+						// 	insertHow();
+						// } else if (e.key === 'Backspace' && e.metaKey) {
+						// 	e.preventDefault();
+						// 	deleteHow();
+						// } else if (e.key === 'ArrowRight' && e.altKey) {
+						// 	e.preventDefault();
+						// 	indentHow(true);
+						// } else if (e.key === 'ArrowLeft' && e.altKey) {
+						// 	e.preventDefault();
+						// 	unindentHow(true);
+						// } else if (e.key === 'ArrowDown') {
+						// 	const lines = text.split('\n');
+						// 	if (input && input.selectionEnd >= text.length - lines[lines.length - 1].length) {
+						// 		e.preventDefault();
+						// 		moveVertically(1);
+						// 	}
+						// } else if (e.key === 'ArrowUp') {
+						// 	const lines = text.split('\n');
+						// 	if (input && input.selectionEnd <= lines[0].length) {
+						// 		e.preventDefault();
+						// 		moveVertically(-1);
+						// 	}
+						// }
 					}}
 				>
 					<MarkupView
