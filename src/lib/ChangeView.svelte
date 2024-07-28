@@ -105,7 +105,7 @@
 			options={[
 				{ value: undefined, label: '—' },
 				...$org.getProfiles().map((person) => {
-					return { value: person.id, label: person.name };
+					return { value: person.id, label: person.name.length === 0 ? person.email : person.name };
 				})
 			]}
 			change={(person) => {
