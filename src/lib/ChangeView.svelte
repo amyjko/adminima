@@ -98,6 +98,27 @@
 	/>.</Paragraph
 >
 
+<Paragraph>
+	{#if editable}<Select
+			tip="Choose who is leading this change"
+			selection={change.lead ?? undefined}
+			options={[
+				{ value: undefined, label: '—' },
+				...$org.getProfiles().map((person) => {
+					return { value: person.id, label: person.name };
+				})
+			]}
+			change={(person) => {
+				queryOrError(
+					errors,
+					$db.updateChangeLead(change, person ?? null),
+					"Couldn't update change processes."
+				);
+			}}
+		/>{:else if change.lead}<PersonLink profile={$org.getProfileWithID(change.lead)} />{:else}No one{/if}
+	is in currently leading this change project.</Paragraph
+>
+
 <Header>Problem</Header>
 
 <MarkupView

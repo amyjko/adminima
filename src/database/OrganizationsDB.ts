@@ -959,10 +959,18 @@ class OrganizationsDB {
 			.single();
 	}
 
-	async updateChangeVisibility(how: ChangeRow, vis: string) {
+	async updateChangeVisibility(change: ChangeRow, vis: string) {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ visibility: vis })
+			.eq('id', change.id);
+		return error;
+	}
+
+	async updateChangeLead(how: ChangeRow, lead: string | null) {
+		const { error } = await this.supabase
+			.from('suggestions')
+			.update({ lead: lead })
 			.eq('id', how.id);
 		return error;
 	}

@@ -17,7 +17,7 @@
 	<Table>
 		<thead>
 			<tr>
-				<th>reporter</th>
+				<th>lead</th>
 				<th>title</th>
 				<th>status</th>
 			</tr>
@@ -27,7 +27,11 @@
 				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
 				.sort((a, b) => Levels[a.status] - Levels[b.status]) as change}
 				<tr>
-					<td><PersonLink profile={$org.getProfileWithPersonID(change.who)} /></td>
+					<td
+						>{#if change.lead}<PersonLink
+								profile={$org.getProfileWithID(change.lead)}
+							/>{:else}&mdash;{/if}</td
+					>
 					<td><ChangeLink id={change.id} /></td><td><Status status={change.status} /></td>
 				</tr>
 			{/each}

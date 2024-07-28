@@ -2,8 +2,6 @@
 	import { getOrg } from './contexts';
 
 	export let status: string;
-
-	const org = getOrg();
 </script>
 
 <span class="status {status}" title={status}
@@ -14,7 +12,6 @@
 	.status {
 		text-transform: none;
 		display: inline-block;
-		align-self: flex-start;
 		font-size: var(--small-size);
 		padding-left: var(--padding);
 		padding-right: var(--padding);

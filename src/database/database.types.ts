@@ -451,6 +451,7 @@ export type Database = {
           comments: string[]
           description: string
           id: string
+          lead: string | null
           orgid: string
           processes: string[]
           proposal: string
@@ -467,6 +468,7 @@ export type Database = {
           comments?: string[]
           description?: string
           id?: string
+          lead?: string | null
           orgid: string
           processes?: string[]
           proposal?: string
@@ -483,6 +485,7 @@ export type Database = {
           comments?: string[]
           description?: string
           id?: string
+          lead?: string | null
           orgid?: string
           processes?: string[]
           proposal?: string
@@ -495,6 +498,13 @@ export type Database = {
           who?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "suggestions_lead_fkey"
+            columns: ["lead"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "suggestions_orgid_fkey"
             columns: ["orgid"]

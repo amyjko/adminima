@@ -46,7 +46,7 @@
 				<EditableText text={title} {edit} />
 			</h1>
 		</div>
-		<slot />
+		<div class="metadata"><slot /></div>
 	</div>
 </div>
 
@@ -79,6 +79,14 @@
 		justify-items: baseline;
 		gap: var(--padding);
 		word-break: break-word;
+	}
+
+	.metadata {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: var(--spacing);
+		align-items: center;
 	}
 
 	.kind {

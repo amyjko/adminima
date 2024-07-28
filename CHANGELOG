@@ -7,6 +7,8 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ### Added
 
+- Added a "lead" on a change to keep track of who is currently in charge of managing the change.
+
 ### Fixed
 
 - Disabled keyboard shortcuts on how view to avoid conflicting with text editing shortcuts.
