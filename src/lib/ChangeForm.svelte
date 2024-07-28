@@ -67,9 +67,12 @@
 			tip="Add a role that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
-				...$organization.getRoles().map((role) => {
-					return { value: role.id, label: role.title };
-				})
+				...$organization
+					.getRoles()
+					.toSorted((a, b) => a.title.localeCompare(b.title))
+					.map((role) => {
+						return { value: role.id, label: role.title };
+					})
 			]}
 			selection={role}
 			change={(r) => (role = r)}
@@ -80,9 +83,12 @@
 			tip="Add a process that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
-				...$organization.getProcesses().map((process) => {
-					return { value: process.id, label: process.title };
-				})
+				...$organization
+					.getProcesses()
+					.toSorted((a, b) => a.title.localeCompare(b.title))
+					.map((process) => {
+						return { value: process.id, label: process.title };
+					})
 			]}
 			selection={process}
 			change={(p) => (process = p)}
