@@ -93,6 +93,7 @@
 							><RoleLink roleID={role.id}
 								>{#if isAdmin}<Button
 										tip="Unassign this role from this person"
+										chromeless
 										action={async () => {
 											const error = await queryOrError(
 												errors,
