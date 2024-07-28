@@ -17,12 +17,16 @@
 		{ value: undefined, label: '▼' },
 		...$org
 			.getRoles()
+			// Exclude any alreaydy included in the how.
 			.filter(
 				(r) =>
 					!how.responsible.includes(r.id) &&
 					!how.consulted.includes(r.id) &&
 					!how.informed.includes(r.id)
 			)
+			// Sort by ttile.
+			.toSorted((a, b) => a.title.localeCompare(b.title))
+			// Map to select options.
 			.map((role) => {
 				return { value: role.id, label: role.title };
 			})

@@ -10,6 +10,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Disabled keyboard shortcuts on how view to avoid conflicting with text editing shortcuts.
+- Sorted how RCI options.
 
 ## v0.6.1 2024-07-21
 
