@@ -194,7 +194,7 @@
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
 				<li>
 					{#if subHow}<HowView how={subHow} {process} {editable} />{:else}<Note
-							>This step is not visible to you. {how.how[index]}</Note
+							>This step is not visible to you.</Note
 						>{/if}
 				</li>
 			{/each}
