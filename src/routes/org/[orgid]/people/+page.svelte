@@ -90,17 +90,19 @@
 				<td class="roles">
 					{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
 						<span class="role"
-							><RoleLink roleID={role.id} />{#if isAdmin}<Button
-									tip="Unassign this role from this person"
-									action={async () => {
-										const error = await queryOrError(
-											errors,
-											$db.unassignPerson($organization.getID(), profile.id, role.id),
-											'Could not unassign role.'
-										);
-										if (error) return;
-									}}>{Delete}</Button
-								>{/if}</span
+							><RoleLink roleID={role.id}
+								>{#if isAdmin}<Button
+										tip="Unassign this role from this person"
+										action={async () => {
+											const error = await queryOrError(
+												errors,
+												$db.unassignPerson($organization.getID(), profile.id, role.id),
+												'Could not unassign role.'
+											);
+											if (error) return;
+										}}>{Delete}</Button
+									>{/if}</RoleLink
+							></span
 						>
 					{/each}
 					{#if isAdmin}

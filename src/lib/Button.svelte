@@ -9,6 +9,7 @@
 	export let submit = false;
 	export let warning = false;
 	export let end = false;
+	export let chromeless = false;
 
 	let confirm = false;
 </script>
@@ -23,13 +24,18 @@
 	<button
 		class:warning
 		class:end
+		class:chromeless
 		type={submit ? 'submit' : 'button'}
 		aria-disabled={!active}
 		title={tip}
 		aria-label={tip}
-		on:click={() => {
+		on:click={(event) => {
 			if (warning) confirm = true;
-			else if (active) action();
+			else if (active) {
+				action();
+				event.stopPropagation();
+				event.preventDefault();
+			}
 		}}><slot /></button
 	>
 {/if}
@@ -48,6 +54,16 @@
 		display: inline-flex;
 		align-items: center;
 		min-width: 1em;
+	}
+
+	button.chromeless {
+		background: transparent;
+		border: none;
+		color: currentColor;
+	}
+
+	button.chromeless:hover {
+		color: var(--chrome);
 	}
 
 	button:active {

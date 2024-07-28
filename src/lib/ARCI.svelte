@@ -58,13 +58,15 @@
 			/>
 		{/if}
 		{#each how.responsible as responsible}
-			<RoleLink roleID={responsible} />
-			{#if editable}
-				<Button
-					tip="Remove this role from the responsible list."
-					action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
-				>
-			{/if}
+			<RoleLink roleID={responsible}
+				>{#if editable}
+					<Button
+						chromeless
+						tip="Remove this role from the responsible list."
+						action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
+					>
+				{/if}</RoleLink
+			>
 		{/each}
 		{#if verbose}
 			is <Level level="responsible" verbose /> for completing this process.
@@ -89,13 +91,15 @@
 			/>
 		{/if}
 		{#each how.consulted as consulted}
-			<RoleLink roleID={consulted} />
-			{#if editable}
-				<Button
-					tip="Remove this role from the consulted list."
-					action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
-				>
-			{/if}
+			<RoleLink roleID={consulted}
+				>{#if editable}
+					<Button
+						chromeless
+						tip="Remove this role from the consulted list."
+						action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
+					>
+				{/if}</RoleLink
+			>
 		{/each}
 		{#if verbose}
 			is <Level level="consulted" verbose /> to complete this process.
@@ -120,13 +124,15 @@
 			/>
 		{/if}
 		{#each how.informed as informed}
-			<RoleLink roleID={informed} />
-			{#if editable}
-				<Button
-					tip="Remove this role from the informed list"
-					action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
-				>
-			{/if}
+			<RoleLink roleID={informed}
+				>{#if editable}
+					<Button
+						chromeless
+						tip="Remove this role from the informed list"
+						action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
+					>
+				{/if}</RoleLink
+			>
 		{/each}
 		{#if verbose}
 			is <Level level="informed" verbose /> about this process and its outcomes.

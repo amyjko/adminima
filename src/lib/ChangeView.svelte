@@ -131,20 +131,22 @@
 <Header>Affected roles</Header>
 <div class="row">
 	{#each change.roles as role}
-		<RoleLink roleID={role} />
-		<Button
-			tip="Remove this role from the affected roles."
-			action={() =>
-				queryOrError(
-					errors,
-					$db.updateChangeRoles(
-						change,
-						change.roles.filter((r) => r !== role)
-					),
-					"Couldn't update change roles."
-				)}
-		>
-			{Delete}</Button
+		<RoleLink roleID={role}
+			><Button
+				chromeless
+				tip="Remove this role from the affected roles."
+				action={() =>
+					queryOrError(
+						errors,
+						$db.updateChangeRoles(
+							change,
+							change.roles.filter((r) => r !== role)
+						),
+						"Couldn't update change roles."
+					)}
+			>
+				{Delete}</Button
+			></RoleLink
 		>
 	{:else}
 		&mdash;

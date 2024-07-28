@@ -13,6 +13,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Sorted how RCI options.
 - Hide widgets if process isn't editable.
 - Improved invisible step rendering.
+- Moved delete button into role links.
 
 ## v0.6.1 2024-07-21
 
