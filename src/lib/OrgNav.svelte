@@ -45,7 +45,7 @@
 	.links {
 		display: flex;
 		flex-direction: row;
-		justify-content: center;
+		justify-content: start;
 		gap: var(--spacing);
 		font-size: var(--small-size);
 	}

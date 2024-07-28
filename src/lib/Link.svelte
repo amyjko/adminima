@@ -38,8 +38,6 @@
 		text-decoration: none;
 		cursor: default;
 		background: none;
-		color: var(--foreground);
-		font-weight: bold;
 	}
 
 	a.bland {

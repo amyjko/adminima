@@ -32,19 +32,9 @@
 </svelte:head>
 
 <div class="title">
-	{#if $org}
-		<OrgNav organization={$org} />
-	{/if}
 	<div class="background {kind}">
-		{#if $org && $page.url.pathname !== `/org/${$org.getPath()}`}
-			<div class="breadcrumbs">
-				{#if $page.url.pathname.includes('/role/')} &gt;<RoleLink roleID={null} /> {/if}
-				{#if $page.url.pathname.includes('/process/')} &gt;<ProcessLink processID={null} /> {/if}
-				{#if $page.url.pathname.includes('/change/')}
-					&gt;<Link to="/org/{$org.getPath()}/changes" kind="change">Changes</Link>{/if}
-				{#if $page.url.pathname.includes('/person/')}
-					&gt; <Link to="/org/{$org.getPath()}/people" kind="person">People</Link>{/if}
-			</div>
+		{#if $org}
+			<OrgNav organization={$org} />
 		{/if}
 		<div>
 			{#if kind}
@@ -62,7 +52,7 @@
 
 <style>
 	.title {
-		width: calc(100% - (2 * var(--spacing)));
+		width: calc(100%);
 		/* position: sticky;
 		top: 0; */
 		z-index: 1;
@@ -75,7 +65,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: calc(var(--spacing) / 2);
-		background: var(--background);
+		background: var(--foreground);
+		color: var(--background);
 		padding: calc(var(--spacing));
 	}
 
