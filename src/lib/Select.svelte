@@ -41,7 +41,6 @@
 	}
 
 	select[disabled] {
-		background: var(--inactive);
 		color: var(--inactive);
 		cursor: default;
 	}

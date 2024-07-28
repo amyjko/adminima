@@ -40,103 +40,118 @@
 
 <div class="arci" class:verbose>
 	<div class="slot">
-		{#if !verbose}
-			<Level level="responsible" />
-		{/if}
-		{#if options.length > 0 && editable}
-			<Select
-				tip="Add a role to be responsible for completing this step."
-				{options}
-				fit={false}
-				bind:selection={responsible}
-				change={(value) => {
-					if (value) {
-						$db.addHowRCI(how, value, 'responsible');
-						responsible = undefined;
-					}
-				}}
-			/>
-		{/if}
-		{#each how.responsible as responsible}
-			<RoleLink roleID={responsible}
-				>{#if editable}
-					<Button
-						chromeless
-						tip="Remove this role from the responsible list."
-						action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
-					>
-				{/if}</RoleLink
-			>
-		{/each}
-		{#if verbose}
-			is <Level level="responsible" verbose /> for completing this process.
-		{/if}
+		<div class="control">
+			{#if !verbose}
+				<Level level="responsible" />
+			{/if}
+			{#if editable}
+				<Select
+					tip="Add a role to be responsible for completing this step."
+					{options}
+					fit={false}
+					active={options.length > 1}
+					bind:selection={responsible}
+					change={(value) => {
+						if (value) {
+							$db.addHowRCI(how, value, 'responsible');
+							responsible = undefined;
+						}
+					}}
+				/>
+			{/if}
+		</div>
+		<div class="roles">
+			{#each how.responsible as responsible}
+				<RoleLink roleID={responsible}
+					>{#if editable}
+						<Button
+							chromeless
+							tip="Remove this role from the responsible list."
+							action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
+						>
+					{/if}</RoleLink
+				>
+			{/each}
+			{#if verbose}
+				is <Level level="responsible" verbose /> for completing this process.
+			{/if}
+		</div>
 	</div>
 	<div class="slot">
-		{#if !verbose}
-			<Level level="consulted" />
-		{/if}
-		{#if options.length > 0 && editable}
-			<Select
-				tip="Add a role to be consulted in this step."
-				{options}
-				bind:selection={consulted}
-				fit={false}
-				change={(value) => {
-					if (value) {
-						$db.addHowRCI(how, value, 'consulted');
-						consulted = undefined;
-					}
-				}}
-			/>
-		{/if}
-		{#each how.consulted as consulted}
-			<RoleLink roleID={consulted}
-				>{#if editable}
-					<Button
-						chromeless
-						tip="Remove this role from the consulted list."
-						action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
-					>
-				{/if}</RoleLink
-			>
-		{/each}
-		{#if verbose}
-			is <Level level="consulted" verbose /> to complete this process.
-		{/if}
+		<div class="control">
+			{#if !verbose}
+				<Level level="consulted" />
+			{/if}
+			{#if editable}
+				<Select
+					tip="Add a role to be consulted in this step."
+					{options}
+					active={options.length > 1}
+					bind:selection={consulted}
+					fit={false}
+					change={(value) => {
+						if (value) {
+							$db.addHowRCI(how, value, 'consulted');
+							consulted = undefined;
+						}
+					}}
+				/>
+			{/if}
+		</div>
+		<div class="roles">
+			{#each how.consulted as consulted}
+				<RoleLink roleID={consulted}
+					>{#if editable}
+						<Button
+							chromeless
+							tip="Remove this role from the consulted list."
+							action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
+						>
+					{/if}</RoleLink
+				>
+			{/each}
+			{#if verbose}
+				is <Level level="consulted" verbose /> to complete this process.
+			{/if}
+		</div>
 	</div>
 	<div class="slot">
-		{#if !verbose}
-			<Level level="informed" />
-		{/if}
-		{#if options.length > 0 && editable}
-			<Select
-				tip="Add a role to be informed in this step."
-				{options}
-				bind:selection={informed}
-				fit={false}
-				change={(value) => {
-					if (value) {
-						$db.addHowRCI(how, value, 'informed');
-						informed = undefined;
-					}
-				}}
-			/>
-		{/if}
-		{#each how.informed as informed}
-			<RoleLink roleID={informed}
-				>{#if editable}
-					<Button
-						chromeless
-						tip="Remove this role from the informed list"
-						action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
-					>
-				{/if}</RoleLink
-			>
-		{/each}
-		{#if verbose}
-			is <Level level="informed" verbose /> about this process and its outcomes.
-		{/if}
+		<div class="controls">
+			{#if !verbose}
+				<Level level="informed" />
+			{/if}
+			{#if editable}
+				<Select
+					tip="Add a role to be informed in this step."
+					{options}
+					bind:selection={informed}
+					active={options.length > 1}
+					fit={false}
+					change={(value) => {
+						if (value) {
+							$db.addHowRCI(how, value, 'informed');
+							informed = undefined;
+						}
+					}}
+				/>
+			{/if}
+		</div>
+		<div class="roles">
+			{#each how.informed as informed}
+				<RoleLink roleID={informed}
+					>{#if editable}
+						<Button
+							chromeless
+							tip="Remove this role from the informed list"
+							action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
+						>
+					{/if}</RoleLink
+				>
+			{/each}
+			{#if verbose}
+				is <Level level="informed" verbose /> about this process and its outcomes.
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -144,12 +159,33 @@
 	.arci {
 		display: flex;
 		flex-direction: row;
+		flex-wrap: wrap;
 		align-items: center;
-		gap: var(--spacing);
+		gap: calc(var(--spacing) / 2);
+		row-gap: calc(var(--spacing) / 2);
 	}
 
 	.slot {
-		display: inline;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		gap: calc(var(--spacing) / 2);
+		align-items: baseline;
+	}
+
+	.control {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: calc(var(--spacing) / 2);
+	}
+
+	.roles {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: calc(var(--spacing) / 2);
 	}
 
 	.verbose {
