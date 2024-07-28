@@ -10,6 +10,7 @@
 	import MarkupView from './MarkupView.svelte';
 	import BlocksView from './BlocksView.svelte';
 	import { parse } from '../markup/parser';
+	import Status from './Status.svelte';
 
 	export let how: HowRow;
 	export let process: ProcessRow;
@@ -206,7 +207,7 @@
 				>
 					<MarkupView
 						markup={text}
-						edit={save}
+						edit={editable ? save : undefined}
 						placeholder="Explain this step…"
 						id={deleted ? '' : `how-${how.id}`}
 					/>
@@ -214,30 +215,36 @@
 			{:else}
 				<BlocksView blocks={parse(text).blocks} />
 			{/if}
-			<Button
-				tip="Unindent this step"
-				action={() => unindentHow(false)}
-				active={getUnindent() !== undefined}>&lt;</Button
-			>
-			<Button
-				tip="Indent this step"
-				action={() => indentHow(false)}
-				active={getIndent() !== undefined}>&gt;</Button
-			>
-			<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
-			<Button tip="Delete this step" action={deleteHow} active={canDelete()}>{Delete}</Button>
+			{#if editable}
+				<Button
+					tip="Unindent this step"
+					action={() => unindentHow(false)}
+					active={getUnindent() !== undefined}>&lt;</Button
+				>
+				<Button
+					tip="Indent this step"
+					action={() => indentHow(false)}
+					active={getIndent() !== undefined}>&gt;</Button
+				>
+				<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
+				<Button tip="Delete this step" action={deleteHow} active={canDelete()}>{Delete}</Button>
+			{/if}
 		</div>
 	{/if}
 	<div class="meta">
-		<Visibility
-			tip="Change visibility of this step"
-			level={how.visibility}
-			edit={(vis) =>
-				vis === 'public' || vis === 'org' || vis === 'admin'
-					? $db.updateHowVisibility(how, vis)
-					: undefined}
-		/>
-		<ARCI {how} verbose={false} />
+		{#if editable}
+			<Visibility
+				tip="Change visibility of this step"
+				level={how.visibility}
+				edit={(vis) =>
+					vis === 'public' || vis === 'org' || vis === 'admin'
+						? $db.updateHowVisibility(how, vis)
+						: undefined}
+			/>
+		{:else}
+			<Status status={how.visibility} />
+		{/if}
+		<ARCI {how} verbose={false} {editable} />
 	</div>
 	<ol>
 		{#each how.how

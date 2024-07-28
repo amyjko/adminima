@@ -158,7 +158,7 @@
 			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible){/if}.
 	</Paragraph>
 
-	<ARCI {how} verbose />
+	<ARCI {how} verbose {editable} />
 
 	<Header>When</Header>
 
