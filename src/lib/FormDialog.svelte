@@ -21,6 +21,16 @@
 	let submitting = false;
 
 	$: active = !submitting && valid();
+
+	async function doAction() {
+		if (!active) {
+			return;
+		}
+		submitting = true;
+		const result = await action();
+		submitting = false;
+		if (result) show = false;
+	}
 </script>
 
 <Button tip={showTip} action={() => (show = true)}>{button}</Button>
@@ -28,19 +38,7 @@
 	<Dialog close={() => (show = false)}>
 		<Header>{header}</Header>
 		<Paragraph>{explanation}</Paragraph>
-		<Form
-			{active}
-			inactiveMessage={inactive}
-			action={async () => {
-				if (!active) {
-					return;
-				}
-				submitting = true;
-				const result = await action();
-				submitting = false;
-				if (result) show = false;
-			}}
-		>
+		<Form {active} inactiveMessage={inactive} action={doAction}>
 			<slot />
 			<Actions
 				><Button tip="Dismiss this dialog." end action={() => (show = false)}>Cancel</Button><Button
@@ -48,7 +46,7 @@
 					end
 					submit
 					{active}
-					action={() => {}}>{submit}</Button
+					action={doAction}>{submit}</Button
 				>
 			</Actions>
 			{#if submitting}<Loading />{/if}
