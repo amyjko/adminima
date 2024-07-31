@@ -156,10 +156,10 @@
 									})
 							]}
 							selection={profile.supervisor ?? undefined}
-							change={(personID) => {
+							change={(profileID) => {
 								queryOrError(
 									errors,
-									$db.updateProfileSupervisor($organization.getID(), profile.id, personID ?? null),
+									$db.updateProfileSupervisor($organization.getID(), profile.id, profileID ?? null),
 									"Couldn't update supervisor."
 								);
 							}}

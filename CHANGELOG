@@ -13,6 +13,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Fixed form submission.
 - Fixed position of dialogs.
+- Fixed supervision setting.
 
 ## v0.6.2 2024-07-28
 

@@ -525,13 +525,13 @@ class OrganizationsDB {
 	async updateProfileSupervisor(
 		orgid: OrganizationID,
 		profileid: ProfileID,
-		supervisor: PersonID | null
+		supervisor: ProfileID | null
 	) {
 		const { error } = await this.supabase
 			.from('profiles')
 			.update({ supervisor })
 			.eq('orgid', orgid)
-			.eq('personid', profileid);
+			.eq('id', profileid);
 		return error;
 	}
 
