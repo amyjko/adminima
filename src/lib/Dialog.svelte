@@ -24,7 +24,7 @@
 
 <style>
 	dialog {
-		position: relative;
+		position: fixed;
 		border-radius: var(--radius);
 		padding: 1em;
 		margin-left: auto;
