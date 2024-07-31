@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.6.3 2024-08-04
 
+### Added
+
+- Added ability to move how items up and down in a list.
+
 ### Fixed
 
 - Fixed form submission.

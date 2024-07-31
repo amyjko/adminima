@@ -16,13 +16,16 @@
 	export let process: ProcessRow;
 	export let editable: boolean;
 
+	$: parent = $org.getHowParent(how.id);
+	$: index = parent?.how.indexOf(how.id) ?? -1;
+	$: length = parent?.how.length ?? -1;
+
 	const org = getOrg();
 	const db = getDB();
 	const errors = getErrors();
 
 	const focusID = getContext<Writable<string | undefined>>('focusID');
 
-	let input: HTMLTextAreaElement;
 	let text = how.what;
 	// Helps us keep track of whether to give this an HTML ID for purposes of focusing.
 	let deleted = false;
@@ -37,7 +40,6 @@
 
 	async function insertHow() {
 		// See if this how has a parent, and if so, insert after this how.
-		const parent = $org.getHowParent(how.id);
 		if (parent) {
 			const { error, id } = await $db.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
 			if (error) addError(errors, 'Unable to insert how.', error);
@@ -52,7 +54,6 @@
 	}
 
 	function canDelete() {
-		const parent = $org.getHowParent(how.id);
 		return (
 			parent &&
 			process.howid !== how.id &&
@@ -61,7 +62,6 @@
 	}
 
 	async function deleteHow() {
-		const parent = $org.getHowParent(how.id);
 		if (parent && canDelete()) {
 			const newFocusID =
 				parent.how.length === 1 || parent.how[0] === how.id
@@ -76,14 +76,10 @@
 	}
 
 	function getIndent() {
-		const parent = $org.getHowParent(how.id);
-		if (parent) {
-			const index = parent.how.indexOf(how.id);
-			if (index > 0) {
-				const previousID = parent.how[index - 1];
-				const previousHow = $org.getHow(previousID);
-				if (previousHow) return [parent, previousHow];
-			}
+		if (parent && index > 0) {
+			const previousID = parent.how[index - 1];
+			const previousHow = $org.getHow(previousID);
+			if (previousHow) return [parent, previousHow];
 		}
 		return undefined;
 	}
@@ -95,7 +91,7 @@
 			deleted = true;
 			const error = await queryOrError(
 				errors,
-				$db.moveHow(how, parent, previousHow, previousHow.how.length),
+				$db.reparentHow(how, parent, previousHow, previousHow.how.length),
 				"Couldn't indent how."
 			);
 			if (error) return;
@@ -105,7 +101,6 @@
 	}
 
 	function getUnindent() {
-		const parent = $org.getHowParent(how.id);
 		if (parent) {
 			const grandparent = $org.getHowParent(parent.id);
 			if (grandparent) {
@@ -122,7 +117,7 @@
 			deleted = true;
 			const error = await queryOrError(
 				errors,
-				$db.moveHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1),
+				$db.reparentHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1),
 				"Couldn't unindent how."
 			);
 			if (error) return;
@@ -131,26 +126,40 @@
 		}
 	}
 
-	function enumerate(how: HowRow, list: HowID[] = []) {
-		list.push(how.id);
-		for (const subhow of how.how
-			.map((id) => $org.getHow(id))
-			.filter((h): h is HowRow => h !== undefined)) {
-			enumerate(subhow, list);
-		}
-		return list;
-	}
+	// function enumerate(how: HowRow, list: HowID[] = []) {
+	// 	list.push(how.id);
+	// 	for (const subhow of how.how
+	// 		.map((id) => $org.getHow(id))
+	// 		.filter((h): h is HowRow => h !== undefined)) {
+	// 		enumerate(subhow, list);
+	// 	}
+	// 	return list;
+	// }
 
-	function moveVertically(dir: -1 | 1) {
-		if (process.howid) {
-			const root = $org.getHow(process.howid);
-			if (root) {
-				const list = enumerate(root);
-				const index = list.indexOf(how.id);
-				if (index >= 0 && index + dir < list.length) {
-					const next = list[index + dir];
-					document.getElementById(`how-${next}`)?.focus();
-				}
+	// function focusVertically(dir: -1 | 1) {
+	// 	const index = getIndex();
+	// 	if (index >= 0 && process.howid) {
+	// 		const root = $org.getHow(process.howid);
+	// 		if (root) {
+	// 			const list = enumerate(root);
+	// 			if (index >= 0 && index + dir < list.length) {
+	// 				const next = list[index + dir];
+	// 				document.getElementById(`how-${next}`)?.focus();
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	async function moveVertically(dir: -1 | 1) {
+		const parent = $org.getHowParent(how.id);
+		if (parent) {
+			if (index >= 0 && index + dir < parent.how.length) {
+				const error = await queryOrError(
+					errors,
+					$db.moveHow(how, parent, index + dir),
+					"Couldn't move how."
+				);
+				if (error) return;
 			}
 		}
 	}
@@ -216,15 +225,19 @@
 				<BlocksView blocks={parse(text).blocks} />
 			{/if}
 			{#if editable}
+				<Button tip="Move up" action={() => moveVertically(-1)} active={index > 0}>⏶</Button>
+				<Button tip="Move down" action={() => moveVertically(1)} active={index + 1 < length}
+					>⏷</Button
+				>
 				<Button
 					tip="Unindent this step"
 					action={() => unindentHow(false)}
-					active={getUnindent() !== undefined}>&lt;</Button
+					active={getUnindent() !== undefined}>⏴</Button
 				>
 				<Button
 					tip="Indent this step"
 					action={() => indentHow(false)}
-					active={getIndent() !== undefined}>&gt;</Button
+					active={getIndent() !== undefined}>⏵</Button
 				>
 				<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
 				<Button tip="Delete this step" action={deleteHow} active={canDelete()}>{Delete}</Button>
@@ -249,7 +262,7 @@
 	<ol>
 		{#each how.how
 			.map((h) => $org.getHow(h))
-			.filter((h) => h !== undefined) as subhow, index (subhow ? subhow.id : index)}
+			.filter((h) => h !== undefined) as subhow, index (subhow.id)}
 			<li><svelte:self how={subhow} {process} {editable} /></li>
 		{/each}
 	</ol>
@@ -281,7 +294,7 @@
 		font-size: var(--font-size);
 		display: flex;
 		flex-direction: row;
-		align-items: center;
+		align-items: baseline;
 		justify-content: space-around;
 		cursor: pointer;
 		user-select: none;

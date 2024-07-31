@@ -900,7 +900,7 @@ class OrganizationsDB {
 		return { error, id: newHow.id };
 	}
 
-	async moveHow(how: HowRow, oldParent: HowRow, newParent: HowRow, index: number) {
+	async reparentHow(how: HowRow, oldParent: HowRow, newParent: HowRow, index: number) {
 		// Remove from the current parent
 		const { error: oldError } = await this.supabase
 			.from('hows')
@@ -912,6 +912,17 @@ class OrganizationsDB {
 			.from('hows')
 			.update({ how: [...newParent.how.slice(0, index), how.id, ...newParent.how.slice(index)] })
 			.eq('id', newParent.id);
+		return newError;
+	}
+
+	async moveHow(how: HowRow, parent: HowRow, index: number) {
+		const hows = parent.how.filter((h) => h !== how.id);
+
+		// Insert in the new parent
+		const { error: newError } = await this.supabase
+			.from('hows')
+			.update({ how: [...hows.slice(0, index), how.id, ...hows.slice(index)] })
+			.eq('id', parent.id);
 		return newError;
 	}
 
