@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import Oops from './Oops.svelte';
 	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import type { ProcessID, RoleID } from '$types/Organization';
@@ -39,7 +39,11 @@
 				role ? [role] : []
 			);
 			if (error) addError(errors, "Couldn't create the change.", error);
-			else if (change) goto(`/org/${$organization.getPath()}/change/${change.id}`);
+			else if (change) {
+				const newChange = `/org/${$organization.getPath()}/change/${change.id}`;
+				await invalidate(newChange);
+				goto(newChange);
+			}
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";
 		}

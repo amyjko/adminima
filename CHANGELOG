@@ -19,6 +19,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Smaller font size for ARCI view.
 - Sort roles in people's table.
 - Removed button min width to avoid clipped labels in flex layouts.
+- Invalidate change page before navigating to it.
 
 ## v0.6.2 2024-07-28
 
