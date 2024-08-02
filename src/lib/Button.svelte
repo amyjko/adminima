@@ -53,7 +53,6 @@
 		white-space: nowrap;
 		display: inline-flex;
 		align-items: center;
-		min-width: 1em;
 	}
 
 	button.chromeless {
