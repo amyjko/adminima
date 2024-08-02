@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Added
 
 - Added ability to move how items up and down in a list.
+- Link email addresses in markup.
 
 ### Fixed
 

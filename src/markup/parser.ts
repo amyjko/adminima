@@ -10,6 +10,8 @@ import Heading from './Heading';
 import Quote from './Quote';
 
 const BulletPrefixes = ['* ', '• ', '- '];
+const EmailRegex =
+	/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*/;
 
 function isBullets(line: string): boolean {
 	return BulletPrefixes.some((b) => line.startsWith(b));
@@ -99,7 +101,26 @@ export function parseSegments(line: string): Segment[] {
 			line = line.substring(index + 1);
 			// Add a new link.
 			segments.push(new Link(label ?? '', url ?? ''));
-		} // Add to accumulator.
+		} else if (EmailRegex.test(next + line)) {
+			// Save what's accumulated.
+			if (characters.length > 0) {
+				segments.push(new Characters('', characters));
+				characters = '';
+			}
+			// Get the match
+			const match = EmailRegex.exec(next + line);
+
+			if (match) {
+				const email = match[0];
+				const index = email.length;
+
+				// Move to after the end of the link
+				line = line.substring(index - 1);
+				// Add a new link.
+				segments.push(new Link(email, `mailto:${email}`));
+			} else characters = characters + next;
+		}
+		// Add to accumulator if none of the above matched.
 		else characters = characters + next;
 	}
 
