@@ -82,13 +82,15 @@
 	</thead>
 	<tbody>
 		{#each $organization.getProfiles() as profile}
-			{@const roles = $organization.getProfileRoles(profile.id)}
+			{@const roles = $organization
+				.getProfileRoles(profile.id)
+				.sort((a, b) => a.title.localeCompare(b.title))}
 			<tr>
 				<td>
 					<PersonLink {profile} />
 				</td>
 				<td class="roles">
-					{#each roles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+					{#each roles as role}
 						<span class="role"
 							><RoleLink roleID={role.id}
 								>{#if isAdmin}<Button
@@ -109,7 +111,8 @@
 					{#if isAdmin}
 						{@const remainingRoles = $organization
 							.getRoles()
-							.filter((r) => !roles.some((currentRole) => currentRole.id === r.id))}
+							.filter((r) => !roles.some((currentRole) => currentRole.id === r.id))
+							.sort((a, b) => a.title.localeCompare(b.title))}
 						{#if $organization.getRoles().length === 0}
 							<em>&mdash;</em>
 						{:else if remainingRoles.length > 0}
