@@ -15,6 +15,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Fixed position of dialogs.
 - Fixed supervision setting.
 - Better indenting on nested lists.
+- Smaller font size for ARCI view.
 
 ## v0.6.2 2024-07-28
 

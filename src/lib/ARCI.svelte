@@ -163,6 +163,7 @@
 		align-items: center;
 		gap: calc(var(--spacing) / 2);
 		row-gap: calc(var(--spacing) / 2);
+		font-size: var(--small-size);
 	}
 
 	.slot {
