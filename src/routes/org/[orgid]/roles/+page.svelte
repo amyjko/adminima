@@ -19,6 +19,8 @@
 	const user = getUser();
 
 	let newRole: string = '';
+	let filter: string = '';
+	$: lowerFilter = filter.toLocaleLowerCase().trim();
 
 	async function createRole() {
 		const { data, error } = await $db.createRole($org.getID(), newRole);
@@ -52,26 +54,69 @@
 	in this organization.</Tip
 >
 
+<Field label="Filter" bind:text={filter} />
+<Flow>
+	{#if $user && $org.hasAdminPerson($user.id)}
+		<FormDialog
+			button="Create role …"
+			showTip="Create a new role."
+			submitTip="Create this new role."
+			header="New role"
+			explanation="Create a new role for this organization"
+			submit="Create"
+			inactive="Ensure your role name is at least three characters."
+			action={createRole}
+			valid={() => newRole.length >= 3}
+		>
+			<Field label="title of new role" bind:text={newRole} />
+		</FormDialog>
+
+		<FormDialog
+			button="Create team …"
+			showTip="Create a new team."
+			submitTip="Create this new team."
+			header="New team"
+			explanation="Create a new team for this organization"
+			inactive="Make sure your team name is at least three characters."
+			submit="Create"
+			action={createTeam}
+			valid={() => newTeam.length >= 3}
+		>
+			<Field label="name of new team" bind:text={newTeam} />
+		</FormDialog>
+	{/if}
+</Flow>
+
 {#if $org.getRoles().length === 0 && $org.getTeams().length === 0}
 	<Notice>There are no roles or teams yet.</Notice>
 {:else}
-	{@const teamless = $org.getRoles().filter((role) => role.team === null)}
+	{@const teamless = $org
+		.getRoles()
+		.filter((role) => role.team === null)
+		.filter((role) => lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter))}
 
 	{#each $org
 		.getTeams()
 		.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
-		<Header><TeamLink id={team.id} /></Header>
-		{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
-			<Flow>
-				<RoleLink roleID={role.id} />{#each $org.getRoleProfiles(role.id) as profile}
-					<ProfileLink {profile} />
-				{:else}
-					&mdash;
-				{/each}
-			</Flow>
-		{:else}
-			<Notice>This team has no roles.</Notice>
-		{/each}
+		{@const teamRoles = $org
+			.getTeamRoles(team.id)
+			.filter((role) => lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter))}
+		{#if teamRoles.length > 0 || filter.length === 0}
+			<Header><TeamLink id={team.id} /></Header>
+			{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+				<Flow>
+					<RoleLink roleID={role.id} />{#each $org.getRoleProfiles(role.id) as profile}
+						<ProfileLink {profile} />
+					{:else}
+						&mdash;
+					{/each}
+				</Flow>
+			{:else}
+				<Notice
+					>{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}</Notice
+				>
+			{/each}
+		{/if}
 	{/each}
 
 	{#if teamless.length > 0}
@@ -87,36 +132,4 @@
 			</Flow>
 		{/each}
 	{/if}
-{/if}
-
-{#if $user && $org.hasAdminPerson($user.id)}
-	<hr />
-
-	<FormDialog
-		button="Create role …"
-		showTip="Create a new role."
-		submitTip="Create this new role."
-		header="New role"
-		explanation="Create a new role for this organization"
-		submit="Create"
-		inactive="Ensure your role name is at least three characters."
-		action={createRole}
-		valid={() => newRole.length >= 3}
-	>
-		<Field label="title of new role" bind:text={newRole} />
-	</FormDialog>
-
-	<FormDialog
-		button="Create team …"
-		showTip="Create a new team."
-		submitTip="Create this new team."
-		header="New team"
-		explanation="Create a new team for this organization"
-		inactive="Make sure your team name is at least three characters."
-		submit="Create"
-		action={createTeam}
-		valid={() => newTeam.length >= 3}
-	>
-		<Field label="name of new team" bind:text={newTeam} />
-	</FormDialog>
 {/if}
