@@ -26,6 +26,8 @@
 	import Note from '$lib/Note.svelte';
 	import ARCI from '$lib/ARCI.svelte';
 	import type { HowRow } from '$database/OrganizationsDB';
+	import type { HowID } from '$types/Organization';
+	import Flow from '$lib/Flow.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -75,6 +77,26 @@
 		const { error, id } = await $db.insertHow(process, how, 0);
 		if (error) addError(errors, 'Unable to insert how.', error);
 		else if (id) focusID.set(id);
+	}
+
+	async function uncheckAll(uncheck: boolean) {
+		function enumerate(how: HowRow, list: HowID[] = []) {
+			list.push(how.id);
+			for (const subhow of how.how
+				.map((id) => $org.getHow(id))
+				.filter((h): h is HowRow => h !== undefined)) {
+				enumerate(subhow, list);
+			}
+			return list;
+		}
+		if (how === undefined) return;
+		const hows = enumerate(how);
+		await Promise.all(
+			hows.map((h) => {
+				const sub = $org.getHow(h);
+				if (sub) $db.updateHowDone(sub, uncheck ? 'no' : 'yes');
+			})
+		);
 	}
 </script>
 
@@ -190,6 +212,12 @@
 			>Create a subtask...</Button
 		>
 	{:else}
+		<Flow
+			><Button tip="Uncheck all steps" action={() => uncheckAll(true)}>Uncheck all</Button><Button
+				tip="Check all steps"
+				action={() => uncheckAll(false)}>Check all</Button
+			></Flow
+		>
 		<ol style:width="100%">
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
 				<li>

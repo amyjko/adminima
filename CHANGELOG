@@ -12,6 +12,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Role filtering.
 - Change filtering.
 - Process filtering.
+- Check and uncheck all process steps.
 
 ### Fixed
 
