@@ -21,6 +21,9 @@
 	const db = getDB();
 	const errors = getErrors();
 
+	let filter = '';
+	$: lowerFilter = filter.toLocaleLowerCase().trim();
+
 	$: personRoles = $user ? $organization.getPersonRoles($user.id) : [];
 
 	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
@@ -117,6 +120,8 @@
 		</FormDialog>
 	{/if}
 
+	<Field label="Filter" bind:text={filter} />
+
 	{#each Array.from(new Set($organization
 				.getProcesses()
 				.map((process) => process.concern))) as concern}
@@ -125,6 +130,7 @@
 		{@const processes = $organization
 			.getProcesses()
 			.filter((p) => p.concern === concern)
+			.filter((p) => lowerFilter.length === 0 || p.title.toLowerCase().includes(lowerFilter))
 			.sort((a, b) => {
 				const howA = $organization.getHow(a.id);
 				const howB = $organization.getHow(b.id);

@@ -11,6 +11,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Link email addresses in markup.
 - Role filtering.
 - Change filtering.
+- Process filtering.
 
 ### Fixed
 
