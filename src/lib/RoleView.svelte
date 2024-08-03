@@ -18,6 +18,7 @@
 	import Tip from './Tip.svelte';
 	import EditableText from './EditableText.svelte';
 	import Flow from './Flow.svelte';
+	import PathEditor from './PathEditor.svelte';
 
 	export let role: RoleRow;
 
@@ -71,23 +72,19 @@
 				return null;
 			}}
 		/>{/if}
-	{#if isAdmin}<code
-			><Flow spaced={false}
-				>...role/<EditableText
-					bind:text={short}
-					transform={(text) => text.trim().replaceAll(' ', '')}
-					edit={async (text) => {
-						await queryOrError(
-							errors,
-							$db.updateRoleShortName(role, text),
-							"Couldn't update role short name"
-						);
-						goto(`/org/${$org.getPath()}/role/${text}`, { replaceState: true });
-						return null;
-					}}
-				/></Flow
-			></code
-		>{/if}
+	{#if isAdmin}<PathEditor
+			short={role.short}
+			path={'...role/'}
+			update={async (text) => {
+				await queryOrError(
+					errors,
+					$db.updateRoleShortName(role, text),
+					"Couldn't update role short name"
+				);
+				goto(`/org/${$org.getPath()}/role/${text}`, { replaceState: true });
+				return null;
+			}}
+		/>{/if}
 </Title>
 
 <Tip admin

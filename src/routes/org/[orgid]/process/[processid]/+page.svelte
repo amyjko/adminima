@@ -28,6 +28,7 @@
 	import type { HowRow } from '$database/OrganizationsDB';
 	import type { HowID } from '$types/Organization';
 	import Flow from '$lib/Flow.svelte';
+	import PathEditor from '$lib/PathEditor.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -36,7 +37,8 @@
 	const db = getDB();
 	const errors = getErrors();
 
-	$: process = $org.getProcess($page.params.processid);
+	$: process =
+		$org.getProcess($page.params.processid) ?? $org.getProcessByShortName($page.params.processid);
 	$: how = process && process.howid ? $org.getHow(process.howid) : undefined;
 
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
@@ -142,6 +144,19 @@
 				members can see this process.{:else if how.visibility === 'admin'}Only admins can see this
 				process.{/if}</Note
 		>
+		{#if admin}<PathEditor
+				short={process.short}
+				path={'...process/'}
+				update={async (text) => {
+					await queryOrError(
+						errors,
+						$db.updateProcessShortName(process, text),
+						"Couldn't update process's short name"
+					);
+					goto(`/org/${$org.getPath()}/process/${text}`, { replaceState: true });
+					return null;
+				}}
+			/>{/if}
 	</Title>
 
 	<Tip member

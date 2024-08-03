@@ -149,7 +149,8 @@ export default class Organization {
 
 	/** Get the role by short name */
 	getRoleByShortName(name: string): RoleRow | null {
-		return this.data.roles.find((role) => role.short === name) ?? null;
+		name = name.toLocaleLowerCase();
+		return this.data.roles.find((role) => role.short.toLocaleLowerCase() === name) ?? null;
 	}
 
 	/** Get all the roles for this organization. */
@@ -261,6 +262,13 @@ export default class Organization {
 
 	getProcess(id: ProcessID) {
 		return this.data.processes.find((process) => process.id === id) ?? null;
+	}
+
+	getProcessByShortName(name: string) {
+		name = name.toLocaleLowerCase();
+		return (
+			this.data.processes.find((process) => process.short.toLocaleLowerCase() === name) ?? null
+		);
 	}
 
 	getProcesses() {

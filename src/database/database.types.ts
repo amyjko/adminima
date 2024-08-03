@@ -280,6 +280,7 @@ export type Database = {
           id: string
           orgid: string
           repeat: string | null
+          short: string
           title: string
           when: string
         }
@@ -292,6 +293,7 @@ export type Database = {
           id?: string
           orgid: string
           repeat?: string | null
+          short?: string
           title?: string
           when?: string
         }
@@ -304,6 +306,7 @@ export type Database = {
           id?: string
           orgid?: string
           repeat?: string | null
+          short?: string
           title?: string
           when?: string
         }

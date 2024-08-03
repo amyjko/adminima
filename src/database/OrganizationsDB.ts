@@ -816,6 +816,11 @@ class OrganizationsDB {
 		);
 	}
 
+	async updateProcessShortName(process: ProcessRow, short: string) {
+		const { error } = await this.supabase.from('processes').update({ short }).eq('id', process.id);
+		return error;
+	}
+
 	async updateProcessConcern(process: ProcessRow, concern: string, who: PersonID) {
 		const { error } = await this.supabase
 			.from('processes')

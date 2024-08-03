@@ -12,8 +12,12 @@
 </script>
 
 {#if process === null}<Oops inline text={(locale) => locale.error.noProcess} />{:else}<Link
+		title={process && process.short.length > 0 ? process.title : undefined}
 		to={processID
-			? `/org/${$organization.getPath()}/process/${processID}`
+			? `/org/${$organization.getPath()}/process/${
+					process && process.short.length > 0 ? process.short : processID
+			  }`
 			: `/org/${$organization.getPath()}/processes`}
-		kind="process">{process ? process.title : 'Processes'}</Link
+		kind="process"
+		>{process ? (process.short.length > 0 ? process.short : process.title) : 'Processes'}</Link
 	>{/if}
