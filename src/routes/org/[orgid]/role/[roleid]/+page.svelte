@@ -5,7 +5,7 @@
 	import { getOrg } from '$lib/contexts';
 
 	const org = getOrg();
-	$: role = $org.getRole($page.params.roleid);
+	$: role = $org.getRole($page.params.roleid) ?? $org.getRoleByShortName($page.params.roleid);
 </script>
 
 {#if role === null}

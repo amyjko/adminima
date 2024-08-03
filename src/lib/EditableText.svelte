@@ -5,6 +5,7 @@
 
 	export let text: string;
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
+	export let transform: undefined | ((text: string) => string) = undefined;
 
 	let editing = false;
 	let revision = '';
@@ -39,6 +40,7 @@
 				disabled={saving}
 				style:width={revision.length + 2 + 'ch'}
 				on:keydown={(event) => (event.key === 'Enter' ? save() : undefined)}
+				on:input={() => (revision = transform ? transform(revision) : revision)}
 				autofocus
 			/>{:else}<span class="text"
 				>{#if text.length === 0}&mdash;{:else}{text}{/if}</span

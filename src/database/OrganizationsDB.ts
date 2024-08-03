@@ -602,6 +602,11 @@ class OrganizationsDB {
 		);
 	}
 
+	async updateRoleShortName(role: RoleRow, short: string) {
+		const { error } = await this.supabase.from('roles').update({ short }).eq('id', role.id);
+		return error;
+	}
+
 	async updateProfileName(profile: ProfileRow, name: string): Promise<PostgrestError | null> {
 		const { error } = await this.supabase
 			.from('profiles')

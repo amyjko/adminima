@@ -3,6 +3,7 @@
 
 	export let to: string;
 	export let bland = false;
+	export let title: string | undefined = undefined;
 	export let kind: 'person' | 'role' | 'process' | 'org' | 'team' | 'change' | null = null;
 
 	$: external = to.startsWith('http');
@@ -13,6 +14,7 @@
 	class={kind}
 	class:inactive
 	class:bland
+	{title}
 	class:kinded={kind !== null}
 	class:external
 	href={inactive ? null : to}

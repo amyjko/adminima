@@ -147,6 +147,11 @@ export default class Organization {
 		return this.data.roles.find((role) => role.id === id) ?? null;
 	}
 
+	/** Get the role by short name */
+	getRoleByShortName(name: string): RoleRow | null {
+		return this.data.roles.find((role) => role.short === name) ?? null;
+	}
+
 	/** Get all the roles for this organization. */
 	getRoles() {
 		return this.data.roles;

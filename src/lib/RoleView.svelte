@@ -16,6 +16,8 @@
 	import ChangeLink from './ChangeLink.svelte';
 	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
+	import EditableText from './EditableText.svelte';
+	import Flow from './Flow.svelte';
 
 	export let role: RoleRow;
 
@@ -26,6 +28,8 @@
 
 	$: profiles = $org.getRoleProfiles(role.id);
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
+
+	let short = role.short;
 </script>
 
 <Title
@@ -41,7 +45,8 @@
 		: undefined}
 >
 	{#if role.team}<TeamLink id={role.team} />{:else}no team{/if}
-	{#if isAdmin}<Select
+	{#if isAdmin}
+		<Select
 			tip="Choose a team for this role"
 			selection={role.team ?? undefined}
 			options={[
@@ -66,10 +71,28 @@
 				return null;
 			}}
 		/>{/if}
+	{#if isAdmin}<code
+			><Flow spaced={false}
+				>...role/<EditableText
+					bind:text={short}
+					transform={(text) => text.trim().replaceAll(' ', '')}
+					edit={async (text) => {
+						await queryOrError(
+							errors,
+							$db.updateRoleShortName(role, text),
+							"Couldn't update role short name"
+						);
+						goto(`/org/${$org.getPath()}/role/${text}`, { replaceState: true });
+						return null;
+					}}
+				/></Flow
+			></code
+		>{/if}
 </Title>
 
 <Tip admin
-	>This is a role in the organization. <strong>Admins</strong> can update it's description and team.</Tip
+	>This is a role in the organization. <strong>Admins</strong> can update it's description and team.
+	Set a short name to use in URLs and links.</Tip
 >
 
 <MarkupView

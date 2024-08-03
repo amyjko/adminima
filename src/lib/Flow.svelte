@@ -1,13 +1,20 @@
-<div class="flow"><slot /></div>
+<script lang="ts">
+	export let spaced: boolean = true;
+</script>
+
+<div class="flow" class:spaced><slot /></div>
 
 <style>
 	.flow {
 		display: flex;
 		flex-direction: row;
-		gap: var(--spacing);
-		row-gap: var(--spacing);
 		flex-wrap: wrap;
 		justify-content: left;
 		align-items: baseline;
+	}
+
+	.spaced {
+		gap: var(--spacing);
+		row-gap: var(--spacing);
 	}
 </style>

@@ -9,9 +9,11 @@
 	const org = getOrg();
 
 	$: role = roleID ? $org.getRole(roleID) : undefined;
+	$: path = role ? (role.short.length > 0 ? role.short : role.id) : undefined;
 </script>
 
 {#if role === null}<Oops inline text={(locale) => locale.error.noRole} />{:else}<Link
-		to={roleID ? `/org/${$org.getPath()}/role/${roleID}` : `/org/${$org.getPath()}/roles`}
-		kind="role">{role ? role.title : 'roles'}<slot /></Link
+		title={role !== undefined && role.short.length > 0 ? role.title : undefined}
+		to={roleID ? `/org/${$org.getPath()}/role/${path}` : `/org/${$org.getPath()}/roles`}
+		kind="role">{role ? (role.short.length > 0 ? role.short : role.title) : 'roles'}<slot /></Link
 	>{/if}

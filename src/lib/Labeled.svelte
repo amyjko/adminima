@@ -3,13 +3,14 @@
 	export let message: string | undefined = undefined;
 </script>
 
-<label
-	><span
-		>{label}
-		{#if message}<span class="invalid">{message}</span>{/if}</span
-	>
-	<slot /></label
->
+{#if label.length > 0}
+	<label
+		><span
+			>{label}
+			{#if message}<span class="invalid">{message}</span>{/if}</span
+		>
+		<slot /></label
+	>{:else}<slot />{/if}
 
 <style>
 	label {

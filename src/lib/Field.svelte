@@ -1,22 +1,24 @@
 <script lang="ts">
 	import Labeled from './Labeled.svelte';
 
-	export let label: string;
+	export let label: string | undefined = undefined;
 	export let text: string;
 	export let active: boolean = true;
 	export let placeholder: string | undefined = undefined;
 	export let autocomplete: boolean = false;
 	export let invalid: ((text: string) => string | undefined) | undefined = undefined;
+	export let done: ((text: string) => void) | undefined = undefined;
 
 	$: message = invalid ? invalid(text) : undefined;
 </script>
 
-<Labeled {label} {message}>
+<Labeled label={label ?? ''} {message}>
 	<input
 		type="text"
 		autocomplete={autocomplete ? 'on' : 'off'}
 		disabled={!active}
 		bind:value={text}
+		on:blur={done ? () => done(text) : undefined}
 		{placeholder}
 	/>
 </Labeled>
