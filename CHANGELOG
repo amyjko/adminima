@@ -25,6 +25,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Sort roles in people's table.
 - Removed button min width to avoid clipped labels in flex layouts.
 - Invalidate change page before navigating to it.
+- Improved commas on role's people list.
 
 ## v0.6.2 2024-07-28
 

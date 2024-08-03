@@ -113,8 +113,12 @@
 {#if profiles.length === 0}<Notice>No one holds this role.</Notice>{:else}
 	<Paragraph
 		>This role is held by
-		{#each profiles as profile, index}<PersonLink {profile} />{#if index > 0},
-			{/if}{#if index < profiles.length - 1} and {/if}{/each}.</Paragraph
+		{#each profiles as profile, index}<PersonLink
+				{profile}
+			/>{#if profiles.length >= 2 && index < profiles.length - 1 && index !== profiles.length - 2},
+			{/if}{#if profiles.length >= 2 && index === profiles.length - 2}
+				&nbsp;and
+			{/if}{/each}.</Paragraph
 	>{/if}
 
 <Header>Processes</Header>
