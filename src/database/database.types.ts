@@ -281,6 +281,7 @@ export type Database = {
           orgid: string
           repeat: string | null
           short: string
+          state: Database["public"]["Enums"]["state"]
           title: string
           when: string
         }
@@ -294,6 +295,7 @@ export type Database = {
           orgid: string
           repeat?: string | null
           short?: string
+          state?: Database["public"]["Enums"]["state"]
           title?: string
           when?: string
         }
@@ -307,6 +309,7 @@ export type Database = {
           orgid?: string
           repeat?: string | null
           short?: string
+          state?: Database["public"]["Enums"]["state"]
           title?: string
           when?: string
         }
@@ -617,6 +620,7 @@ export type Database = {
     }
     Enums: {
       completion: "no" | "pending" | "yes"
+      state: "draft" | "active" | "archived"
       status: "triage" | "backlog" | "active" | "done"
       visibility: "public" | "org" | "people" | "teams" | "roles" | "admin"
     }

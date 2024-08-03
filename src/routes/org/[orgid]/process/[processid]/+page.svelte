@@ -29,6 +29,7 @@
 	import type { HowID } from '$types/Organization';
 	import Flow from '$lib/Flow.svelte';
 	import PathEditor from '$lib/PathEditor.svelte';
+	import Status from '$lib/Status.svelte';
 
 	let deleteError: string | undefined = undefined;
 
@@ -36,6 +37,8 @@
 	const user = getUser();
 	const db = getDB();
 	const errors = getErrors();
+
+	const States = { draft: 'Draft', active: 'Active', archived: 'Archived' };
 
 	$: process =
 		$org.getProcess($page.params.processid) ?? $org.getProcessByShortName($page.params.processid);
@@ -144,19 +147,39 @@
 				members can see this process.{:else if how.visibility === 'admin'}Only admins can see this
 				process.{/if}</Note
 		>
-		{#if admin}<PathEditor
-				short={process.short}
-				path={'...process/'}
-				update={async (text) => {
-					await queryOrError(
-						errors,
-						$db.updateProcessShortName(process, text),
-						"Couldn't update process's short name"
-					);
-					goto(`/org/${$org.getPath()}/process/${text}`, { replaceState: true });
-					return null;
-				}}
-			/>{/if}
+
+		<Flow>
+			<Status status={process.state} />
+			{#if editable}
+				<Select
+					tip="Change the state of this process"
+					selection={process.state}
+					options={Object.entries(States).map(([key, value]) => ({ value: key, label: value }))}
+					change={async (status) => {
+						if ($user && (status === 'draft' || status === 'active' || status === 'archived'))
+							return await queryOrError(
+								errors,
+								$db.updateProcessState(process, status, $user.id),
+								"Couldn't update the process's state"
+							);
+						else return null;
+					}}
+				/>
+			{/if}
+			{#if admin}<PathEditor
+					short={process.short}
+					path={'...process/'}
+					update={async (text) => {
+						await queryOrError(
+							errors,
+							$db.updateProcessShortName(process, text),
+							"Couldn't update process's short name"
+						);
+						goto(`/org/${$org.getPath()}/process/${text}`, { replaceState: true });
+						return null;
+					}}
+				/>{/if}
+		</Flow>
 	</Title>
 
 	<Tip member

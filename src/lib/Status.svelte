@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { getOrg } from './contexts';
-
 	export let status: string;
 </script>
 
@@ -19,7 +17,8 @@
 		color: var(--background);
 	}
 
-	.triage {
+	.triage,
+	.draft {
 		background: var(--warning);
 		color: var(--background);
 	}
@@ -34,7 +33,8 @@
 		color: var(--background);
 	}
 
-	.backlog {
+	.backlog,
+	.archived {
 		background: var(--person);
 		color: var(--background);
 	}

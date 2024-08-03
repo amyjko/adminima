@@ -15,6 +15,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Check and uncheck all process steps.
 - Short names for roles for use in URLs and links.
 - Short names for processes for use in URLs and links.
+- Added process state to keep track of whether processes are active.
 
 ### Fixed
 

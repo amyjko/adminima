@@ -31,6 +31,7 @@ export type CommentRow = Tables<'comments'>;
 export type Visibility = Database['public']['Enums']['visibility'];
 export type Completion = Database['public']['Enums']['completion'];
 export type Status = Database['public']['Enums']['status'];
+export type State = Database['public']['Enums']['state'];
 
 /** A serializable version of all organization data, used to store raw data from the database. */
 export type OrganizationPayload = {
@@ -819,6 +820,20 @@ class OrganizationsDB {
 	async updateProcessShortName(process: ProcessRow, short: string) {
 		const { error } = await this.supabase.from('processes').update({ short }).eq('id', process.id);
 		return error;
+	}
+
+	async updateProcessState(process: ProcessRow, state: State, who: PersonID) {
+		const { error } = await this.supabase.from('processes').update({ state }).eq('id', process.id);
+		if (error) return error;
+
+		return this.addComment(
+			process.orgid,
+			who,
+			`Updated state to ${state}`,
+			'processes',
+			process.id,
+			process.comments
+		);
 	}
 
 	async updateProcessConcern(process: ProcessRow, concern: string, who: PersonID) {

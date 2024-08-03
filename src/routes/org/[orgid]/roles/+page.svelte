@@ -100,7 +100,12 @@
 		.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
 		{@const teamRoles = $org
 			.getTeamRoles(team.id)
-			.filter((role) => lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter))}
+			.filter(
+				(role) =>
+					lowerFilter === '' ||
+					role.title.toLocaleLowerCase().includes(lowerFilter) ||
+					role.short.toLocaleLowerCase().includes(lowerFilter)
+			)}
 		{#if teamRoles.length > 0 || filter.length === 0}
 			<Header><TeamLink id={team.id} /></Header>
 			{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}

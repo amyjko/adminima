@@ -15,6 +15,7 @@
 	import Tip from '$lib/Tip.svelte';
 	import Header from '$lib/Header.svelte';
 	import Table from '$lib/Table.svelte';
+	import Status from '$lib/Status.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -130,7 +131,12 @@
 		{@const processes = $organization
 			.getProcesses()
 			.filter((p) => p.concern === concern)
-			.filter((p) => lowerFilter.length === 0 || p.title.toLowerCase().includes(lowerFilter))
+			.filter(
+				(p) =>
+					lowerFilter.length === 0 ||
+					p.title.toLowerCase().includes(lowerFilter) ||
+					p.short.toLowerCase().includes(lowerFilter)
+			)
 			.sort((a, b) => {
 				const howA = $organization.getHow(a.id);
 				const howB = $organization.getHow(b.id);
@@ -157,6 +163,7 @@
 					{#each processes as process}
 						{@const hows = $organization.getProcessHows(process.id)}
 						<tr>
+							<td><Status status={process.state} /></td>
 							<td><ProcessLink processID={process.id} /></td>
 							{#each roles as role}
 								<td class="level" class:me={personRoles.includes(role.id)}
