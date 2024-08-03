@@ -1,20 +1,13 @@
 <script lang="ts">
 	import MarkupView from './MarkupView.svelte';
-	import Link from './Link.svelte';
 	import Title from './Title.svelte';
-	import Paragraph from './Paragraph.svelte';
 	import type Organization from '$types/Organization';
 	import { addError, getDB, getErrors, getUser, queryOrError } from './contexts';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Note from './Note.svelte';
-	import Tip from './Tip.svelte';
-	import Form from './Form.svelte';
-	import Field from './Field.svelte';
-	import Button from './Button.svelte';
-	import Header from './Header.svelte';
 	import { goto } from '$app/navigation';
-	import OrgNav from './OrgNav.svelte';
+	import PathEditor from './PathEditor.svelte';
 
 	export let organization: Organization;
 
@@ -24,10 +17,6 @@
 
 	$: isAdmin = $user && organization.hasAdminPerson($user.id);
 	$: editable = isAdmin;
-
-	let newPath = '';
-	let submitting = false;
-	$: validPath = /[a-zA-Z]+/.test(newPath);
 </script>
 
 <Title
@@ -65,6 +54,21 @@
 					admins can see this organization's details.{/if}</Note
 			>
 		</div>
+		{#if isAdmin}<PathEditor
+				short={organization.getPaths()[0]}
+				path={'https://adminima.app/org/'}
+				update={async (text) => {
+					if (text === '') return null;
+					const available = await $db.pathIsAvailable(text);
+
+					if (available) {
+						await queryOrError(errors, $db.addOrgPath(organization, text), "Couldn't update path.");
+						goto(`/org/${text}`, { replaceState: true });
+					} else addError(errors, 'This path is not available');
+
+					return null;
+				}}
+			/>{/if}
 	</div></Title
 >
 
@@ -80,47 +84,6 @@
 	comments={organization.getComments()}
 	remove={(comment) => $db.deleteComment(organization.getRow(), 'orgs', comment)}
 />
-
-{#if isAdmin && $user}
-	{@const paths = organization.getPaths()}
-	<hr />
-
-	<Header>Path</Header>
-	<Tip admin
-		>Want to use a custom URL for this organization? Set a path. You can override an existing path,
-		and previous links will continue to work.</Tip
-	>
-
-	<Form
-		active={!submitting && validPath}
-		inactiveMessage={submitting ? undefined : 'Paths must be one or more a-z or A-Z characters.'}
-		action={async () => {
-			const available = await $db.pathIsAvailable(newPath);
-
-			if (available) {
-				await queryOrError(errors, $db.addOrgPath(organization, newPath), "Couldn't update path.");
-				goto(`/org/${newPath}`);
-				newPath = '';
-			} else addError(errors, 'This path is not available');
-			submitting = false;
-		}}
-		><Field label="path" bind:text={newPath} /><code>https://adminima.app/org/{newPath}</code
-		><Button submit active={!submitting && validPath} action={() => {}} tip="Update this path"
-			>{paths.length === 0 ? 'Set' : 'Update'} path</Button
-		></Form
-	>
-
-	{#if paths.length > 0}
-		<Paragraph
-			>Current path: <Link to="https://adminima.app/org/{paths[0]}"
-				>https://adminima.app/org/{paths[0]}</Link
-			></Paragraph
-		>
-		{#if paths.length > 1}<Paragraph
-				>Previous paths: <code>{paths.slice(1).join(', ')}</code></Paragraph
-			>{/if}
-	{/if}
-{/if}
 
 <style>
 	.meta {
