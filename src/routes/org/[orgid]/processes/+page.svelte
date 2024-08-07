@@ -155,7 +155,7 @@
 		<div class="processes">
 			<Table>
 				<thead>
-					<th />{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
+					<th /><th />{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
 							><RoleLink roleID={role.id} /></th
 						>{:else}<th />{/each}
 				</thead>
