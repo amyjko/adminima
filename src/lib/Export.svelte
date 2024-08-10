@@ -9,7 +9,7 @@
 	const org = getOrg();
 
 	function howToString(how: HowRow, depth = 0): string {
-		return `\n${'\t'.repeat(depth)}• ${how.what}${how.how.map((id) => {
+		return `\n${'\t'.repeat(depth)}${depth > 0 ? '•' : ''} ${how.what}${how.how.map((id) => {
 			const child = $org.getHow(id);
 			if (child) return howToString(child, depth + 1);
 			else return '';
@@ -20,16 +20,16 @@
 		const headers = [
 			{
 				value: 'Process',
-				fontWeight: 'bold'
+				fontWeight: 'bold' as const
 			},
 			{
 				value: 'How',
-				fontWeight: 'bold'
+				fontWeight: 'bold' as const
 			},
 			...$org.getRoles().map((role) => {
 				return {
 					value: `${role.title} | ${$org.getRoleProfiles(role.id).map((prof) => prof.email)}`,
-					fontWeight: 'bold',
+					fontWeight: 'bold' as const,
 					textRotation: 90
 				};
 			})
@@ -46,6 +46,7 @@
 				},
 				...$org.getRoles().map((role) => {
 					return {
+						alignVertical: 'top' as const,
 						value:
 							process.accountable === role.id
 								? 'A'
