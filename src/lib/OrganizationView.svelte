@@ -8,6 +8,7 @@
 	import Note from './Note.svelte';
 	import { goto } from '$app/navigation';
 	import PathEditor from './PathEditor.svelte';
+	import Export from './Export.svelte';
 
 	export let organization: Organization;
 
@@ -84,6 +85,10 @@
 	comments={organization.getComments()}
 	remove={(comment) => $db.deleteComment(organization.getRow(), 'orgs', comment)}
 />
+
+{#if isAdmin}
+	<Export />
+{/if}
 
 <style>
 	.meta {

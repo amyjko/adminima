@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Added
 
 - Fixed #6, allowing references to roles and processes.
+- Added export feature.
 
 ### Fixed
 

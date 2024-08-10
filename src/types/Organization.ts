@@ -285,6 +285,7 @@ export default class Organization {
 		return this.data.hows.find((how) => how.id === id);
 	}
 
+	/** Gets how steps associated with the process in no particular order  */
 	getProcessHows(id: ProcessID) {
 		return this.data.hows.filter((how) => how.processid === id);
 	}
