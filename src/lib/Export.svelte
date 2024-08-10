@@ -4,7 +4,6 @@
 	import Tip from './Tip.svelte';
 	import { getOrg } from './contexts';
 	import type { HowRow } from '$database/OrganizationsDB';
-	import Actions from './Actions.svelte';
 
 	const org = getOrg();
 
