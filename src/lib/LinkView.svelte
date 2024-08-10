@@ -9,16 +9,23 @@
 
 	const org = getOrg();
 
+	$: lowerURL = segment.url.toLocaleLowerCase();
+
 	// Does the link correspond to a role short name?
 	$: role = $org
 		.getRoles()
-		.find((role) => role.short.toLocaleLowerCase() === segment.url.toLocaleLowerCase());
+		.find(
+			(role) =>
+				role.short.toLocaleLowerCase() === lowerURL || role.title.toLocaleLowerCase() === lowerURL
+		);
 	// Does the link correspond to a process short name?
 	$: process = $org
 		.getProcesses()
-		.find((process) => process.short.toLocaleLowerCase() === segment.url.toLocaleLowerCase());
-
-	$: console.log(role);
+		.find(
+			(process) =>
+				process.short.toLocaleLowerCase() === lowerURL ||
+				process.title.toLocaleLowerCase() === lowerURL
+		);
 </script>
 
 {#if role}
@@ -26,5 +33,7 @@
 {:else if process}
 	<ProcessLink processID={process.id} />
 {:else}
-	<Link to={segment.url}>{segment.text}</Link>
+	<Link to={segment.url.startsWith('http') || segment.url.startsWith('/') ? segment.url : ''}
+		>{segment.text.length === 0 ? '—' : segment.text}</Link
+	>
 {/if}
