@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.6.5 2024-08-09
 
+### Added
+
+- Fixed #6, allowing references to roles and processes.
+
 ### Fixed
 
 - Clarified visiblity of public processes in non-public orgs.

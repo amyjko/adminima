@@ -87,7 +87,8 @@
 				style:height="{editing ? scrollHeight : height}px"
 			/>
 			<Note
-				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@url&gt;</code>,
+				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@https://url&gt;</code>,
+				<code>&lt;link@role/process&gt;</code>,
 				<code>*/-/• bullets</code>, <code>1. lists</code>, <code>"block quote"</code></Note
 			>
 		</div>

@@ -40,6 +40,7 @@
 		text-decoration: none;
 		cursor: default;
 		background: none;
+		color: currentColor;
 	}
 
 	a.bland {

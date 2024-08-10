@@ -84,7 +84,9 @@ export function parseSegments(line: string): Segment[] {
 			segments.push(new Characters(next, line.substring(0, index)));
 			// Move to after the format.
 			line = line.substring(index + 1);
-		} else if (next === '<') {
+		}
+		// Is it a link?
+		else if (next === '<') {
 			// Save what's accumulated.
 			if (characters.length > 0) {
 				segments.push(new Characters('', characters));
