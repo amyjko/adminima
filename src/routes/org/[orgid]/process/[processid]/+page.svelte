@@ -143,9 +143,10 @@
 				: undefined}
 		/>
 		<Note inline
-			>{#if how.visibility === 'public'}Everyone on the internet can see this process{:else if how.visibility === 'org'}Only
-				members can see this process.{:else if how.visibility === 'admin'}Only admins can see this
-				process.{/if}</Note
+			>{#if how.visibility === 'public'}{#if $org.getVisibility() === 'public'}Everyone on the
+					internet can see this process{:else}Because the organization is not public, this process
+					is not public.{/if}{:else if how.visibility === 'org'}Only members can see this process.{:else if how.visibility === 'admin'}Only
+				admins can see this process.{/if}</Note
 		>
 
 		<Flow>
