@@ -83,7 +83,11 @@
 
 	let title = '';
 	async function newProcess() {
-		const { error, id } = await $db.addProcess($organization.getID(), title);
+		const { error, id } = await $db.addProcess(
+			$organization.getID(),
+			title,
+			$organization.getVisibility()
+		);
 		if (error) {
 			addError(errors, "Couldn't add new process", error);
 			return false;

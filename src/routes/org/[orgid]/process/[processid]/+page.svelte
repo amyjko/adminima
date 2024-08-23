@@ -79,7 +79,7 @@
 
 	async function createFirstSubtask(how: HowRow) {
 		if (process === null) return;
-		const { error, id } = await $db.insertHow(process, how, 0);
+		const { error, id } = await $db.insertHow(process, how.visibility, how, 0);
 		if (error) addError(errors, 'Unable to insert how.', error);
 		else if (id) focusID.set(id);
 	}
@@ -364,5 +364,9 @@
 
 	.steps {
 		width: 100%;
+		margin-block-start: calc(2 * var(--padding));
+		display: flex;
+		flex-direction: column;
+		gap: var(--padding);
 	}
 </style>

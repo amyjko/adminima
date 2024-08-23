@@ -778,10 +778,10 @@ class OrganizationsDB {
 	}
 
 	/** Create a new process, relying on Realtime for refresh */
-	async addProcess(orgid: OrganizationID, title: string) {
+	async addProcess(orgid: OrganizationID, title: string, visibility: Visibility) {
 		const { data: processData, error } = await this.supabase
 			.from('processes')
-			.insert({ title, orgid })
+			.insert({ title, orgid, visibility })
 			.select()
 			.single();
 
@@ -853,10 +853,10 @@ class OrganizationsDB {
 		);
 	}
 
-	async createHow(process: ProcessRow) {
+	async createHow(process: ProcessRow, visibility: Visibility) {
 		return await this.supabase
 			.from('hows')
-			.insert({ orgid: process.orgid, processid: process.id, what: '' })
+			.insert({ orgid: process.orgid, processid: process.id, what: '', visibility })
 			.select()
 			.single();
 	}
@@ -915,8 +915,8 @@ class OrganizationsDB {
 		return error;
 	}
 
-	async insertHow(process: ProcessRow, how: HowRow, index: number) {
-		const { data: newHow, error: howError } = await this.createHow(process);
+	async insertHow(process: ProcessRow, visibility: Visibility, how: HowRow, index: number) {
+		const { data: newHow, error: howError } = await this.createHow(process, visibility);
 		if (howError) return { error: howError, id: null };
 		const { error } = await this.supabase
 			.from('hows')

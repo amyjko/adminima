@@ -41,13 +41,18 @@
 	async function insertHow() {
 		// See if this how has a parent, and if so, insert after this how.
 		if (parent) {
-			const { error, id } = await $db.insertHow(process, parent, parent.how.indexOf(how.id) + 1);
+			const { error, id } = await $db.insertHow(
+				process,
+				parent.visibility,
+				parent,
+				parent.how.indexOf(how.id) + 1
+			);
 			if (error) addError(errors, 'Unable to insert how.', error);
 			else if (id) focusID.set(id);
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
-			const { error, id } = await $db.insertHow(process, how, 0);
+			const { error, id } = await $db.insertHow(process, how.visibility, how, 0);
 			if (error) addError(errors, 'Unable to insert how.', error);
 			if (id) focusID.set(id);
 		}
@@ -270,7 +275,7 @@
 	.how {
 		display: flex;
 		flex-direction: column;
-		gap: var(--padding);
+		gap: 0;
 	}
 
 	.main {
@@ -308,6 +313,10 @@
 	}
 
 	.steps {
+		margin-block-start: calc(2 * var(--padding));
 		margin-inline-start: 1em;
+		display: flex;
+		flex-direction: column;
+		gap: calc(2 * var(--padding));
 	}
 </style>
