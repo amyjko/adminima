@@ -259,13 +259,11 @@
 		{/if}
 		<ARCI {how} verbose={false} {editable} />
 	</div>
-	<ol>
-		{#each how.how
-			.map((h) => $org.getHow(h))
-			.filter((h) => h !== undefined) as subhow, index (subhow.id)}
-			<li><svelte:self how={subhow} {process} {editable} /></li>
+	<div class="steps">
+		{#each how.how.map((h) => $org.getHow(h)).filter((h) => h !== undefined) as subhow (subhow.id)}
+			<svelte:self how={subhow} {process} {editable} />
 		{/each}
-	</ol>
+	</div>
 </div>
 
 <style>
@@ -288,7 +286,7 @@
 	}
 
 	.complete {
-		width: 1em;
+		min-width: 1em;
 		height: 1em;
 		background: var(--chrome);
 		font-size: var(--font-size);
@@ -302,10 +300,14 @@
 
 	.complete[aria-disabled='true'] {
 		cursor: not-allowed;
-		background: none;
+		transform: translateY(0.1em);
 	}
 
 	.complete:focus {
 		outline: var(--focus) solid var(--thickness);
+	}
+
+	.steps {
+		margin-inline-start: 1em;
 	}
 </style>

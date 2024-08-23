@@ -257,15 +257,13 @@
 				action={() => uncheckAll(false)}>Check all</Button
 			></Flow
 		>
-		<ol style:width="100%">
+		<div class="steps">
 			{#each how.how.map((h) => $org.getHow(h)) as subHow, index (subHow?.id ?? index)}
-				<li>
-					{#if subHow}<HowView how={subHow} {process} {editable} />{:else}<Note
-							>This step is not visible to you.</Note
-						>{/if}
-				</li>
+				{#if subHow}<HowView how={subHow} {process} {editable} />{:else}<Note
+						>This step is not visible to you.</Note
+					>{/if}
 			{/each}
-		</ol>
+		</div>
 	{/if}
 
 	<Header>Concern</Header>
@@ -362,5 +360,9 @@
 		flex-direction: row;
 		align-items: center;
 		gap: var(--spacing);
+	}
+
+	.steps {
+		width: 100%;
 	}
 </style>
