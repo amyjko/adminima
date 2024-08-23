@@ -293,6 +293,10 @@
 		align-items: baseline;
 	}
 
+	.meta {
+		margin-left: calc(1em + var(--padding));
+	}
+
 	.complete {
 		min-width: 1em;
 		height: 1em;
