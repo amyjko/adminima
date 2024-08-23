@@ -19,5 +19,9 @@
 			  }`
 			: `/org/${$organization.getPath()}/processes`}
 		kind="process"
-		>{process ? (process.short.length > 0 ? process.short : process.title) : 'Processes'}</Link
+		>{process
+			? process.short.length > 0
+				? process.short.replace(/([A-Z]+)/g, ' $1').trim()
+				: process.title
+			: 'Processes'}</Link
 	>{/if}
