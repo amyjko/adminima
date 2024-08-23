@@ -19,6 +19,7 @@
 	$: parent = $org.getHowParent(how.id);
 	$: index = parent?.how.indexOf(how.id) ?? -1;
 	$: length = parent?.how.length ?? -1;
+	$: subhows = how.how.map((h) => $org.getHow(h)).filter((h) => h !== undefined);
 
 	const org = getOrg();
 	const db = getDB();
@@ -264,11 +265,13 @@
 		{/if}
 		<ARCI {how} verbose={false} {editable} />
 	</div>
-	<div class="steps">
-		{#each how.how.map((h) => $org.getHow(h)).filter((h) => h !== undefined) as subhow (subhow.id)}
-			<svelte:self how={subhow} {process} {editable} />
-		{/each}
-	</div>
+	{#if subhows.length > 0}
+		<div class="steps">
+			{#each subhows as subhow (subhow.id)}
+				<svelte:self how={subhow} {process} {editable} />
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -317,6 +320,8 @@
 		margin-inline-start: 1em;
 		display: flex;
 		flex-direction: column;
-		gap: calc(2 * var(--padding));
+		gap: 1em;
+		padding-left: 1em;
+		border-left: 1px solid var(--border);
 	}
 </style>

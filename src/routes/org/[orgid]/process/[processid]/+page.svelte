@@ -367,6 +367,6 @@
 		margin-block-start: calc(2 * var(--padding));
 		display: flex;
 		flex-direction: column;
-		gap: var(--padding);
+		gap: 1em;
 	}
 </style>
