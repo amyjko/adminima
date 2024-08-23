@@ -228,7 +228,7 @@
 					/>
 				</div>
 			{:else}
-				<BlocksView blocks={parse(text).blocks} />
+				<MarkupView markup={text} edit={undefined} placeholder="Explain this step…" />
 			{/if}
 			{#if editable}
 				<Button tip="Move up" action={() => moveVertically(-1)} active={index > 0}>⏶</Button>
