@@ -176,7 +176,9 @@
 							$db.updateProcessShortName(process, text),
 							"Couldn't update process's short name"
 						);
-						goto(`/org/${$org.getPath()}/process/${text}`, { replaceState: true });
+						goto(`/org/${$org.getPath()}/process/${text.length > 0 ? text : process.id}`, {
+							replaceState: true
+						});
 						return null;
 					}}
 				/>{/if}

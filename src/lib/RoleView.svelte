@@ -81,7 +81,9 @@
 					$db.updateRoleShortName(role, text),
 					"Couldn't update role short name"
 				);
-				goto(`/org/${$org.getPath()}/role/${text}`, { replaceState: true });
+				goto(`/org/${$org.getPath()}/role/${text.length > 0 ? text : role.id}`, {
+					replaceState: true
+				});
 				return null;
 			}}
 		/>{/if}
