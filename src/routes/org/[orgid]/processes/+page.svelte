@@ -130,8 +130,7 @@
 	{#each Array.from(new Set($organization
 				.getProcesses()
 				.map((process) => process.concern))) as concern}
-		<Header><Concern {concern} /></Header>
-
+		<!-- Find the matching for this concern and the filter -->
 		{@const processes = $organization
 			.getProcesses()
 			.filter((p) => p.concern === concern)
@@ -156,38 +155,44 @@
 
 		{@const roles = getRolesByAccountability(processes)}
 
-		<div class="processes">
-			<Table>
-				<thead>
-					<th /><th />{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
-							><RoleLink roleID={role.id} /></th
-						>{:else}<th />{/each}
-				</thead>
-				<tbody>
-					{#each processes as process}
-						{@const hows = $organization.getProcessHows(process.id)}
-						<tr>
-							<td><Status status={process.state} /></td>
-							<td><ProcessLink processID={process.id} /></td>
-							{#each roles as role}
-								<td class="level" class:me={personRoles.includes(role.id)}
-									><Level
-										level={process?.accountable === role.id
-											? 'accountable'
-											: hows.some((how) => how.responsible.includes(role.id))
-											? 'responsible'
-											: hows.some((how) => how.consulted.includes(role.id))
-											? 'consulted'
-											: hows.some((how) => how.informed.includes(role.id))
-											? 'informed'
-											: ''}
-									/></td
-								>{:else}<td><em>no roles</em></td>{/each}
-						</tr>
-					{/each}
-				</tbody>
-			</Table>
-		</div>
+		<!-- If there's no filter, or there is and there are processes that match, show the concern and it's matching processes. -->
+		{#if lowerFilter.length === 0 || processes.length > 0}
+			<Header><Concern {concern} /></Header>
+
+			<div class="processes">
+				<Table>
+					<thead>
+						<th /><th />{#each roles as role}<th
+								class="role"
+								class:me={personRoles.includes(role.id)}><RoleLink roleID={role.id} /></th
+							>{:else}<th />{/each}
+					</thead>
+					<tbody>
+						{#each processes as process}
+							{@const hows = $organization.getProcessHows(process.id)}
+							<tr>
+								<td><Status status={process.state} /></td>
+								<td><ProcessLink processID={process.id} /></td>
+								{#each roles as role}
+									<td class="level" class:me={personRoles.includes(role.id)}
+										><Level
+											level={process?.accountable === role.id
+												? 'accountable'
+												: hows.some((how) => how.responsible.includes(role.id))
+												? 'responsible'
+												: hows.some((how) => how.consulted.includes(role.id))
+												? 'consulted'
+												: hows.some((how) => how.informed.includes(role.id))
+												? 'informed'
+												: ''}
+										/></td
+									>{:else}<td><em>no roles</em></td>{/each}
+							</tr>
+						{/each}
+					</tbody>
+				</Table>
+			</div>
+		{/if}
 	{:else}
 		<Notice>This organization has no processes.</Notice>
 	{/each}
