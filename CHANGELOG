@@ -3,6 +3,14 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.6.6 2024-08-23
+
+### Fixed
+
+- Improved layout of how subtasks.
+- Hide concerns with no process matches when filtering.
+- Render process and role short names with spaces before initial caps.
+
 ## v0.6.5 2024-08-09
 
 ### Added
