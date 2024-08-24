@@ -11,6 +11,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Hide concerns with no process matches when filtering.
 - Render process and role short names with spaces before initial caps.
 - Handle erasure of role and process short names.
+- Don't show comment delete button unless admin or owner.
 
 ## v0.6.5 2024-08-09
 

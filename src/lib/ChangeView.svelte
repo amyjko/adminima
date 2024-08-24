@@ -276,7 +276,9 @@
 					{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment}
 						<CommentView
 							{comment}
-							remove={(comment) => $db.deleteComment(change, 'suggestions', comment)}
+							remove={$user && comment.who === $user.id
+								? (comment) => $db.deleteComment(change, 'suggestions', comment)
+								: undefined}
 						/>
 					{:else}
 						No changes yet.

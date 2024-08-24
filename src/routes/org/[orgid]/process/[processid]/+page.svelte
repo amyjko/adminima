@@ -46,7 +46,7 @@
 
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
 	$: personRoles = $user ? $org.getPersonRoles($user.id) : [];
-	$: admin = $user !== null && $org.hasAdminPerson($user.id);
+	$: isAdmin = $user !== null && $org.hasAdminPerson($user.id);
 	$: accountable =
 		$user !== null &&
 		process !== null &&
@@ -54,7 +54,7 @@
 	$: responsible =
 		$user !== null &&
 		process !== null &&
-		(admin ||
+		(isAdmin ||
 			accountable ||
 			$org
 				.getProcessHows(process.id)
@@ -167,7 +167,7 @@
 					}}
 				/>
 			{/if}
-			{#if admin}<PathEditor
+			{#if isAdmin}<PathEditor
 					short={process.short}
 					path={'...process/'}
 					update={async (text) => {
@@ -330,10 +330,10 @@
 
 	<CommentsView
 		comments={process.comments}
-		remove={(comment) => $db.deleteComment(process, 'processes', comment)}
+		remove={isAdmin ? (comment) => $db.deleteComment(process, 'processes', comment) : undefined}
 	/>
 
-	{#if admin || accountable}
+	{#if isAdmin || accountable}
 		<Header>Delete</Header>
 		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
 		<Tip admin

@@ -83,7 +83,9 @@
 
 <CommentsView
 	comments={organization.getComments()}
-	remove={(comment) => $db.deleteComment(organization.getRow(), 'orgs', comment)}
+	remove={isAdmin
+		? (comment) => $db.deleteComment(organization.getRow(), 'orgs', comment)
+		: undefined}
 />
 
 {#if isAdmin}

@@ -10,7 +10,7 @@
 	import Table from './Table.svelte';
 
 	export let comments: CommentID[];
-	export let remove: (id: CommentID) => Promise<PostgrestError | null>;
+	export let remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
 
 	const db = getDB();
 

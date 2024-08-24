@@ -141,7 +141,7 @@
 
 <CommentsView
 	comments={role.comments}
-	remove={(comment) => $db.deleteComment(role, 'roles', comment)}
+	remove={isAdmin ? (comment) => $db.deleteComment(role, 'roles', comment) : undefined}
 />
 
 <Header>Delete</Header>

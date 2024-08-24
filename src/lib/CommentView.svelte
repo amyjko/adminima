@@ -11,7 +11,7 @@
 	import { type CommentID } from '$types/Organization';
 
 	export let comment: CommentRow;
-	export let remove: (id: CommentID) => Promise<PostgrestError | null>;
+	export let remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
 
 	const org = getOrg();
 	const db = getDB();
