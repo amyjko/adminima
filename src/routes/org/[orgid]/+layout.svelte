@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Link from '$lib/Link.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import Title from '$lib/Title.svelte';
 	import { OrgSymbol, getDB, getUser } from '$lib/contexts';
@@ -35,5 +36,7 @@
 	{/if}
 {:else}
 	<Title title="Oops" kind="organization" />
-	<Oops text="Organization not found. If you're expecting access, try logging in first." />
+	<Oops
+		>Organization not found. If you're expecting access, try <Link to="/login">logging in</Link> first.</Oops
+	>
 {/if}

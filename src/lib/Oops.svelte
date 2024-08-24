@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { locale, type Locale } from '../types/Locales';
 
-	export let text: string | ((locale: Locale) => string);
+	export let text: string | ((locale: Locale) => string) | undefined = undefined;
 	export let inline = false;
 </script>
 
 <div class:inline>
-	<span>{typeof text === 'string' ? text : $locale ? text($locale) : '-'}</span>
+	<span>{typeof text === 'string' ? text : $locale && text ? text($locale) : '-'}</span>
 	<span class="sub"><slot /></span>
 </div>
 
