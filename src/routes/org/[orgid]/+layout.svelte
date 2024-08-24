@@ -35,5 +35,5 @@
 	{/if}
 {:else}
 	<Title title="Oops" kind="organization" />
-	<Oops text="Organization not found." />
+	<Oops text="Organization not found. If you're expecting access, try logging in first." />
 {/if}
