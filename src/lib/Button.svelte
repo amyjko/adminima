@@ -46,7 +46,7 @@
 		background: var(--chrome);
 		font-family: var(--font);
 		font-weight: normal;
-		font-size: var(--normal-size);
+		font-size: var(--small-size);
 		color: var(--foreground);
 		border: var(--chrome) var(--thickness) solid;
 		cursor: pointer;

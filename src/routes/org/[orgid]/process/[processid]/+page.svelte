@@ -132,25 +132,27 @@
 					)
 			: undefined}
 	>
-		<Visibility
-			tip="Change visibility of this process"
-			level={how.visibility}
-			edit={editable
-				? (vis) =>
-						vis === 'public' || vis === 'org' || vis === 'admin'
-							? $db.updateHowVisibility(how, vis)
-							: undefined
-				: undefined}
-		/>
-		<Note inline
-			>{#if how.visibility === 'public'}{#if $org.getVisibility() === 'public'}Everyone on the
-					internet can see this process{:else}Because the organization is not public, this process
-					is not public.{/if}{:else if how.visibility === 'org'}Only members can see this process.{:else if how.visibility === 'admin'}Only
-				admins can see this process.{/if}</Note
-		>
-
 		<Flow>
-			<Status status={process.state} />
+			<Note>Visibility</Note>
+			<Visibility
+				tip="Change visibility of this process"
+				level={how.visibility}
+				edit={editable
+					? (vis) =>
+							vis === 'public' || vis === 'org' || vis === 'admin'
+								? $db.updateHowVisibility(how, vis)
+								: undefined
+					: undefined}
+			/>
+			<Note inline
+				>{#if how.visibility === 'public'}{#if $org.getVisibility() === 'public'}Everyone on the
+						internet can see this process{:else}Because the organization is not public, this process
+						is not public.{/if}{:else if how.visibility === 'org'}Only members can see this process.{:else if how.visibility === 'admin'}Only
+					admins can see this process.{/if}</Note
+			>
+		</Flow>
+		<Flow>
+			<Note>Status</Note>
 			{#if editable}
 				<Select
 					tip="Change the state of this process"
@@ -166,8 +168,52 @@
 						else return null;
 					}}
 				/>
+			{:else}
+				<Status status={process.state} />
 			{/if}
-			{#if isAdmin}<PathEditor
+
+			<Note>Concern</Note>
+			{#if editable && $user && $org.getConcerns().length > 0}
+				<Select
+					tip="Change this process's concern"
+					selection={process.concern}
+					options={$org.getConcerns().map((c) => {
+						return { value: c, label: c };
+					})}
+					change={(concern) =>
+						queryOrError(
+							errors,
+							$db.updateProcessConcern(process, concern ?? '', $user.id),
+							"Couldn't update process's concern"
+						)}
+				/>{:else}
+				<Concern concern={process.concern} />
+			{/if}
+			{#if editable && $user}
+				<FormDialog
+					submit="Create new concern"
+					showTip="Create a new concern."
+					submitTip="Create and select this new concern."
+					button="+ concern"
+					header="Set a new concern"
+					explanation="Set a new concern to group processes."
+					inactive="Fill in a concern that doesn't exist yet."
+					valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
+					action={async () => {
+						const error = await queryOrError(
+							errors,
+							$db.updateProcessConcern(process, newConcern, $user.id),
+							"Couldn't update concern."
+						);
+						if (error) return false;
+						newConcern = '';
+						return true;
+					}}
+				>
+					<Field label="new concern" bind:text={newConcern} />
+				</FormDialog>
+			{/if}
+			{#if isAdmin}<Note>Link</Note><PathEditor
 					short={process.short}
 					path={'...process/'}
 					update={async (text) => {
@@ -268,52 +314,6 @@
 		</div>
 	{/if}
 
-	<Header>Concern</Header>
-
-	<Paragraph>Choose an area of concern to help group processes.</Paragraph>
-
-	<div class="row">
-		<Concern concern={process.concern} />
-		{#if editable && $user && $org.getConcerns().length > 0}
-			<Select
-				tip="Change this process's concern"
-				selection={process.concern}
-				options={$org.getConcerns().map((c) => {
-					return { value: c, label: c };
-				})}
-				change={(concern) =>
-					queryOrError(
-						errors,
-						$db.updateProcessConcern(process, concern ?? '', $user.id),
-						"Couldn't update process's concern"
-					)}
-			/>{/if}
-	</div>
-	{#if editable && $user}
-		<FormDialog
-			submit="New concern"
-			showTip="Create a new concern."
-			submitTip="Create and select this new concern."
-			button="Set concern..."
-			header="Set a new concern"
-			explanation="Set a new concern to group processes."
-			inactive="Fill in a concern that doesn't exist yet."
-			valid={() => newConcern.length > 0 && $org.getConcerns().indexOf(newConcern) === -1}
-			action={async () => {
-				const error = await queryOrError(
-					errors,
-					$db.updateProcessConcern(process, newConcern, $user.id),
-					"Couldn't update concern."
-				);
-				if (error) return false;
-				newConcern = '';
-				return true;
-			}}
-		>
-			<Field label="new concern" bind:text={newConcern} />
-		</FormDialog>
-	{/if}
-
 	<Header>Changes</Header>
 
 	<ChangeLink id={null} process={process.id} />
@@ -357,13 +357,6 @@
 {/if}
 
 <style>
-	.row {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: var(--spacing);
-	}
-
 	.steps {
 		width: 100%;
 		margin-block-start: calc(2 * var(--padding));

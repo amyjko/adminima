@@ -28,6 +28,12 @@
 		white-space: nowrap;
 	}
 
+	select,
+	option {
+		font-size: var(--small-size);
+		font-family: var(--font);
+	}
+
 	select {
 		appearance: none;
 		background: var(--chrome);
@@ -38,6 +44,10 @@
 		width: 2em;
 		max-width: 8em;
 		height: 1.25rem;
+	}
+
+	select:hover {
+		cursor: pointer;
 	}
 
 	select[disabled] {
