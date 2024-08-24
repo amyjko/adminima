@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.6.6 2024-08-23
 
+### Added
+
+- Added feedback link to header.
+
 ### Fixed
 
 - Improved layout of how subtasks.

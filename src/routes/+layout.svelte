@@ -70,9 +70,7 @@
 
 	<hr />
 
-	<Note
-		><Link to="https://amyjko.phd">Amy</Link> built this. It's in <strong>beta</strong>. Have <Link
-			to="https://github.com/amyjko/adminima/issues/new/choose">feedback</Link
-		>?
-	</Note>
+	<div style="display: flex; flex-direction:row; justify-content: center; width: 100%">
+		<Note><Link to="https://amyjko.phd">Amy</Link> built this.</Note>
+	</div>
 </Page>

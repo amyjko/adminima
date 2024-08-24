@@ -3,6 +3,7 @@
 	import Link from './Link.svelte';
 	import Loading from './Loading.svelte';
 	import Logo from './Logo';
+	import Note from './Note.svelte';
 	import { getUser } from './contexts';
 
 	const user = getUser();
@@ -10,6 +11,11 @@
 
 <div class="header">
 	<Link to="/">{Logo}</Link>
+	<Note
+		>Adminima is in <strong>beta</strong>. Submit <Link
+			to="https://github.com/amyjko/adminima/issues/new/choose">feedback</Link
+		>.
+	</Note>
 	{#if $navigating}<Loading inline={false} />{/if}
 	<span class="account"
 		>{#if $user}<Link to="/login">{$user.email}</Link>{:else}<Link to="/login">Login</Link
@@ -37,11 +43,9 @@
 		padding-block-start: var(--spacing);
 		display: flex;
 		flex-direction: row;
-		justify-items: center;
+		justify-content: space-between;
+		align-items: center;
 		padding: var(--spacing);
-	}
-
-	.header .account {
-		margin-inline-start: auto;
+		gap: var(--spacing);
 	}
 </style>
