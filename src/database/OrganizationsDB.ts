@@ -853,6 +853,16 @@ class OrganizationsDB {
 		);
 	}
 
+	async renameConcern(orgid: OrganizationID, oldConcern: string, newConcern: string) {
+		const { error } = await this.supabase
+			.from('processes')
+			.update({ concern: newConcern })
+			.eq('orgid', orgid)
+			.eq('concern', oldConcern);
+		if (error) return error;
+		else return null;
+	}
+
 	async createHow(process: ProcessRow, visibility: Visibility) {
 		return await this.supabase
 			.from('hows')

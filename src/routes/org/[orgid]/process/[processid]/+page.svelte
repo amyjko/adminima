@@ -274,7 +274,7 @@
 
 	<div class="row">
 		<Concern concern={process.concern} />
-		{#if editable && $user}
+		{#if editable && $user && $org.getConcerns().length > 0}
 			<Select
 				tip="Change this process's concern"
 				selection={process.concern}

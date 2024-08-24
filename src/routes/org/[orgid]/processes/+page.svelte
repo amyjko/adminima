@@ -22,6 +22,8 @@
 	const db = getDB();
 	const errors = getErrors();
 
+	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
+
 	let filter = '';
 	$: lowerFilter = filter.toLocaleLowerCase().trim();
 
@@ -157,7 +159,14 @@
 
 		<!-- If there's no filter, or there is and there are processes that match, show the concern and it's matching processes. -->
 		{#if lowerFilter.length === 0 || processes.length > 0}
-			<Header><Concern {concern} /></Header>
+			<Header
+				><Concern
+					{concern}
+					edit={isAdmin
+						? (newConcern) => $db.renameConcern($organization.getID(), concern, newConcern)
+						: undefined}
+				/></Header
+			>
 
 			<div class="processes">
 				<Table>
