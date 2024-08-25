@@ -84,9 +84,9 @@ export function sortProcessesByNextDate(processes: ProcessRow[]): ProcessRow[] {
 	return processes.toSorted((a, b) => {
 		if (a.repeat.length === 0) {
 			if (b.repeat.length === 0) return a.title.localeCompare(b.title);
-			else return -1;
+			else return 1;
 		} else {
-			if (b.repeat.length === 0) return 1;
+			if (b.repeat.length === 0) return -1;
 			else {
 				return (
 					Math.min.apply(

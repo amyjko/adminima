@@ -16,13 +16,7 @@
 	import Header from '$lib/Header.svelte';
 	import Table from '$lib/Table.svelte';
 	import Status from '$lib/Status.svelte';
-	import {
-		getNextPeriodDate,
-		formatNextDate,
-		sortProcessesByNextDate,
-		getNextProcessDate
-	} from '$database/Period';
-	import { format } from 'date-fns';
+	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from '$lib/ProcessDate.svelte';
 
 	const organization = getOrg();
