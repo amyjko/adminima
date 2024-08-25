@@ -8,4 +8,10 @@
 	$: nextDate = getNextProcessDate(process);
 </script>
 
-{#if nextDate}<Note>⟳ {formatNextDate(nextDate)}</Note>{/if}
+{#if nextDate}<Note><span>⟳ {formatNextDate(nextDate)}</span></Note>{/if}
+
+<style>
+	span {
+		white-space: nowrap;
+	}
+</style>
