@@ -3,7 +3,7 @@
 	export let tip: string;
 	export let change: (value: string | undefined) => any;
 	export let selection: string | undefined;
-	export let fit: boolean = true;
+	export let fit: string | boolean = true;
 	export let active: boolean = true;
 </script>
 
@@ -13,7 +13,8 @@
 		aria-label={tip}
 		bind:value={selection}
 		on:change={change(selection)}
-		class:fit
+		class:fit={typeof fit === 'boolean' && fit === true ? 'fit' : ''}
+		style:width={typeof fit === 'string' ? fit : ''}
 		disabled={active === false}
 	>
 		{#each options as option}

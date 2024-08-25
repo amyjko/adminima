@@ -38,7 +38,7 @@
 
 		{#if orgs.data.length}
 			<Paragraph>Here are the organizations you're part of and your profiles for each:</Paragraph>
-			<Table>
+			<Table full={false}>
 				<tr>
 					<th>Organization</th>
 					<th>Profile</th>

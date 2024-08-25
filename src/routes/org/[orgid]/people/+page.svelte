@@ -29,6 +29,8 @@
 	let match: PersonRow | undefined | null = undefined;
 	$: existing = $organization.getProfileWithEmail(newPersonEmail);
 
+	let newRole: string | undefined = undefined;
+
 	async function addEmail() {
 		match = undefined;
 		match = await $db.getPersonWithEmail(newPersonEmail);
@@ -90,24 +92,6 @@
 					<PersonLink {profile} />
 				</td>
 				<td class="roles">
-					{#each roles as role}
-						<span class="role"
-							><RoleLink roleID={role.id}
-								>{#if isAdmin}<Button
-										tip="Unassign this role from this person"
-										chromeless
-										action={async () => {
-											const error = await queryOrError(
-												errors,
-												$db.unassignPerson($organization.getID(), profile.id, role.id),
-												'Could not unassign role.'
-											);
-											if (error) return;
-										}}>{Delete}</Button
-									>{/if}</RoleLink
-							></span
-						>
-					{/each}
 					{#if isAdmin}
 						{@const remainingRoles = $organization
 							.getRoles()
@@ -118,15 +102,16 @@
 						{:else if remainingRoles.length > 0}
 							<Select
 								tip="Choose a role for this person."
-								selection={undefined}
-								fit={false}
+								bind:selection={newRole}
+								fit="1.5em"
 								options={[
-									{ value: undefined, label: '▼' },
+									{ value: undefined, label: '▾' },
 									...remainingRoles.map((role) => {
 										return { value: role.id, label: role.title };
 									})
 								]}
 								change={async (roleID) => {
+									newRole = undefined;
 									if (roleID !== undefined)
 										await queryOrError(
 											errors,
@@ -137,6 +122,26 @@
 							/>
 						{/if}
 					{/if}
+					<div class="role-list">
+						{#each roles as role}
+							<span class="role"
+								><RoleLink roleID={role.id}
+									>{#if isAdmin}<Button
+											tip="Unassign this role from this person"
+											chromeless
+											action={async () => {
+												const error = await queryOrError(
+													errors,
+													$db.unassignPerson($organization.getID(), profile.id, role.id),
+													'Could not unassign role.'
+												);
+												if (error) return;
+											}}>{Delete}</Button
+										>{/if}</RoleLink
+								></span
+							>
+						{/each}
+					</div>
 				</td>
 				<td class="team">
 					{#each roles as role}{#if role.team}<TeamLink id={role.team} />{/if}{:else}<em>&mdash;</em
@@ -233,13 +238,19 @@
 		display: flex;
 		flex-direction: row;
 		gap: var(--padding);
-		align-items: baseline;
 	}
 
 	.roles {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		flex-wrap: wrap;
+		gap: var(--padding);
+	}
+
+	.role-list {
+		display: flex;
+		flex-direction: column;
+		flex-wrap: nowrap;
 		gap: var(--padding);
 	}
 </style>

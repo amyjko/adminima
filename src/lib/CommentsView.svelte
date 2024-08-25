@@ -25,7 +25,7 @@
 			<Loading />
 		{:then comments}
 			{#if comments.data}
-				<Table>
+				<Table full={false}>
 					<tbody>
 						{#each comments.data.reverse() as comment}
 							<CommentView {comment} {remove} />
