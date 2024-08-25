@@ -260,4 +260,8 @@
 		flex-wrap: nowrap;
 		gap: var(--padding);
 	}
+
+	tr:nth-child(odd) {
+		background-color: var(--separator);
+	}
 </style>
