@@ -16,6 +16,14 @@
 	import Header from '$lib/Header.svelte';
 	import Table from '$lib/Table.svelte';
 	import Status from '$lib/Status.svelte';
+	import {
+		getNextPeriodDate,
+		formatNextDate,
+		sortProcessesByNextDate,
+		getNextProcessDate
+	} from '$database/Period';
+	import { format } from 'date-fns';
+	import ProcessDate from '$lib/ProcessDate.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -133,73 +141,79 @@
 				.getProcesses()
 				.map((process) => process.concern))) as concern}
 		<!-- Find the matching for this concern and the filter -->
-		{@const processes = $organization
-			.getProcesses()
-			.filter((p) => p.concern === concern)
-			.filter(
-				(p) =>
-					lowerFilter.length === 0 ||
-					p.title.toLowerCase().includes(lowerFilter) ||
-					p.short.toLowerCase().includes(lowerFilter)
-			)
-			.sort((a, b) => {
-				const howA = $organization.getHow(a.id);
-				const howB = $organization.getHow(b.id);
-				if (howA === undefined || howB === undefined) return 0;
+		{@const processes = sortProcessesByNextDate(
+			$organization
+				.getProcesses()
+				.filter((p) => p.concern === concern)
+				.filter(
+					(p) =>
+						lowerFilter.length === 0 ||
+						p.title.toLowerCase().includes(lowerFilter) ||
+						p.short.toLowerCase().includes(lowerFilter)
+				)
+				.sort((a, b) => {
+					const howA = $organization.getHow(a.id);
+					const howB = $organization.getHow(b.id);
+					if (howA === undefined || howB === undefined) return 0;
 
-				return (
-					howB.responsible.length +
-					howB.consulted.length +
-					howB.informed.length -
-					(howA.responsible.length + howA.consulted.length + howA.informed.length)
-				);
-			})}
+					return (
+						howB.responsible.length +
+						howB.consulted.length +
+						howB.informed.length -
+						(howA.responsible.length + howA.consulted.length + howA.informed.length)
+					);
+				})
+		)}
 
 		{@const roles = getRolesByAccountability(processes)}
 
 		<!-- If there's no filter, or there is and there are processes that match, show the concern and it's matching processes. -->
 		{#if lowerFilter.length === 0 || processes.length > 0}
-			<Header
-				><Concern
-					{concern}
-					edit={isAdmin
-						? (newConcern) => $db.renameConcern($organization.getID(), concern, newConcern)
-						: undefined}
-				/></Header
-			>
-
-			<div class="processes">
-				<Table>
-					<thead>
-						<th /><th />{#each roles as role}<th
-								class="role"
-								class:me={personRoles.includes(role.id)}><RoleLink roleID={role.id} /></th
-							>{:else}<th />{/each}
-					</thead>
-					<tbody>
-						{#each processes as process}
-							{@const hows = $organization.getProcessHows(process.id)}
-							<tr>
-								<td><Status status={process.state} /></td>
-								<td><ProcessLink processID={process.id} /></td>
-								{#each roles as role}
-									<td class="level" class:me={personRoles.includes(role.id)}
-										><Level
-											level={process?.accountable === role.id
-												? 'accountable'
-												: hows.some((how) => how.responsible.includes(role.id))
-												? 'responsible'
-												: hows.some((how) => how.consulted.includes(role.id))
-												? 'consulted'
-												: hows.some((how) => how.informed.includes(role.id))
-												? 'informed'
-												: ''}
-										/></td
-									>{:else}<td><em>no roles</em></td>{/each}
+			<div class="concern">
+				<Header
+					><Concern
+						{concern}
+						edit={isAdmin
+							? (newConcern) => $db.renameConcern($organization.getID(), concern, newConcern)
+							: undefined}
+					/></Header
+				>
+				<div class="processes">
+					<Table>
+						<thead>
+							<tr
+								><th>status</th><th>repeats</th><th>process</th>{#each roles as role}<th
+										class="role"
+										class:me={personRoles.includes(role.id)}><RoleLink roleID={role.id} /></th
+									>{:else}<th />{/each}
 							</tr>
-						{/each}
-					</tbody>
-				</Table>
+						</thead>
+						<tbody>
+							{#each processes as process}
+								{@const hows = $organization.getProcessHows(process.id)}
+								<tr>
+									<td><Status status={process.state} /></td>
+									<td><ProcessDate {process} /></td>
+									<td><ProcessLink processID={process.id} /></td>
+									{#each roles as role}
+										<td class="level" class:me={personRoles.includes(role.id)}
+											><Level
+												level={process?.accountable === role.id
+													? 'accountable'
+													: hows.some((how) => how.responsible.includes(role.id))
+													? 'responsible'
+													: hows.some((how) => how.consulted.includes(role.id))
+													? 'consulted'
+													: hows.some((how) => how.informed.includes(role.id))
+													? 'informed'
+													: ''}
+											/></td
+										>{:else}<td><em>no roles</em></td>{/each}
+								</tr>
+							{/each}
+						</tbody>
+					</Table>
+				</div>
 			</div>
 		{/if}
 	{:else}
@@ -215,6 +229,10 @@
 	th {
 		vertical-align: baseline;
 		font-size: var(--small-size);
+	}
+
+	th {
+		vertical-align: bottom;
 	}
 
 	.level {

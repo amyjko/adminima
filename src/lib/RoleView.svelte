@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Timeline from '$lib/Timeline.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import { type RoleRow } from '../database/OrganizationsDB';
 	import PersonLink from './ProfileLink.svelte';
@@ -16,9 +15,8 @@
 	import ChangeLink from './ChangeLink.svelte';
 	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
-	import EditableText from './EditableText.svelte';
-	import Flow from './Flow.svelte';
 	import PathEditor from './PathEditor.svelte';
+	import RoleProcesses from './RoleProcesses.svelte';
 
 	export let role: RoleRow;
 
@@ -122,7 +120,7 @@
 
 <Header>Processes</Header>
 
-<Timeline {role} processes={$org.getRoleProcesses(role.id)} />
+<RoleProcesses {role} processes={$org.getRoleProcesses(role.id)} />
 
 <Header>Changes</Header>
 

@@ -19,10 +19,6 @@
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 	$: roles = $org.getProfileRoles(profile.id);
-	$: allProcesses = roles.reduce(
-		(processes: ProcessRow[], role) => [...processes, ...$org.getRoleProcesses(role.id)],
-		[]
-	);
 </script>
 
 <Title
@@ -54,13 +50,10 @@
 
 <Header>Roles</Header>
 {#if roles.length > 0}
-	<Flow>
-		{#each roles as role}
-			<RoleLink roleID={role.id} />
-		{/each}
-	</Flow>
-
-	<RoleProcesses role={roles[0]} processes={allProcesses} />
+	{#each roles as role}
+		<RoleLink roleID={role.id} />
+		<RoleProcesses {role} processes={$org.getRoleProcesses(role.id)} />
+	{/each}
 {:else}
 	<Notice>This person has no roles in this organization.</Notice>
 {/if}

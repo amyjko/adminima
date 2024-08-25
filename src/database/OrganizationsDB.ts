@@ -15,19 +15,21 @@ import {
 	type RealtimeChannel,
 	type RealtimePostgresChangesPayload
 } from '@supabase/supabase-js';
-import type { Database, Tables } from './database.types';
+import type { Database } from './database.types.extended';
+import type Period from './Period';
 import { type Markup } from '$types/Organization';
 
-export type PersonRow = Tables<'people'>;
-export type OrganizationRow = Tables<'orgs'>;
-export type RoleRow = Tables<'roles'>;
-export type ProfileRow = Tables<'profiles'>;
-export type AssignmentRow = Tables<'assignments'>;
-export type ProcessRow = Tables<'processes'>;
-export type TeamRow = Tables<'teams'>;
-export type HowRow = Tables<'hows'>;
-export type ChangeRow = Tables<'suggestions'>;
-export type CommentRow = Tables<'comments'>;
+type Tables = Database['public']['Tables'];
+export type PersonRow = Tables['people']['Row'];
+export type OrganizationRow = Tables['orgs']['Row'];
+export type RoleRow = Tables['roles']['Row'];
+export type ProfileRow = Tables['profiles']['Row'];
+export type AssignmentRow = Tables['assignments']['Row'];
+export type ProcessRow = Tables['processes']['Row'];
+export type TeamRow = Tables['teams']['Row'];
+export type HowRow = Tables['hows']['Row'];
+export type ChangeRow = Tables['suggestions']['Row'];
+export type CommentRow = Tables['comments']['Row'];
 export type Visibility = Database['public']['Enums']['visibility'];
 export type Completion = Database['public']['Enums']['completion'];
 export type Status = Database['public']['Enums']['status'];
@@ -834,6 +836,34 @@ class OrganizationsDB {
 			process.id,
 			process.comments
 		);
+	}
+
+	async addProcessPeriod(process: ProcessRow, period: Period) {
+		const { error } = await this.supabase
+			.from('processes')
+			.update({ repeat: [...(process.repeat ? process.repeat : []), period] })
+			.eq('id', process.id);
+		return error;
+	}
+
+	async updateProcessPeriod(process: ProcessRow, period: Period, index: number) {
+		if (process.repeat === null || process.repeat.length <= index) return null;
+		const { error } = await this.supabase
+			.from('processes')
+			.update({
+				repeat: [...process.repeat.slice(0, index), period, ...process.repeat.slice(index + 1)]
+			})
+			.eq('id', process.id);
+		return error;
+	}
+
+	async removeProcessPeriod(process: ProcessRow, index: number) {
+		if (process.repeat === null || process.repeat.length <= index || index < 0) return null;
+		const { error } = await this.supabase
+			.from('processes')
+			.update({ repeat: process.repeat.filter((_, i) => i !== index) })
+			.eq('id', process.id);
+		return error;
 	}
 
 	async updateProcessConcern(process: ProcessRow, concern: string, who: PersonID) {

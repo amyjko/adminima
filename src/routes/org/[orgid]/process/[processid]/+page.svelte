@@ -30,6 +30,8 @@
 	import Flow from '$lib/Flow.svelte';
 	import PathEditor from '$lib/PathEditor.svelte';
 	import Status from '$lib/Status.svelte';
+	import Period from '$lib/Period.svelte';
+	import type { default as PeriodType } from '$database/Period';
 
 	let deleteError: string | undefined = undefined;
 
@@ -62,6 +64,8 @@
 	$: editable = process !== null && $user !== null && responsible;
 
 	let newConcern = '';
+
+	let newPeriod: string | undefined = undefined;
 
 	const focusID = writable<string | undefined>(undefined);
 	setContext<Writable<string | undefined>>('focusID', focusID);
@@ -102,6 +106,30 @@
 				if (sub) $db.updateHowDone(sub, uncheck ? 'no' : 'yes');
 			})
 		);
+	}
+
+	async function addPeriod(kind: string | undefined) {
+		// Reset the selection
+		newPeriod = undefined;
+
+		if (process === null) return;
+		// Create an initial period based on the type chosen.
+		const periodToAdd: PeriodType | undefined =
+			kind === 'annually-date'
+				? { type: kind, month: 1, date: 1 }
+				: kind === 'annually-week'
+				? { type: kind, week: 1, day: 1 }
+				: kind === 'monthly-date'
+				? { type: kind, day: 1 }
+				: kind === 'monthly-weekday'
+				? { type: kind, week: 1, day: 1 }
+				: kind === 'weekly'
+				? { type: kind, weeks: 1, day: 1 }
+				: undefined;
+		if (periodToAdd) {
+			const error = await $db.addProcessPeriod(process, periodToAdd);
+			if (error) addError(errors, 'Unable to add period.', error);
+		}
 	}
 </script>
 
@@ -271,15 +299,56 @@
 
 	<Header>When</Header>
 
-	{#if process.repeat}
-		Haven't built repeation renderer yet.
-		<!-- {#if process.repeat.type === 'monthly'}
-			This happens on the {process.repeat.date}st day of each month.
-		{:else if process.repeat.type === 'weekly'}
-			This happens every {process.repeat.weekday} of each week.
-		{:else if process.repeat.type === 'annually'}
-			This happens on day {process.repeat.day} of month {process.repeat.month} each year.
-		{/if} -->
+	{#if editable}
+		<Tip
+			>Setting one or more periods for when a process starts helps communicate when it should
+			happen.</Tip
+		>
+		<Select
+			tip="Add a frequency on which this process occurs"
+			options={[
+				{ value: undefined, label: 'Add a period …' },
+				{ value: 'annually-date', label: 'Annually on a specific date (e.g., every March 1st)' },
+				{
+					value: 'annually-week',
+					label: 'Annually on a specific week and weekday (e.g., every 13th week on Monday)'
+				},
+				{
+					value: 'monthly-date',
+					label: 'Monthly on a specific day (e.g., every 1st of the month)'
+				},
+				{
+					value: 'monthly-weekday',
+					label: 'Monthly on a specific weekday (e.g., 2nd Monday of each month'
+				},
+				{
+					value: 'weekly',
+					label:
+						'Every week or number of weeks on a specific weekday (e.g., every 2 weeks on Monday)'
+				}
+			]}
+			bind:selection={newPeriod}
+			change={addPeriod}
+		/>
+	{/if}
+	{#if process.repeat && process.repeat.length > 0}
+		{#each process.repeat as period, index}
+			<Period
+				{period}
+				edit={editable
+					? async (period) => {
+							const error = await $db.updateProcessPeriod(process, period, index);
+							if (error) addError(errors, "Couldn't update period.", error);
+					  }
+					: undefined}
+				remove={editable
+					? async () => {
+							const error = await $db.removeProcessPeriod(process, index);
+							if (error) addError(errors, "Coudln't remove period");
+					  }
+					: undefined}
+			/>
+		{/each}
 	{:else}
 		This process doesn't happen at a particular time.
 	{/if}

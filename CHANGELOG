@@ -9,6 +9,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Added feedback link to header.
 - Edit concerns.
+- Added process schedules (#10).
 
 ### Fixed
 
