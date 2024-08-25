@@ -109,13 +109,12 @@
 		{#if teamRoles.length > 0 || filter.length === 0}
 			<Header><TeamLink id={team.id} /></Header>
 			{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-				<Flow>
-					<RoleLink roleID={role.id} />{#each $org.getRoleProfiles(role.id) as profile}
+				<RoleLink roleID={role.id} />
+				<div class="people">
+					{#each $org.getRoleProfiles(role.id) as profile}
 						<ProfileLink {profile} />
-					{:else}
-						&mdash;
 					{/each}
-				</Flow>
+				</div>
 			{:else}
 				<Notice
 					>{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}</Notice
@@ -127,14 +126,21 @@
 	{#if teamless.length > 0}
 		<Header>No team</Header>
 		{#each teamless as role}
-			<Flow>
-				<RoleLink roleID={role.id} />
+			<RoleLink roleID={role.id} />
+			<div class="people">
 				{#each $org.getRoleProfiles(role.id) as profile}
 					<ProfileLink {profile} />
-				{:else}
-					&mdash;
 				{/each}
-			</Flow>
+			</div>
 		{/each}
 	{/if}
 {/if}
+
+<style>
+	.people {
+		display: flex;
+		flex-direction: column;
+		gap: var(--padding);
+		margin-left: 1em;
+	}
+</style>
