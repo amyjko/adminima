@@ -143,10 +143,12 @@
 						{/each}
 					</div>
 				</td>
-				<td class="teams">
-					{#each roles.map((role) => role.team).filter((team) => team !== null) as team}<TeamLink
-							id={team}
-						/>{:else}<em>&mdash;</em>{/each}
+				<td>
+					<div class="teams">
+						{#each roles.map((role) => role.team).filter((team) => team !== null) as team}<TeamLink
+								id={team}
+							/>{:else}<em>&mdash;</em>{/each}
+					</div>
 				</td>
 				<td class="supervisor">
 					{#if isAdmin}
