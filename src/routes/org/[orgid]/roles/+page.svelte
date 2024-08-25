@@ -94,52 +94,55 @@
 		.getRoles()
 		.filter((role) => role.team === null)
 		.filter((role) => lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter))}
-
-	{#each $org
-		.getTeams()
-		.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
-		{@const teamRoles = $org
-			.getTeamRoles(team.id)
-			.filter(
-				(role) =>
-					lowerFilter === '' ||
-					role.title.toLocaleLowerCase().includes(lowerFilter) ||
-					role.short.toLocaleLowerCase().includes(lowerFilter)
-			)}
-		{#if teamRoles.length > 0 || filter.length === 0}
-			<Header><TeamLink id={team.id} /></Header>
-			{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-				{@const profiles = $org.getRoleProfiles(role.id)}
-				<RoleLink roleID={role.id} />
-				{#if profiles.length > 0}
-					<div class="people">
-						{#each profiles as profile}
-							<ProfileLink {profile} />
-						{/each}
-					</div>
-				{/if}
-			{:else}
-				<Notice
-					>{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}</Notice
-				>
-			{/each}
-		{/if}
-	{/each}
-
-	{#if teamless.length > 0}
-		<Header>No team</Header>
-		{#each teamless as role}
-			{@const profiles = $org.getRoleProfiles(role.id)}
-			<RoleLink roleID={role.id} />
-			{#if profiles.length > 0}
-				<div class="people">
-					{#each profiles as profile}
-						<ProfileLink {profile} />
+	<ul>
+		{#each $org
+			.getTeams()
+			.sort((a, b) => $org.getTeamRoles(b.id).length - $org.getTeamRoles(a.id).length) as team}
+			{@const teamRoles = $org
+				.getTeamRoles(team.id)
+				.filter(
+					(role) =>
+						lowerFilter === '' ||
+						role.title.toLocaleLowerCase().includes(lowerFilter) ||
+						role.short.toLocaleLowerCase().includes(lowerFilter)
+				)}
+			{#if teamRoles.length > 0 || filter.length === 0}
+				<li><Header><TeamLink id={team.id} /></Header></li>
+				<ul>
+					{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+						{@const profiles = $org.getRoleProfiles(role.id)}
+						<li><RoleLink roleID={role.id} /></li>
+						{#if profiles.length > 0}
+							<ul class="people">
+								{#each profiles as profile}
+									<li><ProfileLink {profile} /></li>
+								{/each}
+							</ul>
+						{/if}
+					{:else}
+						<Notice
+							>{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}</Notice
+						>
 					{/each}
-				</div>
+				</ul>
 			{/if}
 		{/each}
-	{/if}
+
+		{#if teamless.length > 0}
+			<li><Header>No team</Header></li>
+			{#each teamless as role}
+				{@const profiles = $org.getRoleProfiles(role.id)}
+				<li><RoleLink roleID={role.id} /></li>
+				{#if profiles.length > 0}
+					<ul class="people">
+						{#each profiles as profile}
+							<li><ProfileLink {profile} /></li>
+						{/each}
+					</ul>
+				{/if}
+			{/each}
+		{/if}
+	</ul>
 {/if}
 
 <style>
@@ -148,5 +151,16 @@
 		flex-direction: column;
 		gap: var(--padding);
 		margin-left: 1em;
+	}
+
+	ul {
+		margin-inline-start: 0;
+	}
+
+	ul li {
+		list-style-type: none;
+		margin-top: 0;
+		margin-bottom: 1em;
+		padding-inline-start: 0;
 	}
 </style>
