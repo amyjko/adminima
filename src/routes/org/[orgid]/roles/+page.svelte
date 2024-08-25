@@ -107,9 +107,9 @@
 						role.short.toLocaleLowerCase().includes(lowerFilter)
 				)}
 			{#if teamRoles.length > 0 || filter.length === 0}
-				<ul class="team">
+				<ul>
 					<li><Header><TeamLink id={team.id} /></Header></li>
-					<ul>
+					<ul class="roles">
 						{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
 							{@const profiles = $org.getRoleProfiles(role.id)}
 							<li><RoleLink roleID={role.id} /></li>
@@ -150,7 +150,7 @@
 {/if}
 
 <style>
-	.team,
+	.roles,
 	.people {
 		display: flex;
 		flex-direction: column;
