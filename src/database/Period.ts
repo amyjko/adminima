@@ -108,7 +108,7 @@ export function getNextProcessDate(process: ProcessRow): Date | undefined {
 }
 
 export function formatNextDate(date: Date) {
-	return format(date, 'MMMM dd, YYY');
+	return format(date, 'MMMM dd, yyy');
 }
 
 export type { Period as default };
