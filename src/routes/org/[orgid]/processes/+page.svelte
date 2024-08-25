@@ -216,9 +216,11 @@
 {/if}
 
 <style>
-	.processes {
-		overflow: scroll;
+	.concern {
+		width: calc(100vw - 2em);
+		margin-left: calc(-1 * (100vw - 2em - 100%) / 2);
 	}
+
 	td,
 	th {
 		vertical-align: baseline;
