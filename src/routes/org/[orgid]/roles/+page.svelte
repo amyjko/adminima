@@ -127,8 +127,10 @@
 				</ul>
 			{/if}
 		{/each}
+	</ul>
 
-		{#if teamless.length > 0}
+	{#if teamless.length > 0}
+		<ul>
 			<li><Header>No team</Header></li>
 			{#each teamless as role}
 				{@const profiles = $org.getRoleProfiles(role.id)}
@@ -141,8 +143,8 @@
 					</ul>
 				{/if}
 			{/each}
-		{/if}
-	</ul>
+		</ul>
+	{/if}
 {/if}
 
 <style>
