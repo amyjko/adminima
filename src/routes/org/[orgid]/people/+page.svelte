@@ -261,7 +261,7 @@
 		gap: var(--padding);
 	}
 
-	tr:nth-child(odd) {
+	tr:nth-child(even) {
 		background-color: var(--separator);
 	}
 </style>

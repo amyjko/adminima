@@ -241,7 +241,7 @@
 		text-align: end;
 	}
 
-	tr:nth-child(odd) {
+	tr:nth-child(even) {
 		background-color: var(--separator);
 	}
 
