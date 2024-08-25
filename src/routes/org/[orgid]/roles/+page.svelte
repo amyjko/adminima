@@ -107,23 +107,25 @@
 						role.short.toLocaleLowerCase().includes(lowerFilter)
 				)}
 			{#if teamRoles.length > 0 || filter.length === 0}
-				<li><Header><TeamLink id={team.id} /></Header></li>
 				<ul>
-					{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-						{@const profiles = $org.getRoleProfiles(role.id)}
-						<li><RoleLink roleID={role.id} /></li>
-						{#if profiles.length > 0}
-							<ul class="people">
-								{#each profiles as profile}
-									<li><ProfileLink {profile} /></li>
-								{/each}
-							</ul>
-						{/if}
-					{:else}
-						<Notice
-							>{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}</Notice
-						>
-					{/each}
+					<li><Header><TeamLink id={team.id} /></Header></li>
+					<ul>
+						{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+							{@const profiles = $org.getRoleProfiles(role.id)}
+							<li><RoleLink roleID={role.id} /></li>
+							{#if profiles.length > 0}
+								<ul class="people">
+									{#each profiles as profile}
+										<li><ProfileLink {profile} /></li>
+									{/each}
+								</ul>
+							{/if}
+						{:else}
+							<Notice
+								>{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}</Notice
+							>
+						{/each}
+					</ul>
 				</ul>
 			{/if}
 		{/each}
