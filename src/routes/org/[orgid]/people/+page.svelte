@@ -245,6 +245,7 @@
 		flex-direction: row;
 		flex-wrap: wrap;
 		gap: var(--padding);
+		align-items: baseline;
 	}
 
 	.role-list {
