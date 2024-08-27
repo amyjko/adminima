@@ -783,7 +783,7 @@ class OrganizationsDB {
 	async addProcess(orgid: OrganizationID, title: string, visibility: Visibility) {
 		const { data: processData, error } = await this.supabase
 			.from('processes')
-			.insert({ title, orgid, visibility })
+			.insert({ title, orgid })
 			.select()
 			.single();
 
@@ -791,7 +791,7 @@ class OrganizationsDB {
 
 		const { data: newHow, error: howError } = await this.supabase
 			.from('hows')
-			.insert({ orgid, processid: processData.id, what: '' })
+			.insert({ orgid, processid: processData.id, what: '', visibility })
 			.select()
 			.single();
 
