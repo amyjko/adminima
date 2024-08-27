@@ -7,6 +7,7 @@
 	import { getOrg } from './contexts';
 	import Table from './Table.svelte';
 	import Field from './Field.svelte';
+	import Visibility from './Visibility.svelte';
 
 	export let changes: ChangeRow[];
 
@@ -32,6 +33,7 @@
 		<thead>
 			<tr>
 				<th>lead</th>
+				<th>visibility</th>
 				<th>title</th>
 				<th>status</th>
 			</tr>
@@ -42,6 +44,7 @@
 				.sort((a, b) => Levels[a.status] - Levels[b.status]) as change}
 				<tr>
 					<td><Status status={change.status} /></td>
+					<td><Visibility level={change.visibility} tip="Visibility of the change" /></td>
 					<td
 						>{#if change.lead}<PersonLink
 								profile={$org.getProfileWithID(change.lead)}

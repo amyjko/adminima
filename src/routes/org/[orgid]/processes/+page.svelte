@@ -18,6 +18,7 @@
 	import Status from '$lib/Status.svelte';
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from '$lib/ProcessDate.svelte';
+	import Visibility from '$lib/Visibility.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -176,17 +177,25 @@
 					<Table>
 						<thead>
 							<tr
-								><th>status</th><th>repeats</th><th>process</th>{#each roles as role}<th
-										class="role"
-										class:me={personRoles.includes(role.id)}><RoleLink roleID={role.id} /></th
+								><th>status</th><th>visibility</th><th>repeats</th><th>process</th
+								>{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
+										><RoleLink roleID={role.id} /></th
 									>{:else}<th />{/each}
 							</tr>
 						</thead>
 						<tbody>
 							{#each processes as process}
+								{@const how =
+									process.howid !== null ? $organization.getHow(process.howid) : undefined}
 								{@const hows = $organization.getProcessHows(process.id)}
 								<tr>
 									<td><Status status={process.state} /></td>
+									<td
+										>{#if how}<Visibility
+												tip="The visibility of tis process"
+												level={how.visibility}
+											/>{/if}</td
+									>
 									<td><ProcessDate {process} /></td>
 									<td><ProcessLink processID={process.id} /></td>
 									{#each roles as role}

@@ -23,5 +23,32 @@
 		change={(value) => (value ? edit(value) : undefined)}
 	/>
 {:else}
-	{level}
+	<span class="visibility {level}">{level}</span>
 {/if}
+
+<style>
+	.visibility {
+		text-transform: none;
+		display: inline-block;
+		font-size: var(--small-size);
+		padding-left: var(--padding);
+		padding-right: var(--padding);
+		background: var(--warning);
+		color: var(--background);
+	}
+
+	.public {
+		background: var(--salient);
+		color: var(--background);
+	}
+
+	.org {
+		background: var(--error);
+		color: var(--background);
+	}
+
+	.admin {
+		background: var(--foreground);
+		color: var(--background);
+	}
+</style>
