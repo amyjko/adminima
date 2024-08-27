@@ -271,7 +271,7 @@
 				>
 			{/if}
 
-			<Table>
+			<Table full={false}>
 				<tbody>
 					{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment}
 						<CommentView
