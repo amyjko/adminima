@@ -138,7 +138,7 @@
 	<Oops text={(locale) => locale.error.noProcess} />
 {:else if how === undefined}
 	<Oops>Unable to load this process.</Oops>
-{:else if $user === null || (how.visibility !== 'public' && !$org.hasPerson($user.id))}
+{:else if how.visibility !== 'public' && ($user === null || !$org.hasPerson($user.id))}
 	<Title title={$org.getName()} />
 	<Oops
 		text="This process is only visible to people in the organization. If you believe you have access, ensure you're logged in."
