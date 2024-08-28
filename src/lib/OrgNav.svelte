@@ -1,9 +1,18 @@
 <script lang="ts">
 	import type Organization from '$types/Organization';
+	import { getUser } from './contexts';
 	import Link from './Link.svelte';
 	import OrganizationLink from './OrganizationLink.svelte';
 
 	export let organization: Organization;
+
+	const user = getUser();
+
+	$: visible =
+		organization.getVisibility() === 'public' ||
+		($user &&
+			((organization.getVisibility() === 'org' && organization.hasPerson($user.id)) ||
+				(organization.getVisibility() === 'admin' && organization.hasAdminPerson($user.id))));
 </script>
 
 <div class="links">
@@ -17,12 +26,14 @@
 				: 's'}</Link
 		>
 	</span>
-	<span class="link">
-		<Link kind="person" to="/org/{organization.getPath()}/people"
-			><strong>{organization.getProfiles().length} </strong>
-			{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
-		>
-	</span>
+	{#if visible}
+		<span class="link">
+			<Link kind="person" to="/org/{organization.getPath()}/people"
+				><strong>{organization.getProfiles().length} </strong>
+				{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
+			>
+		</span>
+	{/if}
 	<span class="link">
 		<Link kind="process" to="/org/{organization.getPath()}/processes"
 			><strong>{organization.getProcesses().length}</strong> Process{organization.getProcesses()

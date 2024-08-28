@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Added
 
 - Visibility indicators in process and change tables.
+- Processes can be public even when an organization is private, allowing sharing of some internal processes. Roles are also public. The only content that is private is non-public processes and non-public changes.
 
 ## v0.6.6 2024-08-23
 

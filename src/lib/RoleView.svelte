@@ -28,7 +28,9 @@
 	$: profiles = $org.getRoleProfiles(role.id);
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 
-	let short = role.short;
+	$: visible =
+		($user === null && $org.getVisibility() === 'public') ||
+		($user !== null && $org.hasPerson($user.id));
 </script>
 
 <Title
@@ -107,7 +109,8 @@
 
 <Header>Who</Header>
 
-{#if profiles.length === 0}<Notice>No one holds this role.</Notice>{:else}
+{#if profiles.length === 0}{#if visible}<Notice>No one holds this role.</Notice>{:else}Who holds
+		this role is private.{/if}{:else}
 	<Paragraph
 		>This role is held by
 		{#each profiles as profile, index}<PersonLink

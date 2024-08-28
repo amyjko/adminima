@@ -51,7 +51,7 @@
 			<Note inline
 				>{#if organization.getVisibility() === 'public'}Everyone on the internet can see this
 					organization's details.{:else if organization.getVisibility() === 'org'}Only members can
-					see this organization's detail.{:else if organization.getVisibility() === 'admin'}Only
+					see this organization's private processes and changes.{:else if organization.getVisibility() === 'admin'}Only
 					admins can see this organization's details.{/if}</Note
 			>
 		</div>

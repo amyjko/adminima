@@ -27,6 +27,10 @@
 
 	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
 
+	$: visible =
+		($user === null && $organization.getVisibility() === 'public') ||
+		($user !== null && $organization.hasPerson($user.id));
+
 	let filter = '';
 	$: lowerFilter = filter.toLocaleLowerCase().trim();
 
@@ -105,124 +109,124 @@
 
 <Title title="Processes" kind="process" />
 
-{#if ($user === null && $organization.getVisibility() !== 'public') || ($user !== null && !$organization.hasPerson($user.id))}
-	<Oops text="This organization's processes are not public." />
-{:else}
-	<Tip member
-		>These are all of the processes in this organization and which roles are involved in them.
-		Select one to see how it works, who's responsible for it, or to suggest a change. Change process
-		concerns in each process's page.
-	</Tip>
+<Tip member
+	>These are all of the processes in this organization and which roles are involved in them. Select
+	one to see how it works, who's responsible for it, or to suggest a change. Change process concerns
+	in each process's page.
+</Tip>
 
-	{#if $user && $organization.hasPerson($user.id)}
-		<FormDialog
-			button="Create process …"
-			showTip="Create a new process."
-			submitTip="Create this new process."
-			header="New process"
-			explanation="Let's give the process a name."
-			submit="Create"
-			inactive="Fill in a title."
-			action={newProcess}
-			valid={() => title.length > 0}
-		>
-			<Field active={true} label="title" bind:text={title} />
-		</FormDialog>
-	{/if}
-
-	<Field label="Filter" bind:text={filter} />
-
-	{#each Array.from(new Set($organization
-				.getProcesses()
-				.map((process) => process.concern))) as concern}
-		<!-- Find the matching for this concern and the filter -->
-		{@const processes = sortProcessesByNextDate(
-			$organization
-				.getProcesses()
-				.filter((p) => p.concern === concern)
-				.filter(
-					(p) =>
-						lowerFilter.length === 0 ||
-						p.title.toLowerCase().includes(lowerFilter) ||
-						p.short.toLowerCase().includes(lowerFilter)
-				)
-				.sort((a, b) => {
-					const howA = $organization.getHow(a.id);
-					const howB = $organization.getHow(b.id);
-					if (howA === undefined || howB === undefined) return 0;
-
-					return (
-						howB.responsible.length +
-						howB.consulted.length +
-						howB.informed.length -
-						(howA.responsible.length + howA.consulted.length + howA.informed.length)
-					);
-				})
-		)}
-
-		{@const roles = getRolesByAccountability(processes)}
-
-		<!-- If there's no filter, or there is and there are processes that match, show the concern and it's matching processes. -->
-		{#if lowerFilter.length === 0 || processes.length > 0}
-			<div class="concern">
-				<Header
-					><Concern
-						{concern}
-						edit={isAdmin
-							? (newConcern) => $db.renameConcern($organization.getID(), concern, newConcern)
-							: undefined}
-					/></Header
-				>
-				<div class="processes">
-					<Table>
-						<thead>
-							<tr
-								><th>status</th><th>visibility</th><th>repeats</th><th>process</th
-								>{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
-										><RoleLink roleID={role.id} /></th
-									>{:else}<th />{/each}
-							</tr>
-						</thead>
-						<tbody>
-							{#each processes as process}
-								{@const how =
-									process.howid !== null ? $organization.getHow(process.howid) : undefined}
-								{@const hows = $organization.getProcessHows(process.id)}
-								<tr>
-									<td><Status status={process.state} /></td>
-									<td
-										>{#if how}<Visibility
-												tip="The visibility of tis process"
-												level={how.visibility}
-											/>{/if}</td
-									>
-									<td><ProcessDate {process} /></td>
-									<td><ProcessLink processID={process.id} /></td>
-									{#each roles as role}
-										<td class="level" class:me={personRoles.includes(role.id)}
-											><Level
-												level={process?.accountable === role.id
-													? 'accountable'
-													: hows.some((how) => how.responsible.includes(role.id))
-													? 'responsible'
-													: hows.some((how) => how.consulted.includes(role.id))
-													? 'consulted'
-													: hows.some((how) => how.informed.includes(role.id))
-													? 'informed'
-													: ''}
-											/></td
-										>{:else}<td><em>no roles</em></td>{/each}
-								</tr>
-							{/each}
-						</tbody>
-					</Table>
-				</div>
-			</div>
-		{/if}
-	{:else}
-		<Notice>This organization has no processes.</Notice>
-	{/each}
+{#if !visible}
+	<Oops text="Only showing public processes of this private organization." />
 {/if}
+
+{#if $user && $organization.hasPerson($user.id)}
+	<FormDialog
+		button="Create process …"
+		showTip="Create a new process."
+		submitTip="Create this new process."
+		header="New process"
+		explanation="Let's give the process a name."
+		submit="Create"
+		inactive="Fill in a title."
+		action={newProcess}
+		valid={() => title.length > 0}
+	>
+		<Field active={true} label="title" bind:text={title} />
+	</FormDialog>
+{/if}
+
+<Field label="Filter" bind:text={filter} />
+
+{#each Array.from(new Set($organization
+			.getProcesses()
+			.map((process) => process.concern))) as concern}
+	<!-- Find the matching for this concern and the filter -->
+	{@const processes = sortProcessesByNextDate(
+		$organization
+			.getProcesses()
+			.filter((p) => p.concern === concern)
+			.filter(
+				(p) =>
+					lowerFilter.length === 0 ||
+					p.title.toLowerCase().includes(lowerFilter) ||
+					p.short.toLowerCase().includes(lowerFilter)
+			)
+			.sort((a, b) => {
+				const howA = $organization.getHow(a.id);
+				const howB = $organization.getHow(b.id);
+				if (howA === undefined || howB === undefined) return 0;
+
+				return (
+					howB.responsible.length +
+					howB.consulted.length +
+					howB.informed.length -
+					(howA.responsible.length + howA.consulted.length + howA.informed.length)
+				);
+			})
+	)}
+
+	{@const roles = getRolesByAccountability(processes)}
+
+	<!-- If there's no filter, or there is and there are processes that match, show the concern and it's matching processes. -->
+	{#if lowerFilter.length === 0 || processes.length > 0}
+		<div class="concern">
+			<Header
+				><Concern
+					{concern}
+					edit={isAdmin
+						? (newConcern) => $db.renameConcern($organization.getID(), concern, newConcern)
+						: undefined}
+				/></Header
+			>
+			<div class="processes">
+				<Table>
+					<thead>
+						<tr
+							><th>status</th><th>visibility</th><th>repeats</th><th>process</th
+							>{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
+									><RoleLink roleID={role.id} /></th
+								>{:else}<th />{/each}
+						</tr>
+					</thead>
+					<tbody>
+						{#each processes as process}
+							{@const how =
+								process.howid !== null ? $organization.getHow(process.howid) : undefined}
+							{@const hows = $organization.getProcessHows(process.id)}
+							<tr>
+								<td><Status status={process.state} /></td>
+								<td
+									>{#if how}<Visibility
+											tip="The visibility of tis process"
+											level={how.visibility}
+										/>{/if}</td
+								>
+								<td><ProcessDate {process} /></td>
+								<td><ProcessLink processID={process.id} /></td>
+								{#each roles as role}
+									<td class="level" class:me={personRoles.includes(role.id)}
+										><Level
+											level={process?.accountable === role.id
+												? 'accountable'
+												: hows.some((how) => how.responsible.includes(role.id))
+												? 'responsible'
+												: hows.some((how) => how.consulted.includes(role.id))
+												? 'consulted'
+												: hows.some((how) => how.informed.includes(role.id))
+												? 'informed'
+												: ''}
+										/></td
+									>{:else}<td><em>no roles</em></td>{/each}
+							</tr>
+						{/each}
+					</tbody>
+				</Table>
+			</div>
+		</div>
+	{/if}
+{:else}
+	<Notice>This organization has no processes.</Notice>
+{/each}
 
 <style>
 	.concern {

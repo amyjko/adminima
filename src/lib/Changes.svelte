@@ -4,15 +4,21 @@
 	import ChangeLink from './ChangeLink.svelte';
 	import PersonLink from './ProfileLink.svelte';
 	import Status from './Status.svelte';
-	import { getOrg } from './contexts';
+	import { getOrg, getUser } from './contexts';
 	import Table from './Table.svelte';
 	import Field from './Field.svelte';
 	import Visibility from './Visibility.svelte';
+	import Oops from './Oops.svelte';
 
 	export let changes: ChangeRow[];
 
 	const org = getOrg();
+	const user = getUser();
 	const Levels = { triage: 0, active: 1, done: 3, backlog: 2 };
+
+	$: visible =
+		($user === null && $org.getVisibility() === 'public') ||
+		($user !== null && $org.hasPerson($user.id));
 
 	let filter = '';
 	$: lowerFilter = filter.toLocaleLowerCase().trim();
@@ -26,6 +32,10 @@
 			  )
 			: changes;
 </script>
+
+{#if !visible}
+	<Oops text="Only showing public changes of this private organization." />
+{/if}
 
 {#if changes.length > 0}
 	<Field label="Filter" bind:text={filter} />

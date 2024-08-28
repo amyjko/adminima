@@ -28,12 +28,7 @@
 </script>
 
 {#if $org}
-	{#if $org.getVisibility() === 'public' || ($user && (($org.getVisibility() === 'org' && $org.hasPerson($user.id)) || ($org.getVisibility() === 'admin' && $org.hasAdminPerson($user.id))))}
-		<slot />
-	{:else}
-		<Title title="Oops" kind="organization" />
-		<Oops text="This organization's details aren't visible to you." />
-	{/if}
+	<slot />
 {:else}
 	<Title title="Oops" kind="organization" />
 	<Oops

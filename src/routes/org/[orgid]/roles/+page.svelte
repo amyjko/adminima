@@ -11,7 +11,7 @@
 	import FormDialog from '$lib/FormDialog.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import ProfileLink from '$lib/ProfileLink.svelte';
-	import { resolveRoute } from '$app/paths';
+	import Oops from '$lib/Oops.svelte';
 
 	const org = getOrg();
 	const db = getDB();
@@ -21,6 +21,10 @@
 	let newRole: string = '';
 	let filter: string = '';
 	$: lowerFilter = filter.toLocaleLowerCase().trim();
+
+	$: visible =
+		($user === null && $org.getVisibility() === 'public') ||
+		($user !== null && $org.hasPerson($user.id));
 
 	async function createRole() {
 		const { data, error } = await $db.createRole($org.getID(), newRole);
@@ -53,6 +57,12 @@
 	>These are the roles held in this organization. Each one is responsible for particular processes
 	in this organization.</Tip
 >
+
+{#if !visible}
+	<Oops
+		text="You are not a member of this private organization, so people assigned to roles are not shown."
+	/>
+{/if}
 
 <Field label="Filter" bind:text={filter} />
 <Flow>
