@@ -133,20 +133,16 @@
 	}
 </script>
 
-{#if $user === null && $org.getVisibility() !== 'public'}
-	<Title title={$org.getName()} />
-	<Oops text="This process is private. If you believe you have access, log in to view it." />
-{:else if $user !== null && !$org.hasPerson($user.id) && $org.getVisibility() !== 'public'}
-	<Title title={$org.getName()} />
-	<Oops
-		text="This process is only visible to people in the organization. If you want access, write the organization's administrators."
-	/>
-{:else if process === null}
+{#if process === null}
 	<Title title={$org.getName()} />
 	<Oops text={(locale) => locale.error.noProcess} />
 {:else if how === undefined}
-	<Title title="Oops" kind="process" />
-	<Oops text="This process isn't visible to you." />
+	<Oops>Unable to load this process.</Oops>
+{:else if $user === null || (how.visibility !== 'public' && !$org.hasPerson($user.id))}
+	<Title title={$org.getName()} />
+	<Oops
+		text="This process is only visible to people in the organization. If you believe you have access, ensure you're logged in."
+	/>
 {:else}
 	<Title
 		title={process.title}
