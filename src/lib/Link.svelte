@@ -65,6 +65,7 @@
 		padding-inline-start: var(--padding);
 		padding-inline-end: var(--padding);
 		text-decoration: none;
+		box-shadow: var(--border) 1px 1px;
 		/* text-shadow: 1px 1px black; */
 	}
 
