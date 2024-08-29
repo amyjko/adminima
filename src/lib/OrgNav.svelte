@@ -56,6 +56,7 @@
 	.links {
 		display: flex;
 		flex-direction: row;
+		flex-wrap: wrap;
 		justify-content: start;
 		gap: var(--spacing);
 		font-size: var(--small-size);

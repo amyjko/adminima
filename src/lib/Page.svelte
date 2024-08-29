@@ -11,11 +11,13 @@
 
 <div class="header">
 	<Link to="/">{Logo}</Link>
-	<Note
-		>Adminima is in <strong>beta</strong>. Submit <Link
-			to="https://github.com/amyjko/adminima/issues/new/choose">feedback</Link
-		>.
-	</Note>
+	<span style="white-space: nowrap"
+		><Note
+			>Adminima is in <strong>beta</strong>. <Link
+				to="https://github.com/amyjko/adminima/issues/new/choose">Feedback</Link
+			>?
+		</Note>
+	</span>
 	{#if $navigating}<Loading inline={false} />{/if}
 	<span class="account"
 		>{#if $user}<Link to="/login">{$user.email}</Link>{:else}<Link to="/login">Login</Link

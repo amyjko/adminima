@@ -13,6 +13,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Handled case where person has account before they are added to an org.
+- Bad wraps on small screens.
 
 ## v0.6.6 2024-08-23
 
