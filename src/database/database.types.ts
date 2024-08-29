@@ -279,7 +279,7 @@ export type Database = {
           icon: string
           id: string
           orgid: string
-          repeat: Json | null
+          repeat: Json
           short: string
           state: Database["public"]["Enums"]["state"]
           title: string
@@ -293,7 +293,7 @@ export type Database = {
           icon?: string
           id?: string
           orgid: string
-          repeat?: Json | null
+          repeat?: Json
           short?: string
           state?: Database["public"]["Enums"]["state"]
           title?: string
@@ -307,7 +307,7 @@ export type Database = {
           icon?: string
           id?: string
           orgid?: string
-          repeat?: Json | null
+          repeat?: Json
           short?: string
           state?: Database["public"]["Enums"]["state"]
           title?: string

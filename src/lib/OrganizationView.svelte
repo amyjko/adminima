@@ -56,7 +56,7 @@
 			>
 		</div>
 		{#if isAdmin}<PathEditor
-				short={organization.getPaths()[0]}
+				short={organization.getPaths()[0] ?? ''}
 				path={'https://adminima.app/org/'}
 				update={async (text) => {
 					if (text === '') return null;

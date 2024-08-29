@@ -135,9 +135,11 @@
 
 {#if process === null}
 	<Title title={$org.getName()} />
-	<Oops text={(locale) => locale.error.noProcess} />
+	<Oops
+		text="This process does not exist or is not public. If you believe you should have access, ensure you're logged in."
+	/>
 {:else if how === undefined}
-	<Oops>Unable to load this process.</Oops>
+	<Oops text="Unable to load this process." />
 {:else if how.visibility !== 'public' && ($user === null || !$org.hasPerson($user.id))}
 	<Title title={$org.getName()} />
 	<Oops
