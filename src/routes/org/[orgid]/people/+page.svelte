@@ -69,6 +69,25 @@
 	>
 {/if}
 
+{#if isAdmin}
+	<Header>Add people</Header>
+	<Paragraph>Enter the email of the person to add. <em /></Paragraph>
+	<Tip admin
+		>Adding an email doesn't send an invitation, but they will have access once they log in.</Tip
+	>
+	<Form action={addEmail} {active} inactiveMessage="Make sure the email is valid.">
+		<Field
+			label="email"
+			bind:text={newPersonEmail}
+			invalid={(text) => (text.length === 0 || validEmail(text) ? undefined : 'Not a valid email')}
+		/>
+		<Button tip="Add this person to the organization" action={addEmail} {active} submit>Add</Button>
+		{#if existing}
+			<Paragraph>This person is already added.</Paragraph>
+		{/if}
+	</Form>
+{/if}
+
 <Table>
 	<thead>
 		<tr>
@@ -210,26 +229,6 @@
 		{/each}
 	</tbody>
 </Table>
-
-{#if isAdmin}
-	<Header>Add people</Header>
-	<Paragraph>Enter the email of the person to add. <em /></Paragraph>
-	<Form action={addEmail} {active} inactiveMessage="Make sure the email is valid.">
-		<Field
-			label="email"
-			bind:text={newPersonEmail}
-			invalid={(text) => (text.length === 0 || validEmail(text) ? undefined : 'Not a valid email')}
-		/>
-		<Button tip="Add this person to the organization" action={addEmail} {active} submit>Add</Button>
-		{#if existing}
-			<Paragraph>This person is already added.</Paragraph>
-		{/if}
-	</Form>
-	<Tip admin
-		>Adding an email address not send an invitation. They can log in at any time to claim and update
-		their profile.</Tip
-	>
-{/if}
 
 <style>
 	.role,
