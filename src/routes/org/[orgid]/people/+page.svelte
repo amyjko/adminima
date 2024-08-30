@@ -10,7 +10,7 @@
 	import { type PersonRow } from '$database/OrganizationsDB';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Select from '$lib/Select.svelte';
-	import validEmail from '../../../validEmail';
+	import validEmail, { validNameAndEmail } from '../../../validEmail';
 	import Form from '$lib/Form.svelte';
 	import Notice from '$lib/Notice.svelte';
 	import Link from '$lib/Link.svelte';
@@ -32,12 +32,20 @@
 	let newRole: string | undefined = undefined;
 
 	async function addEmail() {
+		let email = newPersonEmail;
+		let name = undefined;
+		if (validNameAndEmail(newPersonEmail)) {
+			const parts = newPersonEmail.split('<');
+			name = parts[0].trim();
+			email = parts[1].replace('>', '').trim();
+		}
+
 		match = undefined;
-		match = await $db.getPersonWithEmail(newPersonEmail);
+		match = await $db.getPersonWithEmail(email);
 		await (match === null
 			? queryOrError(
 					errors,
-					$db.addPersonByEmail($organization.getID(), newPersonEmail),
+					$db.addPersonByEmail($organization.getID(), email, name),
 					"Couldn't add person."
 			  )
 			: match !== null && match !== undefined
@@ -70,16 +78,18 @@
 {/if}
 
 {#if isAdmin}
-	<Header>Add people</Header>
-	<Paragraph>Enter the email of the person to add. <em /></Paragraph>
+	<Header>Add a person</Header>
 	<Tip admin
 		>Adding an email doesn't send an invitation, but they will have access once they log in.</Tip
 	>
 	<Form action={addEmail} {active} inactiveMessage="Make sure the email is valid.">
 		<Field
-			label="email"
+			label="email or name <email>"
 			bind:text={newPersonEmail}
-			invalid={(text) => (text.length === 0 || validEmail(text) ? undefined : 'Not a valid email')}
+			invalid={(text) =>
+				text.length === 0 || validEmail(text) || validNameAndEmail(text)
+					? undefined
+					: 'Not a valid email'}
 		/>
 		<Button tip="Add this person to the organization" action={addEmail} {active} submit>Add</Button>
 		{#if existing}

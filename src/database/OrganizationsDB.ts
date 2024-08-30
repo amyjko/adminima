@@ -487,10 +487,10 @@ class OrganizationsDB {
 	}
 
 	/** Add a person to the organization's profiles by email. Rely on Realtime notification for update. */
-	async addPersonByEmail(orgid: OrganizationID, email: string) {
+	async addPersonByEmail(orgid: OrganizationID, email: string, name: string | undefined) {
 		const { error } = await this.supabase
 			.from('profiles')
-			.insert({ orgid, personid: null, name: '', email, admin: false });
+			.insert({ orgid, personid: null, name: name ?? '', email, admin: false });
 		return error;
 	}
 
