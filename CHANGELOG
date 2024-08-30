@@ -3,12 +3,13 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
-## v0.0.7 2024-08-27
+## v0.6.7 2024-08-27
 
 ### Added
 
 - Visibility indicators in process and change tables.
 - Processes can be public even when an organization is private, allowing sharing of some internal processes. Roles are also public. The only content that is private is non-public processes and non-public changes.
+- Filter roles by profile names and emails.
 
 ### Fixed
 

@@ -12,6 +12,9 @@
 	import Tip from '$lib/Tip.svelte';
 	import ProfileLink from '$lib/ProfileLink.svelte';
 	import Oops from '$lib/Oops.svelte';
+	import type Organization from '$types/Organization';
+	import type { RoleID } from '$types/Organization';
+	import type { RoleRow } from '$database/OrganizationsDB';
 
 	const org = getOrg();
 	const db = getDB();
@@ -50,6 +53,17 @@
 		}
 		return false;
 	}
+
+	function filteredProfiles(org: Organization, role: RoleRow) {
+		return org
+			.getRoleProfiles(role.id)
+			.filter((prof) =>
+				lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter)
+					? true
+					: prof.name.toLocaleLowerCase().includes(lowerFilter) ||
+					  prof.email.toLocaleLowerCase().includes(lowerFilter)
+			);
+	}
 </script>
 
 <Title title="Roles" kind="role" />
@@ -64,7 +78,7 @@
 	/>
 {/if}
 
-<Field label="Filter" bind:text={filter} />
+<Field label="Filter by role or person" bind:text={filter} />
 <Flow>
 	{#if $user && $org.hasAdminPerson($user.id)}
 		<FormDialog
@@ -103,7 +117,19 @@
 	{@const teamless = $org
 		.getRoles()
 		.filter((role) => role.team === null)
-		.filter((role) => lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter))}
+		// If no filter, include all. Otherwise, only include roles with a matching title or person with the role with a matching name.
+		.filter(
+			(role) =>
+				lowerFilter === '' ||
+				role.title.toLocaleLowerCase().includes(lowerFilter) ||
+				$org
+					.getRoleProfiles(role.id)
+					.filter(
+						(prof) =>
+							prof.email.toLocaleLowerCase().includes(lowerFilter) ||
+							prof.name.toLocaleLowerCase().includes(lowerFilter)
+					).length > 0
+		)}
 	<ul>
 		{#each $org
 			.getTeams()
@@ -121,14 +147,16 @@
 					<li><Header><TeamLink id={team.id} /></Header></li>
 					<ul class="roles">
 						{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-							{@const profiles = $org.getRoleProfiles(role.id)}
-							<li><RoleLink roleID={role.id} /></li>
-							{#if profiles.length > 0}
-								<ul class="people">
-									{#each profiles as profile}
-										<li><ProfileLink {profile} /></li>
-									{/each}
-								</ul>
+							{@const profiles = filteredProfiles($org, role)}
+							{#if profiles.length > 0 || filter.length === 0}
+								<li><RoleLink roleID={role.id} /></li>
+								{#if profiles.length > 0}
+									<ul class="people">
+										{#each profiles as profile}
+											<li><ProfileLink {profile} /></li>
+										{/each}
+									</ul>
+								{/if}
 							{/if}
 						{:else}
 							<Notice
@@ -145,7 +173,7 @@
 		<ul>
 			<li><Header>No team</Header></li>
 			{#each teamless as role}
-				{@const profiles = $org.getRoleProfiles(role.id)}
+				{@const profiles = filteredProfiles($org, role)}
 				<li><RoleLink roleID={role.id} /></li>
 				{#if profiles.length > 0}
 					<ul class="people">
