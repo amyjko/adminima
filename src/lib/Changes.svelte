@@ -42,10 +42,10 @@
 	<Table>
 		<thead>
 			<tr>
-				<th>lead</th>
-				<th>visibility</th>
-				<th>title</th>
 				<th>status</th>
+				<th>visibility</th>
+				<th>lead</th>
+				<th>title</th>
 			</tr>
 		</thead>
 		<tbody>
