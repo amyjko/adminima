@@ -141,7 +141,6 @@
 	.blocks {
 		display: flex;
 		flex-direction: column;
-		gap: var(--spacing);
 		width: 100%;
 	}
 

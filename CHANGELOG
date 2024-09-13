@@ -3,6 +3,12 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.6.8 2024-09-13
+
+### Added
+
+- ARCI legend on processes page.
+
 ## v0.6.7 2024-08-27
 
 ### Added

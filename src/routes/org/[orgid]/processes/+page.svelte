@@ -110,9 +110,19 @@
 <Title title="Processes" kind="process" />
 
 <Tip member
-	>These are all of the processes in this organization and which roles are involved in them. Select
-	one to see how it works, who's responsible for it, or to suggest a change. Change process concerns
-	in each process's page.
+	><p>
+		These are all of the processes in this organization and which roles are involved in them. Select
+		one to see how it works, who's responsible for it, or to suggest a change. Change process
+		concerns in each process's page.
+	</p>
+	<p>
+		<Level level="accountable" />ccountable roles are in charge of the process's outcomes.
+		<br /><Level level="responsible" />esponsible roles complete a process.
+		<br /><Level level="consulted" />onsulted roles provide input, information, and guidance on a
+		process.
+		<br /><Level level="informed" />nformed roles are notified a process is happening and of its
+		outcomes.
+	</p>
 </Tip>
 
 {#if !visible}
@@ -134,6 +144,8 @@
 		<Field active={true} label="title" bind:text={title} />
 	</FormDialog>
 {/if}
+
+<p />
 
 <Field label="Filter" bind:text={filter} />
 
