@@ -17,12 +17,14 @@
 		color: var(--background);
 	}
 
+	.blocked,
 	.triage,
 	.draft {
 		background: var(--warning);
 		color: var(--background);
 	}
 
+	.declined,
 	.done {
 		background: var(--foreground);
 		color: var(--background);

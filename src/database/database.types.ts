@@ -621,7 +621,7 @@ export type Database = {
     Enums: {
       completion: "no" | "pending" | "yes"
       state: "draft" | "active" | "archived"
-      status: "triage" | "backlog" | "active" | "done"
+      status: "triage" | "backlog" | "active" | "done" | "blocked" | "declined"
       visibility: "public" | "org" | "people" | "teams" | "roles" | "admin"
     }
     CompositeTypes: {

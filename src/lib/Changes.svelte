@@ -14,7 +14,7 @@
 
 	const org = getOrg();
 	const user = getUser();
-	const Levels = { triage: 0, active: 1, done: 3, backlog: 2 };
+	const Levels = { triage: 0, active: 1, blocked: 2, done: 4, backlog: 3, declined: 5 };
 
 	$: visible =
 		($user === null && $org.getVisibility() === 'public') ||

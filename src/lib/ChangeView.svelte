@@ -31,7 +31,16 @@
 	const db = getDB();
 	const errors = getErrors();
 
-	const Statuses = { triage: 'Triage', backlog: 'Backlog', active: 'Active', done: 'Done' };
+	const Statuses = {
+		triage: 'Triage',
+		backlog: 'Backlog',
+		active: 'Active',
+		blocked: 'Blocked',
+		done: 'Done',
+		declined: 'Declined'
+	} as const;
+
+	const isStatus = (x: string): x is keyof typeof Statuses => x in Statuses;
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 	$: editable = $user && (isAdmin || change.who === $user.id);
@@ -69,10 +78,7 @@
 			selection={change.status}
 			options={Object.entries(Statuses).map(([key, value]) => ({ value: key, label: value }))}
 			change={async (status) => {
-				if (
-					$user &&
-					(status === 'triage' || status === 'active' || status === 'done' || status === 'backlog')
-				)
+				if ($user && status !== undefined && isStatus(status))
 					return await queryOrError(
 						errors,
 						$db.updateChangeStatus(change, status, $user.id),
