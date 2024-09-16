@@ -10,6 +10,11 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - ARCI legend on processes page.
 - Fixed #18, adding `blocked` and `declined` status for change requests.
 
+### Fixed
+
+- Fixed layout of teams
+- Fixed removal of roles.
+
 ## v0.6.7 2024-08-27
 
 ### Added

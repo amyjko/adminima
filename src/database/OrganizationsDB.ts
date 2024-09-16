@@ -517,6 +517,15 @@ class OrganizationsDB {
 			.eq('orgid', orgid)
 			.eq('profileid', profileid)
 			.eq('roleid', roleid);
+
+		// No error? Update the organization on the front end.
+		if (error === null) {
+			const org = this.organizations.get(orgid);
+			if (!org) return error;
+
+			this.organizations.set(orgid, org.withoutAssignment(roleid, profileid));
+		}
+
 		return error;
 	}
 
