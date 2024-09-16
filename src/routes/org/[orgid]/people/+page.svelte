@@ -245,7 +245,8 @@
 	.teams {
 		font-size: var(--small-size);
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
+		flex-wrap: wrap;
 		gap: var(--padding);
 	}
 
