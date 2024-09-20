@@ -15,6 +15,7 @@
 		padding-right: var(--padding);
 		background: var(--warning);
 		color: var(--background);
+		box-shadow: var(--border) 1px 1px;
 	}
 
 	.blocked,
