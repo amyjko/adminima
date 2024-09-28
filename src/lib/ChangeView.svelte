@@ -53,6 +53,9 @@
 		.filter((p) => !change.processes.includes(p.id))
 		.sort((a, b) => a.title.localeCompare(b.title));
 
+	let commentIDs: string[] = change.comments;
+	$: if (commentIDs.join('') !== change.comments.join('')) commentIDs = change.comments.slice();
+
 	let processSelection: string | undefined = undefined;
 	let roleSelection: string | undefined = undefined;
 
@@ -249,11 +252,11 @@
 
 <Header>Discussion</Header>
 
-{#await $db.getComments(change.comments)}
-	<Loading />
-{:then comments}
-	{#if comments.data}
-		<div class="comments">
+<div class="comments">
+	{#await $db.getComments(commentIDs)}
+		<Loading />
+	{:then comments}
+		{#if comments.data}
 			{#if $user}
 				<Labeled label="Have a comment?">
 					<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
@@ -279,7 +282,7 @@
 
 			<Table full={false}>
 				<tbody>
-					{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment}
+					{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment (comment.id)}
 						<CommentView
 							{comment}
 							remove={$user && comment.who === $user.id
@@ -291,11 +294,11 @@
 					{/each}
 				</tbody>
 			</Table>
-		</div>
-	{:else}
-		Unable to load comment history.
-	{/if}
-{/await}
+		{:else}
+			Unable to load comment history.
+		{/if}
+	{/await}
+</div>
 
 {#if editable}
 	<hr />

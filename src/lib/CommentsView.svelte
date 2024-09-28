@@ -27,7 +27,7 @@
 			{#if comments.data}
 				<Table full={false}>
 					<tbody>
-						{#each comments.data.reverse() as comment}
+						{#each comments.data.reverse() as comment (comment.id)}
 							<CommentView {comment} {remove} />
 						{:else}
 							No changes yet.

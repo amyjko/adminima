@@ -645,7 +645,7 @@ class OrganizationsDB {
 		id: string,
 		comments: CommentID[]
 	) {
-		// Record that we edited it.
+		// Insert the new comment.
 		const { data, error: insertError } = await this.supabase
 			.from('comments')
 			.insert({ orgid, what, who })
@@ -655,6 +655,7 @@ class OrganizationsDB {
 
 		const commentID = data?.id ?? null;
 
+		// If we succeeded, update the list of comments for the table.
 		if (commentID) {
 			const { error: updateError } = await this.supabase
 				.from(table)
