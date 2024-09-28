@@ -257,7 +257,7 @@
 		<Loading />
 	{:then comments}
 		{#if comments.data}
-			{#if $user}
+			{#if $user && $org.hasPerson($user.id)}
 				<Labeled label="Have a comment?">
 					<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
 				</Labeled>
