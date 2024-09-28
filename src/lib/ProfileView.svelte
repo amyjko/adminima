@@ -9,6 +9,8 @@
 	import type { ProcessRow, ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';
 	import Tip from './Tip.svelte';
+	import Paragraph from './Paragraph.svelte';
+	import ChangeLink from './ChangeLink.svelte';
 
 	export let profile: ProfileRow;
 
@@ -19,6 +21,7 @@
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
 	$: roles = $org.getProfileRoles(profile.id);
+	$: changes = $org.getChanges().filter((c) => c.lead === profile.id);
 </script>
 
 <Title
@@ -49,6 +52,8 @@
 />
 
 <Header>Roles</Header>
+
+<Paragraph>Roles and duties this person has.</Paragraph>
 {#if roles.length > 0}
 	{#each roles as role}
 		<RoleLink roleID={role.id} />
@@ -57,3 +62,11 @@
 {:else}
 	<Notice>This person has no roles in this organization.</Notice>
 {/if}
+
+<Header>Changes</Header>
+
+<Paragraph>These are changes this person is leading.</Paragraph>
+
+{#each changes as change}
+	<ChangeLink id={change.id} />
+{/each}
