@@ -1,11 +1,12 @@
-import OrganizationsDB, { type OrganizationPayload } from '$database/OrganizationsDB';
+import { type OrganizationPayload } from '$database/OrganizationsDB';
 
 /** @type {import('./$types').LayoutServerLoad} */
 export async function load({ params, locals }): Promise<{ payload: OrganizationPayload | null }> {
-	/** Get the serializable organization payload from the database */
-	const org = await new OrganizationsDB(locals.supabase).getPayload(params.orgid);
+	const { data, error } = await locals.supabase
+		.rpc('organization_payload', { _orgid: params.orgid })
+		.single();
 
 	return {
-		payload: org
+		payload: error ? null : data.payload
 	};
 }

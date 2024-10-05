@@ -6,7 +6,7 @@
 </script>
 
 <div class:inline>
-	<span>{typeof text === 'string' ? text : $locale && text ? text($locale) : '-'}</span>
+	{#if text}<span>{typeof text === 'string' ? text : $locale ? text($locale) : 'Error'}</span>{/if}
 	<span class="sub"><slot /></span>
 </div>
 
