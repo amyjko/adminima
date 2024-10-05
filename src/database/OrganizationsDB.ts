@@ -81,12 +81,6 @@ class OrganizationsDB {
 		return this.organizations.set(org.organization.id, new Organization(org));
 	}
 
-	/** Reload an entire organization. Needed because Supabase realtime doesn't guarantee eventual message delivery. */
-	async refresh(orgid: OrganizationID) {
-		const payload = await this.getPayload(orgid);
-		if (payload) this.updateOrg(payload);
-	}
-
 	async getPayload(orgid: string): Promise<OrganizationPayload | null> {
 		// First find the org that has the id or the path.
 		const result = await this.supabase.from('orgs').select().eq('id', orgid).single();
