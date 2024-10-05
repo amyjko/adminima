@@ -107,7 +107,7 @@
 	}
 </script>
 
-<Title title="Processes" kind="process" />
+<Title title="Processes" kind="process" label={false} />
 
 <Tip member
 	><p>

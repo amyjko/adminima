@@ -9,7 +9,7 @@
 	const organization = getOrg();
 </script>
 
-<Title title="Changes" kind="change" />
+<Title title="Changes" kind="change" label={false} />
 
 <Link to="/org/{$organization.getPath()}/changes/new">Suggest a change…</Link>
 

@@ -66,7 +66,7 @@
 	}
 </script>
 
-<Title title="Roles" kind="role" />
+<Title title="Roles" kind="role" label={false} />
 <Tip
 	>These are the roles held in this organization. Each one is responsible for particular processes
 	in this organization.</Tip

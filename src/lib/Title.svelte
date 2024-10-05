@@ -1,17 +1,12 @@
 <script lang="ts">
-	import OrganizationLink from './OrganizationLink.svelte';
 	import { getOrg } from './contexts';
-	import { page } from '$app/stores';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
-	import RoleLink from './RoleLink.svelte';
-	import ProcessLink from './ProcessLink.svelte';
-	import Link from './Link.svelte';
 	import OrgNav from './OrgNav.svelte';
 
 	// The title to show in the header
 	export let title: string;
-	// A descriptive label for what kind of page this is
+	// The kind of page this is, to determine background
 	export let kind:
 		| 'process'
 		| 'change'
@@ -21,6 +16,8 @@
 		| 'organization'
 		| 'error'
 		| undefined = undefined;
+	// Whether to show the kind
+	export let label = true;
 	// An optional function for editing the title
 	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
 
@@ -37,7 +34,7 @@
 			<OrgNav organization={$org} />
 		{/if}
 		<div>
-			{#if kind}
+			{#if kind && label}
 				<div class="kind">
 					{kind}
 				</div>
