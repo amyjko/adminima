@@ -12,7 +12,9 @@
 
 {#if profile}
 	<Link to="/org/{$org?.getPath() ?? profile.orgid}/person/{profile.id}" kind="person"
-		>{profile.name === '' ? profile.email : short ? profile.name.split(' ')[0] : profile.name}</Link
+		>{#if profile.name === ''}{profile.email}{:else if short}{profile.name.split(
+				' '
+			)[0]}{:else}{profile.name} <sub>&lt;{profile.email}&gt;</sub>{/if}</Link
 	>
 {:else}
 	<Oops inline text={(locale) => locale.error.noPerson} />

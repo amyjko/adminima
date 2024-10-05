@@ -13,7 +13,6 @@
 	import ProfileLink from '$lib/ProfileLink.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import type Organization from '$types/Organization';
-	import type { RoleID } from '$types/Organization';
 	import type { RoleRow } from '$database/OrganizationsDB';
 
 	const org = getOrg();
@@ -78,7 +77,6 @@
 	/>
 {/if}
 
-<Field label="Filter by role or person" bind:text={filter} />
 <Flow>
 	{#if $user && $org.hasAdminPerson($user.id)}
 		<FormDialog
@@ -110,6 +108,7 @@
 		</FormDialog>
 	{/if}
 </Flow>
+<Field label="Filter by role or person" bind:text={filter} />
 
 {#if $org.getRoles().length === 0 && $org.getTeams().length === 0}
 	<Notice>There are no roles or teams yet.</Notice>

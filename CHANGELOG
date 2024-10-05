@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.6.10 2024-10-05
 
+### Added
+
+- People filtering.
+
 ### Fixed
 
 - Removed redundant kind headers on collection pages.

@@ -145,8 +145,6 @@
 	</FormDialog>
 {/if}
 
-<p />
-
 <Field label="Filter" bind:text={filter} />
 
 {#each Array.from(new Set($organization

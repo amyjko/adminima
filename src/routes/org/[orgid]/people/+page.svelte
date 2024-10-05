@@ -17,6 +17,7 @@
 	import Tip from '$lib/Tip.svelte';
 	import Header from '$lib/Header.svelte';
 	import Table from '$lib/Table.svelte';
+	import FormDialog from '$lib/FormDialog.svelte';
 
 	const organization = getOrg();
 	const user = getUser();
@@ -28,6 +29,9 @@
 	let newPersonEmail: string = '';
 	let match: PersonRow | undefined | null = undefined;
 	$: existing = $organization.getProfileWithEmail(newPersonEmail);
+
+	let filter = '';
+	$: lowerFilter = filter.toLocaleLowerCase().trim();
 
 	let newRole: string | undefined = undefined;
 
@@ -56,9 +60,9 @@
 			  )
 			: undefined);
 		newPersonEmail = '';
-	}
 
-	$: active = !match && !existing && newPersonEmail.length > 0;
+		return true;
+	}
 </script>
 
 <Title title="People" kind="person" label={false} />
@@ -78,24 +82,32 @@
 {/if}
 
 {#if isAdmin}
-	<Header>Add a person</Header>
-	<Tip admin
-		>Adding an email doesn't send an invitation, but they will have access once they log in.</Tip
+	<FormDialog
+		button="Add person …"
+		showTip="Add a person."
+		submitTip="Add this person."
+		header="Add person"
+		explanation="Add a person to this organization by their email address. They will not receive a notification."
+		submit="Add"
+		inactive={existing ? 'This person is already added' : 'Ensure the email address is valid'}
+		action={addEmail}
+		valid={() =>
+			!existing &&
+			newPersonEmail.length > 0 &&
+			(validEmail(newPersonEmail) || validNameAndEmail(newPersonEmail))}
 	>
-	<Form action={addEmail} {active} inactiveMessage="Make sure the email is valid.">
 		<Field
 			label="email or name <email>"
 			bind:text={newPersonEmail}
 			invalid={(text) =>
-				text.length === 0 || validEmail(text) || validNameAndEmail(text)
+				existing
+					? 'This person is already added'
+					: text.length === 0 || validEmail(text) || validNameAndEmail(text)
 					? undefined
 					: 'Not a valid email'}
 		/>
-		<Button tip="Add this person to the organization" action={addEmail} {active} submit>Add</Button>
-		{#if existing}
-			<Paragraph>This person is already added.</Paragraph>
-		{/if}
-	</Form>
+	</FormDialog>
+	<Field label="Filter by name or email" bind:text={filter} />
 {/if}
 
 <Table>
@@ -112,7 +124,11 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each $organization.getProfiles() as profile}
+		{#each $organization
+			.getProfiles()
+			.filter((prof) => lowerFilter === '' || prof.name
+						.toLowerCase()
+						.includes(lowerFilter) || prof.email.toLowerCase().includes(lowerFilter)) as profile}
 			{@const roles = $organization
 				.getProfileRoles(profile.id)
 				.sort((a, b) => a.title.localeCompare(b.title))}
