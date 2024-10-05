@@ -139,7 +139,7 @@
 					(role) =>
 						lowerFilter === '' ||
 						role.title.toLocaleLowerCase().includes(lowerFilter) ||
-						role.short.toLocaleLowerCase().includes(lowerFilter)
+						role.short.some((name) => name.toLocaleLowerCase().includes(lowerFilter))
 				)}
 			{#if teamRoles.length > 0 || filter.length === 0}
 				<ul>

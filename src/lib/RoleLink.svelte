@@ -18,7 +18,7 @@
 		kind="role"
 		>{role
 			? role.short.length > 0
-				? role.short.replace(/([A-Z]+)/g, ' $1').trim()
+				? role.short[0].replace(/([A-Z]+)/g, ' $1').trim()
 				: role.title
 			: 'roles'}<slot /></Link
 	>{/if}

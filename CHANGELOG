@@ -12,6 +12,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Removed redundant kind headers on collection pages.
+- Preserve all previous short names to prevent broken links.
 
 ## v0.6.9 2024-09-27
 

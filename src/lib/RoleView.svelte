@@ -73,7 +73,7 @@
 			}}
 		/>{/if}
 	{#if isAdmin}<PathEditor
-			short={role.short}
+			short={role.short[0] ?? ''}
 			path={'...role/'}
 			update={async (text) => {
 				await queryOrError(

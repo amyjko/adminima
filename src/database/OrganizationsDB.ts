@@ -615,7 +615,10 @@ class OrganizationsDB {
 	}
 
 	async updateRoleShortName(role: RoleRow, short: string) {
-		const { error } = await this.supabase.from('roles').update({ short }).eq('id', role.id);
+		const { error } = await this.supabase
+			.from('roles')
+			.update({ short: Array.from(new Set([short, ...role.short].filter((s) => s !== ''))) })
+			.eq('id', role.id);
 		return error;
 	}
 
@@ -830,7 +833,10 @@ class OrganizationsDB {
 	}
 
 	async updateProcessShortName(process: ProcessRow, short: string) {
-		const { error } = await this.supabase.from('processes').update({ short }).eq('id', process.id);
+		const { error } = await this.supabase
+			.from('processes')
+			.update({ short: Array.from(new Set([short, ...process.short].filter((s) => s !== ''))) })
+			.eq('id', process.id);
 		return error;
 	}
 

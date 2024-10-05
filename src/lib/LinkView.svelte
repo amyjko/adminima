@@ -16,14 +16,15 @@
 		.getRoles()
 		.find(
 			(role) =>
-				role.short.toLocaleLowerCase() === lowerURL || role.title.toLocaleLowerCase() === lowerURL
+				role.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
+				role.title.toLocaleLowerCase() === lowerURL
 		);
 	// Does the link correspond to a process short name?
 	$: process = $org
 		.getProcesses()
 		.find(
 			(process) =>
-				process.short.toLocaleLowerCase() === lowerURL ||
+				process.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
 				process.title.toLocaleLowerCase() === lowerURL
 		);
 </script>

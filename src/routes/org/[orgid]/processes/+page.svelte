@@ -159,7 +159,7 @@
 				(p) =>
 					lowerFilter.length === 0 ||
 					p.title.toLowerCase().includes(lowerFilter) ||
-					p.short.toLowerCase().includes(lowerFilter)
+					p.short.some((name) => name.toLowerCase().includes(lowerFilter))
 			)
 			.sort((a, b) => {
 				const howA = $organization.getHow(a.id);

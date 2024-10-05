@@ -21,7 +21,7 @@
 		kind="process"
 		>{process
 			? process.short.length > 0
-				? process.short.replace(/([A-Z]+)/g, ' $1').trim()
+				? process.short[0].replace(/([A-Z]+)/g, ' $1').trim()
 				: process.title
 			: 'Processes'}</Link
 	>{/if}

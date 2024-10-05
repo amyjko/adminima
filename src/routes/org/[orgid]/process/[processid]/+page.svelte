@@ -239,7 +239,7 @@
 				</FormDialog>
 			{/if}
 			{#if isAdmin}<Note>Link</Note><PathEditor
-					short={process.short}
+					short={process.short[0] ?? ''}
 					path={'...process/'}
 					update={async (text) => {
 						await queryOrError(
