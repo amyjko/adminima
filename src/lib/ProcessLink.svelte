@@ -15,7 +15,7 @@
 		title={process && process.short.length > 0 ? process.title : undefined}
 		to={processID
 			? `/org/${$organization.getPath()}/process/${
-					process && process.short.length > 0 ? process.short : processID
+					process && process.short.length > 0 ? process.short[0] : processID
 			  }`
 			: `/org/${$organization.getPath()}/processes`}
 		kind="process"
