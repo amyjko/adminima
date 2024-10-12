@@ -53,11 +53,11 @@
 
 <Header>Roles</Header>
 
-<Paragraph>Roles and duties this person has.</Paragraph>
+<Paragraph>Roles and recurring processes this person is accountable or responsible for.</Paragraph>
 {#if roles.length > 0}
 	{#each roles as role}
 		<RoleLink roleID={role.id} />
-		<RoleProcesses {role} processes={$org.getRoleProcesses(role.id)} />
+		<RoleProcesses {role} processes={$org.getRoleProcesses(role.id)} onlyPeriodic />
 	{/each}
 {:else}
 	<Notice>This person has no roles in this organization.</Notice>
