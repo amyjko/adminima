@@ -32,7 +32,7 @@
 	<Loading />
 {:then orgs}
 	{#if orgs.data === null}
-		<Oops text="Couldn't load organizations" />
+		<Oops text="Couldn't load organizations: {orgs.error.message}" />
 	{:else if $user}
 		<Paragraph>Hi <strong>{$user.email}</strong>!</Paragraph>
 

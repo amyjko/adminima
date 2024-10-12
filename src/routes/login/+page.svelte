@@ -35,18 +35,19 @@
 
 	async function login() {
 		submitting = true;
-		const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
+		const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
 
 		if (error) message = error.code ?? error.message;
 		else {
 			submitted = false;
 			message = null;
+			if (data.user?.id) goto(`/person/${data.user.id}`);
 		}
 		submitting = false;
 	}
 
 	// Already signed in? Go to the profile.
-	$: if (browser && $user) goto(`/person/${$user.id}`);
+	// $: if (browser && $user) goto(`/person/${$user.id}`);
 
 	$: emailActive = !submitting && validEmail(email);
 

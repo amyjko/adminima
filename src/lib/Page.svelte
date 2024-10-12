@@ -20,7 +20,8 @@
 	</span>
 	{#if $navigating}<Loading inline={false} />{/if}
 	<span class="account"
-		>{#if $user}<Link to="/login">{$user.email}</Link>{:else}<Link to="/login">Login</Link
+		>{#if $user}<Link to="/person/{$user.id}">{$user.email}</Link>{:else}<Link to="/login"
+				>Login</Link
 			>{/if}</span
 	>
 </div>
