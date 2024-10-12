@@ -5,7 +5,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getDB, getUser } from '$lib/contexts';
+	import { addError, getDB, getErrors, getUser } from '$lib/contexts';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
 	import NewOrganization from '$lib/NewOrganization.svelte';
@@ -21,13 +21,13 @@
 	$: orgs = data.orgs;
 	$: isSelf = $user && $user.id === $page.params.personid;
 
-	let user = getUser();
-	let db = getDB();
-	let message: string | null = null;
+	const user = getUser();
+	const db = getDB();
+	const errors = getErrors();
 
 	async function logout() {
 		const { error } = await $db.signOut();
-		if (error) message = error.code ?? error.message;
+		if (error) addError(errors, error.code ?? error.message);
 		else goto(`/login`);
 	}
 </script>
@@ -74,8 +74,4 @@
 				</ul>{/if}</Notice
 		>
 	{/if}
-{/if}
-
-{#if message}
-	<Oops text={message} />
 {/if}
