@@ -10,6 +10,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Corrected profile links in header.
 - Prevented profile redirect cycle.
 - Fixed permissions on change editing.
+- Personalized person page.
 
 ## v0.6.10 2024-10-05
 

@@ -6,14 +6,20 @@
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
 	import { getDB, getUser } from '$lib/contexts';
-	import { page } from '$app/stores';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
-	import Loading from '$lib/Loading.svelte';
 	import NewOrganization from '$lib/NewOrganization.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import Link from '$lib/Link.svelte';
 	import Table from '$lib/Table.svelte';
+	import { page } from '$app/stores';
+	import Header from '$lib/Header.svelte';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+
+	$: orgs = data.orgs;
+	$: isSelf = $user && $user.id === $page.params.personid;
 
 	let user = getUser();
 	let db = getDB();
@@ -26,56 +32,50 @@
 	}
 </script>
 
-<Title title="You" />
+<Title title={isSelf ? 'You' : 'Person'}>
+	{#if isSelf}<Button action={logout} tip="Log out of the application.">Log out</Button>{/if}
+</Title>
 
-{#await $db.getPersonsOrganizations($page.params.personid)}
-	<Loading />
-{:then orgs}
-	{#if orgs.data === null}
-		<Oops text="Couldn't load organizations: {orgs.error.message}" />
-	{:else if $user}
-		<Paragraph>Hi <strong>{$user.email}</strong>!</Paragraph>
+<Header>Organizations</Header>
 
-		{#if orgs.data.length}
-			<Paragraph>Here are the organizations you're part of and your profiles for each:</Paragraph>
-			<Table full={false}>
-				<tr>
-					<th>Organization</th>
-					<th>Profile</th>
-				</tr>
-				{#each orgs.data as org}
-					<tr>
-						<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
-						<td
-							>{#await $db.getPersonProfile(org.id, $user.id) then profile}
-								<PersonLink {profile} />
-							{/await}
-						</td>
-					</tr>
-				{/each}
-			</Table>
-		{:else}
-			<Notice
-				>You're not part of any organizations.
-				<ul>
-					<li>Join one by asking the person in charge.</li>
-					<li>Create one if you're in charge.</li>
-				</ul></Notice
-			>
-		{/if}
-
+{#if orgs === null}
+	<Oops text="Couldn't load this person's organizations" />
+{:else}
+	{#if isSelf}
 		<Tip
 			>Want to create an organization? Make sure you've got an invite code from <Link
 				to="mailto:ajko@uw.edu">Amy</Link
 			>.</Tip
 		>
-
 		<NewOrganization />
 	{/if}
-{/await}
+	{#if orgs.length > 0}
+		<Paragraph
+			>Here are the organizations {#if isSelf}you are{:else}this person is{/if} part of:</Paragraph
+		>
+		<Table full={false}>
+			{#each orgs as org}
+				<tr>
+					<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
+					<td
+						>{#if org.profiles.length > 0}{#await $db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
+								<PersonLink {profile} />
+							{/await}{/if}
+					</td>
+				</tr>
+			{/each}
+		</Table>
+	{:else}
+		<Notice
+			>{#if isSelf}You are{:else}this person is{/if} not part of any organizations.
+			{#if isSelf}<ul>
+					<li>Join one by asking the person in charge.</li>
+					<li>Create one if you're in charge.</li>
+				</ul>{/if}</Notice
+		>
+	{/if}
+{/if}
 
 {#if message}
 	<Oops text={message} />
 {/if}
-
-<Button action={logout} tip="Log out of the application.">Log out</Button>
