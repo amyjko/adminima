@@ -611,6 +611,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      organization_payload: {
+        Args: {
+          _orgid: string
+        }
+        Returns: {
+          payload: Json
+        }[]
+      }
       path_available: {
         Args: {
           _path: string
