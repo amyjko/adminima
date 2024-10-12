@@ -43,7 +43,7 @@
 	const isStatus = (x: string): x is keyof typeof Statuses => x in Statuses;
 
 	$: isAdmin = $user && $org.hasAdminPerson($user.id);
-	$: editable = $user && (isAdmin || change.who === $user.id);
+	$: editable = $user && (isAdmin || change.who === $user.id || change.lead === $user.id);
 	$: unselectedRoles = $org
 		.getRoles()
 		.filter((r) => !change.roles.includes(r.id))
@@ -65,7 +65,7 @@
 <Title
 	title={change.what}
 	kind="change"
-	edit={$user && isAdmin && change.who === $user.id
+	edit={editable
 		? (text) =>
 				queryOrError(
 					errors,
@@ -125,7 +125,7 @@
 				);
 			}}
 		/>{:else if change.lead}<PersonLink profile={$org.getProfileWithID(change.lead)} />{:else}No one{/if}
-	is in currently leading this change project.</Paragraph
+	is currently leading this change.</Paragraph
 >
 
 <Header>Problem</Header>
