@@ -49,7 +49,7 @@ export type OrganizationPayload = {
 
 /** A front end interface to the backing store, caching data loaded from the database and offering operations for modifying the database. */
 class OrganizationsDB {
-	private supabase: SupabaseClient;
+	private supabase: SupabaseClient<Database>;
 
 	/** A collection of organization stores, kept in sync with the database for use by client */
 	readonly organizations = new ReactiveMap<OrganizationID, Organization>();
@@ -57,7 +57,7 @@ class OrganizationsDB {
 	/** Organization specific Supabase realtime channels */
 	readonly channels = new Map<OrganizationID, RealtimeChannel>();
 
-	constructor(supabase: SupabaseClient) {
+	constructor(supabase: SupabaseClient<Database>) {
 		this.supabase = supabase;
 	}
 
@@ -69,7 +69,7 @@ class OrganizationsDB {
 		return this.supabase.auth.signOut();
 	}
 
-	setSupabaseClient(client: SupabaseClient) {
+	setSupabaseClient(client: SupabaseClient<Database>) {
 		this.supabase = client;
 	}
 
@@ -707,7 +707,7 @@ class OrganizationsDB {
 	async addProcess(orgid: OrganizationID, title: string, visibility: Visibility) {
 		const { data: processData, error } = await this.supabase
 			.from('processes')
-			.insert({ title, orgid })
+			.insert({ title, orgid, repeat: [] })
 			.select()
 			.single();
 
@@ -965,7 +965,7 @@ class OrganizationsDB {
 	async updateChangeVisibility(change: ChangeRow, vis: string) {
 		const { error } = await this.supabase
 			.from('suggestions')
-			.update({ visibility: vis })
+			.update({ visibility: vis as Visibility })
 			.eq('id', change.id);
 		return error;
 	}
