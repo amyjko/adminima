@@ -2,11 +2,10 @@
 	import Header from './Header.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import Title from './Title.svelte';
-	import Flow from './Flow.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
 	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
 	import MarkupView from './MarkupView.svelte';
-	import type { ProcessRow, ProfileRow } from '$database/OrganizationsDB';
+	import type { ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';
 	import Tip from './Tip.svelte';
 	import Paragraph from './Paragraph.svelte';
@@ -65,7 +64,9 @@
 
 <Header>Changes</Header>
 
-<Paragraph>These are changes this person is leading.</Paragraph>
+<Paragraph
+	>These are the <strong>{changes.length}</strong> changes this person is leading.</Paragraph
+>
 
 {#each changes as change}
 	<ChangeLink id={change.id} />
