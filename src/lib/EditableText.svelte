@@ -2,6 +2,7 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import Button from './Button.svelte';
 	import Loading from './Loading.svelte';
+	import { tick } from 'svelte';
 
 	interface Props {
 		text: string;
@@ -14,6 +15,7 @@
 	let editing = $state(false);
 	let revision = $state('');
 	let saving = $state(false);
+	let view = $state<HTMLInputElement | null>(null);
 
 	async function save() {
 		if (editing) {
@@ -30,6 +32,9 @@
 		} else {
 			editing = true;
 			revision = text;
+
+			await tick();
+			if (view) view.focus();
 		}
 	}
 </script>
@@ -40,6 +45,7 @@
 			<!-- svelte-ignore a11y_autofocus -->
 			<input
 				type="text"
+				bind:this={view}
 				bind:value={revision}
 				disabled={saving}
 				style:width={revision.length + 2 + 'ch'}
