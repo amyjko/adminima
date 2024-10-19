@@ -12,7 +12,7 @@
 	let { profile, short = false }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context?.org);
 </script>
 
 {#if profile}
