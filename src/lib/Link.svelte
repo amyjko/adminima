@@ -9,13 +9,7 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let {
-		to,
-		bland = false,
-		title = undefined,
-		kind = null,
-		children
-	}: Props = $props();
+	let { to, bland = false, title = undefined, kind = null, children }: Props = $props();
 
 	let external = $derived(to.startsWith('http'));
 	let inactive = $derived(to === $page.url.pathname);
@@ -52,7 +46,6 @@
 		cursor: default;
 		background: none;
 		color: currentColor;
-		box-shadow: none;
 	}
 
 	a.bland {
@@ -78,7 +71,10 @@
 		padding-inline-end: var(--padding);
 		text-decoration: none;
 		box-shadow: var(--border) 1px 1px;
-		/* text-shadow: 1px 1px black; */
+	}
+
+	.kinded.inactive {
+		box-shadow: none;
 	}
 
 	.person {
