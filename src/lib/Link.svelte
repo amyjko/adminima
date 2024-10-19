@@ -1,13 +1,24 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	export let to: string;
-	export let bland = false;
-	export let title: string | undefined = undefined;
-	export let kind: 'person' | 'role' | 'process' | 'org' | 'team' | 'change' | null = null;
+	interface Props {
+		to: string;
+		bland?: boolean;
+		title?: string | undefined;
+		kind?: 'person' | 'role' | 'process' | 'org' | 'team' | 'change' | null;
+		children?: import('svelte').Snippet;
+	}
 
-	$: external = to.startsWith('http');
-	$: inactive = to === $page.url.pathname;
+	let {
+		to,
+		bland = false,
+		title = undefined,
+		kind = null,
+		children
+	}: Props = $props();
+
+	let external = $derived(to.startsWith('http'));
+	let inactive = $derived(to === $page.url.pathname);
 </script>
 
 <a
@@ -22,7 +33,7 @@
 	><span class="emoji"
 		>{#if kind === 'person'}⍜{:else if kind === 'role'}☑{:else if kind === 'process'}⚙{:else if kind === 'org'}▦{:else if kind === 'change'}𝚫{:else if kind === 'team'}𑗕{/if}</span
 	>
-	<slot /></a
+	{@render children?.()}</a
 >
 
 <style>

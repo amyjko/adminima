@@ -9,9 +9,13 @@
 	import { format } from 'date-fns';
 	import Note from './Note.svelte';
 
-	export let period: Period;
-	export let edit: ((period: Period) => void) | undefined = undefined;
-	export let remove: (() => void) | undefined = undefined;
+	interface Props {
+		period: Period;
+		edit?: ((period: Period) => void) | undefined;
+		remove?: (() => void) | undefined;
+	}
+
+	let { period, edit = undefined, remove = undefined }: Props = $props();
 
 	function suffix(n: number) {
 		return n === 1 ? 'st' : n === 2 ? 'nd' : 'th';

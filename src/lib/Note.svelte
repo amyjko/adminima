@@ -1,8 +1,13 @@
 <script lang="ts">
-	export let inline: boolean = false;
+	interface Props {
+		inline?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { inline = false, children }: Props = $props();
 </script>
 
-<div class:inline><em><slot /></em></div>
+<div class:inline><em>{@render children?.()}</em></div>
 
 <style>
 	div {

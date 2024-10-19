@@ -1,9 +1,14 @@
 <script lang="ts">
-	export let full = true;
+	interface Props {
+		full?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { full = true, children }: Props = $props();
 </script>
 
 <div class="table" class:full>
-	<table><slot /></table>
+	<table>{@render children?.()}</table>
 </div>
 
 <style>

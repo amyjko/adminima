@@ -11,7 +11,11 @@
 	import Quote from '../markup/Quote';
 	import QuoteView from './QuoteView.svelte';
 
-	export let blocks: Block[];
+	interface Props {
+		blocks: Block[];
+	}
+
+	let { blocks }: Props = $props();
 </script>
 
 {#each blocks as block}

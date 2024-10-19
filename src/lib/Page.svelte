@@ -4,7 +4,9 @@
 	import Loading from './Loading.svelte';
 	import Logo from './Logo';
 	import Note from './Note.svelte';
-	import { getUser } from './contexts';
+	import { getUser } from './contexts.svelte';
+	/** @type {{children?: import('svelte').Snippet}} */
+	let { children } = $props();
 
 	const user = getUser();
 </script>
@@ -26,7 +28,7 @@
 	>
 </div>
 <main class="page" data-sveltekit-reload={$updated ? '' : 'off'}>
-	<slot />
+	{@render children?.()}
 </main>
 
 <style>

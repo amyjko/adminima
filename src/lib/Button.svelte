@@ -1,23 +1,37 @@
-<script context="module" lang="ts">
+<script module lang="ts">
 	export const Delete = '×';
 </script>
 
 <script lang="ts">
-	export let action: () => void;
-	export let tip: string;
-	export let active = true;
-	export let submit = false;
-	export let warning = false;
-	export let end = false;
-	export let chromeless = false;
+	interface Props {
+		action: () => void;
+		tip: string;
+		active?: boolean;
+		submit?: boolean;
+		warning?: boolean;
+		end?: boolean;
+		chromeless?: boolean;
+		children?: import('svelte').Snippet;
+	}
 
-	let confirm = false;
+	let {
+		action,
+		tip,
+		active = true,
+		submit = false,
+		warning = false,
+		end = false,
+		chromeless = false,
+		children
+	}: Props = $props();
+
+	let confirm = $state(false);
 </script>
 
 {#if confirm}
 	<div class="row">
-		Are you sure? <button type={submit ? 'submit' : null} class:warning on:click={action}
-			><slot /></button
+		Are you sure? <button type={submit ? 'submit' : null} class:warning onclick={action}
+			>{@render children?.()}</button
 		>
 	</div>
 {:else}
@@ -29,14 +43,14 @@
 		aria-disabled={!active}
 		title={tip}
 		aria-label={tip}
-		on:click={(event) => {
+		onclick={(event) => {
 			if (warning) confirm = true;
 			else if (active) {
 				action();
 				event.stopPropagation();
 				event.preventDefault();
 			}
-		}}><slot /></button
+		}}>{@render children?.()}</button
 	>
 {/if}
 

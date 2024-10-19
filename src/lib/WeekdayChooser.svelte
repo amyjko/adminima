@@ -2,8 +2,12 @@
 	import Select from './Select.svelte';
 	import Weekdays from '../database/Weekdays';
 
-	export let weekday: number;
-	export let change: (value: number) => void;
+	interface Props {
+		weekday: number;
+		change: (value: number) => void;
+	}
+
+	let { weekday, change }: Props = $props();
 </script>
 
 <Select

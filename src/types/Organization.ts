@@ -187,7 +187,7 @@ export default class Organization {
 			processes: this.data.processes.some((process) => process.id === newProcess.id)
 				? this.data.processes.map((process) =>
 						process.id === newProcess.id ? newProcess : process
-				  )
+					)
 				: [...this.data.processes, newProcess]
 		});
 	}

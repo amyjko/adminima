@@ -1,8 +1,12 @@
 <script lang="ts">
 	import Link from './Link.svelte';
 
-	export let id: string;
-	export let name: string;
+	interface Props {
+		id: string;
+		name: string;
+	}
+
+	let { id, name }: Props = $props();
 </script>
 
 <Link to="/org/{id}" kind="org">{name}</Link>

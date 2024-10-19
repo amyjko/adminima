@@ -3,33 +3,46 @@
 	import Flow from './Flow.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import type { HowRow, ProcessRow, RoleRow } from '$database/OrganizationsDB';
-	import { getOrg } from './contexts';
+	import { getOrg } from './contexts.svelte';
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from './ProcessDate.svelte';
 
-	export let role: RoleRow;
-	export let processes: ProcessRow[];
-	export let onlyPeriodic = false;
+	interface Props {
+		role: RoleRow;
+		processes: ProcessRow[];
+		onlyPeriodic?: boolean;
+	}
 
-	$: sorted = sortProcessesByNextDate(processes);
+	let { role, processes, onlyPeriodic = false }: Props = $props();
 
-	const org = getOrg();
+	let sorted = $derived(sortProcessesByNextDate(processes));
 
-	$: accountable = sorted.filter(
-		(process) => role.id === process.accountable && (!onlyPeriodic || process.repeat.length > 0)
+	const context = getOrg();
+	let org = $derived(context.org);
+
+	let accountable = $derived(
+		sorted.filter(
+			(process) => role.id === process.accountable && (!onlyPeriodic || process.repeat.length > 0)
+		)
 	);
-	$: responsible = sorted.filter((process) =>
-		$org
-			.getProcessHows(process.id)
-			.some(
-				(how) => how.responsible.includes(role.id) && (!onlyPeriodic || process.repeat.length > 0)
-			)
+	let responsible = $derived(
+		sorted.filter((process) =>
+			org
+				.getProcessHows(process.id)
+				.some(
+					(how) => how.responsible.includes(role.id) && (!onlyPeriodic || process.repeat.length > 0)
+				)
+		)
 	);
-	$: consulted = sorted.filter((process) =>
-		$org.getProcessHows(process.id).some((how) => how.consulted.includes(role.id))
+	let consulted = $derived(
+		sorted.filter((process) =>
+			org.getProcessHows(process.id).some((how) => how.consulted.includes(role.id))
+		)
 	);
-	$: informed = sorted.filter((process) =>
-		$org.getProcessHows(process.id).some((how) => how.informed.includes(role.id))
+	let informed = $derived(
+		sorted.filter((process) =>
+			org.getProcessHows(process.id).some((how) => how.informed.includes(role.id))
+		)
 	);
 </script>
 

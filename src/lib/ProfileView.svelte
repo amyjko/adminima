@@ -3,7 +3,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import Title from './Title.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
-	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
+	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import type { ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';
@@ -11,23 +11,29 @@
 	import Paragraph from './Paragraph.svelte';
 	import ChangeLink from './ChangeLink.svelte';
 
-	export let profile: ProfileRow;
+	interface Props {
+		profile: ProfileRow;
+	}
+
+	let { profile }: Props = $props();
 
 	const user = getUser();
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const db = getDB();
 	const errors = getErrors();
 
-	$: isAdmin = $user && $org.hasAdminPerson($user.id);
-	$: roles = $org.getProfileRoles(profile.id);
-	$: changes = $org.getChanges().filter((c) => c.lead === profile.id);
+	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
+	let roles = $derived(org.getProfileRoles(profile.id));
+	let changes = $derived(org.getChanges().filter((c) => c.lead === profile.id));
 </script>
 
 <Title
 	title={profile.name.length === 0 ? '(no name)' : profile.name}
 	kind="person"
 	edit={$user && (profile.personid === $user.id || isAdmin)
-		? (text) => queryOrError(errors, $db.updateProfileName(profile, text), "Couldn't update name")
+		? (text) => queryOrError(errors, db.updateProfileName(profile, text), "Couldn't update name")
 		: undefined}
 >
 	{profile.email}
@@ -46,7 +52,7 @@
 	placeholder="No bio"
 	edit={$user
 		? (text) =>
-				queryOrError(errors, $db.updateProfileBio(profile, text), "Couldn't update profile bio.")
+				queryOrError(errors, db.updateProfileBio(profile, text), "Couldn't update profile bio.")
 		: undefined}
 />
 
@@ -56,7 +62,7 @@
 {#if roles.length > 0}
 	{#each roles as role}
 		<RoleLink roleID={role.id} />
-		<RoleProcesses {role} processes={$org.getRoleProcesses(role.id)} onlyPeriodic />
+		<RoleProcesses {role} processes={org.getRoleProcesses(role.id)} onlyPeriodic />
 	{/each}
 {:else}
 	<Notice>This person has no roles in this organization.</Notice>

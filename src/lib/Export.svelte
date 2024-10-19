@@ -2,14 +2,15 @@
 	import writeXlsxFile, { type SheetData } from 'write-excel-file';
 	import Button from './Button.svelte';
 	import Tip from './Tip.svelte';
-	import { getOrg } from './contexts';
+	import { getOrg } from './contexts.svelte';
 	import type { HowRow } from '$database/OrganizationsDB';
 
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
 
 	function howToString(how: HowRow, depth = 0): string {
 		return `\n${'\t'.repeat(depth)}${depth > 0 ? '•' : ''} ${how.what}${how.how.map((id) => {
-			const child = $org.getHow(id);
+			const child = org.getHow(id);
 			if (child) return howToString(child, depth + 1);
 			else return '';
 		})}`;
@@ -25,17 +26,17 @@
 				value: 'How',
 				fontWeight: 'bold' as const
 			},
-			...$org.getRoles().map((role) => {
+			...org.getRoles().map((role) => {
 				return {
-					value: `${role.title} | ${$org.getRoleProfiles(role.id).map((prof) => prof.email)}`,
+					value: `${role.title} | ${org.getRoleProfiles(role.id).map((prof) => prof.email)}`,
 					fontWeight: 'bold' as const,
 					textRotation: 90
 				};
 			})
 		];
 
-		const processRows = $org.getProcesses().map((process) => {
-			const how = process.howid ? $org.getHow(process.howid) : undefined;
+		const processRows = org.getProcesses().map((process) => {
+			const how = process.howid ? org.getHow(process.howid) : undefined;
 			return [
 				{ value: process.title, wrap: true, alignVertical: 'top' as const },
 				{
@@ -43,21 +44,21 @@
 					wrap: true,
 					alignVertical: 'top' as const
 				},
-				...$org.getRoles().map((role) => {
+				...org.getRoles().map((role) => {
 					return {
 						alignVertical: 'top' as const,
 						value:
 							process.accountable === role.id
 								? 'A'
 								: how
-								? how.responsible.includes(role.id)
-									? 'R'
-									: how.consulted.includes(role.id)
-									? 'C'
-									: how.informed.includes(role.id)
-									? 'I'
+									? how.responsible.includes(role.id)
+										? 'R'
+										: how.consulted.includes(role.id)
+											? 'C'
+											: how.informed.includes(role.id)
+												? 'I'
+												: ''
 									: ''
-								: ''
 					};
 				})
 			];
@@ -68,7 +69,7 @@
 			columns: [
 				{ width: 30 },
 				{ width: 60 },
-				...$org.getRoles().map(() => {
+				...org.getRoles().map(() => {
 					return { width: 3 };
 				})
 			],

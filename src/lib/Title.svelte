@@ -1,27 +1,25 @@
 <script lang="ts">
-	import { getOrg } from './contexts';
+	import { getOrg } from './contexts.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
 	import OrgNav from './OrgNav.svelte';
 
 	// The title to show in the header
-	export let title: string;
 	// The kind of page this is, to determine background
-	export let kind:
-		| 'process'
-		| 'change'
-		| 'team'
-		| 'person'
-		| 'role'
-		| 'organization'
-		| 'error'
-		| undefined = undefined;
 	// Whether to show the kind
-	export let label = true;
 	// An optional function for editing the title
-	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
+	interface Props {
+		title: string;
+		kind?: 'process' | 'change' | 'team' | 'person' | 'role' | 'organization' | 'error' | undefined;
+		label?: boolean;
+		edit?: undefined | ((text: string) => Promise<PostgrestError | null>);
+		children?: import('svelte').Snippet;
+	}
 
-	const org = getOrg();
+	let { title, kind = undefined, label = true, edit = undefined, children }: Props = $props();
+
+	const context = getOrg();
+	let org = $derived(context.org);
 </script>
 
 <svelte:head>
@@ -30,8 +28,8 @@
 
 <div class="title">
 	<div class="background {kind}">
-		{#if $org}
-			<OrgNav organization={$org} />
+		{#if org}
+			<OrgNav organization={org} />
 		{/if}
 		<div>
 			{#if kind && label}
@@ -43,7 +41,7 @@
 				<EditableText text={title} {edit} />
 			</h1>
 		</div>
-		<div class="metadata"><slot /></div>
+		<div class="metadata">{@render children?.()}</div>
 	</div>
 </div>
 

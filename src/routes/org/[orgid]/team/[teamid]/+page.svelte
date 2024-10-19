@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
-	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts';
+	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts.svelte';
 	import Title from '$lib/Title.svelte';
 	import { page } from '$app/stores';
 	import MarkupView from '$lib/MarkupView.svelte';
@@ -16,9 +16,9 @@
 	const db = getDB();
 	const errors = getErrors();
 
-	$: teamID = $page.params.teamid;
-	$: team = $org.getTeam(teamID);
-	$: isAdmin = $user && $org.hasAdminPerson($user.id);
+	let teamID = $derived($page.params.teamid);
+	let team = $derived(org.org.getTeam(teamID));
+	let isAdmin = $derived($user && org.org.hasAdminPerson($user.id));
 </script>
 
 {#if team}
@@ -29,7 +29,7 @@
 			? (text) =>
 					queryOrError(
 						errors,
-						$db.updateTeamName(team, text, $user.id),
+						db.updateTeamName(team, text, $user.id),
 						"We couldn't update the team's name."
 					)
 			: undefined}
@@ -47,13 +47,13 @@
 			? (text) =>
 					queryOrError(
 						errors,
-						$db.updateTeamDescription(team, text, $user.id),
+						db.updateTeamDescription(team, text, $user.id),
 						"We couldn't update the team's description."
 					)
 			: undefined}
 	/>
 
-	{#each $org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
+	{#each org.org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
 		<RoleLink roleID={role.id} />
 	{:else}
 		<Notice>This team has no roles.</Notice>
@@ -68,8 +68,8 @@
 	<Button
 		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {
-			const error = await queryOrError(errors, $db.deleteTeam(teamID), "Couldn't delete the team.");
-			if (error === null) goto(`/org/${$org.getPath()}/roles`);
+			const error = await queryOrError(errors, db.deleteTeam(teamID), "Couldn't delete the team.");
+			if (error === null) goto(`/org/${org.org.getPath()}/roles`);
 		}}
 		warning>{Delete} Delete this team</Button
 	>

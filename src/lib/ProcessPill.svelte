@@ -1,16 +1,21 @@
 <script lang="ts">
 	import type { ProcessRow } from '$database/OrganizationsDB';
-	import { getOrg } from './contexts';
+	import { getOrg } from './contexts.svelte';
 	import Link from './Link.svelte';
 
-	export let process: ProcessRow;
-	export let left: number | undefined = undefined;
+	interface Props {
+		process: ProcessRow;
+		left?: number | undefined;
+	}
 
-	const org = getOrg();
+	let { process, left = undefined }: Props = $props();
+
+	const context = getOrg();
+	let org = $derived(context.org);
 </script>
 
 <div class="process" style:left="{left}px">
-	<Link bland to="/org/{$org.getPath()}/process/{process.id}">{process.title}</Link>
+	<Link bland to="/org/{org.getPath()}/process/{process.id}">{process.title}</Link>
 </div>
 
 <style>

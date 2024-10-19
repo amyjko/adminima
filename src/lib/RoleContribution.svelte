@@ -2,7 +2,12 @@
 	import type { RoleID } from '$types/Organization';
 	import RoleLink from './RoleLink.svelte';
 
-	export let roles: RoleID[];
+	interface Props {
+		roles: RoleID[];
+		children?: import('svelte').Snippet;
+	}
+
+	let { roles, children }: Props = $props();
 </script>
 
 {#each roles as role, index}<RoleLink
@@ -11,4 +16,4 @@
 		&nbsp;and&nbsp;
 	{/if}
 {/each}
-<slot />
+{@render children?.()}

@@ -3,9 +3,13 @@
 	import { formatNextDate, getNextProcessDate } from '$database/Period';
 	import Note from './Note.svelte';
 
-	export let process: ProcessRow;
+	interface Props {
+		process: ProcessRow;
+	}
 
-	$: nextDate = getNextProcessDate(process);
+	let { process }: Props = $props();
+
+	let nextDate = $derived(getNextProcessDate(process));
 </script>
 
 {#if nextDate}<Note><span>⟳ {formatNextDate(nextDate)}</span></Note>{/if}

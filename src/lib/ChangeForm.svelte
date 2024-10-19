@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
 	import Oops from './Oops.svelte';
-	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
+	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
 	import type { ProcessID, RoleID } from '$types/Organization';
 	import Field from './Field.svelte';
 	import Button from './Button.svelte';
@@ -10,37 +10,41 @@
 	import Tip from './Tip.svelte';
 	import Select from './Select.svelte';
 
-	export let process: ProcessID | undefined = undefined;
-	export let role: RoleID | undefined = undefined;
+	interface Props {
+		process?: ProcessID | undefined;
+		role?: RoleID | undefined;
+	}
+
+	let { process = $bindable(undefined), role = $bindable(undefined) }: Props = $props();
 
 	const defaultPrompt = 'Describe the problem';
 
-	let newRequestTitle = '';
-	let newRequestProblem = '';
-	let newRequestError: string | undefined = undefined;
+	let newRequestTitle = $state('');
+	let newRequestProblem = $state('');
+	let newRequestError: string | undefined = $state(undefined);
 
 	const organization = getOrg();
 	const user = getUser();
 	const db = getDB();
 	const errors = getErrors();
 
-	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
+	let isAdmin = $derived($user && organization.org.hasAdminPerson($user.id));
 
 	async function createChange() {
 		if ($user === null) return;
 		try {
-			const { data: change, error } = await $db.createChange(
+			const { data: change, error } = await db.createChange(
 				$user.id,
-				$organization.getID(),
+				organization.org.getID(),
 				newRequestTitle,
 				newRequestProblem,
-				$organization.getVisibility(),
+				organization.org.getVisibility(),
 				process ? [process] : [],
 				role ? [role] : []
 			);
 			if (error) addError(errors, "Couldn't create the change.", error);
 			else if (change) {
-				const newChange = `/org/${$organization.getPath()}/change/${change.id}`;
+				const newChange = `/org/${organization.org.getPath()}/change/${change.id}`;
 				await invalidate(newChange);
 				goto(newChange);
 			}
@@ -49,15 +53,15 @@
 		}
 	}
 
-	$: active = newRequestTitle.length > 0 && newRequestProblem.length > 0;
+	let active = $derived(newRequestTitle.length > 0 && newRequestProblem.length > 0);
 </script>
 
 <div class="form">
 	<Field label="Title" bind:text={newRequestTitle} />
 	<Labeled
-		label={$organization.getPrompt().trim().length === 0
+		label={organization.org.getPrompt().trim().length === 0
 			? defaultPrompt
-			: $organization.getPrompt()}
+			: organization.org.getPrompt()}
 	>
 		<MarkupView
 			bind:markup={newRequestProblem}
@@ -71,7 +75,7 @@
 			tip="Add a role that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
-				...$organization
+				...organization.org
 					.getRoles()
 					.toSorted((a, b) => a.title.localeCompare(b.title))
 					.map((role) => {
@@ -87,7 +91,7 @@
 			tip="Add a process that is affected by this suggestion."
 			options={[
 				{ value: undefined, label: '—' },
-				...$organization
+				...organization.org
 					.getProcesses()
 					.toSorted((a, b) => a.title.localeCompare(b.title))
 					.map((process) => {
@@ -110,13 +114,13 @@
 	<hr />
 	<Tip admin>Want to customize the prompt above?</Tip>
 	<MarkupView
-		markup={$organization.getPrompt()}
+		markup={organization.org.getPrompt()}
 		placeholder={'No custom prompt set'}
 		edit={$user
 			? (text) =>
 					queryOrError(
 						errors,
-						$db.updateOrgPrompt($organization, text, $user.id),
+						db.updateOrgPrompt(organization.org, text, $user.id),
 						"Couldn't update prompt"
 					)
 			: undefined}

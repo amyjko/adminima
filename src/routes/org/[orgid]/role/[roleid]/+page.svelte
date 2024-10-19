@@ -2,10 +2,14 @@
 	import RoleView from '$lib/RoleView.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import { page } from '$app/stores';
-	import { getOrg } from '$lib/contexts';
+	import { getOrg } from '$lib/contexts.svelte';
 
-	const org = getOrg();
-	$: role = $org.getRole($page.params.roleid) ?? $org.getRoleByShortName($page.params.roleid);
+	const context = getOrg();
+	let org = $derived(context.org);
+
+	let role = $derived(
+		org.getRole($page.params.roleid) ?? org.getRoleByShortName($page.params.roleid)
+	);
 </script>
 
 {#if role === null}

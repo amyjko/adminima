@@ -3,11 +3,12 @@
 	import { page } from '$app/stores';
 	import ChangeView from '$lib/ChangeView.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getOrg } from '$lib/contexts';
+	import { getOrg } from '$lib/contexts.svelte';
 
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
 
-	$: change = $org.getChange($page.params.changeid);
+	let change = $derived(org.getChange($page.params.changeid));
 </script>
 
 {#if change === null}

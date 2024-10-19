@@ -2,7 +2,11 @@
 	import type Quote from '../markup/Quote';
 	import SegmentsView from '$lib/SegmentsView.svelte';
 
-	export let block: Quote;
+	interface Props {
+		block: Quote;
+	}
+
+	let { block }: Props = $props();
 </script>
 
 <blockquote><SegmentsView segments={block.segments} /></blockquote>

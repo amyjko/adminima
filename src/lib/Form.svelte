@@ -1,29 +1,45 @@
 <script lang="ts">
+	import { run, preventDefault } from 'svelte/legacy';
+
 	import Oops from './Oops.svelte';
 
-	export let action: (() => void) | undefined = undefined;
-	export let borders = false;
-	export let inline = false;
-	export let active: boolean;
-	export let inactiveMessage: string | undefined;
+	interface Props {
+		action?: (() => void) | undefined;
+		borders?: boolean;
+		inline?: boolean;
+		active: boolean;
+		inactiveMessage: string | undefined;
+		children?: import('svelte').Snippet;
+	}
 
-	let form: HTMLFormElement;
+	let {
+		action = undefined,
+		borders = false,
+		inline = false,
+		active,
+		inactiveMessage,
+		children
+	}: Props = $props();
 
-	let showInactive = false;
-	$: if (active) showInactive = false;
+	let form: HTMLFormElement | undefined = $state();
+
+	let showInactive = $state(false);
+	run(() => {
+		if (active) showInactive = false;
+	});
 </script>
 
 <form
 	bind:this={form}
-	on:submit|preventDefault={() => {
+	onsubmit={preventDefault(() => {
 		if (action && active) action();
 		else showInactive = true;
-	}}
+	})}
 	class="form"
 	class:borders
 	class:inline
 >
-	<slot />
+	{@render children?.()}
 	{#if showInactive && inactiveMessage}
 		<div class="row">
 			<Oops text={inactiveMessage} />

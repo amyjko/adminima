@@ -4,13 +4,13 @@
 	import FormDialog from './FormDialog.svelte';
 	import Link from './Link.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import { addError, getDB, getErrors, getUser } from './contexts';
+	import { addError, getDB, getErrors, getUser } from './contexts.svelte';
 
 	const db = getDB();
 	const user = getUser();
 	const errors = getErrors();
 
-	let submitting = false;
+	let submitting = $state(false);
 
 	async function create() {
 		if ($user === null || $user.email === undefined) {
@@ -19,7 +19,7 @@
 		}
 		submitting = false;
 
-		const id = await $db.createOrganization(orgName, name, invite, $user.id, $user.email);
+		const id = await db.createOrganization(orgName, name, invite, $user.id, $user.email);
 
 		if (typeof id === 'string') {
 			goto(`/org/${id}`);
@@ -30,9 +30,9 @@
 		}
 	}
 
-	let name = '';
-	let orgName = '';
-	let invite = '';
+	let name = $state('');
+	let orgName = $state('');
+	let invite = $state('');
 </script>
 
 {#if $user === null}

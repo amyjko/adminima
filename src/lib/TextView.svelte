@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type Text from '../markup/Text';
 
-	export let segment: Text;
+	interface Props {
+		segment: Text;
+	}
+
+	let { segment }: Props = $props();
 </script>
 
 {#if segment.format === '*'}

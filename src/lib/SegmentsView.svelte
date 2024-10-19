@@ -2,7 +2,11 @@
 	import type Segment from '../markup/Segment';
 	import SegmentView from './SegmentView.svelte';
 
-	export let segments: Segment[];
+	interface Props {
+		segments: Segment[];
+	}
+
+	let { segments }: Props = $props();
 </script>
 
 {#each segments as segment}

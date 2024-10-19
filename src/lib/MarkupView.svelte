@@ -4,33 +4,43 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
-	import { addError, getErrors } from './contexts';
+	import { addError, getErrors } from './contexts.svelte';
 	import Note from './Note.svelte';
 	import Loading from './Loading.svelte';
 
-	/** The markup's text */
-	export let markup: string;
-	/** Placeholder text */
-	export let placeholder: string;
-	/** If given, allows the markup to edited. Returns an error */
-	export let edit: undefined | ((text: string) => Promise<PostgrestError | null> | null) =
-		undefined;
-	/** Whether in editing state */
-	export let editing = false;
-	/** An HTML id to apply to the text area, if desired */
-	export let id: string | undefined = undefined;
+	interface Props {
+		/** The markup's text */
+		markup: string;
+		/** Placeholder text */
+		placeholder: string;
+		/** If given, allows the markup to edited. Returns an error */
+		edit?: undefined | ((text: string) => Promise<PostgrestError | null> | null);
+		/** Whether in editing state */
+		editing?: boolean;
+		/** An HTML id to apply to the text area, if desired */
+		id?: string | undefined;
+	}
 
-	let height = 0;
-	let revisedText = markup;
-	let input: HTMLTextAreaElement;
-	let saving = false;
+	let {
+		markup = $bindable(),
+		placeholder,
+		edit = undefined,
+		editing = $bindable(false),
+		id = undefined
+	}: Props = $props();
+
+	let height = $state(0);
+	let revisedText = $state(markup);
+	let input: HTMLTextAreaElement | undefined = $state();
+	let scrollHeight = $derived(revisedText ? (input ? input.scrollHeight : height) : height);
+	let saving = $state(false);
 
 	const errors = getErrors();
 
-	$: scrollHeight = revisedText ? input?.scrollHeight ?? height : height;
-
 	// No edit function? Immediately update the markup.
-	$: if (edit === undefined) markup = revisedText;
+	$effect(() => {
+		if (edit === undefined) markup = revisedText;
+	});
 
 	async function startEditing() {
 		revisedText = markup;
@@ -76,7 +86,7 @@
 				bind:this={input}
 				{id}
 				disabled={saving}
-				on:keydown={(e) => {
+				onkeydown={(e) => {
 					// Shortcut to submit without using button.
 					if (e.key === 'Enter' && e.metaKey) {
 						e.preventDefault();
@@ -85,7 +95,7 @@
 					}
 				}}
 				style:height="{editing ? scrollHeight : height}px"
-			/>
+			></textarea>
 			<Note
 				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@https://url&gt;</code>,
 				<code>&lt;link@role/process&gt;</code>,

@@ -2,22 +2,27 @@
 	import type { ProcessID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import { getOrg } from './contexts';
+	import { getOrg } from './contexts.svelte';
 
-	export let processID: ProcessID | null;
+	interface Props {
+		processID: ProcessID | null;
+	}
 
-	const organization = getOrg();
+	let { processID }: Props = $props();
 
-	$: process = processID ? $organization.getProcess(processID) : undefined;
+	const context = getOrg();
+	let org = $derived(context.org);
+
+	let process = $derived(processID ? org.getProcess(processID) : undefined);
 </script>
 
 {#if process === null}<Oops inline text={(locale) => locale.error.noProcess} />{:else}<Link
 		title={process && process.short.length > 0 ? process.title : undefined}
 		to={processID
-			? `/org/${$organization.getPath()}/process/${
+			? `/org/${org.getPath()}/process/${
 					process && process.short.length > 0 ? process.short[0] : processID
-			  }`
-			: `/org/${$organization.getPath()}/processes`}
+				}`
+			: `/org/${org.getPath()}/processes`}
 		kind="process"
 		>{process
 			? process.short.length > 0

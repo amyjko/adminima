@@ -1,8 +1,13 @@
 <script lang="ts">
-	export let spaced: boolean = true;
+	interface Props {
+		spaced?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { spaced = true, children }: Props = $props();
 </script>
 
-<div class="flow" class:spaced><slot /></div>
+<div class="flow" class:spaced>{@render children?.()}</div>
 
 <style>
 	.flow {

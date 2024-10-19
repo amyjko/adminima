@@ -11,7 +11,7 @@
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
 	import Status from './Status.svelte';
-	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
+	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
 	import timestampToDate from '$database/timestampToDate';
 	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
@@ -22,11 +22,17 @@
 	import Table from './Table.svelte';
 	import Labeled from './Labeled.svelte';
 
-	export let change: ChangeRow;
+	interface Props {
+		change: ChangeRow;
+	}
+
+	let { change }: Props = $props();
 
 	let deleteError: string | undefined = undefined;
 
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const user = getUser();
 	const db = getDB();
 	const errors = getErrors();
@@ -42,24 +48,32 @@
 
 	const isStatus = (x: string): x is keyof typeof Statuses => x in Statuses;
 
-	$: isAdmin = $user && $org.hasAdminPerson($user.id);
-	$: editable = $user && (isAdmin || change.who === $user.id || change.lead === $user.id);
-	$: unselectedRoles = $org
-		.getRoles()
-		.filter((r) => !change.roles.includes(r.id))
-		.sort((a, b) => a.title.localeCompare(b.title));
-	$: unselectedProcesses = $org
-		.getProcesses()
-		.filter((p) => !change.processes.includes(p.id))
-		.sort((a, b) => a.title.localeCompare(b.title));
+	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
+	let editable = $derived(
+		$user && (isAdmin || change.who === $user.id || change.lead === $user.id)
+	);
+	let unselectedRoles = $derived(
+		org
+			.getRoles()
+			.filter((r) => !change.roles.includes(r.id))
+			.sort((a, b) => a.title.localeCompare(b.title))
+	);
+	let unselectedProcesses = $derived(
+		org
+			.getProcesses()
+			.filter((p) => !change.processes.includes(p.id))
+			.sort((a, b) => a.title.localeCompare(b.title))
+	);
 
-	let commentIDs: string[] = change.comments;
-	$: if (commentIDs.join('') !== change.comments.join('')) commentIDs = change.comments.slice();
+	let commentIDs: string[] = $state(change.comments);
+	$effect(() => {
+		if (commentIDs.join('') !== change.comments.join('')) commentIDs = change.comments.slice();
+	});
 
-	let processSelection: string | undefined = undefined;
-	let roleSelection: string | undefined = undefined;
+	let processSelection: string | undefined = $state(undefined);
+	let roleSelection: string | undefined = $state(undefined);
 
-	let newComment: string = '';
+	let newComment: string = $state('');
 </script>
 
 <Title
@@ -69,7 +83,7 @@
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.udpateChangeWhat(change, text),
+					db.udpateChangeWhat(change, text),
 					"Couldn't update the change's title"
 				)
 		: undefined}
@@ -84,7 +98,7 @@
 				if ($user && status !== undefined && isStatus(status))
 					return await queryOrError(
 						errors,
-						$db.updateChangeStatus(change, status, $user.id),
+						db.updateChangeStatus(change, status, $user.id),
 						"Couldn't update the change's status."
 					);
 				else return null;
@@ -94,7 +108,7 @@
 		<Visibility
 			level={change.visibility}
 			tip="Edit this change's visibility"
-			edit={(vis) => $db.updateChangeVisibility(change, vis)}
+			edit={(vis) => db.updateChangeVisibility(change, vis)}
 		/>
 	{/if}
 </Title>
@@ -102,7 +116,7 @@
 <Tip admin>Use changes as a place to capture progress on a change and to document decisions.</Tip>
 
 <Paragraph>
-	<PersonLink profile={$org.getProfileWithPersonID(change.who)} /> reported this problem on <TimeView
+	<PersonLink profile={org.getProfileWithPersonID(change.who)} /> reported this problem on <TimeView
 		date={timestampToDate(change.when)}
 	/>.</Paragraph
 >
@@ -113,18 +127,18 @@
 			selection={change.lead ?? undefined}
 			options={[
 				{ value: undefined, label: '—' },
-				...$org.getProfiles().map((person) => {
+				...org.getProfiles().map((person) => {
 					return { value: person.id, label: person.name.length === 0 ? person.email : person.name };
 				})
 			]}
 			change={(person) => {
 				queryOrError(
 					errors,
-					$db.updateChangeLead(change, person ?? null),
+					db.updateChangeLead(change, person ?? null),
 					"Couldn't update change processes."
 				);
 			}}
-		/>{:else if change.lead}<PersonLink profile={$org.getProfileWithID(change.lead)} />{:else}No one{/if}
+		/>{:else if change.lead}<PersonLink profile={org.getProfileWithID(change.lead)} />{:else}No one{/if}
 	is currently leading this change.</Paragraph
 >
 
@@ -137,7 +151,7 @@
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.updateChangeDescription(change, text),
+					db.updateChangeDescription(change, text),
 					"Couldn't update change description."
 				)
 		: undefined}
@@ -152,7 +166,7 @@
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.updateChangeProposal(change, text),
+					db.updateChangeProposal(change, text),
 					"Couldn't update change description."
 				)
 		: undefined}
@@ -168,7 +182,7 @@
 				action={() =>
 					queryOrError(
 						errors,
-						$db.updateChangeRoles(
+						db.updateChangeRoles(
 							change,
 							change.roles.filter((r) => r !== role)
 						),
@@ -195,7 +209,7 @@
 				if (r !== undefined) {
 					queryOrError(
 						errors,
-						$db.updateChangeRoles(change, Array.from(new Set([...change.roles, r]))),
+						db.updateChangeRoles(change, Array.from(new Set([...change.roles, r]))),
 						"Couldn't update change roles."
 					);
 					roleSelection = undefined;
@@ -214,7 +228,7 @@
 			action={() =>
 				queryOrError(
 					errors,
-					$db.updateChangeProcesses(
+					db.updateChangeProcesses(
 						change,
 						change.processes.filter((p) => p !== process)
 					),
@@ -240,7 +254,7 @@
 				if (p !== undefined) {
 					queryOrError(
 						errors,
-						$db.updateChangeProcesses(change, Array.from(new Set([...change.processes, p]))),
+						db.updateChangeProcesses(change, Array.from(new Set([...change.processes, p]))),
 						"Couldn't update change processes."
 					);
 					processSelection = undefined;
@@ -253,11 +267,11 @@
 <Header>Discussion</Header>
 
 <div class="comments">
-	{#await $db.getComments(commentIDs)}
+	{#await db.getComments(commentIDs)}
 		<Loading />
 	{:then comments}
 		{#if comments.data}
-			{#if $user && $org.hasPerson($user.id)}
+			{#if $user && org.hasPerson($user.id)}
 				<Labeled label="Have a comment?">
 					<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
 				</Labeled>
@@ -265,8 +279,8 @@
 					end
 					tip="Add a comment to this change."
 					action={async () => {
-						const result = await $db.addComment(
-							$org.getID(),
+						const result = await db.addComment(
+							org.getID(),
 							$user.id,
 							newComment,
 							'suggestions',
@@ -286,11 +300,11 @@
 						<CommentView
 							{comment}
 							remove={$user && comment.who === $user.id
-								? (comment) => $db.deleteComment(change, 'suggestions', comment)
+								? (comment) => db.deleteComment(change, 'suggestions', comment)
 								: undefined}
 						/>
 					{:else}
-						No changes yet.
+						<tr><td>No changes yet.</td></tr>
 					{/each}
 				</tbody>
 			</Table>
@@ -307,9 +321,9 @@
 	<Button
 		tip="Permanently delete this change."
 		action={async () => {
-			const { error } = await $db.deleteChange(change.id);
+			const { error } = await db.deleteChange(change.id);
 			if (error) addError(errors, "Couldn't delete this change.", error);
-			else goto(`/org/${$org.getPath()}`);
+			else goto(`/org/${org.getPath()}`);
 		}}
 		warning>{Delete} Delete this change</Button
 	>

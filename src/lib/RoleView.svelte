@@ -6,7 +6,7 @@
 	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
-	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
+	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
@@ -18,19 +18,26 @@
 	import PathEditor from './PathEditor.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
 
-	export let role: RoleRow;
+	interface Props {
+		role: RoleRow;
+	}
+
+	let { role }: Props = $props();
 
 	const user = getUser();
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const db = getDB();
 	const errors = getErrors();
 
-	$: profiles = $org.getRoleProfiles(role.id);
-	$: isAdmin = $user && $org.hasAdminPerson($user.id);
+	let profiles = $derived(org.getRoleProfiles(role.id));
+	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
 
-	$: visible =
-		($user === null && $org.getVisibility() === 'public') ||
-		($user !== null && $org.hasPerson($user.id));
+	let visible = $derived(
+		($user === null && org.getVisibility() === 'public') ||
+			($user !== null && org.hasPerson($user.id))
+	);
 </script>
 
 <Title
@@ -38,11 +45,7 @@
 	kind="role"
 	edit={isAdmin && $user
 		? (text) =>
-				queryOrError(
-					errors,
-					$db.updateRoleTitle(role, text, $user.id),
-					"Couldn't update role title"
-				)
+				queryOrError(errors, db.updateRoleTitle(role, text, $user.id), "Couldn't update role title")
 		: undefined}
 >
 	{#if role.team}<TeamLink id={role.team} />{:else}no team{/if}
@@ -52,7 +55,7 @@
 			selection={role.team ?? undefined}
 			options={[
 				{ value: undefined, label: 'No team' },
-				...$org.getTeams().map((team) => {
+				...org.getTeams().map((team) => {
 					return { value: team.id, label: team.name };
 				})
 			]}
@@ -60,12 +63,7 @@
 				if (isAdmin && $user) {
 					return await queryOrError(
 						errors,
-						$db.updateRoleTeam(
-							role,
-							team ?? null,
-							$org.getTeams().find((t) => t.id)?.name,
-							$user.id
-						),
+						db.updateRoleTeam(role, team ?? null, org.getTeams().find((t) => t.id)?.name, $user.id),
 						"Couldn't update role team"
 					);
 				}
@@ -78,10 +76,10 @@
 			update={async (text) => {
 				await queryOrError(
 					errors,
-					$db.updateRoleShortName(role, text),
+					db.updateRoleShortName(role, text),
 					"Couldn't update role short name"
 				);
-				goto(`/org/${$org.getPath()}/role/${text.length > 0 ? text : role.id}`, {
+				goto(`/org/${org.getPath()}/role/${text.length > 0 ? text : role.id}`, {
 					replaceState: true
 				});
 				return null;
@@ -101,7 +99,7 @@
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.updateRoleDescription(role, text, $user.id),
+					db.updateRoleDescription(role, text, $user.id),
 					"Couldn't update role description."
 				)
 		: undefined}
@@ -123,7 +121,7 @@
 
 <Header>Processes</Header>
 
-<RoleProcesses {role} processes={$org.getRoleProcesses(role.id)} />
+<RoleProcesses {role} processes={org.getRoleProcesses(role.id)} />
 
 <Header>Changes</Header>
 
@@ -132,7 +130,7 @@
 <Tip>These are changes people have made that might affect this role.</Tip>
 
 <Changes
-	changes={$org
+	changes={org
 		.getChanges()
 		.filter((change) => change.status === 'active' && change.roles.includes(role.id))}
 	><Paragraph>There are no active changes suggested for this role.</Paragraph></Changes
@@ -142,7 +140,7 @@
 
 <CommentsView
 	comments={role.comments}
-	remove={isAdmin ? (comment) => $db.deleteComment(role, 'roles', comment) : undefined}
+	remove={isAdmin ? (comment) => db.deleteComment(role, 'roles', comment) : undefined}
 />
 
 <Header>Delete</Header>
@@ -154,10 +152,10 @@
 	<Button
 		tip="Permanently delete this role. All processes will remain, but without a role."
 		action={async () => {
-			const error = await $db.deleteRole(role.orgid, role.id);
+			const error = await db.deleteRole(role.orgid, role.id);
 			if (error) {
 				addError(errors, "We couldn't delete this role.", error);
-			} else goto(`/org/${$org.getPath()}/roles`);
+			} else goto(`/org/${org.getPath()}/roles`);
 		}}
 		warning>{Delete} Delete this role</Button
 	>

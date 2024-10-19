@@ -1,6 +1,11 @@
 <script lang="ts">
-	export let label: string;
-	export let message: string | undefined = undefined;
+	interface Props {
+		label: string;
+		message?: string | undefined;
+		children?: import('svelte').Snippet;
+	}
+
+	let { label, message = undefined, children }: Props = $props();
 </script>
 
 {#if label.length > 0}
@@ -9,8 +14,8 @@
 			>{label}
 			{#if message}<span class="invalid">{message}</span>{/if}</span
 		>
-		<slot /></label
-	>{:else}<slot />{/if}
+		{@render children?.()}</label
+	>{:else}{@render children?.()}{/if}
 
 <style>
 	label {

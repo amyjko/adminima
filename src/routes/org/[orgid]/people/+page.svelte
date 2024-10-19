@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts';
+	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
@@ -11,29 +11,29 @@
 	import TeamLink from '$lib/TeamLink.svelte';
 	import Select from '$lib/Select.svelte';
 	import validEmail, { validNameAndEmail } from '../../../validEmail';
-	import Form from '$lib/Form.svelte';
 	import Notice from '$lib/Notice.svelte';
 	import Link from '$lib/Link.svelte';
 	import Tip from '$lib/Tip.svelte';
-	import Header from '$lib/Header.svelte';
 	import Table from '$lib/Table.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 
-	const organization = getOrg();
+	const context = getOrg();
+	let organization = $derived(context.org);
+
 	const user = getUser();
 	const db = getDB();
 	const errors = getErrors();
 
-	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
+	let isAdmin = $derived($user && organization.hasAdminPerson($user.id));
 
-	let newPersonEmail: string = '';
+	let newPersonEmail: string = $state('');
 	let match: PersonRow | undefined | null = undefined;
-	$: existing = $organization.getProfileWithEmail(newPersonEmail);
+	let existing = $derived(organization.getProfileWithEmail(newPersonEmail));
 
-	let filter = '';
-	$: lowerFilter = filter.toLocaleLowerCase().trim();
+	let filter = $state('');
+	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
 
-	let newRole: string | undefined = undefined;
+	let newRole: string | undefined = $state(undefined);
 
 	async function addEmail() {
 		let email = newPersonEmail;
@@ -45,20 +45,20 @@
 		}
 
 		match = undefined;
-		match = await $db.getPersonWithEmail(email);
+		match = await db.getPersonWithEmail(email);
 		await (match === null
 			? queryOrError(
 					errors,
-					$db.addPersonByEmail($organization.getID(), email, name),
+					db.addPersonByEmail(organization.getID(), email, name),
 					"Couldn't add person."
-			  )
+				)
 			: match !== null && match !== undefined
-			? queryOrError(
-					errors,
-					$db.addPersonByID($organization.getID(), match.id),
-					"Couldn't add person."
-			  )
-			: undefined);
+				? queryOrError(
+						errors,
+						db.addPersonByID(organization.getID(), match.id),
+						"Couldn't add person."
+					)
+				: undefined);
 		newPersonEmail = '';
 
 		return true;
@@ -73,9 +73,9 @@
 	roles. Select a person to see the roles they have.</Tip
 >
 
-{#if isAdmin && $organization.getRoles().length === 0}
+{#if isAdmin && organization.getRoles().length === 0}
 	<Notice
-		>Want to give people roles? First you'll need to <Link to="/org/{$organization.getPath()}/roles"
+		>Want to give people roles? First you'll need to <Link to="/org/{organization.getPath()}/roles"
 			>define some</Link
 		>.</Notice
 	>
@@ -103,8 +103,8 @@
 				existing
 					? 'This person is already added'
 					: text.length === 0 || validEmail(text) || validNameAndEmail(text)
-					? undefined
-					: 'Not a valid email'}
+						? undefined
+						: 'Not a valid email'}
 		/>
 	</FormDialog>
 	<Field label="Filter by name or email" bind:text={filter} />
@@ -124,12 +124,12 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each $organization
+		{#each organization
 			.getProfiles()
 			.filter((prof) => lowerFilter === '' || prof.name
 						.toLowerCase()
 						.includes(lowerFilter) || prof.email.toLowerCase().includes(lowerFilter)) as profile}
-			{@const roles = $organization
+			{@const roles = organization
 				.getProfileRoles(profile.id)
 				.sort((a, b) => a.title.localeCompare(b.title))}
 			<tr>
@@ -138,11 +138,11 @@
 				</td>
 				<td class="roles">
 					{#if isAdmin}
-						{@const remainingRoles = $organization
+						{@const remainingRoles = organization
 							.getRoles()
 							.filter((r) => !roles.some((currentRole) => currentRole.id === r.id))
 							.sort((a, b) => a.title.localeCompare(b.title))}
-						{#if $organization.getRoles().length === 0}
+						{#if organization.getRoles().length === 0}
 							<em>&mdash;</em>
 						{:else if remainingRoles.length > 0}
 							<Select
@@ -160,7 +160,7 @@
 									if (roleID !== undefined)
 										await queryOrError(
 											errors,
-											$db.assignPerson($organization.getID(), profile.id, roleID),
+											db.assignPerson(organization.getID(), profile.id, roleID),
 											'Could not assign role.'
 										);
 								}}
@@ -177,7 +177,7 @@
 											action={async () => {
 												const error = await queryOrError(
 													errors,
-													$db.unassignPerson($organization.getID(), profile.id, role.id),
+													db.unassignPerson(organization.getID(), profile.id, role.id),
 													'Could not unassign role.'
 												);
 												if (error) return;
@@ -201,7 +201,7 @@
 							tip="Choose a supervisor for this person."
 							options={[
 								{ value: undefined, label: '—' },
-								...$organization
+								...organization
 									.getProfiles()
 									.filter((prof) => prof.id !== profile.id)
 									.map((prof) => {
@@ -215,30 +215,30 @@
 							change={(profileID) => {
 								queryOrError(
 									errors,
-									$db.updateProfileSupervisor($organization.getID(), profile.id, profileID ?? null),
+									db.updateProfileSupervisor(organization.getID(), profile.id, profileID ?? null),
 									"Couldn't update supervisor."
 								);
 							}}
 						/>
 					{:else if profile.supervisor}<PersonLink
-							profile={$organization.getProfileWithID(profile.supervisor)}
+							profile={organization.getProfileWithID(profile.supervisor)}
 						/>{/if}
 				</td>
 				<td>
 					{#if isAdmin}
 						<Checkbox
 							tip={isAdmin ? "Remove this person's admin status" : 'Make this person an admin.'}
-							on={$organization.hasAdminProfile(profile.id)}
+							on={organization.hasAdminProfile(profile.id)}
 							enabled={isAdmin &&
-								($organization.getAdminCount() > 1 || !$organization.hasAdminProfile(profile.id))}
+								(organization.getAdminCount() > 1 || !organization.hasAdminProfile(profile.id))}
 							change={(on) =>
 								queryOrError(
 									errors,
-									$db.updateAdmin($organization.getID(), profile.id, on),
+									db.updateAdmin(organization.getID(), profile.id, on),
 									"Couldn't update admin status."
 								)}
 						/>
-					{:else if $organization.hasAdminProfile(profile.id)}&check;{/if}
+					{:else if organization.hasAdminProfile(profile.id)}&check;{/if}
 				</td>
 
 				{#if isAdmin}
@@ -246,8 +246,8 @@
 						<Button
 							tip="Remove this person from the organization."
 							action={() =>
-								queryOrError(errors, $db.removeProfile(profile.id), "Couldn't remove person.")}
-							active={!$organization.hasAdminProfile(profile.id)}>{Delete}</Button
+								queryOrError(errors, db.removeProfile(profile.id), "Couldn't remove person.")}
+							active={!organization.hasAdminProfile(profile.id)}>{Delete}</Button
 						>
 					</td>
 				{/if}

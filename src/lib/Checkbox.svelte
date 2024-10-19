@@ -1,8 +1,17 @@
 <script lang="ts">
-	export let on: boolean;
-	export let tip: string;
-	export let enabled: boolean = true;
-	export let change: undefined | ((on: boolean) => void) = undefined;
+	interface Props {
+		on: boolean;
+		tip: string;
+		enabled?: boolean;
+		change?: undefined | ((on: boolean) => void);
+	}
+
+	let {
+		on = $bindable(),
+		tip,
+		enabled = true,
+		change = undefined
+	}: Props = $props();
 </script>
 
 <input
@@ -11,5 +20,5 @@
 	aria-label={tip}
 	disabled={!enabled}
 	bind:checked={on}
-	on:change={() => (change ? change(on) : undefined)}
+	onchange={() => (change ? change(on) : undefined)}
 />

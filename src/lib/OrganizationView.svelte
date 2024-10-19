@@ -2,7 +2,7 @@
 	import MarkupView from './MarkupView.svelte';
 	import Title from './Title.svelte';
 	import type Organization from '$types/Organization';
-	import { addError, getDB, getErrors, getUser, queryOrError } from './contexts';
+	import { addError, getDB, getErrors, getUser, queryOrError } from './contexts.svelte';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Note from './Note.svelte';
@@ -10,14 +10,18 @@
 	import PathEditor from './PathEditor.svelte';
 	import Export from './Export.svelte';
 
-	export let organization: Organization;
+	interface Props {
+		organization: Organization;
+	}
+
+	let { organization }: Props = $props();
 
 	const user = getUser();
 	const db = getDB();
 	const errors = getErrors();
 
-	$: isAdmin = $user && organization.hasAdminPerson($user.id);
-	$: editable = isAdmin;
+	let isAdmin = $derived($user && organization.hasAdminPerson($user.id));
+	let editable = $derived(isAdmin);
 </script>
 
 <Title
@@ -27,7 +31,7 @@
 		? (text) =>
 				queryOrError(
 					errors,
-					$db.updateOrgName(organization, text, $user.id),
+					db.updateOrgName(organization, text, $user.id),
 					"Couldn't update organization name."
 				)
 		: undefined}
@@ -42,9 +46,9 @@
 							vis === 'org' || vis === 'admin' || vis === 'public'
 								? queryOrError(
 										errors,
-										$db.updateOrgVisibility(organization, vis, $user.id),
+										db.updateOrgVisibility(organization, vis, $user.id),
 										"Couldn't update organization visibility."
-								  )
+									)
 								: undefined
 					: undefined}
 			/>
@@ -60,10 +64,10 @@
 				path={'https://adminima.app/org/'}
 				update={async (text) => {
 					if (text === '') return null;
-					const available = await $db.pathIsAvailable(text);
+					const available = await db.pathIsAvailable(text);
 
 					if (available) {
-						await queryOrError(errors, $db.addOrgPath(organization, text), "Couldn't update path.");
+						await queryOrError(errors, db.addOrgPath(organization, text), "Couldn't update path.");
 						goto(`/org/${text}`, { replaceState: true });
 					} else addError(errors, 'This path is not available');
 
@@ -77,14 +81,14 @@
 	markup={organization.getDescription()}
 	placeholder="No description"
 	edit={editable && $user
-		? (text) => $db.updateOrgDescription(organization, text, $user.id)
+		? (text) => db.updateOrgDescription(organization, text, $user.id)
 		: undefined}
 />
 
 <CommentsView
 	comments={organization.getComments()}
 	remove={isAdmin
-		? (comment) => $db.deleteComment(organization.getRow(), 'orgs', comment)
+		? (comment) => db.deleteComment(organization.getRow(), 'orgs', comment)
 		: undefined}
 />
 

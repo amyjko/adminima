@@ -7,20 +7,36 @@
 	import Actions from './Actions.svelte';
 	import Loading from './Loading.svelte';
 
-	export let button: string;
-	export let showTip: string;
-	export let submitTip: string;
-	export let submit: string;
-	export let header: string;
-	export let explanation: string;
-	export let action: () => Promise<boolean>;
-	export let valid: () => boolean;
-	export let inactive: string;
+	interface Props {
+		button: string;
+		showTip: string;
+		submitTip: string;
+		submit: string;
+		header: string;
+		explanation: string;
+		action: () => Promise<boolean>;
+		valid: () => boolean;
+		inactive: string;
+		children?: import('svelte').Snippet;
+	}
 
-	let show = false;
-	let submitting = false;
+	let {
+		button,
+		showTip,
+		submitTip,
+		submit,
+		header,
+		explanation,
+		action,
+		valid,
+		inactive,
+		children
+	}: Props = $props();
 
-	$: active = !submitting && valid();
+	let show = $state(false);
+	let submitting = $state(false);
+
+	let active = $derived(!submitting && valid());
 
 	async function doAction() {
 		if (!active) {
@@ -39,7 +55,7 @@
 		<Header>{header}</Header>
 		<Paragraph>{explanation}</Paragraph>
 		<Form {active} inactiveMessage={inactive} action={doAction}>
-			<slot />
+			{@render children?.()}
 			<Actions
 				><Button tip="Dismiss this dialog." end action={() => (show = false)}>Cancel</Button><Button
 					tip={submitTip}

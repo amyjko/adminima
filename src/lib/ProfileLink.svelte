@@ -2,16 +2,21 @@
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
 	import type { ProfileRow } from '$database/OrganizationsDB';
-	import { getOrg } from './contexts';
+	import { getOrg } from './contexts.svelte';
 
-	export let profile: ProfileRow | null;
-	export let short = false;
+	interface Props {
+		profile: ProfileRow | null;
+		short?: boolean;
+	}
 
-	const org = getOrg();
+	let { profile, short = false }: Props = $props();
+
+	const context = getOrg();
+	let org = $derived(context.org);
 </script>
 
 {#if profile}
-	<Link to="/org/{$org?.getPath() ?? profile.orgid}/person/{profile.id}" kind="person"
+	<Link to="/org/{org?.getPath() ?? profile.orgid}/person/{profile.id}" kind="person"
 		>{#if profile.name === ''}{profile.email}{:else if short}{profile.name.split(
 				' '
 			)[0]}{:else}{profile.name} <sub>&lt;{profile.email}&gt;</sub>{/if}</Link

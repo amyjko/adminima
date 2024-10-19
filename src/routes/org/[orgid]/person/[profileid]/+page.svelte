@@ -3,11 +3,12 @@
 	import Oops from '$lib/Oops.svelte';
 	import ProfileView from '$lib/ProfileView.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getOrg } from '$lib/contexts';
+	import { getOrg } from '$lib/contexts.svelte';
 
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
 
-	$: profile = $org.getProfileWithID($page.params.profileid);
+	let profile = $derived(org.getProfileWithID($page.params.profileid));
 </script>
 
 {#if profile === null}

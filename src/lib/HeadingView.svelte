@@ -4,7 +4,11 @@
 	import Header from './Header.svelte';
 	import Subheader from './Subheader.svelte';
 
-	export let block: Heading;
+	interface Props {
+		block: Heading;
+	}
+
+	let { block }: Props = $props();
 </script>
 
 {#if block.level === 1}<h3>

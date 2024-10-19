@@ -1,48 +1,51 @@
 <script lang="ts">
+	import HowView from './HowView.svelte';
 	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
 	import { getContext, tick } from 'svelte';
 	import Visibility from './Visibility.svelte';
-	import { addError, getDB, getErrors, getOrg, queryOrError } from './contexts';
-	import type { HowID } from '$types/Organization';
+	import { addError, getDB, getErrors, getOrg, queryOrError } from './contexts.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import BlocksView from './BlocksView.svelte';
-	import { parse } from '../markup/parser';
 	import Status from './Status.svelte';
 
-	export let how: HowRow;
-	export let process: ProcessRow;
-	export let editable: boolean;
+	interface Props {
+		how: HowRow;
+		process: ProcessRow;
+		editable: boolean;
+	}
 
-	$: parent = $org.getHowParent(how.id);
-	$: index = parent?.how.indexOf(how.id) ?? -1;
-	$: length = parent?.how.length ?? -1;
-	$: subhows = how.how.map((h) => $org.getHow(h)).filter((h) => h !== undefined);
+	let { how, process, editable }: Props = $props();
 
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const db = getDB();
 	const errors = getErrors();
-
 	const focusID = getContext<Writable<string | undefined>>('focusID');
+
+	let parent = $derived(org.getHowParent(how.id));
+	let index = $derived(parent?.how.indexOf(how.id) ?? -1);
+	let length = $derived(parent?.how.length ?? -1);
+	let subhows = $derived(how.how.map((h) => org.getHow(h)).filter((h) => h !== undefined));
 
 	let text = how.what;
 	// Helps us keep track of whether to give this an HTML ID for purposes of focusing.
-	let deleted = false;
+	let deleted = $state(false);
 
 	function save(newText: string) {
-		return queryOrError(errors, $db.updateHowText(how, newText), "Couldn't update step text.");
+		return queryOrError(errors, db.updateHowText(how, newText), "Couldn't update step text.");
 	}
 
 	function toggleDone() {
-		$db.updateHowDone(how, how.done === 'no' ? 'pending' : how.done === 'pending' ? 'yes' : 'no');
+		db.updateHowDone(how, how.done === 'no' ? 'pending' : how.done === 'pending' ? 'yes' : 'no');
 	}
 
 	async function insertHow() {
 		// See if this how has a parent, and if so, insert after this how.
 		if (parent) {
-			const { error, id } = await $db.insertHow(
+			const { error, id } = await db.insertHow(
 				process,
 				parent.visibility,
 				parent,
@@ -53,7 +56,7 @@
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
-			const { error, id } = await $db.insertHow(process, how.visibility, how, 0);
+			const { error, id } = await db.insertHow(process, how.visibility, how, 0);
 			if (error) addError(errors, 'Unable to insert how.', error);
 			if (id) focusID.set(id);
 		}
@@ -74,7 +77,7 @@
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
 
-			const error = await queryOrError(errors, $db.deleteHow(parent, how), "Couldn't delete how.");
+			const error = await queryOrError(errors, db.deleteHow(parent, how), "Couldn't delete how.");
 			if (error) return;
 
 			focusID.set(newFocusID);
@@ -84,7 +87,7 @@
 	function getIndent() {
 		if (parent && index > 0) {
 			const previousID = parent.how[index - 1];
-			const previousHow = $org.getHow(previousID);
+			const previousHow = org.getHow(previousID);
 			if (previousHow) return [parent, previousHow];
 		}
 		return undefined;
@@ -97,7 +100,7 @@
 			deleted = true;
 			const error = await queryOrError(
 				errors,
-				$db.reparentHow(how, parent, previousHow, previousHow.how.length),
+				db.reparentHow(how, parent, previousHow, previousHow.how.length),
 				"Couldn't indent how."
 			);
 			if (error) return;
@@ -108,7 +111,7 @@
 
 	function getUnindent() {
 		if (parent) {
-			const grandparent = $org.getHowParent(parent.id);
+			const grandparent = org.getHowParent(parent.id);
 			if (grandparent) {
 				return [parent, grandparent];
 			}
@@ -123,7 +126,7 @@
 			deleted = true;
 			const error = await queryOrError(
 				errors,
-				$db.reparentHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1),
+				db.reparentHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1),
 				"Couldn't unindent how."
 			);
 			if (error) return;
@@ -135,7 +138,7 @@
 	// function enumerate(how: HowRow, list: HowID[] = []) {
 	// 	list.push(how.id);
 	// 	for (const subhow of how.how
-	// 		.map((id) => $org.getHow(id))
+	// 		.map((id) => org.getHow(id))
 	// 		.filter((h): h is HowRow => h !== undefined)) {
 	// 		enumerate(subhow, list);
 	// 	}
@@ -145,7 +148,7 @@
 	// function focusVertically(dir: -1 | 1) {
 	// 	const index = getIndex();
 	// 	if (index >= 0 && process.howid) {
-	// 		const root = $org.getHow(process.howid);
+	// 		const root = org.getHow(process.howid);
 	// 		if (root) {
 	// 			const list = enumerate(root);
 	// 			if (index >= 0 && index + dir < list.length) {
@@ -157,12 +160,12 @@
 	// }
 
 	async function moveVertically(dir: -1 | 1) {
-		const parent = $org.getHowParent(how.id);
+		const parent = org.getHowParent(how.id);
 		if (parent) {
 			if (index >= 0 && index + dir < parent.how.length) {
 				const error = await queryOrError(
 					errors,
-					$db.moveHow(how, parent, index + dir),
+					db.moveHow(how, parent, index + dir),
 					"Couldn't move how."
 				);
 				if (error) return;
@@ -180,19 +183,19 @@
 				aria-disabled={!editable}
 				aria-checked={how.done === 'no' ? 'false' : how.done === 'pending' ? 'mixed' : 'true'}
 				tabindex={editable ? 0 : null}
-				on:keydown={(event) =>
+				onkeydown={(event) =>
 					editable && (event.key === 'Enter' || event.key === ' ') ? toggleDone() : undefined}
-				on:pointerdown={editable ? toggleDone : undefined}
+				onpointerdown={editable ? toggleDone : undefined}
 			>
 				{#if how.done === 'no'}&nbsp;{:else if how.done === 'pending'}…{:else}✓{/if}
 			</div>
 			{#if editable}
-				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					style:width="100%"
 					class:done={how.done === 'yes'}
 					class:pending={how.done === 'pending'}
-					on:keydown={(e) => {
+					onkeydown={(e) => {
 						// if (e.key === 'Enter' && e.metaKey) {
 						// 	e.preventDefault();
 						// 	insertHow();
@@ -257,7 +260,7 @@
 				level={how.visibility}
 				edit={(vis) =>
 					vis === 'public' || vis === 'org' || vis === 'admin'
-						? $db.updateHowVisibility(how, vis)
+						? db.updateHowVisibility(how, vis)
 						: undefined}
 			/>
 		{:else}
@@ -268,7 +271,7 @@
 	{#if subhows.length > 0}
 		<div class="steps">
 			{#each subhows as subhow (subhow.id)}
-				<svelte:self how={subhow} {process} {editable} />
+				<HowView how={subhow} {process} {editable} />
 			{/each}
 		</div>
 	{/if}

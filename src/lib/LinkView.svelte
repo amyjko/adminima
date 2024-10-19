@@ -1,32 +1,41 @@
 <script lang="ts">
 	import type { default as MarkupLink } from '../markup/Link';
 	import Link from '$lib/Link.svelte';
-	import { getOrg } from './contexts';
+	import { getOrg } from './contexts.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 
-	export let segment: MarkupLink;
+	interface Props {
+		segment: MarkupLink;
+	}
 
-	const org = getOrg();
+	let { segment }: Props = $props();
 
-	$: lowerURL = segment.url.toLocaleLowerCase();
+	const context = getOrg();
+	let org = $derived(context.org);
+
+	let lowerURL = $derived(segment.url.toLocaleLowerCase());
 
 	// Does the link correspond to a role short name?
-	$: role = $org
-		.getRoles()
-		.find(
-			(role) =>
-				role.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
-				role.title.toLocaleLowerCase() === lowerURL
-		);
+	let role = $derived(
+		org
+			.getRoles()
+			.find(
+				(role) =>
+					role.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
+					role.title.toLocaleLowerCase() === lowerURL
+			)
+	);
 	// Does the link correspond to a process short name?
-	$: process = $org
-		.getProcesses()
-		.find(
-			(process) =>
-				process.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
-				process.title.toLocaleLowerCase() === lowerURL
-		);
+	let process = $derived(
+		org
+			.getProcesses()
+			.find(
+				(process) =>
+					process.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
+					process.title.toLocaleLowerCase() === lowerURL
+			)
+	);
 </script>
 
 {#if role}

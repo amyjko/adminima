@@ -2,7 +2,11 @@
 	import type { default as Bullets } from '../markup/Bullets';
 	import SegmentView from '$lib/SegmentView.svelte';
 
-	export let block: Bullets;
+	interface Props {
+		block: Bullets;
+	}
+
+	let { block }: Props = $props();
 </script>
 
 <ol>

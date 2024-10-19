@@ -1,5 +1,9 @@
 <script lang="ts">
-	export let text: string | undefined;
+	interface Props {
+		text: string | undefined;
+	}
+
+	let { text }: Props = $props();
 </script>
 
 <span class="localized">{text ?? '...'}</span>

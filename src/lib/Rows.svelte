@@ -1,4 +1,9 @@
-<div class="rows"><slot /></div>
+<script>
+	/** @type {{children?: import('svelte').Snippet}} */
+	let { children } = $props();
+</script>
+
+<div class="rows">{@render children?.()}</div>
 
 <style>
 	.rows {

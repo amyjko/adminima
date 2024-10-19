@@ -4,8 +4,8 @@
 	import Title from '$lib/Title.svelte';
 	import { page } from '$app/stores';
 
-	$: role = $page.url.searchParams.get('role') ?? undefined;
-	$: process = $page.url.searchParams.get('process') ?? undefined;
+	let role = $derived($page.url.searchParams.get('role') ?? undefined);
+	let process = $derived($page.url.searchParams.get('process') ?? undefined);
 </script>
 
 <Title title="New change" kind="change" />

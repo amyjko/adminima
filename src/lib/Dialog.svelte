@@ -1,21 +1,30 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import Button, { Delete } from './Button.svelte';
 
-	export let close: () => void;
+	interface Props {
+		close: () => void;
+		children?: import('svelte').Snippet;
+	}
 
-	let view: HTMLDialogElement | undefined = undefined;
+	let { close, children }: Props = $props();
 
-	$: if (view) view.showModal();
+	let view: HTMLDialogElement | undefined = $state(undefined);
+
+	run(() => {
+		if (view) view.showModal();
+	});
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
 	bind:this={view}
 	tabindex="-1"
-	on:keydown={(event) => (event.key === 'Escape' ? close() : undefined)}
+	onkeydown={(event) => (event.key === 'Escape' ? close() : undefined)}
 >
 	<div class="content">
-		<slot />
+		{@render children?.()}
 	</div>
 	<div class="close">
 		<Button tip="Close this dialog" action={close}>{Delete}</Button>

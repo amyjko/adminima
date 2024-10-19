@@ -3,10 +3,13 @@
 	import { type Visibility as Vis, type Visibility } from '../database/OrganizationsDB';
 	import Select from './Select.svelte';
 
-	export let level: Vis;
-	export let tip: string;
-	export let edit: undefined | ((level: string) => Promise<PostgrestError | null> | undefined) =
-		undefined;
+	interface Props {
+		level: Vis;
+		tip: string;
+		edit?: undefined | ((level: string) => Promise<PostgrestError | null> | undefined);
+	}
+
+	let { level, tip, edit = undefined }: Props = $props();
 
 	const opts: { value: Visibility; label: string }[] = [
 		{ value: 'public', label: 'public' },

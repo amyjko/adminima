@@ -5,7 +5,11 @@
 	import TextView from '$lib/TextView.svelte';
 	import LinkView from './LinkView.svelte';
 
-	export let segment: Segment;
+	interface Props {
+		segment: Segment;
+	}
+
+	let { segment }: Props = $props();
 </script>
 
 {#if segment instanceof Characters}

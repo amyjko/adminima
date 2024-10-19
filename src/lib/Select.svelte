@@ -1,10 +1,21 @@
 <script lang="ts">
-	export let options: { value: string | undefined; label: string }[] = [];
-	export let tip: string;
-	export let change: (value: string | undefined) => any;
-	export let selection: string | undefined;
-	export let fit: string | boolean = true;
-	export let active: boolean = true;
+	interface Props {
+		options?: { value: string | undefined; label: string }[];
+		tip: string;
+		change: (value: string | undefined) => any;
+		selection: string | undefined;
+		fit?: string | boolean;
+		active?: boolean;
+	}
+
+	let {
+		options = [],
+		tip,
+		change,
+		selection = $bindable(),
+		fit = true,
+		active = true
+	}: Props = $props();
 </script>
 
 <div class="select">
@@ -12,7 +23,7 @@
 		title={tip}
 		aria-label={tip}
 		bind:value={selection}
-		on:change={change(selection)}
+		onchange={change(selection)}
 		class:fit={typeof fit === 'boolean' && fit === true ? 'fit' : ''}
 		style:width={typeof fit === 'string' ? fit : ''}
 		disabled={active === false}

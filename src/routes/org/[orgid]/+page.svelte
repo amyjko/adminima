@@ -1,8 +1,9 @@
 <script lang="ts">
 	import OrganizationView from '$lib/OrganizationView.svelte';
-	import { getOrg } from '$lib/contexts';
+	import { getOrg } from '$lib/contexts.svelte';
 
-	const organization = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
 </script>
 
-<OrganizationView organization={$organization} />
+<OrganizationView organization={org} />

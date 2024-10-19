@@ -5,18 +5,24 @@
 	import Level from './Level.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import Select from './Select.svelte';
-	import { getDB, getOrg } from './contexts';
+	import { getDB, getOrg } from './contexts.svelte';
 
-	export let how: HowRow;
-	export let verbose: boolean;
-	export let editable: boolean;
+	interface Props {
+		how: HowRow;
+		verbose: boolean;
+		editable: boolean;
+	}
 
-	const org = getOrg();
+	let { how, verbose, editable }: Props = $props();
+
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const db = getDB();
 
-	$: options = [
+	let options = $derived([
 		{ value: undefined, label: '▼' },
-		...$org
+		...org
 			.getRoles()
 			// Exclude any alreaydy included in the how.
 			.filter(
@@ -31,11 +37,11 @@
 			.map((role) => {
 				return { value: role.id, label: role.title };
 			})
-	];
+	]);
 
-	let responsible: string | undefined = undefined;
-	let consulted: string | undefined = undefined;
-	let informed: string | undefined = undefined;
+	let responsible: string | undefined = $state(undefined);
+	let consulted: string | undefined = $state(undefined);
+	let informed: string | undefined = $state(undefined);
 </script>
 
 <div class="arci" class:verbose>
@@ -53,7 +59,7 @@
 					bind:selection={responsible}
 					change={(value) => {
 						if (value) {
-							$db.addHowRCI(how, value, 'responsible');
+							db.addHowRCI(how, value, 'responsible');
 							responsible = undefined;
 						}
 					}}
@@ -67,7 +73,7 @@
 						<Button
 							chromeless
 							tip="Remove this role from the responsible list."
-							action={() => $db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
+							action={() => db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
 						>
 					{/if}</RoleLink
 				>
@@ -91,7 +97,7 @@
 					fit={false}
 					change={(value) => {
 						if (value) {
-							$db.addHowRCI(how, value, 'consulted');
+							db.addHowRCI(how, value, 'consulted');
 							consulted = undefined;
 						}
 					}}
@@ -105,7 +111,7 @@
 						<Button
 							chromeless
 							tip="Remove this role from the consulted list."
-							action={() => $db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
+							action={() => db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
 						>
 					{/if}</RoleLink
 				>
@@ -129,7 +135,7 @@
 					fit={false}
 					change={(value) => {
 						if (value) {
-							$db.addHowRCI(how, value, 'informed');
+							db.addHowRCI(how, value, 'informed');
 							informed = undefined;
 						}
 					}}
@@ -143,7 +149,7 @@
 						<Button
 							chromeless
 							tip="Remove this role from the informed list"
-							action={() => $db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
+							action={() => db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
 						>
 					{/if}</RoleLink
 				>

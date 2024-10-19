@@ -1,18 +1,23 @@
 <script lang="ts">
 	import type Organization from '$types/Organization';
-	import { getUser } from './contexts';
+	import { getUser } from './contexts.svelte';
 	import Link from './Link.svelte';
 	import OrganizationLink from './OrganizationLink.svelte';
 
-	export let organization: Organization;
+	interface Props {
+		organization: Organization;
+	}
+
+	let { organization }: Props = $props();
 
 	const user = getUser();
 
-	$: visible =
+	let visible = $derived(
 		organization.getVisibility() === 'public' ||
-		($user &&
-			((organization.getVisibility() === 'org' && organization.hasPerson($user.id)) ||
-				(organization.getVisibility() === 'admin' && organization.hasAdminPerson($user.id))));
+			($user &&
+				((organization.getVisibility() === 'org' && organization.hasPerson($user.id)) ||
+					(organization.getVisibility() === 'admin' && organization.hasAdminPerson($user.id))))
+	);
 </script>
 
 <div class="links">

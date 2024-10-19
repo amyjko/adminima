@@ -3,13 +3,17 @@
 	import Button from './Button.svelte';
 	import Loading from './Loading.svelte';
 
-	export let text: string;
-	export let edit: undefined | ((text: string) => Promise<PostgrestError | null>) = undefined;
-	export let transform: undefined | ((text: string) => string) = undefined;
+	interface Props {
+		text: string;
+		edit?: undefined | ((text: string) => Promise<PostgrestError | null>);
+		transform?: undefined | ((text: string) => string);
+	}
 
-	let editing = false;
-	let revision = '';
-	let saving = false;
+	let { text = $bindable(), edit = undefined, transform = undefined }: Props = $props();
+
+	let editing = $state(false);
+	let revision = $state('');
+	let saving = $state(false);
 
 	async function save() {
 		if (editing) {
@@ -33,14 +37,14 @@
 {#if edit}
 	<form class="editable">
 		{#if editing}
-			<!-- svelte-ignore a11y-autofocus -->
+			<!-- svelte-ignore a11y_autofocus -->
 			<input
 				type="text"
 				bind:value={revision}
 				disabled={saving}
 				style:width={revision.length + 2 + 'ch'}
-				on:keydown={(event) => (event.key === 'Enter' ? save() : undefined)}
-				on:input={() => (revision = transform ? transform(revision) : revision)}
+				onkeydown={(event) => (event.key === 'Enter' ? save() : undefined)}
+				oninput={() => (revision = transform ? transform(revision) : revision)}
 				autofocus
 			/>{:else}<span class="text"
 				>{#if text.length === 0}&mdash;{:else}{text}{/if}</span

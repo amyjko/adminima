@@ -3,7 +3,11 @@
 	import Paragraph from './Paragraph.svelte';
 	import SegmentsView from '$lib/SegmentsView.svelte';
 
-	export let block: ParagraphMarkup;
+	interface Props {
+		block: ParagraphMarkup;
+	}
+
+	let { block }: Props = $props();
 </script>
 
 <Paragraph><SegmentsView segments={block.segments} /></Paragraph>

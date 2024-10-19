@@ -1,9 +1,13 @@
 <script lang="ts">
 	import Button, { Delete } from './Button.svelte';
 	import Oops from './Oops.svelte';
-	import { getErrors, type DBError } from './contexts';
+	import { getErrors, type DBError } from './contexts.svelte';
 
-	export let error: DBError;
+	interface Props {
+		error: DBError;
+	}
+
+	let { error }: Props = $props();
 
 	const errors = getErrors();
 </script>

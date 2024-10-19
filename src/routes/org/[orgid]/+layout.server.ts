@@ -1,7 +1,10 @@
 import { type OrganizationPayload } from '$database/OrganizationsDB';
+import type { LayoutServerLoadEvent } from './$types';
 
-/** @type {import('./$types').LayoutServerLoad} */
-export async function load({ params, locals }): Promise<{ payload: OrganizationPayload | null }> {
+export async function load({
+	params,
+	locals
+}: LayoutServerLoadEvent): Promise<{ payload: OrganizationPayload | null }> {
 	const { data, error } = await locals.supabase
 		.rpc('organization_payload', { _orgid: params.orgid })
 		.single();

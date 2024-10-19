@@ -1,8 +1,13 @@
 <script lang="ts">
-	export let warning = false;
+	interface Props {
+		warning?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { warning = false, children }: Props = $props();
 </script>
 
-<h3 class:warning><slot /></h3>
+<h3 class:warning>{@render children?.()}</h3>
 
 <style>
 	h3 {

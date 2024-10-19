@@ -6,22 +6,26 @@
 	import Dialog from './Dialog.svelte';
 	import Header from './Header.svelte';
 	import Loading from './Loading.svelte';
-	import { getDB } from './contexts';
+	import { getDB } from './contexts.svelte';
 	import Table from './Table.svelte';
 
-	export let comments: CommentID[];
-	export let remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
+	interface Props {
+		comments: CommentID[];
+		remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
+	}
+
+	let { comments, remove }: Props = $props();
 
 	const db = getDB();
 
-	let show = false;
+	let show = $state(false);
 </script>
 
 <Button tip="Show the history of edits to this." action={() => (show = true)}>See history…</Button>
 {#if show}
 	<Dialog close={() => (show = false)}>
 		<Header>History</Header>
-		{#await $db.getComments(comments)}
+		{#await db.getComments(comments)}
 			<Loading />
 		{:then comments}
 			{#if comments.data}
@@ -30,7 +34,7 @@
 						{#each comments.data.reverse() as comment (comment.id)}
 							<CommentView {comment} {remove} />
 						{:else}
-							No changes yet.
+							<tr><td>No changes yet.</td></tr>
 						{/each}
 					</tbody>
 				</Table>

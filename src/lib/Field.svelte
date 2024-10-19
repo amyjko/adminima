@@ -1,15 +1,27 @@
 <script lang="ts">
 	import Labeled from './Labeled.svelte';
 
-	export let label: string | undefined = undefined;
-	export let text: string;
-	export let active: boolean = true;
-	export let placeholder: string | undefined = undefined;
-	export let autocomplete: boolean = false;
-	export let invalid: ((text: string) => string | undefined) | undefined = undefined;
-	export let done: ((text: string) => void) | undefined = undefined;
+	interface Props {
+		label?: string | undefined;
+		text: string;
+		active?: boolean;
+		placeholder?: string | undefined;
+		autocomplete?: boolean;
+		invalid?: ((text: string) => string | undefined) | undefined;
+		done?: ((text: string) => void) | undefined;
+	}
 
-	$: message = invalid ? invalid(text) : undefined;
+	let {
+		label = undefined,
+		text = $bindable(),
+		active = true,
+		placeholder = undefined,
+		autocomplete = false,
+		invalid = undefined,
+		done = undefined
+	}: Props = $props();
+
+	let message = $derived(invalid ? invalid(text) : undefined);
 </script>
 
 <Labeled label={label ?? ''} {message}>
@@ -18,7 +30,7 @@
 		autocomplete={autocomplete ? 'on' : 'off'}
 		disabled={!active}
 		bind:value={text}
-		on:blur={done ? () => done(text) : undefined}
+		onblur={done ? () => done(text) : undefined}
 		{placeholder}
 	/>
 </Labeled>

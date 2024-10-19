@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { addError, getDB, getErrors, getOrg, getUser } from '$lib/contexts';
+	import { addError, getDB, getErrors, getOrg, getUser } from '$lib/contexts.svelte';
 	import ProcessLink from '$lib/ProcessLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
@@ -20,27 +20,30 @@
 	import ProcessDate from '$lib/ProcessDate.svelte';
 	import Visibility from '$lib/Visibility.svelte';
 
-	const organization = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const user = getUser();
 	const db = getDB();
 	const errors = getErrors();
 
-	$: isAdmin = $user && $organization.hasAdminPerson($user.id);
+	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
 
-	$: visible =
-		($user === null && $organization.getVisibility() === 'public') ||
-		($user !== null && $organization.hasPerson($user.id));
+	let visible = $derived(
+		($user === null && org.getVisibility() === 'public') ||
+			($user !== null && org.hasPerson($user.id))
+	);
 
-	let filter = '';
-	$: lowerFilter = filter.toLocaleLowerCase().trim();
+	let filter = $state('');
+	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
 
-	$: personRoles = $user ? $organization.getPersonRoles($user.id) : [];
+	let personRoles = $derived($user ? org.getPersonRoles($user.id) : []);
 
 	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
 		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
 
 		for (const process of processes) {
-			const hows = $organization.getProcessHows(process.id);
+			const hows = org.getProcessHows(process.id);
 
 			if (process.accountable && !roles.has(process.accountable))
 				roles.set(process.accountable, { a: 0, r: 0, c: 0, i: 0 });
@@ -86,22 +89,18 @@
 					(ao.a * 1000 + ao.r * 100 + ao.c * 10 + ao.i)
 				);
 			})
-			.map((id) => $organization.getRole(id))
+			.map((id) => org.getRole(id))
 			.filter((r): r is RoleRow => r !== undefined);
 	}
 
-	let title = '';
+	let title = $state('');
 	async function newProcess() {
-		const { error, id } = await $db.addProcess(
-			$organization.getID(),
-			title,
-			$organization.getVisibility()
-		);
+		const { error, id } = await db.addProcess(org.getID(), title, org.getVisibility());
 		if (error) {
 			addError(errors, "Couldn't add new process", error);
 			return false;
 		} else {
-			goto(`/org/${$organization.getPath()}/process/${id}`);
+			goto(`/org/${org.getPath()}/process/${id}`);
 			return true;
 		}
 	}
@@ -129,7 +128,7 @@
 	<Oops text="Only showing public processes of this private organization." />
 {/if}
 
-{#if $user && $organization.hasPerson($user.id)}
+{#if $user && org.hasPerson($user.id)}
 	<FormDialog
 		button="Create process …"
 		showTip="Create a new process."
@@ -147,12 +146,10 @@
 
 <Field label="Filter" bind:text={filter} />
 
-{#each Array.from(new Set($organization
-			.getProcesses()
-			.map((process) => process.concern))) as concern}
+{#each Array.from(new Set(org.getProcesses().map((process) => process.concern))) as concern}
 	<!-- Find the matching for this concern and the filter -->
 	{@const processes = sortProcessesByNextDate(
-		$organization
+		org
 			.getProcesses()
 			.filter((p) => p.concern === concern)
 			.filter(
@@ -162,8 +159,8 @@
 					p.short.some((name) => name.toLowerCase().includes(lowerFilter))
 			)
 			.sort((a, b) => {
-				const howA = $organization.getHow(a.id);
-				const howB = $organization.getHow(b.id);
+				const howA = org.getHow(a.id);
+				const howB = org.getHow(b.id);
 				if (howA === undefined || howB === undefined) return 0;
 
 				return (
@@ -184,7 +181,7 @@
 				><Concern
 					{concern}
 					edit={isAdmin
-						? (newConcern) => $db.renameConcern($organization.getID(), concern, newConcern)
+						? (newConcern) => db.renameConcern(org.getID(), concern, newConcern)
 						: undefined}
 				/></Header
 			>
@@ -195,14 +192,13 @@
 							><th>status</th><th>visibility</th><th>repeats</th><th>process</th
 							>{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
 									><RoleLink roleID={role.id} /></th
-								>{:else}<th />{/each}
+								>{:else}<th></th>{/each}
 						</tr>
 					</thead>
 					<tbody>
 						{#each processes as process}
-							{@const how =
-								process.howid !== null ? $organization.getHow(process.howid) : undefined}
-							{@const hows = $organization.getProcessHows(process.id)}
+							{@const how = process.howid !== null ? org.getHow(process.howid) : undefined}
+							{@const hows = org.getProcessHows(process.id)}
 							<tr>
 								<td><Status status={process.state} /></td>
 								<td
@@ -219,12 +215,12 @@
 											level={process?.accountable === role.id
 												? 'accountable'
 												: hows.some((how) => how.responsible.includes(role.id))
-												? 'responsible'
-												: hows.some((how) => how.consulted.includes(role.id))
-												? 'consulted'
-												: hows.some((how) => how.informed.includes(role.id))
-												? 'informed'
-												: ''}
+													? 'responsible'
+													: hows.some((how) => how.consulted.includes(role.id))
+														? 'consulted'
+														: hows.some((how) => how.informed.includes(role.id))
+															? 'informed'
+															: ''}
 										/></td
 									>{:else}<td><em>no roles</em></td>{/each}
 							</tr>

@@ -1,13 +1,18 @@
 <script lang="ts">
 	import { locale, type Locale } from '../types/Locales';
 
-	export let text: string | ((locale: Locale) => string) | undefined = undefined;
-	export let inline = false;
+	interface Props {
+		text?: string | ((locale: Locale) => string) | undefined;
+		inline?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { text = undefined, inline = false, children }: Props = $props();
 </script>
 
 <div class:inline>
 	{#if text}<span>{typeof text === 'string' ? text : $locale ? text($locale) : 'Error'}</span>{/if}
-	<span class="sub"><slot /></span>
+	<span class="sub">{@render children?.()}</span>
 </div>
 
 <style>

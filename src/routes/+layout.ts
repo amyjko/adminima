@@ -1,9 +1,9 @@
 import { type Locale } from '$types/Locales';
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_API_URL } from '$env/static/public';
+import type { LayoutLoadEvent } from './$types';
 
-/** @type {import('./$types').LayoutLoad} */
-export async function load({ fetch, data, depends }) {
+export const load = async ({ fetch, data, depends }: LayoutLoadEvent) => {
 	const response = await fetch(`/locales/en-US.json`);
 	const strings = (await response.json()) as Locale;
 
@@ -18,7 +18,7 @@ export async function load({ fetch, data, depends }) {
 				global: {
 					fetch
 				}
-		  })
+			})
 		: createServerClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {
 				global: {
 					fetch
@@ -28,7 +28,7 @@ export async function load({ fetch, data, depends }) {
 						return data.cookies;
 					}
 				}
-		  });
+			});
 
 	/**
 	 * It's fine to use `getSession` here, because on the client, `getSession` is
@@ -40,4 +40,4 @@ export async function load({ fetch, data, depends }) {
 	} = await supabase.auth.getSession();
 
 	return { session, supabase, strings };
-}
+};

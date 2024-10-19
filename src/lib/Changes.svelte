@@ -4,33 +4,42 @@
 	import ChangeLink from './ChangeLink.svelte';
 	import PersonLink from './ProfileLink.svelte';
 	import Status from './Status.svelte';
-	import { getOrg, getUser } from './contexts';
+	import { getOrg, getUser } from './contexts.svelte';
 	import Table from './Table.svelte';
 	import Field from './Field.svelte';
 	import Visibility from './Visibility.svelte';
 	import Oops from './Oops.svelte';
 
-	export let changes: ChangeRow[];
+	interface Props {
+		changes: ChangeRow[];
+		children?: import('svelte').Snippet;
+	}
 
-	const org = getOrg();
+	let { changes, children }: Props = $props();
+
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const user = getUser();
 	const Levels = { triage: 0, active: 1, blocked: 2, done: 4, backlog: 3, declined: 5 };
 
-	$: visible =
-		($user === null && $org.getVisibility() === 'public') ||
-		($user !== null && $org.hasPerson($user.id));
+	let visible = $derived(
+		($user === null && org.getVisibility() === 'public') ||
+			($user !== null && org.hasPerson($user.id))
+	);
 
-	let filter = '';
-	$: lowerFilter = filter.toLocaleLowerCase().trim();
-	$: filteredChanges =
+	let filter = $state('');
+	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
+	let filteredChanges = $derived(
 		lowerFilter.length > 0
 			? changes.filter(
 					(change) =>
 						change.what.toLocaleLowerCase().includes(lowerFilter) ||
 						change.description.toLocaleLowerCase().includes(lowerFilter) ||
 						change.proposal.toLocaleLowerCase().includes(lowerFilter)
-			  )
-			: changes;
+				)
+			: changes
+	);
 </script>
 
 {#if !visible}
@@ -57,7 +66,7 @@
 					<td><Visibility level={change.visibility} tip="Visibility of the change" /></td>
 					<td
 						>{#if change.lead}<PersonLink
-								profile={$org.getProfileWithID(change.lead)}
+								profile={org.getProfileWithID(change.lead)}
 							/>{:else}&mdash;{/if}</td
 					>
 					<td><ChangeLink id={change.id} /></td>
@@ -66,7 +75,7 @@
 		</tbody>
 	</Table>
 {:else}
-	<slot />
+	{@render children?.()}
 {/if}
 
 <style>

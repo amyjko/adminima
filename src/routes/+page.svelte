@@ -8,7 +8,11 @@
 	import Flow from '$lib/Flow.svelte';
 	import Tip from '$lib/Tip.svelte';
 
-	export let data;
+	interface Props {
+		data: any;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <Title title="Adminima" />

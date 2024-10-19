@@ -1,6 +1,10 @@
 <script lang="ts">
-	export let level: 'accountable' | 'responsible' | 'consulted' | 'informed' | '';
-	export let verbose = false;
+	interface Props {
+		level: 'accountable' | 'responsible' | 'consulted' | 'informed' | '';
+		verbose?: boolean;
+	}
+
+	let { level, verbose = false }: Props = $props();
 </script>
 
 <span class="level"

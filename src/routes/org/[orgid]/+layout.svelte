@@ -2,33 +2,51 @@
 	import Link from '$lib/Link.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import Title from '$lib/Title.svelte';
-	import { OrgSymbol, getDB, getUser } from '$lib/contexts';
-	import { onMount, setContext } from 'svelte';
+	import { getDB, OrgSymbol } from '$lib/contexts.svelte';
+	import { onMount, setContext, type Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
+	import Organization from '$types/Organization';
 
-	export let data;
+	interface Props {
+		data: LayoutData;
+		children?: Snippet;
+	}
 
-	$: ({ payload } = data);
+	let { data, children }: Props = $props();
 
 	const db = getDB();
-	const user = getUser();
 
-	// Save the payload in the database cache.
-	$: org = data.payload ? $db.updateOrg(data.payload) : undefined;
-	$: if (payload) setContext(OrgSymbol, org);
+	// Create a state to store the current organization. We'll store this as context.
+	let context = $state({ org: data.payload ? new Organization(data.payload) : undefined });
+
+	// svelte-ignore state_referenced_locally
+	setContext(OrgSymbol, context);
+
+	// When the payload changes, update the organization state and all views dependent on it.
+	$effect(() => {
+		context.org = data.payload ? new Organization(data.payload) : undefined;
+	});
+
 	onMount(() => {
 		// When this layout mounts, listen to realtime changes on the organization payload.
 		const orgid = data.payload?.organization.id;
-		if (orgid) $db.subscribe(orgid);
 
+		// When realtime has a revised org, update the context.
+		function updateOrg(payload: Organization) {
+			context.org = payload;
+		}
+		// Listen to realitime changes on the organization.
+		if (context.org) db.listen(context.org, updateOrg);
+
+		// When this layout unmounts, unsubscribe from the organization realitime updates.
 		return () => {
-			// When this layout unmounts, unsubscribe from the organization payload.
-			if (orgid) $db.unsubscribe(orgid);
+			if (orgid) db.ignore(orgid, updateOrg);
 		};
 	});
 </script>
 
-{#if $org}
-	<slot />
+{#if context.org}
+	{@render children?.()}
 {:else}
 	<Title title="Oops" kind="organization" />
 	<Oops

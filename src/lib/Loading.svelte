@@ -2,8 +2,12 @@
 	import { onMount } from 'svelte';
 	import Logo from './Logo';
 
-	export let inline = true;
-	export let text: string = 'Loading...';
+	interface Props {
+		inline?: boolean;
+		text?: string;
+	}
+
+	let { inline = true, text = 'Loading...' }: Props = $props();
 </script>
 
 <div class:inline>

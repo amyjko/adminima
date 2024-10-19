@@ -1,9 +1,13 @@
 <script lang="ts">
 	import Select from './Select.svelte';
 
-	export let num: number;
-	export let max: number;
-	export let change: (date: number) => void;
+	interface Props {
+		num: number;
+		max: number;
+		change: (date: number) => void;
+	}
+
+	let { num, max, change }: Props = $props();
 </script>
 
 <Select

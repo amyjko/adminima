@@ -1,20 +1,26 @@
 <script lang="ts">
-	import { getOrg, getUser } from './contexts';
+	import { getOrg, getUser } from './contexts.svelte';
 
-	export let admin = false;
-	export let member = false;
+	interface Props {
+		admin?: boolean;
+		member?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { admin = false, member = false, children }: Props = $props();
 
 	const user = getUser();
-	const org = getOrg();
+	const context = getOrg();
+	let org = $derived(context.org);
 
-	$: isMember = $user && $org?.hasPerson($user.id);
-	$: isAdmin = $user && $org?.hasAdminPerson($user.id);
+	let isMember = $derived($user && org?.hasPerson($user.id));
+	let isAdmin = $derived($user && org?.hasAdminPerson($user.id));
 </script>
 
 {#if (admin === false && member === false) || (admin && isAdmin) || (member && isMember)}
 	<div class="tip">
 		<div>💡</div>
-		<div><slot /></div>
+		<div>{@render children?.()}</div>
 	</div>
 {/if}
 

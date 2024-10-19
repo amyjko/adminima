@@ -51,8 +51,11 @@ export type OrganizationPayload = {
 class OrganizationsDB {
 	private supabase: SupabaseClient<Database>;
 
-	/** A collection of organization stores, kept in sync with the database for use by client */
-	readonly organizations = new ReactiveMap<OrganizationID, Organization>();
+	/** A map of organizations */
+	private organizations = new Map<OrganizationID, Organization>();
+
+	/** A list of listeners to notify of realtime updates. */
+	private listeners: { id: OrganizationID; listener: (org: Organization) => void }[] = [];
 
 	/** Organization specific Supabase realtime channels */
 	readonly channels = new Map<OrganizationID, RealtimeChannel>();
@@ -77,12 +80,25 @@ class OrganizationsDB {
 		return `orgs:${orgid}`;
 	}
 
-	updateOrg(org: OrganizationPayload) {
-		return this.organizations.set(org.organization.id, new Organization(org));
+	notify(org: Organization) {
+		this.cache(org);
+		for (const listener of this.listeners) if (listener.id === org.getID()) listener.listener(org);
+	}
+
+	cache(org: Organization) {
+		this.organizations.set(org.getID(), org);
 	}
 
 	/** Subscribe to an organization-specific channel, listening to all modifications to organization-related tables  */
-	subscribe(orgid: OrganizationID) {
+	listen(org: Organization, listener: (org: Organization) => void) {
+		const orgid = org.getID();
+
+		// Remember the organization's value.
+		this.organizations.set(orgid, org);
+
+		// Add the listener to the list of listeners.
+		this.listeners.push({ id: orgid, listener });
+
 		// See if there's a channel already.
 		let channel = this.channels.get(this.getOrgChannel(orgid));
 
@@ -109,7 +125,7 @@ class OrganizationsDB {
 
 					// Otherwise, update the organization.
 					if (payload.eventType === 'UPDATE') {
-						this.organizations.set(orgid, org.withUpdate(payload.new));
+						this.notify(org.withUpdate(payload.new));
 					}
 				}
 			)
@@ -167,17 +183,14 @@ class OrganizationsDB {
 
 					// Otherwise, update the organization's profile.
 					if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-						this.organizations.set(orgid, org.withAssignment(payload.new));
+						this.notify(org.withAssignment(payload.new));
 					} else if (
 						payload.eventType === 'DELETE' &&
 						payload.old.roleid &&
 						payload.old.profileid
 					) {
 						// Supabase doesn't allow filtering on delete events, so we have to filter here.
-						this.organizations.set(
-							orgid,
-							org.withoutAssignment(payload.old.roleid, payload.old.profileid)
-						);
+						this.notify(org.withoutAssignment(payload.old.roleid, payload.old.profileid));
 					}
 				}
 			)
@@ -272,17 +285,19 @@ class OrganizationsDB {
 
 		// Otherwise, update the organization's profile.
 		if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-			this.organizations.set(orgid, update(org, payload.new));
+			this.notify(update(org, payload.new));
 		} else if (payload.eventType === 'DELETE' && payload.old.id) {
 			// Supabase doesn't allow filtering on delete events, so we have to filter here.
-			this.organizations.set(orgid, remove(org, payload.old));
+			this.notify(remove(org, payload.old));
 		}
 	}
 
 	/** Unsubscribe from the organization specific channel, if there is one. */
-	unsubscribe(orgid: OrganizationID) {
+	ignore(orgid: OrganizationID, listener: (org: Organization) => void) {
 		const channel = this.channels.get(this.getOrgChannel(orgid));
 		if (channel) this.supabase.removeChannel(channel);
+
+		this.listeners = this.listeners.filter((l) => l.listener !== listener);
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
@@ -434,7 +449,7 @@ class OrganizationsDB {
 			const org = this.organizations.get(orgid);
 			if (!org) return error;
 
-			this.organizations.set(orgid, org.withoutAssignment(roleid, profileid));
+			this.notify(org.withoutAssignment(roleid, profileid));
 		}
 
 		return error;
@@ -861,8 +876,8 @@ class OrganizationsDB {
 				rci === 'responsible'
 					? { responsible: [...how.responsible, role] }
 					: rci === 'consulted'
-					? { consulted: [...how.consulted, role] }
-					: { informed: [...how.informed, role] }
+						? { consulted: [...how.consulted, role] }
+						: { informed: [...how.informed, role] }
 			)
 			.eq('id', how.id);
 		return error;
@@ -875,8 +890,8 @@ class OrganizationsDB {
 				rci === 'responsible'
 					? { responsible: how.responsible.filter((r) => r !== role) }
 					: rci === 'consulted'
-					? { consulted: how.consulted.filter((c) => c !== role) }
-					: { informed: how.informed.filter((i) => i !== role) }
+						? { consulted: how.consulted.filter((c) => c !== role) }
+						: { informed: how.informed.filter((i) => i !== role) }
 			)
 			.eq('id', how.id);
 		return error;

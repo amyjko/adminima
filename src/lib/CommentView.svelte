@@ -7,24 +7,30 @@
 	import PersonLink from './ProfileLink.svelte';
 	import Quote from './Quote.svelte';
 	import TimeView from './TimeView.svelte';
-	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts';
+	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
 	import { type CommentID } from '$types/Organization';
 
-	export let comment: CommentRow;
-	export let remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
+	interface Props {
+		comment: CommentRow;
+		remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
+	}
 
-	const org = getOrg();
+	let { comment, remove }: Props = $props();
+
+	const context = getOrg();
+	let org = $derived(context.org);
+
 	const db = getDB();
 	const user = getUser();
 	const errors = getErrors();
 
-	$: admin = $user && $org.hasAdminPerson($user.id);
+	let admin = $derived($user && org.hasAdminPerson($user.id));
 </script>
 
 <tr class="comment">
 	<td width="20%">
 		<div class="meta">
-			<PersonLink profile={$org.getProfileWithPersonID(comment.who)} />
+			<PersonLink profile={org.getProfileWithPersonID(comment.who)} />
 			<TimeView date={timestampToDate(comment.when)} />
 		</div>
 	</td>
@@ -35,7 +41,7 @@
 					markup={comment.what}
 					placeholder="—"
 					edit={async (text) =>
-						queryOrError(errors, $db.updateComment(comment, text), 'Unable to save comment.')}
+						queryOrError(errors, db.updateComment(comment, text), 'Unable to save comment.')}
 				/>
 			{:else}
 				{comment.what}

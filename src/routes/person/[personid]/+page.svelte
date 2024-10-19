@@ -5,7 +5,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { addError, getDB, getErrors, getUser } from '$lib/contexts';
+	import { addError, getDB, getErrors, getUser } from '$lib/contexts.svelte';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
 	import NewOrganization from '$lib/NewOrganization.svelte';
@@ -16,17 +16,21 @@
 	import Header from '$lib/Header.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	$: orgs = data.orgs;
-	$: isSelf = $user && $user.id === $page.params.personid;
+	let { data }: Props = $props();
 
 	const user = getUser();
 	const db = getDB();
 	const errors = getErrors();
 
+	let orgs = $derived(data.orgs);
+	let isSelf = $derived($user && $user.id === $page.params.personid);
+
 	async function logout() {
-		const { error } = await $db.signOut();
+		const { error } = await db.signOut();
 		if (error) addError(errors, error.code ?? error.message);
 		else goto(`/login`);
 	}
@@ -58,7 +62,7 @@
 				<tr>
 					<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
 					<td
-						>{#if org.profiles.length > 0}{#await $db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
+						>{#if org.profiles.length > 0}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
 								<PersonLink {profile} />
 							{/await}{/if}
 					</td>

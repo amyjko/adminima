@@ -7,19 +7,23 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getUser } from '$lib/contexts';
+	import { getUser } from '$lib/contexts.svelte';
 	import validEmail from '../validEmail';
 
-	export let data;
+	interface Props {
+		data: any;
+	}
 
-	$: ({ supabase } = data);
+	let { data }: Props = $props();
 
-	let email = '';
-	let code = '';
-	let message: string | null = null;
+	let { supabase } = $derived(data);
+
+	let email = $state('');
+	let code = $state('');
+	let message: string | null = $state(null);
 	/** True if waiting for a code */
-	let submitted = false;
-	let submitting = false;
+	let submitted = $state(false);
+	let submitting = $state(false);
 
 	let user = getUser();
 
@@ -49,9 +53,9 @@
 	// Already signed in? Go to the profile.
 	// $: if (browser && $user) goto(`/person/${$user.id}`);
 
-	$: emailActive = !submitting && validEmail(email);
+	let emailActive = $derived(!submitting && validEmail(email));
 
-	$: codeActive = !submitting && code.length === 6;
+	let codeActive = $derived(!submitting && code.length === 6);
 </script>
 
 <Title title="Login" />

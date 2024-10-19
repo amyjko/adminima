@@ -2,8 +2,12 @@
 	import Months from '../database/Months';
 	import Select from './Select.svelte';
 
-	export let month: number;
-	export let change: (value: number) => void;
+	interface Props {
+		month: number;
+		change: (value: number) => void;
+	}
+
+	let { month, change }: Props = $props();
 </script>
 
 <Select

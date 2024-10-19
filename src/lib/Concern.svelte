@@ -2,8 +2,12 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
 
-	export let concern: string;
-	export let edit: ((concern: string) => Promise<PostgrestError | null>) | undefined = undefined;
+	interface Props {
+		concern: string;
+		edit?: ((concern: string) => Promise<PostgrestError | null>) | undefined;
+	}
+
+	let { concern, edit = undefined }: Props = $props();
 </script>
 
 {#if concern.length === 0}
