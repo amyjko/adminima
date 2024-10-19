@@ -11,7 +11,7 @@
 
 	const user = getUser();
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context?.org);
 
 	let isMember = $derived($user && org?.hasPerson($user.id));
 	let isAdmin = $derived($user && org?.hasAdminPerson($user.id));

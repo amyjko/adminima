@@ -12,13 +12,15 @@
 	import Header from '$lib/Header.svelte';
 
 	const user = getUser();
-	const org = getOrg();
+	const context = getOrg();
+	const org = $derived(context.org);
+
 	const db = getDB();
 	const errors = getErrors();
 
 	let teamID = $derived($page.params.teamid);
-	let team = $derived(org.org.getTeam(teamID));
-	let isAdmin = $derived($user && org.org.hasAdminPerson($user.id));
+	let team = $derived(org.getTeam(teamID));
+	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
 </script>
 
 {#if team}
@@ -53,7 +55,7 @@
 			: undefined}
 	/>
 
-	{#each org.org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
+	{#each org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
 		<RoleLink roleID={role.id} />
 	{:else}
 		<Notice>This team has no roles.</Notice>
@@ -69,7 +71,7 @@
 		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {
 			const error = await queryOrError(errors, db.deleteTeam(teamID), "Couldn't delete the team.");
-			if (error === null) goto(`/org/${org.org.getPath()}/roles`);
+			if (error === null) goto(`/org/${org.getPath()}/roles`);
 		}}
 		warning>{Delete} Delete this team</Button
 	>

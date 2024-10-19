@@ -5,9 +5,9 @@ import type OrganizationsDB from '$database/OrganizationsDB';
 import type Organization from '$types/Organization';
 
 export const OrgSymbol = Symbol('organization');
-
-export function getOrg(): { org: Organization } {
-	return getContext<{ org: Organization }>(OrgSymbol);
+export type OrgContext = { org: Organization };
+export function getOrg(): OrgContext {
+	return getContext<OrgContext>(OrgSymbol);
 }
 
 export const UserSymbol = Symbol('user');

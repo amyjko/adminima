@@ -19,7 +19,7 @@
 	let { title, kind = undefined, label = true, edit = undefined, children }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context?.org);
 </script>
 
 <svelte:head>
