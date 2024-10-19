@@ -12,6 +12,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Maintained
 
 - Upgraded to date-fns 4.1.
+- Upgraded Supabase.
 
 ## v0.6.11 2024-10-11
 
