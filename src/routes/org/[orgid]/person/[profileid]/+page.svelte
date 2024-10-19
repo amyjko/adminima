@@ -13,7 +13,7 @@
 
 {#if profile === null}
 	<Title title="oops" kind="error" />
-	<Oops text={(locale) => locale.error.noPerson} />
+	<Oops text="We couldn't find this person." />
 {:else}
 	<ProfileView {profile} />
 {/if}

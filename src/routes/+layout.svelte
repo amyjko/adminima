@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Page from '$lib/Page.svelte';
-	import { locale } from '$types/Locales';
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import {
@@ -46,10 +45,7 @@
 	const errors: ErrorsContext = writable([]);
 	setContext(ErrorsSymbol, errors);
 
-	let { strings, supabase, session } = $derived(data);
-	$effect(() => {
-		locale.set(strings);
-	});
+	let { supabase, session } = $derived(data);
 
 	onMount(() => {
 		const subscription = supabase.auth.onAuthStateChange((newUser, newSession) => {

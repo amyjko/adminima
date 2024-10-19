@@ -16,7 +16,7 @@
 	let process = $derived(processID ? org.getProcess(processID) : undefined);
 </script>
 
-{#if process === null}<Oops inline text={(locale) => locale.error.noProcess} />{:else}<Link
+{#if process === null}<Oops inline text="We couldn't find this process" />{:else}<Link
 		title={process && process.short.length > 0 ? process.title : undefined}
 		to={processID
 			? `/org/${org.getPath()}/process/${

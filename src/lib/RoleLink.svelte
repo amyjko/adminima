@@ -18,7 +18,7 @@
 	let path = $derived(role ? (role.short.length > 0 ? role.short : role.id) : undefined);
 </script>
 
-{#if role === null}<Oops inline text={(locale) => locale.error.noRole} />{:else}<Link
+{#if role === null}<Oops inline text="Unknown role" />{:else}<Link
 		title={role !== undefined && role.short.length > 0 ? role.title : undefined}
 		to={roleID ? `/org/${org.getPath()}/role/${path}` : `/org/${org.getPath()}/roles`}
 		kind="role"

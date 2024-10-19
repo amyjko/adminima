@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { locale, type Locale } from '../types/Locales';
+	import { type Locale } from '../types/Locales';
 
 	interface Props {
-		text?: string | ((locale: Locale) => string) | undefined;
+		text?: string | undefined;
 		inline?: boolean;
 		children?: import('svelte').Snippet;
 	}
@@ -11,7 +11,7 @@
 </script>
 
 <div class:inline>
-	{#if text}<span>{typeof text === 'string' ? text : $locale ? text($locale) : 'Error'}</span>{/if}
+	{#if text}<span>{typeof text === 'string' ? text : 'Error'}</span>{/if}
 	<span class="sub">{@render children?.()}</span>
 </div>
 

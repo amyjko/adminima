@@ -13,7 +13,7 @@
 </script>
 
 {#if role === null}
-	<Oops text={(locale) => locale.error.noRoleProcesses} />
+	<Oops text="We couldn't find this role." />
 {:else}
 	<RoleView {role} />
 {/if}

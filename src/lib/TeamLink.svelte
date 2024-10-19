@@ -16,7 +16,7 @@
 	let team = $derived(org.getTeam(id));
 </script>
 
-{#if team === null}<Oops inline text={(locale) => locale.error.noTeam} />{:else}<Link
+{#if team === null}<Oops inline text="Unknown team" />{:else}<Link
 		to="/org/{org.getPath()}/team/{id}"
 		kind="team">{team.name}</Link
 	>{/if}

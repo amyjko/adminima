@@ -1,12 +1,8 @@
-import { type Locale } from '$types/Locales';
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_API_URL } from '$env/static/public';
 import type { LayoutLoadEvent } from './$types';
 
 export const load = async ({ fetch, data, depends }: LayoutLoadEvent) => {
-	const response = await fetch(`/locales/en-US.json`);
-	const strings = (await response.json()) as Locale;
-
 	/**
 	 * Declare a dependency so the layout can be invalidated, for example, on
 	 * session refresh.
@@ -39,5 +35,5 @@ export const load = async ({ fetch, data, depends }: LayoutLoadEvent) => {
 		data: { session }
 	} = await supabase.auth.getSession();
 
-	return { session, supabase, strings };
+	return { session, supabase };
 };

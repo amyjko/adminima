@@ -22,5 +22,5 @@
 			)[0]}{:else}{profile.name} <sub>&lt;{profile.email}&gt;</sub>{/if}</Link
 	>
 {:else}
-	<Oops inline text={(locale) => locale.error.noPerson} />
+	<Oops inline text="Unknown person" />
 {/if}

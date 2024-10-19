@@ -1,7 +1,5 @@
 import { writable } from 'svelte/store';
 
-export const locale = writable<Locale | undefined>(undefined);
-
 export type Locale = {
 	name: string;
 	term: {
