@@ -46,6 +46,7 @@
 		cursor: default;
 		background: none;
 		color: currentColor;
+		box-shadow: none;
 	}
 
 	a.bland {
