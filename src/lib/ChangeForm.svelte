@@ -2,7 +2,8 @@
 	import { goto, invalidate } from '$app/navigation';
 	import Oops from './Oops.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, addError, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { addError, queryOrError } from '$routes/errors.svelte';
 	import type { ProcessID, RoleID } from '$types/Organization';
 	import Field from './Field.svelte';
 	import Button from './Button.svelte';

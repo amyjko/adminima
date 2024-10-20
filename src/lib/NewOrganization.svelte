@@ -4,7 +4,8 @@
 	import FormDialog from './FormDialog.svelte';
 	import Link from './Link.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import { getUser, addError } from '$routes/+layout.svelte';
+	import { getUser } from '$routes/+layout.svelte';
+	import { addError } from '$routes/errors.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 
 	const db = getDB();

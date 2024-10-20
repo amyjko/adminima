@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
-	import { getOrg, getDB, getUser, queryOrError } from '$routes/+layout.svelte';
+	import { getOrg, getDB, getUser } from '$routes/+layout.svelte';
+	import { queryOrError } from '$routes/errors.svelte';
 	import Title from '$lib/Title.svelte';
 	import { page } from '$app/stores';
 	import MarkupView from '$lib/MarkupView.svelte';

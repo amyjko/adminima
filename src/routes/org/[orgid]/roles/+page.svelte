@@ -2,7 +2,8 @@
 	import { goto } from '$app/navigation';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Field from '$lib/Field.svelte';
-	import { getOrg, getDB, getUser, addError } from '$routes/+layout.svelte';
+	import { getOrg, getDB, getUser } from '$routes/+layout.svelte';
+	import { addError } from '$routes/errors.svelte';
 	import Title from '$lib/Title.svelte';
 	import Flow from '$lib/Flow.svelte';
 	import Header from '$lib/Header.svelte';

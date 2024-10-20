@@ -3,7 +3,7 @@
 	import Title from './Title.svelte';
 	import type Organization from '$types/Organization';
 	import { getDB } from '$routes/+layout.svelte';
-	import { addError, queryOrError } from '$routes/+layout.svelte';
+	import { addError, queryOrError } from '$routes/errors.svelte';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Note from './Note.svelte';

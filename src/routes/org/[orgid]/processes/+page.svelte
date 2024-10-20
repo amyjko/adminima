@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, addError } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { addError } from '$routes/errors.svelte';
 	import ProcessLink from '$lib/ProcessLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';

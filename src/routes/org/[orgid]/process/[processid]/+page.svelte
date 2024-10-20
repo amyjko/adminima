@@ -11,7 +11,8 @@
 	import Title from '$lib/Title.svelte';
 	import Level from '$lib/Level.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, addError, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { addError, queryOrError } from '$routes/errors.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Concern from '$lib/Concern.svelte';
 	import { page } from '$app/stores';

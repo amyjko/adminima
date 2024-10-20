@@ -8,7 +8,8 @@
 	import Quote from './Quote.svelte';
 	import TimeView from './TimeView.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { queryOrError } from '$routes/errors.svelte';
 	import { type CommentID } from '$types/Organization';
 
 	interface Props {

@@ -4,7 +4,8 @@
 	import { getContext, tick } from 'svelte';
 	import Visibility from './Visibility.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, addError, queryOrError } from '$routes/+layout.svelte';
+	import { getDB } from '$routes/+layout.svelte';
+	import { addError, queryOrError } from '$routes/errors.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';

@@ -11,19 +11,6 @@
 		setContext(UserSymbol, context);
 	}
 
-	export function addError(message: string, error?: PostgrestError) {
-		errors.push({ message, error });
-	}
-
-	export async function queryOrError(query: Promise<PostgrestError | null>, message: string) {
-		const error = await query;
-		if (error) {
-			addError(message, error);
-			return error;
-		}
-		return null;
-	}
-
 	export const DBSymbol = Symbol('db');
 
 	export function getDB(): OrganizationsDB {
@@ -40,7 +27,7 @@
 <script lang="ts">
 	import Page from '$lib/Page.svelte';
 	import { getContext, onMount, setContext } from 'svelte';
-	import { get, writable, type Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import OrganizationsDB from '$database/OrganizationsDB';
 	import Error from '$lib/Error.svelte';
 	import { goto, invalidate } from '$app/navigation';

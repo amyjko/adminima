@@ -4,7 +4,8 @@
 	import Title from './Title.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { queryOrError } from '$routes/errors.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import type { ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';

@@ -7,7 +7,8 @@
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, queryOrError, addError, getUser } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { addError, queryOrError } from '$routes/errors.svelte';
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';

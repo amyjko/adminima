@@ -12,7 +12,8 @@
 	import Title from './Title.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, addError, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { addError, queryOrError } from '$routes/errors.svelte';
 	import timestampToDate from '$database/timestampToDate';
 	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';

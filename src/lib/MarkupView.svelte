@@ -4,7 +4,7 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
-	import { addError } from '$routes/+layout.svelte';
+	import { addError } from '$routes/errors.svelte';
 	import Note from './Note.svelte';
 	import Loading from './Loading.svelte';
 
