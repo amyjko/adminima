@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Field from '$lib/Field.svelte';
-	import { getOrg, getDB, getUser, addError, getErrors } from '$routes/+layout.svelte';
+	import { getOrg, getDB, getUser, addError } from '$routes/+layout.svelte';
 	import Title from '$lib/Title.svelte';
 	import Flow from '$lib/Flow.svelte';
 	import Header from '$lib/Header.svelte';
@@ -19,7 +19,6 @@
 	let org = $derived(context.org);
 
 	const db = getDB();
-	const errors = getErrors();
 	const user = getUser();
 
 	let newRole: string = $state('');
@@ -37,7 +36,7 @@
 			goto(`/org/${org.getPath()}/role/${data.id}`);
 			return true;
 		} else if (error) {
-			addError(errors, "We couldn't create the new role.", error);
+			addError("We couldn't create the new role.", error);
 			return false;
 		} else return false;
 	}
@@ -47,7 +46,7 @@
 	async function createTeam() {
 		const { data, error } = await db.createTeam(org.getID(), newTeam);
 		if (error) {
-			addError(errors, "We couldn't create the new team.", error);
+			addError("We couldn't create the new team.", error);
 			return false;
 		} else if (data) {
 			goto(`/org/${org.getPath()}/team/${data.id}`);

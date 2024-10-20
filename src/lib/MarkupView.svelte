@@ -4,7 +4,7 @@
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
-	import { addError, getErrors } from '$routes/+layout.svelte';
+	import { addError } from '$routes/+layout.svelte';
 	import Note from './Note.svelte';
 	import Loading from './Loading.svelte';
 
@@ -35,8 +35,6 @@
 	let scrollHeight = $derived(revisedText ? (input ? input.scrollHeight : height) : height);
 	let saving = $state(false);
 
-	const errors = getErrors();
-
 	// No edit function? Immediately update the markup.
 	$effect(() => {
 		if (edit === undefined) markup = revisedText;
@@ -58,7 +56,7 @@
 				const error = await edit(revisedText);
 				// If there was an error, show the error.
 				if (error) {
-					addError(errors, 'Unable to save markup.', error);
+					addError('Unable to save markup.', error);
 				}
 				// Otherwise, on success, show the revised text on the front end.
 				else {
@@ -66,7 +64,7 @@
 				}
 			} catch (err) {
 				// If there was an error, show it.
-				addError(errors, '' + err);
+				addError('' + err);
 			} finally {
 				// No matter what happens, stop saving and stop editing.
 				editing = false;

@@ -5,7 +5,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getDB, getUser, addError, getErrors } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError } from '$routes/+layout.svelte';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
 	import NewOrganization from '$lib/NewOrganization.svelte';
@@ -24,14 +24,13 @@
 
 	const user = getUser();
 	const db = getDB();
-	const errors = getErrors();
 
 	let orgs = $derived(data.orgs);
 	let isSelf = $derived($user && $user.id === $page.params.personid);
 
 	async function logout() {
 		const { error } = await db.signOut();
-		if (error) addError(errors, error.code ?? error.message);
+		if (error) addError(error.code ?? error.message);
 		else goto(`/login`);
 	}
 </script>

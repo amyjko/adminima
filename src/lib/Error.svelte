@@ -1,19 +1,16 @@
 <script lang="ts">
 	import Button, { Delete } from './Button.svelte';
-	import Oops from './Oops.svelte';
-	import { getErrors, type DBError } from '$routes/+layout.svelte';
+	import { errors, type DBError } from '$routes/errors.svelte';
 
 	interface Props {
 		error: DBError;
 	}
 
 	let { error }: Props = $props();
-
-	const errors = getErrors();
 </script>
 
 <div class="columns">
-	<Button tip="Dismiss this alert" action={() => errors.set($errors.filter((e) => e !== error))}
+	<Button tip="Dismiss this alert" action={() => errors.splice(errors.indexOf(error), 1)}
 		>{Delete}</Button
 	>
 	<div class="messages">

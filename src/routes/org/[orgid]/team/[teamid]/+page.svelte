@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
-	import { getOrg, getDB, getUser, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getOrg, getDB, getUser, queryOrError } from '$routes/+layout.svelte';
 	import Title from '$lib/Title.svelte';
 	import { page } from '$app/stores';
 	import MarkupView from '$lib/MarkupView.svelte';
@@ -16,7 +16,6 @@
 	const org = $derived(context.org);
 
 	const db = getDB();
-	const errors = getErrors();
 
 	let teamID = $derived($page.params.teamid);
 	let team = $derived(org.getTeam(teamID));
@@ -30,7 +29,6 @@
 		edit={$user && isAdmin
 			? (text) =>
 					queryOrError(
-						errors,
 						db.updateTeamName(team, text, $user.id),
 						"We couldn't update the team's name."
 					)
@@ -48,7 +46,6 @@
 		edit={isAdmin && $user
 			? (text) =>
 					queryOrError(
-						errors,
 						db.updateTeamDescription(team, text, $user.id),
 						"We couldn't update the team's description."
 					)
@@ -70,7 +67,7 @@
 	<Button
 		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {
-			const error = await queryOrError(errors, db.deleteTeam(teamID), "Couldn't delete the team.");
+			const error = await queryOrError(db.deleteTeam(teamID), "Couldn't delete the team.");
 			if (error === null) goto(`/org/${org.getPath()}/roles`);
 		}}
 		warning>{Delete} Delete this team</Button

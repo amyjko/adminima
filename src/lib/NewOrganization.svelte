@@ -4,18 +4,17 @@
 	import FormDialog from './FormDialog.svelte';
 	import Link from './Link.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import { getUser, addError, getErrors } from '$routes/+layout.svelte';
+	import { getUser, addError } from '$routes/+layout.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 
 	const db = getDB();
 	const user = getUser();
-	const errors = getErrors();
 
 	let submitting = $state(false);
 
 	async function create() {
 		if ($user === null || $user.email === undefined) {
-			addError(errors, "You're not logged in.");
+			addError("You're not logged in.");
 			return false;
 		}
 		submitting = false;
@@ -26,7 +25,7 @@
 			goto(`/org/${id}`);
 			return true;
 		} else {
-			addError(errors, "Couldn't create a new organization with this invite code", id ?? undefined);
+			addError("Couldn't create a new organization with this invite code", id ?? undefined);
 			return false;
 		}
 	}

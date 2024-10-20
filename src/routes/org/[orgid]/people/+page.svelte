@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser, queryOrError } from '$routes/+layout.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
@@ -22,7 +22,6 @@
 
 	const user = getUser();
 	const db = getDB();
-	const errors = getErrors();
 
 	let isAdmin = $derived($user && organization.hasAdminPerson($user.id));
 
@@ -47,17 +46,9 @@
 		match = undefined;
 		match = await db.getPersonWithEmail(email);
 		await (match === null
-			? queryOrError(
-					errors,
-					db.addPersonByEmail(organization.getID(), email, name),
-					"Couldn't add person."
-				)
+			? queryOrError(db.addPersonByEmail(organization.getID(), email, name), "Couldn't add person.")
 			: match !== null && match !== undefined
-				? queryOrError(
-						errors,
-						db.addPersonByID(organization.getID(), match.id),
-						"Couldn't add person."
-					)
+				? queryOrError(db.addPersonByID(organization.getID(), match.id), "Couldn't add person.")
 				: undefined);
 		newPersonEmail = '';
 
@@ -159,7 +150,6 @@
 									newRole = undefined;
 									if (roleID !== undefined)
 										await queryOrError(
-											errors,
 											db.assignPerson(organization.getID(), profile.id, roleID),
 											'Could not assign role.'
 										);
@@ -176,7 +166,6 @@
 											chromeless
 											action={async () => {
 												const error = await queryOrError(
-													errors,
 													db.unassignPerson(organization.getID(), profile.id, role.id),
 													'Could not unassign role.'
 												);
@@ -214,7 +203,6 @@
 							selection={profile.supervisor ?? undefined}
 							change={(profileID) => {
 								queryOrError(
-									errors,
 									db.updateProfileSupervisor(organization.getID(), profile.id, profileID ?? null),
 									"Couldn't update supervisor."
 								);
@@ -233,7 +221,6 @@
 								(organization.getAdminCount() > 1 || !organization.hasAdminProfile(profile.id))}
 							change={(on) =>
 								queryOrError(
-									errors,
 									db.updateAdmin(organization.getID(), profile.id, on),
 									"Couldn't update admin status."
 								)}
@@ -245,8 +232,7 @@
 					<td>
 						<Button
 							tip="Remove this person from the organization."
-							action={() =>
-								queryOrError(errors, db.removeProfile(profile.id), "Couldn't remove person.")}
+							action={() => queryOrError(db.removeProfile(profile.id), "Couldn't remove person.")}
 							active={!organization.hasAdminProfile(profile.id)}>{Delete}</Button
 						>
 					</td>

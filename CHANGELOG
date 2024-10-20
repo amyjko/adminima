@@ -13,6 +13,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Maintained
 
 - Centralized contexts in layout root.
+- Simplified global error list.
 - Upgraded to date-fns 4.1.
 - Upgraded Supabase.
 - Upgraded to Svelte 5.

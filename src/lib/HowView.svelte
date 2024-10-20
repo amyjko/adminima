@@ -4,7 +4,7 @@
 	import { getContext, tick } from 'svelte';
 	import Visibility from './Visibility.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, addError, queryOrError } from '$routes/+layout.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
@@ -23,7 +23,7 @@
 	let org = $derived(context.org);
 
 	const db = getDB();
-	const errors = getErrors();
+
 	const focusID = getContext<Writable<string | undefined>>('focusID');
 
 	let parent = $derived(org.getHowParent(how.id));
@@ -36,7 +36,7 @@
 	let deleted = $state(false);
 
 	function save(newText: string) {
-		return queryOrError(errors, db.updateHowText(how, newText), "Couldn't update step text.");
+		return queryOrError(db.updateHowText(how, newText), "Couldn't update step text.");
 	}
 
 	function toggleDone() {
@@ -52,13 +52,13 @@
 				parent,
 				parent.how.indexOf(how.id) + 1
 			);
-			if (error) addError(errors, 'Unable to insert how.', error);
+			if (error) addError('Unable to insert how.', error);
 			else if (id) focusID.set(id);
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
 			const { error, id } = await db.insertHow(process, how.visibility, how, 0);
-			if (error) addError(errors, 'Unable to insert how.', error);
+			if (error) addError('Unable to insert how.', error);
 			if (id) focusID.set(id);
 		}
 	}
@@ -78,7 +78,7 @@
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
 
-			const error = await queryOrError(errors, db.deleteHow(parent, how), "Couldn't delete how.");
+			const error = await queryOrError(db.deleteHow(parent, how), "Couldn't delete how.");
 			if (error) return;
 
 			focusID.set(newFocusID);
@@ -100,7 +100,6 @@
 			const [parent, previousHow] = result;
 			deleted = true;
 			const error = await queryOrError(
-				errors,
 				db.reparentHow(how, parent, previousHow, previousHow.how.length),
 				"Couldn't indent how."
 			);
@@ -126,7 +125,6 @@
 			const [parent, grandparent] = result;
 			deleted = true;
 			const error = await queryOrError(
-				errors,
 				db.reparentHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1),
 				"Couldn't unindent how."
 			);
@@ -165,7 +163,6 @@
 		if (parent) {
 			if (index >= 0 && index + dir < parent.how.length) {
 				const error = await queryOrError(
-					errors,
 					db.moveHow(how, parent, index + dir),
 					"Couldn't move how."
 				);

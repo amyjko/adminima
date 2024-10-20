@@ -3,7 +3,7 @@
 	import Title from './Title.svelte';
 	import type Organization from '$types/Organization';
 	import { getDB } from '$routes/+layout.svelte';
-	import { addError, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { addError, queryOrError } from '$routes/+layout.svelte';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Note from './Note.svelte';
@@ -20,7 +20,6 @@
 
 	const user = getUser();
 	const db = getDB();
-	const errors = getErrors();
 
 	let isAdmin = $derived($user && organization.hasAdminPerson($user.id));
 	let editable = $derived(isAdmin);
@@ -32,7 +31,6 @@
 	edit={$user && isAdmin
 		? (text) =>
 				queryOrError(
-					errors,
 					db.updateOrgName(organization, text, $user.id),
 					"Couldn't update organization name."
 				)
@@ -47,7 +45,6 @@
 					? (vis) =>
 							vis === 'org' || vis === 'admin' || vis === 'public'
 								? queryOrError(
-										errors,
 										db.updateOrgVisibility(organization, vis, $user.id),
 										"Couldn't update organization visibility."
 									)
@@ -69,9 +66,9 @@
 					const available = await db.pathIsAvailable(text);
 
 					if (available) {
-						await queryOrError(errors, db.addOrgPath(organization, text), "Couldn't update path.");
+						await queryOrError(db.addOrgPath(organization, text), "Couldn't update path.");
 						goto(`/org/${text}`, { replaceState: true });
-					} else addError(errors, 'This path is not available');
+					} else addError('This path is not available');
 
 					return null;
 				}}

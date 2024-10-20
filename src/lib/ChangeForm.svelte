@@ -2,7 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import Oops from './Oops.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError, queryOrError } from '$routes/+layout.svelte';
 	import type { ProcessID, RoleID } from '$types/Organization';
 	import Field from './Field.svelte';
 	import Button from './Button.svelte';
@@ -27,7 +27,6 @@
 	const organization = getOrg();
 	const user = getUser();
 	const db = getDB();
-	const errors = getErrors();
 
 	let isAdmin = $derived($user && organization.org.hasAdminPerson($user.id));
 
@@ -43,7 +42,7 @@
 				process ? [process] : [],
 				role ? [role] : []
 			);
-			if (error) addError(errors, "Couldn't create the change.", error);
+			if (error) addError("Couldn't create the change.", error);
 			else if (change) {
 				const newChange = `/org/${organization.org.getPath()}/change/${change.id}`;
 				await invalidate(newChange);
@@ -120,7 +119,6 @@
 		edit={$user
 			? (text) =>
 					queryOrError(
-						errors,
 						db.updateOrgPrompt(organization.org, text, $user.id),
 						"Couldn't update prompt"
 					)

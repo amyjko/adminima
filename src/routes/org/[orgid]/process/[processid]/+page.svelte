@@ -11,7 +11,7 @@
 	import Title from '$lib/Title.svelte';
 	import Level from '$lib/Level.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError, queryOrError } from '$routes/+layout.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Concern from '$lib/Concern.svelte';
 	import { page } from '$app/stores';
@@ -43,7 +43,6 @@
 
 	const user = getUser();
 	const db = getDB();
-	const errors = getErrors();
 
 	const States = { draft: 'Draft', active: 'Active', archived: 'Archived' };
 
@@ -94,7 +93,7 @@
 	async function createFirstSubtask(how: HowRow) {
 		if (process === null) return;
 		const { error, id } = await db.insertHow(process, how.visibility, how, 0);
-		if (error) addError(errors, 'Unable to insert how.', error);
+		if (error) addError('Unable to insert how.', error);
 		else if (id) focusID.set(id);
 	}
 
@@ -138,7 +137,7 @@
 								: undefined;
 		if (periodToAdd) {
 			const error = await db.addProcessPeriod(process, periodToAdd);
-			if (error) addError(errors, 'Unable to add period.', error);
+			if (error) addError('Unable to add period.', error);
 		}
 	}
 </script>
@@ -162,7 +161,6 @@
 		edit={$user && editable
 			? (text) =>
 					queryOrError(
-						errors,
 						db.updateProcessTitle(process, text, $user.id),
 						"Couldn't update process title."
 					)
@@ -196,7 +194,6 @@
 					change={async (status) => {
 						if ($user && (status === 'draft' || status === 'active' || status === 'archived'))
 							return await queryOrError(
-								errors,
 								db.updateProcessState(process, status, $user.id),
 								"Couldn't update the process's state"
 							);
@@ -217,7 +214,6 @@
 					})}
 					change={(concern) =>
 						queryOrError(
-							errors,
 							db.updateProcessConcern(process, concern ?? '', $user.id),
 							"Couldn't update process's concern"
 						)}
@@ -236,7 +232,6 @@
 					valid={() => newConcern.length > 0 && org.getConcerns().indexOf(newConcern) === -1}
 					action={async () => {
 						const error = await queryOrError(
-							errors,
 							db.updateProcessConcern(process, newConcern, $user.id),
 							"Couldn't update concern."
 						);
@@ -253,7 +248,6 @@
 					path={'...process/'}
 					update={async (text) => {
 						await queryOrError(
-							errors,
 							db.updateProcessShortName(process, text),
 							"Couldn't update process's short name"
 						);
@@ -345,13 +339,13 @@
 				edit={editable
 					? async (period) => {
 							const error = await db.updateProcessPeriod(process, period, index);
-							if (error) addError(errors, "Couldn't update period.", error);
+							if (error) addError("Couldn't update period.", error);
 						}
 					: undefined}
 				remove={editable
 					? async () => {
 							const error = await db.removeProcessPeriod(process, index);
-							if (error) addError(errors, "Coudln't remove period");
+							if (error) addError("Coudln't remove period");
 						}
 					: undefined}
 			/>
@@ -420,7 +414,7 @@
 			action={async () => {
 				try {
 					const { error } = await db.deleteProcess(process.id);
-					if (error) addError(errors, "Couldn't delete this", error);
+					if (error) addError("Couldn't delete this", error);
 					else goto(`/org/${org.getPath()}/processes`);
 				} catch (_) {
 					deleteError = "We couldn't delete this";

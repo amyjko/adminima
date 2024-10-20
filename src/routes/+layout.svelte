@@ -11,26 +11,14 @@
 		setContext(UserSymbol, context);
 	}
 
-	export const ErrorsSymbol = Symbol('errors');
-	export type DBError = { message: string; error: PostgrestError | undefined };
-	export type ErrorsContext = Writable<DBError[]>;
-
-	export function getErrors(): ErrorsContext {
-		return getContext<ErrorsContext>(ErrorsSymbol);
+	export function addError(message: string, error?: PostgrestError) {
+		errors.push({ message, error });
 	}
 
-	export function addError(errors: ErrorsContext, message: string, error?: PostgrestError) {
-		return errors.set([...get(errors), { message, error }]);
-	}
-
-	export async function queryOrError(
-		errors: ErrorsContext,
-		query: Promise<PostgrestError | null>,
-		message: string
-	) {
+	export async function queryOrError(query: Promise<PostgrestError | null>, message: string) {
 		const error = await query;
 		if (error) {
-			addError(errors, message, error);
+			addError(message, error);
 			return error;
 		}
 		return null;
@@ -62,6 +50,7 @@
 	import type { LayoutData } from './$types';
 	import Organization from '$types/Organization';
 	import { type Snippet } from 'svelte';
+	import { errors } from './errors.svelte';
 
 	interface Props {
 		data: LayoutData;
@@ -90,9 +79,6 @@
 		user.set(data.session ? getUserMetadata(data.session.user) : null);
 	});
 
-	const errors: ErrorsContext = writable([]);
-	setContext(ErrorsSymbol, errors);
-
 	let { supabase, session } = $derived(data);
 
 	onMount(() => {
@@ -116,7 +102,7 @@
 </script>
 
 <div class="errors">
-	{#each $errors as error}
+	{#each errors as error}
 		<Error {error} />
 	{/each}
 </div>

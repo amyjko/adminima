@@ -12,7 +12,7 @@
 	import Title from './Title.svelte';
 	import Status from './Status.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError, queryOrError } from '$routes/+layout.svelte';
 	import timestampToDate from '$database/timestampToDate';
 	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
@@ -36,7 +36,6 @@
 
 	const user = getUser();
 	const db = getDB();
-	const errors = getErrors();
 
 	const Statuses = {
 		triage: 'Triage',
@@ -82,11 +81,7 @@
 	kind="change"
 	edit={editable
 		? (text) =>
-				queryOrError(
-					errors,
-					db.udpateChangeWhat(change, text),
-					"Couldn't update the change's title"
-				)
+				queryOrError(db.udpateChangeWhat(change, text), "Couldn't update the change's title")
 		: undefined}
 >
 	<Status status={change.status} />
@@ -98,7 +93,6 @@
 			change={async (status) => {
 				if ($user && status !== undefined && isStatus(status))
 					return await queryOrError(
-						errors,
 						db.updateChangeStatus(change, status, $user.id),
 						"Couldn't update the change's status."
 					);
@@ -134,7 +128,6 @@
 			]}
 			change={(person) => {
 				queryOrError(
-					errors,
 					db.updateChangeLead(change, person ?? null),
 					"Couldn't update change processes."
 				);
@@ -151,7 +144,6 @@
 	edit={editable
 		? (text) =>
 				queryOrError(
-					errors,
 					db.updateChangeDescription(change, text),
 					"Couldn't update change description."
 				)
@@ -165,11 +157,7 @@
 	placeholder="No proposal"
 	edit={editable
 		? (text) =>
-				queryOrError(
-					errors,
-					db.updateChangeProposal(change, text),
-					"Couldn't update change description."
-				)
+				queryOrError(db.updateChangeProposal(change, text), "Couldn't update change description.")
 		: undefined}
 />
 
@@ -182,7 +170,6 @@
 				tip="Remove this role from the affected roles."
 				action={() =>
 					queryOrError(
-						errors,
 						db.updateChangeRoles(
 							change,
 							change.roles.filter((r) => r !== role)
@@ -209,7 +196,6 @@
 			change={(r) => {
 				if (r !== undefined) {
 					queryOrError(
-						errors,
 						db.updateChangeRoles(change, Array.from(new Set([...change.roles, r]))),
 						"Couldn't update change roles."
 					);
@@ -228,7 +214,6 @@
 			tip="Remove this process from the affected processes."
 			action={() =>
 				queryOrError(
-					errors,
 					db.updateChangeProcesses(
 						change,
 						change.processes.filter((p) => p !== process)
@@ -254,7 +239,6 @@
 			change={(p) => {
 				if (p !== undefined) {
 					queryOrError(
-						errors,
 						db.updateChangeProcesses(change, Array.from(new Set([...change.processes, p]))),
 						"Couldn't update change processes."
 					);
@@ -323,7 +307,7 @@
 		tip="Permanently delete this change."
 		action={async () => {
 			const { error } = await db.deleteChange(change.id);
-			if (error) addError(errors, "Couldn't delete this change.", error);
+			if (error) addError("Couldn't delete this change.", error);
 			else goto(`/org/${org.getPath()}`);
 		}}
 		warning>{Delete} Delete this change</Button

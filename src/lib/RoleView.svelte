@@ -7,7 +7,7 @@
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getErrors, queryOrError, addError, getUser } from '$routes/+layout.svelte';
+	import { getDB, queryOrError, addError, getUser } from '$routes/+layout.svelte';
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
@@ -30,7 +30,6 @@
 	let org = $derived(context.org);
 
 	const db = getDB();
-	const errors = getErrors();
 
 	let profiles = $derived(org.getRoleProfiles(role.id));
 	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
@@ -45,8 +44,7 @@
 	title={role.title}
 	kind="role"
 	edit={isAdmin && $user
-		? (text) =>
-				queryOrError(errors, db.updateRoleTitle(role, text, $user.id), "Couldn't update role title")
+		? (text) => queryOrError(db.updateRoleTitle(role, text, $user.id), "Couldn't update role title")
 		: undefined}
 >
 	{#if role.team}<TeamLink id={role.team} />{:else}no team{/if}
@@ -63,7 +61,6 @@
 			change={async (team) => {
 				if (isAdmin && $user) {
 					return await queryOrError(
-						errors,
 						db.updateRoleTeam(role, team ?? null, org.getTeams().find((t) => t.id)?.name, $user.id),
 						"Couldn't update role team"
 					);
@@ -75,11 +72,7 @@
 			short={role.short[0] ?? ''}
 			path={'...role/'}
 			update={async (text) => {
-				await queryOrError(
-					errors,
-					db.updateRoleShortName(role, text),
-					"Couldn't update role short name"
-				);
+				await queryOrError(db.updateRoleShortName(role, text), "Couldn't update role short name");
 				goto(`/org/${org.getPath()}/role/${text.length > 0 ? text : role.id}`, {
 					replaceState: true
 				});
@@ -99,7 +92,6 @@
 	edit={$user
 		? (text) =>
 				queryOrError(
-					errors,
 					db.updateRoleDescription(role, text, $user.id),
 					"Couldn't update role description."
 				)
@@ -155,7 +147,7 @@
 		action={async () => {
 			const error = await db.deleteRole(role.orgid, role.id);
 			if (error) {
-				addError(errors, "We couldn't delete this role.", error);
+				addError("We couldn't delete this role.", error);
 			} else goto(`/org/${org.getPath()}/roles`);
 		}}
 		warning>{Delete} Delete this role</Button

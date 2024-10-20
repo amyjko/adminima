@@ -8,7 +8,7 @@
 	import Quote from './Quote.svelte';
 	import TimeView from './TimeView.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser, queryOrError } from '$routes/+layout.svelte';
 	import { type CommentID } from '$types/Organization';
 
 	interface Props {
@@ -23,7 +23,6 @@
 
 	const db = getDB();
 	const user = getUser();
-	const errors = getErrors();
 
 	let admin = $derived($user && org.hasAdminPerson($user.id));
 </script>
@@ -42,7 +41,7 @@
 					markup={comment.what}
 					placeholder="—"
 					edit={async (text) =>
-						queryOrError(errors, db.updateComment(comment, text), 'Unable to save comment.')}
+						queryOrError(db.updateComment(comment, text), 'Unable to save comment.')}
 				/>
 			{:else}
 				{comment.what}
@@ -54,7 +53,7 @@
 			<Button
 				tip="Delete this comment"
 				warning
-				action={() => queryOrError(errors, remove(comment.id), 'Unable to delete comment.')}
+				action={() => queryOrError(remove(comment.id), 'Unable to delete comment.')}
 				>{Delete}</Button
 			>
 		</td>{/if}

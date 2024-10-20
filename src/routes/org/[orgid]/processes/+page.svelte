@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, getErrors, addError } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError } from '$routes/+layout.svelte';
 	import ProcessLink from '$lib/ProcessLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
@@ -26,7 +26,6 @@
 
 	const user = getUser();
 	const db = getDB();
-	const errors = getErrors();
 
 	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
 
@@ -98,7 +97,7 @@
 	async function newProcess() {
 		const { error, id } = await db.addProcess(org.getID(), title, org.getVisibility());
 		if (error) {
-			addError(errors, "Couldn't add new process", error);
+			addError("Couldn't add new process", error);
 			return false;
 		} else {
 			goto(`/org/${org.getPath()}/process/${id}`);

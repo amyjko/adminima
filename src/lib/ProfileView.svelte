@@ -4,7 +4,7 @@
 	import Title from './Title.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser, getErrors, queryOrError } from '$routes/+layout.svelte';
+	import { getDB, getUser, queryOrError } from '$routes/+layout.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import type { ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';
@@ -23,7 +23,6 @@
 	let org = $derived(context.org);
 
 	const db = getDB();
-	const errors = getErrors();
 
 	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
 	let roles = $derived(org.getProfileRoles(profile.id));
@@ -34,7 +33,7 @@
 	title={profile.name.length === 0 ? '(no name)' : profile.name}
 	kind="person"
 	edit={$user && (profile.personid === $user.id || isAdmin)
-		? (text) => queryOrError(errors, db.updateProfileName(profile, text), "Couldn't update name")
+		? (text) => queryOrError(db.updateProfileName(profile, text), "Couldn't update name")
 		: undefined}
 >
 	{profile.email}
@@ -52,8 +51,7 @@
 	markup={profile.bio}
 	placeholder="No bio"
 	edit={$user
-		? (text) =>
-				queryOrError(errors, db.updateProfileBio(profile, text), "Couldn't update profile bio.")
+		? (text) => queryOrError(db.updateProfileBio(profile, text), "Couldn't update profile bio.")
 		: undefined}
 />
 
