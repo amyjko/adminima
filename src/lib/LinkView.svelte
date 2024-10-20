@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { default as MarkupLink } from '../markup/Link';
 	import Link from '$lib/Link.svelte';
-	import { getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 

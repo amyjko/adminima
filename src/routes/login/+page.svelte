@@ -7,7 +7,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getUser } from '$lib/contexts.svelte';
+	import { getUser } from '$routes/+layout.svelte';
 	import validEmail from '../validEmail';
 
 	interface Props {

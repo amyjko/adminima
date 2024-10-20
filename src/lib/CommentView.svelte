@@ -7,7 +7,8 @@
 	import PersonLink from './ProfileLink.svelte';
 	import Quote from './Quote.svelte';
 	import TimeView from './TimeView.svelte';
-	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getUser, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import { type CommentID } from '$types/Organization';
 
 	interface Props {

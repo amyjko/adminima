@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getUser, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';

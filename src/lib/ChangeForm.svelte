@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
 	import Oops from './Oops.svelte';
-	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import type { ProcessID, RoleID } from '$types/Organization';
 	import Field from './Field.svelte';
 	import Button from './Button.svelte';

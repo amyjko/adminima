@@ -2,7 +2,7 @@
 	import type { RoleID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import { getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 
 	interface Props {
 		roleID: RoleID | null;

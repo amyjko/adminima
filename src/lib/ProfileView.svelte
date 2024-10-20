@@ -3,7 +3,8 @@
 	import RoleLink from './RoleLink.svelte';
 	import Title from './Title.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
-	import { getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getUser, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import type { ProfileRow } from '$database/OrganizationsDB';
 	import Notice from './Notice.svelte';

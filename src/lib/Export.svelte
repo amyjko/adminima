@@ -2,7 +2,7 @@
 	import writeXlsxFile, { type SheetData } from 'write-excel-file';
 	import Button from './Button.svelte';
 	import Tip from './Tip.svelte';
-	import { getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 	import type { HowRow } from '$database/OrganizationsDB';
 
 	const context = getOrg();

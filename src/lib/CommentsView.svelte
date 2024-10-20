@@ -6,7 +6,7 @@
 	import Dialog from './Dialog.svelte';
 	import Header from './Header.svelte';
 	import Loading from './Loading.svelte';
-	import { getDB } from './contexts.svelte';
+	import { getDB } from '$routes/+layout.svelte';
 	import Table from './Table.svelte';
 
 	interface Props {

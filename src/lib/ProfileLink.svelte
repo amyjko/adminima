@@ -2,7 +2,7 @@
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
 	import type { ProfileRow } from '$database/OrganizationsDB';
-	import { getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 
 	interface Props {
 		profile: ProfileRow | null;

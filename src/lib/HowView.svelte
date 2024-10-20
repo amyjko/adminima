@@ -3,7 +3,8 @@
 	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
 	import { getContext, tick } from 'svelte';
 	import Visibility from './Visibility.svelte';
-	import { addError, getDB, getErrors, getOrg, queryOrError } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';

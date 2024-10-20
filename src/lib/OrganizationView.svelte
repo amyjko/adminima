@@ -2,13 +2,15 @@
 	import MarkupView from './MarkupView.svelte';
 	import Title from './Title.svelte';
 	import type Organization from '$types/Organization';
-	import { addError, getDB, getErrors, getUser, queryOrError } from './contexts.svelte';
+	import { getDB } from '$routes/+layout.svelte';
+	import { addError, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import Visibility from './Visibility.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Note from './Note.svelte';
 	import { goto } from '$app/navigation';
 	import PathEditor from './PathEditor.svelte';
 	import Export from './Export.svelte';
+	import { getUser } from '$routes/+layout.svelte';
 
 	interface Props {
 		organization: Organization;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Link from './Link.svelte';
-	import { getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 	import Oops from './Oops.svelte';
 	import type { TeamID } from '$types/Organization';
 

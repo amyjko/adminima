@@ -5,7 +5,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
-	import { addError, getDB, getErrors, getUser } from '$lib/contexts.svelte';
+	import { getDB, getUser, addError, getErrors } from '$routes/+layout.svelte';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
 	import PersonLink from '$lib/ProfileLink.svelte';
 	import NewOrganization from '$lib/NewOrganization.svelte';

@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import ChangeView from '$lib/ChangeView.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getOrg } from '$lib/contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 
 	const context = getOrg();
 	let org = $derived(context.org);

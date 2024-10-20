@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { getOrg, getUser } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getUser } from '$routes/+layout.svelte';
 
 	interface Props {
 		admin?: boolean;

@@ -6,7 +6,8 @@
 	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
-	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getErrors, queryOrError, addError, getUser } from '$routes/+layout.svelte';
 	import Header from './Header.svelte';
 	import TeamLink from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';

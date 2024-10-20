@@ -5,7 +5,8 @@
 	import Level from './Level.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import Select from './Select.svelte';
-	import { getDB, getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB } from '$routes/+layout.svelte';
 
 	interface Props {
 		how: HowRow;

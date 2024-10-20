@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
 	import OrgNav from './OrgNav.svelte';

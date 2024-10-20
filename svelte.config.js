@@ -11,7 +11,8 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			$types: 'src/types',
-			$database: 'src/database'
+			$database: 'src/database',
+			$routes: 'src/routes'
 		},
 		version: {
 			pollInterval: 600000

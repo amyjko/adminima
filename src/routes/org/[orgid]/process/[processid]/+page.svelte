@@ -10,7 +10,8 @@
 	import { goto } from '$app/navigation';
 	import Title from '$lib/Title.svelte';
 	import Level from '$lib/Level.svelte';
-	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from '$lib/contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Concern from '$lib/Concern.svelte';
 	import { page } from '$app/stores';

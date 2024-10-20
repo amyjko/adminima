@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Changes from '$lib/Changes.svelte';
-	import { getOrg } from '$lib/contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 	import Paragraph from '$lib/Paragraph.svelte';
 	import Title from '$lib/Title.svelte';
 	import Link from '$lib/Link.svelte';

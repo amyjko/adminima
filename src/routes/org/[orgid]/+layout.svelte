@@ -2,7 +2,7 @@
 	import Link from '$lib/Link.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import Title from '$lib/Title.svelte';
-	import { getDB, OrgSymbol } from '$lib/contexts.svelte';
+	import { getDB, OrgSymbol } from '$routes/+layout.svelte';
 	import { onMount, setContext, type Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 	import Organization from '$types/Organization';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button, { Delete } from './Button.svelte';
 	import Oops from './Oops.svelte';
-	import { getErrors, type DBError } from './contexts.svelte';
+	import { getErrors, type DBError } from '$routes/+layout.svelte';
 
 	interface Props {
 		error: DBError;

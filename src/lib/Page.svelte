@@ -4,7 +4,8 @@
 	import Loading from './Loading.svelte';
 	import Logo from './Logo';
 	import Note from './Note.svelte';
-	import { getUser } from './contexts.svelte';
+	import { getUser } from '$routes/+layout.svelte';
+
 	/** @type {{children?: import('svelte').Snippet}} */
 	let { children } = $props();
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ProcessRow } from '$database/OrganizationsDB';
-	import { getOrg } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 	import Link from './Link.svelte';
 
 	interface Props {

@@ -4,7 +4,8 @@
 	import ChangeLink from './ChangeLink.svelte';
 	import PersonLink from './ProfileLink.svelte';
 	import Status from './Status.svelte';
-	import { getOrg, getUser } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getUser } from '$routes/+layout.svelte';
 	import Table from './Table.svelte';
 	import Field from './Field.svelte';
 	import Visibility from './Visibility.svelte';

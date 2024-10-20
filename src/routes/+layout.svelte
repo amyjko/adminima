@@ -1,31 +1,79 @@
+<script module lang="ts">
+	import type { PostgrestError } from '@supabase/postgrest-js';
+
+	export const UserSymbol = Symbol('user');
+	export type UserContext = Writable<{ id: string; email: string | undefined } | null>;
+
+	export function getUser(): UserContext {
+		return getContext<UserContext>(UserSymbol);
+	}
+	export function setUser(context: UserContext | null) {
+		setContext(UserSymbol, context);
+	}
+
+	export const ErrorsSymbol = Symbol('errors');
+	export type DBError = { message: string; error: PostgrestError | undefined };
+	export type ErrorsContext = Writable<DBError[]>;
+
+	export function getErrors(): ErrorsContext {
+		return getContext<ErrorsContext>(ErrorsSymbol);
+	}
+
+	export function addError(errors: ErrorsContext, message: string, error?: PostgrestError) {
+		return errors.set([...get(errors), { message, error }]);
+	}
+
+	export async function queryOrError(
+		errors: ErrorsContext,
+		query: Promise<PostgrestError | null>,
+		message: string
+	) {
+		const error = await query;
+		if (error) {
+			addError(errors, message, error);
+			return error;
+		}
+		return null;
+	}
+
+	export const DBSymbol = Symbol('db');
+
+	export function getDB(): OrganizationsDB {
+		return getContext<OrganizationsDB>(DBSymbol);
+	}
+
+	export const OrgSymbol = Symbol('organization');
+	export type OrgContext = { org: Organization };
+	export function getOrg(): OrgContext {
+		return getContext<OrgContext>(OrgSymbol);
+	}
+</script>
+
 <script lang="ts">
 	import Page from '$lib/Page.svelte';
-	import { onMount, setContext } from 'svelte';
-	import { writable } from 'svelte/store';
-	import {
-		DBSymbol,
-		ErrorsSymbol,
-		UserSymbol,
-		type ErrorsContext,
-		type UserContext
-	} from '$lib/contexts.svelte';
-	import Organizations from '$database/OrganizationsDB.js';
+	import { getContext, onMount, setContext } from 'svelte';
+	import { get, writable, type Writable } from 'svelte/store';
+	import OrganizationsDB from '$database/OrganizationsDB';
 	import Error from '$lib/Error.svelte';
 	import { goto, invalidate } from '$app/navigation';
 	import Note from '$lib/Note.svelte';
 	import Link from '$lib/Link.svelte';
 	import type { User } from '@supabase/supabase-js';
 	import type { LayoutData } from './$types';
+	import Organization from '$types/Organization';
+	import { type Snippet } from 'svelte';
 
 	interface Props {
 		data: LayoutData;
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
 	let { data, children }: Props = $props();
 
-	let db = $state(new Organizations(data.supabase));
+	let db = $state(new OrganizationsDB(data.supabase));
 	setContext(DBSymbol, db);
+
+	// Update client when data updates.
 	$effect(() => {
 		db.setSupabaseClient(data.supabase);
 	});

@@ -2,7 +2,7 @@
 	import RoleView from '$lib/RoleView.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import { page } from '$app/stores';
-	import { getOrg } from '$lib/contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
 
 	const context = getOrg();
 	let org = $derived(context.org);

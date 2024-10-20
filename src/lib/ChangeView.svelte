@@ -11,7 +11,8 @@
 	import { goto } from '$app/navigation';
 	import Title from './Title.svelte';
 	import Status from './Status.svelte';
-	import { addError, getDB, getErrors, getOrg, getUser, queryOrError } from './contexts.svelte';
+	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getUser, addError, getErrors, queryOrError } from '$routes/+layout.svelte';
 	import timestampToDate from '$database/timestampToDate';
 	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
@@ -31,7 +32,7 @@
 	let deleteError: string | undefined = undefined;
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context?.org);
 
 	const user = getUser();
 	const db = getDB();
@@ -48,7 +49,7 @@
 
 	const isStatus = (x: string): x is keyof typeof Statuses => x in Statuses;
 
-	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
+	let isAdmin = $derived($user && org?.hasAdminPerson($user.id));
 	let editable = $derived(
 		$user && (isAdmin || change.who === $user.id || change.lead === $user.id)
 	);
