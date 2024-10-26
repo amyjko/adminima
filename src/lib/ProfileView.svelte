@@ -58,7 +58,10 @@
 
 <Header>Roles</Header>
 
-<Paragraph>Roles and recurring processes this person is accountable or responsible for.</Paragraph>
+<Paragraph
+	>Roles and recurring processes this person is accountable or responsible for. Use this like a to
+	do list, to check for upcoming tasks.</Paragraph
+>
 {#if roles.length > 0}
 	{#each roles as role}
 		<RoleLink roleID={role.id} />
