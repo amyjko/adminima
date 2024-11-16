@@ -9,6 +9,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Numbered list rendering.
 
+### Maintenance
+
+- Updated point releases of all dependencies.
+
 ## v0.7.0 2024-10-19
 
 ### Fixed
