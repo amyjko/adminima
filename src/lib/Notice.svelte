@@ -10,7 +10,7 @@
 
 <style>
 	div {
-		display: inline-block;
+		display: block;
 		background-color: var(--warning);
 		color: var(--background);
 		padding: var(--padding);

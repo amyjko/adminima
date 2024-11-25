@@ -10,6 +10,11 @@
 	import Field from './Field.svelte';
 	import Visibility from './Visibility.svelte';
 	import Oops from './Oops.svelte';
+	import Flow from './Flow.svelte';
+	import StatusChooser from './StatusChooser.svelte';
+	import Labeled from './Labeled.svelte';
+	import { type StatusType } from './status';
+	import Notice from './Notice.svelte';
 
 	interface Props {
 		changes: ChangeRow[];
@@ -29,9 +34,10 @@
 			($user !== null && org.hasPerson($user.id))
 	);
 
-	let filter = $state('');
-	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
-	let filteredChanges = $derived(
+	let filterText = $state('');
+	let filterStatus = $state<undefined | StatusType>(undefined);
+	let lowerFilter = $derived(filterText.toLocaleLowerCase().trim());
+	let textFilteredChanges = $derived(
 		lowerFilter.length > 0
 			? changes.filter(
 					(change) =>
@@ -41,6 +47,11 @@
 				)
 			: changes
 	);
+	let statusFilteredChanges = $derived(
+		filterStatus === undefined
+			? textFilteredChanges
+			: textFilteredChanges.filter((change) => change.status === filterStatus)
+	);
 </script>
 
 {#if !visible}
@@ -48,7 +59,17 @@
 {/if}
 
 {#if changes.length > 0}
-	<Field label="Filter" bind:text={filter} />
+	<Flow>
+		<Field label="Filter by text" bind:text={filterText} />
+		<Labeled label="Filter by status">
+			<StatusChooser
+				none={true}
+				tip="Filter by status"
+				change={(value) => (filterStatus = value)}
+				value={undefined}
+			/>
+		</Labeled>
+	</Flow>
 	<Table>
 		<thead>
 			<tr>
@@ -59,7 +80,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each filteredChanges
+			{#each statusFilteredChanges
 				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
 				.sort((a, b) => Levels[a.status] - Levels[b.status]) as change}
 				<tr>
@@ -71,6 +92,10 @@
 							/>{:else}&mdash;{/if}</td
 					>
 					<td><ChangeLink id={change.id} /></td>
+				</tr>
+			{:else}
+				<tr>
+					<td colspan="4"><Notice>All changes filtered.</Notice></td>
 				</tr>
 			{/each}
 		</tbody>

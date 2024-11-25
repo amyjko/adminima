@@ -23,7 +23,7 @@
 		title={tip}
 		aria-label={tip}
 		bind:value={selection}
-		onchange={change(selection)}
+		onchange={() => change(selection)}
 		class:fit={typeof fit === 'boolean' && fit === true ? 'fit' : ''}
 		style:width={typeof fit === 'string' ? fit : ''}
 		disabled={active === false}

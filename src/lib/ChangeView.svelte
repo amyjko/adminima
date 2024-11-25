@@ -23,6 +23,8 @@
 	import Visibility from './Visibility.svelte';
 	import Table from './Table.svelte';
 	import Labeled from './Labeled.svelte';
+	import StatusChooser from './StatusChooser.svelte';
+	import { isStatus } from './status';
 
 	interface Props {
 		change: ChangeRow;
@@ -37,17 +39,6 @@
 
 	const user = getUser();
 	const db = getDB();
-
-	const Statuses = {
-		triage: 'Triage',
-		backlog: 'Backlog',
-		active: 'Active',
-		blocked: 'Blocked',
-		done: 'Done',
-		declined: 'Declined'
-	} as const;
-
-	const isStatus = (x: string): x is keyof typeof Statuses => x in Statuses;
 
 	let isAdmin = $derived($user && org?.hasAdminPerson($user.id));
 	let editable = $derived(
@@ -87,11 +78,11 @@
 >
 	<Status status={change.status} />
 	{#if editable}
-		<Select
+		<StatusChooser
 			tip="Change the status of this change"
-			selection={change.status}
-			options={Object.entries(Statuses).map(([key, value]) => ({ value: key, label: value }))}
-			change={async (status) => {
+			value={change.status}
+			none={false}
+			change={async (status: string | undefined) => {
 				if ($user && status !== undefined && isStatus(status))
 					return await queryOrError(
 						db.updateChangeStatus(change, status, $user.id),
