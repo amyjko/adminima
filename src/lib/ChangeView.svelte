@@ -264,9 +264,13 @@
 							change.id,
 							comments.data.map((c) => c.id)
 						);
-						if (result) return false;
-						newComment = '';
-						return true;
+						if (result) {
+							addError(result.message);
+							return false;
+						} else {
+							newComment = '';
+							return true;
+						}
 					}}>Submit</Button
 				>
 			{/if}

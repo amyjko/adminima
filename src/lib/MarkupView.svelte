@@ -22,7 +22,7 @@
 	}
 
 	let {
-		markup = $bindable(),
+		markup = $bindable(''),
 		placeholder,
 		edit = undefined,
 		editing = $bindable(false),
@@ -102,7 +102,7 @@
 		</div>
 	{:else}
 		<div class="blocks" bind:clientHeight={height}>
-			{#if markup === ''}<em>{placeholder}</em>{:else}<BlocksView
+			{#if markup === '' || markup === undefined}<em>{placeholder}</em>{:else}<BlocksView
 					blocks={parse(markup).blocks}
 				/>{/if}
 		</div>
