@@ -13,8 +13,10 @@
 	import Flow from './Flow.svelte';
 	import StatusChooser from './StatusChooser.svelte';
 	import Labeled from './Labeled.svelte';
-	import { type StatusType } from './status';
+	import { Statuses, type StatusType } from './status';
 	import Notice from './Notice.svelte';
+	import { page } from '$app/stores';
+	import { goto, replaceState } from '$app/navigation';
 
 	interface Props {
 		changes: ChangeRow[];
@@ -34,8 +36,9 @@
 			($user !== null && org.hasPerson($user.id))
 	);
 
-	let filterText = $state('');
-	let filterStatus = $state<undefined | StatusType>(undefined);
+	let filterText = $state(getInitialTextFilter());
+	let filterStatus = $state<undefined | StatusType>(getInitialStatusFilter());
+
 	let lowerFilter = $derived(filterText.toLocaleLowerCase().trim());
 	let textFilteredChanges = $derived(
 		lowerFilter.length > 0
@@ -52,6 +55,26 @@
 			? textFilteredChanges
 			: textFilteredChanges.filter((change) => change.status === filterStatus)
 	);
+
+	function getInitialTextFilter() {
+		return decodeURI($page.url.searchParams.get('words') || '');
+	}
+
+	function getInitialStatusFilter() {
+		const params = $page.url.searchParams;
+		const status = params.get('status');
+		return status !== null && status in Statuses ? (status as StatusType) : undefined;
+	}
+
+	// When the filters change, update the URL to match
+	$effect(() => {
+		const params = new URLSearchParams($page.url.searchParams.toString());
+		if (filterText === '') params.delete('words');
+		else params.set('words', encodeURI(filterText));
+		if (filterStatus === undefined) params.delete('status');
+		else params.set('status', filterStatus);
+		goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
+	});
 </script>
 
 {#if !visible}
@@ -66,7 +89,7 @@
 				none={true}
 				tip="Filter by status"
 				change={(value) => (filterStatus = value)}
-				value={undefined}
+				value={filterStatus}
 			/>
 		</Labeled>
 	</Flow>

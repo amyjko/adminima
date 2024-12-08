@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.3 2024-12-08
 
+### Added
+
+- Preserve process and change filters in URL to support back navigation and referesh.
+
 ### Fixed
 
 - Prevent `MarkupView` from crashing if `markup` is somehow undefined.

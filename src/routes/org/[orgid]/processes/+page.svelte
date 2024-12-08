@@ -21,6 +21,7 @@
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from '$lib/ProcessDate.svelte';
 	import Visibility from '$lib/Visibility.svelte';
+	import { page } from '$app/stores';
 
 	const context = getOrg();
 	let org = $derived(context.org);
@@ -35,7 +36,7 @@
 			($user !== null && org.hasPerson($user.id))
 	);
 
-	let filter = $state('');
+	let filter = $state(getInitialTextFilter());
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
 
 	let personRoles = $derived($user ? org.getPersonRoles($user.id) : []);
@@ -105,6 +106,18 @@
 			return true;
 		}
 	}
+
+	function getInitialTextFilter() {
+		return decodeURI($page.url.searchParams.get('words') || '');
+	}
+
+	// When the filters change, update the URL to match
+	$effect(() => {
+		const params = new URLSearchParams($page.url.searchParams.toString());
+		if (filter === '') params.delete('words');
+		else params.set('words', encodeURI(filter));
+		goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
+	});
 </script>
 
 <Title title="Processes" kind="process" label={false} />
@@ -230,6 +243,8 @@
 				</Table>
 			</div>
 		</div>
+	{:else}
+		<Notice>All processes filtered.</Notice>
 	{/if}
 {:else}
 	<Notice>This organization has no processes.</Notice>
