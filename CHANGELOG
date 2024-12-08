@@ -11,6 +11,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ### Fixed
 
+- Fixed #21, correcting org realtime context updates.
 - Prevent `MarkupView` from crashing if `markup` is somehow undefined.
 - Improved layout of confirm button.
 

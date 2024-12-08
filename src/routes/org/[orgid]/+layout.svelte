@@ -27,14 +27,15 @@
 		context.org = data.payload ? new Organization(data.payload) : undefined;
 	});
 
+	// When realtime has a revised org, update the context.
+	function updateOrg(payload: Organization) {
+		context.org = payload;
+	}
+
 	onMount(() => {
 		// When this layout mounts, listen to realtime changes on the organization payload.
 		const orgid = data.payload?.organization.id;
 
-		// When realtime has a revised org, update the context.
-		function updateOrg(payload: Organization) {
-			context.org = payload;
-		}
 		// Listen to realitime changes on the organization.
 		if (context.org) db.listen(context.org, updateOrg);
 
