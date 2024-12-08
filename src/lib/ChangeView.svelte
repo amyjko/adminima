@@ -5,7 +5,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
-	import { type ChangeRow } from '../database/OrganizationsDB';
+	import { type ChangeRow, type CommentRow } from '../database/OrganizationsDB';
 	import Oops from './Oops.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import { goto } from '$app/navigation';
@@ -25,6 +25,7 @@
 	import Labeled from './Labeled.svelte';
 	import StatusChooser from './StatusChooser.svelte';
 	import { isStatus } from './status';
+	import Form from './Form.svelte';
 
 	interface Props {
 		change: ChangeRow;
@@ -66,6 +67,24 @@
 	let roleSelection: string | undefined = $state(undefined);
 
 	let newComment: string = $state('');
+
+	async function submitComment(comments: { data: CommentRow[] }) {
+		if (!$user) return null;
+		const result = await db.addComment(
+			org.getID(),
+			$user.id,
+			newComment,
+			'suggestions',
+			change.id,
+			comments.data.map((c) => c.id)
+		);
+		if (result) {
+			addError(result.message);
+		} else {
+			newComment = '';
+		}
+		return result;
+	}
 </script>
 
 <Title
@@ -249,30 +268,17 @@
 	{:then comments}
 		{#if comments.data}
 			{#if $user && org.hasPerson($user.id)}
-				<Labeled label="Have a comment?">
-					<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
-				</Labeled>
-				<Button
-					end
-					tip="Add a comment to this change."
-					action={async () => {
-						const result = await db.addComment(
-							org.getID(),
-							$user.id,
-							newComment,
-							'suggestions',
-							change.id,
-							comments.data.map((c) => c.id)
-						);
-						if (result) {
-							addError(result.message);
-							return false;
-						} else {
-							newComment = '';
-							return true;
-						}
-					}}>Submit</Button
-				>
+				<Form active inactiveMessage={undefined} action={() => submitComment(comments)}>
+					<Labeled label="Have a comment?">
+						<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
+					</Labeled>
+					<Button
+						end
+						submit
+						tip="Add a comment to this change."
+						action={() => submitComment(comments)}>Submit</Button
+					>
+				</Form>
 			{/if}
 
 			<Table full={false}>

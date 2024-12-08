@@ -31,10 +31,12 @@
 
 <form
 	bind:this={form}
-	onsubmit={preventDefault(() => {
-		if (action && active) action();
-		else showInactive = true;
-	})}
+	onsubmit={(event) => {
+		if (action && active) {
+			event.preventDefault();
+			action();
+		} else showInactive = true;
+	}}
 	class="form"
 	class:borders
 	class:inline
@@ -52,7 +54,6 @@
 		gap: var(--spacing);
 		display: flex;
 		flex-direction: column;
-		align-items: baseline;
 	}
 
 	form.borders {

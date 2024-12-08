@@ -9,6 +9,11 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Prevent `MarkupView` from crashing if `markup` is somehow undefined.
 
+### Maintenance
+
+- Updated minor point releases
+- Updated to Vite 6
+
 ## v0.7.2 2024-11-24
 
 ### Added
