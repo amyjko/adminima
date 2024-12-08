@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Prevent `MarkupView` from crashing if `markup` is somehow undefined.
+- Improved layout of confirm button.
 
 ### Maintenance
 

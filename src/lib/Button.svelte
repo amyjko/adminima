@@ -1,5 +1,6 @@
 <script module lang="ts">
 	export const Delete = '×';
+	export const Confirm = '✓';
 </script>
 
 <script lang="ts">
@@ -30,8 +31,10 @@
 
 {#if confirm}
 	<div class="row">
-		Are you sure? <button type={submit ? 'submit' : null} class:warning onclick={action}
-			>{@render children?.()}</button
+		<button onclick={() => (confirm = false)}>{Delete}</button><button
+			type={submit ? 'submit' : null}
+			class:warning
+			onclick={action}>{Confirm}</button
 		>
 	</div>
 {:else}
@@ -111,7 +114,6 @@
 	.row {
 		display: flex;
 		flex-direction: row;
-		gap: var(--spacing);
 		align-items: baseline;
 	}
 </style>
