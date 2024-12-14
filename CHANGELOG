@@ -1,7 +1,13 @@
 # Changes
 
-We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
+sWe'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
+
+## v0.7.4 2024-12-14
+
+### Maintenance
+
+- Updated minor point releases.
 
 ## v0.7.3 2024-12-08
 
@@ -17,8 +23,8 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ### Maintenance
 
-- Updated minor point releases
-- Updated to Vite 6
+- Updated minor point releases.
+- Updated to Vite 6.
 
 ## v0.7.2 2024-11-24
 
