@@ -145,13 +145,16 @@
 					<td class="info">
 						<ChangeLink id={change.id} />
 						<div class="update">
-							{#if comment}<em>{org.getProfileWithPersonID(comment.who)?.name}</em>
-								<TimeView time={false} date={timestampToDate(comment.when)} />
-								<MarkupView small markup={comment.what.split('\n\n')[0]} placeholder="status"
-								></MarkupView><Button
+							{#if comment}<Button
 									tip="Add comment to change"
 									action={() => (submittingComment = change)}>+</Button
-								>
+								><em>{org.getProfileWithPersonID(comment.who)?.name}</em>
+								<TimeView time={false} date={timestampToDate(comment.when)} />
+								<MarkupView
+									small
+									markup={`${comment.what.split('\n\n')[0].substring(0, 100)}...`}
+									placeholder="status"
+								></MarkupView>
 							{/if}
 						</div>
 					</td>
