@@ -26,6 +26,7 @@
 	import StatusChooser from './StatusChooser.svelte';
 	import { isStatus } from './status';
 	import Form from './Form.svelte';
+	import NewComment from './NewComment.svelte';
 
 	interface Props {
 		change: ChangeRow;
@@ -65,26 +66,6 @@
 
 	let processSelection: string | undefined = $state(undefined);
 	let roleSelection: string | undefined = $state(undefined);
-
-	let newComment: string = $state('');
-
-	async function submitComment(comments: { data: CommentRow[] }) {
-		if (!$user) return null;
-		const result = await db.addComment(
-			org.getID(),
-			$user.id,
-			newComment,
-			'suggestions',
-			change.id,
-			comments.data.map((c) => c.id)
-		);
-		if (result) {
-			addError(result.message);
-		} else {
-			newComment = '';
-		}
-		return result;
-	}
 </script>
 
 <Title
@@ -267,19 +248,7 @@
 		<Loading />
 	{:then comments}
 		{#if comments.data}
-			{#if $user && org.hasPerson($user.id)}
-				<Form active inactiveMessage={undefined} action={() => submitComment(comments)}>
-					<Labeled label="Have a comment?">
-						<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
-					</Labeled>
-					<Button
-						end
-						submit
-						tip="Add a comment to this change."
-						action={() => submitComment(comments)}>Submit</Button
-					>
-				</Form>
-			{/if}
+			<NewComment {change} />
 
 			<Table full={false}>
 				<tbody>

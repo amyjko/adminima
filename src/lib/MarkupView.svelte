@@ -19,6 +19,8 @@
 		editing?: boolean;
 		/** An HTML id to apply to the text area, if desired */
 		id?: string | undefined;
+		/** Whether to render the text smaller */
+		small?: boolean;
 	}
 
 	let {
@@ -26,7 +28,8 @@
 		placeholder,
 		edit = undefined,
 		editing = $bindable(false),
-		id = undefined
+		id = undefined,
+		small = false
 	}: Props = $props();
 
 	let height = $state(0);
@@ -76,7 +79,7 @@
 	}
 </script>
 
-<div class="markup" class:editable={edit !== undefined}>
+<div class="markup" class:editable={edit !== undefined} class:small>
 	{#if editing}
 		<div class="editor">
 			<textarea
@@ -136,6 +139,9 @@
 		align-items: stretch;
 		width: 100%;
 		font-size: var(--normal-size);
+	}
+	.small {
+		font-size: var(--small-size);
 	}
 
 	.editor {

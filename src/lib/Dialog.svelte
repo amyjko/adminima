@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import Button, { Delete } from './Button.svelte';
+	import { onMount } from 'svelte';
 
 	interface Props {
 		close: () => void;
@@ -12,7 +11,7 @@
 
 	let view: HTMLDialogElement | undefined = $state(undefined);
 
-	run(() => {
+	onMount(() => {
 		if (view) view.showModal();
 	});
 </script>

@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { type ChangeRow } from '$database/OrganizationsDB';
+	import { type ChangeRow, type CommentRow } from '$database/OrganizationsDB';
 	import timestampToDate from '$database/timestampToDate';
 	import ChangeLink from './ChangeLink.svelte';
-	import PersonLink from './ProfileLink.svelte';
+	import ProfileLink from './ProfileLink.svelte';
 	import Status from './Status.svelte';
-	import { getOrg } from '$routes/+layout.svelte';
+	import { getDB, getOrg } from '$routes/+layout.svelte';
 	import { getUser } from '$routes/+layout.svelte';
 	import Table from './Table.svelte';
 	import Field from './Field.svelte';
-	import Visibility from './Visibility.svelte';
 	import Oops from './Oops.svelte';
 	import Flow from './Flow.svelte';
 	import StatusChooser from './StatusChooser.svelte';
@@ -16,7 +15,12 @@
 	import { Statuses, type StatusType } from './status';
 	import Notice from './Notice.svelte';
 	import { page } from '$app/stores';
-	import { goto, replaceState } from '$app/navigation';
+	import { goto } from '$app/navigation';
+	import MarkupView from './MarkupView.svelte';
+	import TimeView from './TimeView.svelte';
+	import Dialog from './Dialog.svelte';
+	import NewComment from './NewComment.svelte';
+	import Button from './Button.svelte';
 
 	interface Props {
 		changes: ChangeRow[];
@@ -27,6 +31,8 @@
 
 	const context = getOrg();
 	let org = $derived(context.org);
+
+	const db = getDB();
 
 	const user = getUser();
 	const Levels = { triage: 0, active: 1, blocked: 2, done: 4, backlog: 3, declined: 5 };
@@ -56,6 +62,12 @@
 			: textFilteredChanges.filter((change) => change.status === filterStatus)
 	);
 
+	/** The change for which a comment is being submitted */
+	let submittingComment: ChangeRow | undefined = $state(undefined);
+	function hideNewComment() {
+		submittingComment = undefined;
+	}
+
 	function getInitialTextFilter() {
 		return decodeURI($page.url.searchParams.get('words') || '');
 	}
@@ -75,6 +87,19 @@
 		else params.set('status', filterStatus);
 		goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
 	});
+
+	// The filtered list of comment IDs that we need to asynchronously load.
+	let latestCommentIDs = $derived(
+		statusFilteredChanges.map((change) => change.comments.at(-1))?.filter((c) => c !== undefined)
+	);
+	let latestComments = $state<CommentRow[]>([]);
+
+	// Whenever the changes update, retrieve the latest comments.
+	$effect(() => {
+		db.getComments(latestCommentIDs).then((comments) => {
+			latestComments = comments.data ?? [];
+		});
+	});
 </script>
 
 {#if !visible}
@@ -83,7 +108,7 @@
 
 {#if changes.length > 0}
 	<Flow>
-		<Field label="Filter by text" bind:text={filterText} />
+		<Field label="Filter by title" bind:text={filterText} />
 		<Labeled label="Filter by status">
 			<StatusChooser
 				none={true}
@@ -93,12 +118,12 @@
 			/>
 		</Labeled>
 	</Flow>
-	<Table>
+	<Table fixed>
 		<thead>
 			<tr>
-				<th>status</th>
-				<th>visibility</th>
-				<th>lead</th>
+				<th style="width: 3em">status</th>
+				<!-- <th>visibility</th> -->
+				<th style="width: 10%; min-width: 5em;">lead</th>
 				<th>title</th>
 			</tr>
 		</thead>
@@ -106,15 +131,30 @@
 			{#each statusFilteredChanges
 				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
 				.sort((a, b) => Levels[a.status] - Levels[b.status]) as change}
+				<!-- Get the most recent comment -->
+				{@const comment = latestComments.find((c) => c.id === change.comments.at(-1))}
 				<tr>
 					<td><Status status={change.status} /></td>
-					<td><Visibility level={change.visibility} tip="Visibility of the change" /></td>
+					<!-- <td><Visibility level={change.visibility} tip="Visibility of the change" /></td> -->
 					<td
-						>{#if change.lead}<PersonLink
+						>{#if change.lead}<ProfileLink
+								short
 								profile={org.getProfileWithID(change.lead)}
 							/>{:else}&mdash;{/if}</td
 					>
-					<td><ChangeLink id={change.id} /></td>
+					<td class="info">
+						<ChangeLink id={change.id} />
+						<div class="update">
+							{#if comment}<em>{org.getProfileWithPersonID(comment.who)?.name}</em>
+								<TimeView time={false} date={timestampToDate(comment.when)} />
+								<MarkupView small markup={comment.what.split('\n\n')[0]} placeholder="status"
+								></MarkupView><Button
+									tip="Add comment to change"
+									action={() => (submittingComment = change)}>+</Button
+								>
+							{/if}
+						</div>
+					</td>
 				</tr>
 			{:else}
 				<tr>
@@ -123,6 +163,12 @@
 			{/each}
 		</tbody>
 	</Table>
+
+	{#if submittingComment}
+		<Dialog close={hideNewComment}>
+			<NewComment change={submittingComment} submitted={hideNewComment} />
+		</Dialog>
+	{/if}
 {:else}
 	{@render children?.()}
 {/if}
@@ -130,5 +176,20 @@
 <style>
 	tr:nth-child(even) {
 		background-color: var(--separator);
+	}
+
+	.info {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--spacing) / 2);
+		align-items: flex-start;
+	}
+
+	.update {
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
+		font-size: var(--small-size);
+		gap: 1em;
 	}
 </style>

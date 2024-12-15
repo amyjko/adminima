@@ -1,12 +1,13 @@
 <script lang="ts">
 	interface Props {
 		date: Date;
+		time?: boolean;
 	}
 
-	let { date }: Props = $props();
+	let { date, time = true }: Props = $props();
 </script>
 
-<span class="time">{date.toLocaleString()}</span>
+<span class="time">{time ? date.toLocaleString() : date.toLocaleDateString()}</span>
 
 <style>
 	.time {

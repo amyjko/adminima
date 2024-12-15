@@ -1,13 +1,14 @@
 <script lang="ts">
 	interface Props {
 		full?: boolean;
+		fixed?: boolean;
 		children?: import('svelte').Snippet;
 	}
 
-	let { full = true, children }: Props = $props();
+	let { full = true, fixed = true, children }: Props = $props();
 </script>
 
-<div class="table" class:full>
+<div class="table" class:full class:fixed>
 	<table>{@render children?.()}</table>
 </div>
 
@@ -15,6 +16,10 @@
 	.table {
 		overflow-x: auto;
 		width: 100%;
+	}
+
+	.fixed {
+		table-layout: fixed;
 	}
 
 	.full {
