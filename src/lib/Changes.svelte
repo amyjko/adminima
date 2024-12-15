@@ -152,7 +152,7 @@
 								<TimeView time={false} date={timestampToDate(comment.when)} />
 								<MarkupView
 									small
-									markup={`${comment.what.split('\n\n')[0].substring(0, 100)}...`}
+									markup={`${comment.what.split('\n')[0].substring(0, 100)}...`}
 									placeholder="status"
 								></MarkupView>
 							{/if}
