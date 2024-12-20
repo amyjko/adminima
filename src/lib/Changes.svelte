@@ -151,6 +151,7 @@
 							value: lead,
 							label: org.getProfileNameOrEmail(lead) ?? '—'
 						}))
+						.sort((a, b) => a.label.localeCompare(b.label))
 				]}
 				change={(value) => (filterLead = value)}
 			/>
