@@ -81,11 +81,14 @@
 	// When the filters change, update the URL to match
 	$effect(() => {
 		const params = new URLSearchParams($page.url.searchParams.toString());
+		const start = params.toString();
 		if (filterText === '') params.delete('words');
 		else params.set('words', encodeURI(filterText));
 		if (filterStatus === undefined) params.delete('status');
 		else params.set('status', filterStatus);
-		goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
+		// Did the params change? Navigate.
+		if (start !== params.toString())
+			goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
 	});
 
 	// The filtered list of comment IDs that we need to asynchronously load.
@@ -145,10 +148,10 @@
 					<td class="info">
 						<ChangeLink id={change.id} />
 						<div class="update">
-							{#if comment}<Button
-									tip="Add comment to change"
-									action={() => (submittingComment = change)}>+</Button
-								><em>{org.getProfileWithPersonID(comment.who)?.name}</em>
+							<Button tip="Add comment to change" action={() => (submittingComment = change)}
+								>+</Button
+							>
+							{#if comment}<em>{org.getProfileWithPersonID(comment.who)?.name}</em>
 								<TimeView time={false} date={timestampToDate(comment.when)} />
 								<MarkupView
 									small
