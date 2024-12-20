@@ -151,7 +151,10 @@
 							<Button tip="Add comment to change" action={() => (submittingComment = change)}
 								>+</Button
 							>
-							{#if comment}<em>{org.getProfileWithPersonID(comment.who)?.name}</em>
+							{#if comment}
+								<em style="white-space: nowrap"
+									>{(org.getProfileWithPersonID(comment.who)?.name ?? '—').split(' ')[0]}</em
+								>
 								<TimeView time={false} date={timestampToDate(comment.when)} />
 								<MarkupView
 									small
