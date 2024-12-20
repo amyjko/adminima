@@ -389,11 +389,13 @@
 
 	<ChangeLink id={null} process={process.id} />
 
-	<Tip member>These are changes people have suggested that might affect this process.</Tip>
+	<Tip member
+		>These are changes people have suggested that might affect this process that aren't yet done.</Tip
+	>
 	<Changes
 		changes={org
 			.getChanges()
-			.filter((change) => change.status === 'active' && change.processes.includes(process.id))}
+			.filter((change) => change.status !== 'done' && change.processes.includes(process.id))}
 		><Paragraph>There are no active changes suggested for this process.</Paragraph></Changes
 	>
 

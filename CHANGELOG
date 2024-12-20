@@ -10,6 +10,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Prevented cycle in changes and processes URL navigation.
 - Prevent name wraps in changes table.
 - Don't arbitrarily clip comments.
+- Show all non-done changes on a process.
 
 ### Maintenance
 
