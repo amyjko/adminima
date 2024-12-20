@@ -145,16 +145,12 @@
 				selection={filterLead}
 				options={[
 					{ value: undefined, label: 'All' },
-					...changes
-						.map((change) =>
-							change.lead === null
-								? null
-								: {
-										value: change.lead,
-										label: org.getProfileNameOrEmail(change.lead) ?? '—'
-									}
-						)
-						.filter((change) => change !== null)
+					...[...new Set(changes.map((change) => change.lead))]
+						.filter((lead) => lead !== null)
+						.map((lead) => ({
+							value: lead,
+							label: org.getProfileNameOrEmail(lead) ?? '—'
+						}))
 				]}
 				change={(value) => (filterLead = value)}
 			/>
