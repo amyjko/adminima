@@ -1,6 +1,6 @@
 {
 	"name": "adminima",
-	"version": "0.6.11",
+	"version": "0.7.5",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
