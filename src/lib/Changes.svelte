@@ -152,14 +152,9 @@
 								>+</Button
 							>
 							{#if comment}
-								<em style="white-space: nowrap"
-									>{(org.getProfileWithPersonID(comment.who)?.name ?? '—').split(' ')[0]}</em
-								>
+								<em>{(org.getProfileWithPersonID(comment.who)?.name ?? '—').split(' ')[0]}</em>
 								<TimeView time={false} date={timestampToDate(comment.when)} />
-								<MarkupView
-									small
-									markup={`${comment.what.split('\n')[0].substring(0, 100)}...`}
-									placeholder="status"
+								<MarkupView small markup={comment.what.split('\n')[0]} placeholder="status"
 								></MarkupView>
 							{/if}
 						</div>
@@ -200,5 +195,8 @@
 		align-items: baseline;
 		font-size: var(--small-size);
 		gap: 1em;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 </style>
