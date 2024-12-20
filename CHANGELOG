@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.5 2024-12-19
 
+### Added
+
+- Filter by lead on changes page.
+
 ### Fixed
 
 - Prevented cycle in changes and processes URL navigation.

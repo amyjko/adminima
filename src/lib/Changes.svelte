@@ -21,6 +21,7 @@
 	import Dialog from './Dialog.svelte';
 	import NewComment from './NewComment.svelte';
 	import Button from './Button.svelte';
+	import Select from './Select.svelte';
 
 	interface Props {
 		changes: ChangeRow[];
@@ -44,6 +45,7 @@
 
 	let filterText = $state(getInitialTextFilter());
 	let filterStatus = $state<undefined | StatusType>(getInitialStatusFilter());
+	let filterLead = $state<undefined | string>(getInitialLeadFilter());
 
 	let lowerFilter = $derived(filterText.toLocaleLowerCase().trim());
 	let textFilteredChanges = $derived(
@@ -62,6 +64,14 @@
 			: textFilteredChanges.filter((change) => change.status === filterStatus)
 	);
 
+	let leadFilteredChanges = $derived(
+		filterLead === undefined
+			? statusFilteredChanges
+			: statusFilteredChanges.filter((change) => change.lead === filterLead)
+	);
+
+	let filteredChanges = $derived(leadFilteredChanges);
+
 	/** The change for which a comment is being submitted */
 	let submittingComment: ChangeRow | undefined = $state(undefined);
 	function hideNewComment() {
@@ -78,6 +88,12 @@
 		return status !== null && status in Statuses ? (status as StatusType) : undefined;
 	}
 
+	function getInitialLeadFilter() {
+		const params = $page.url.searchParams;
+		const lead = params.get('lead');
+		return lead !== null ? lead : undefined;
+	}
+
 	// When the filters change, update the URL to match
 	$effect(() => {
 		const params = new URLSearchParams($page.url.searchParams.toString());
@@ -86,6 +102,8 @@
 		else params.set('words', encodeURI(filterText));
 		if (filterStatus === undefined) params.delete('status');
 		else params.set('status', filterStatus);
+		if (filterLead === undefined) params.delete('lead');
+		else params.set('lead', filterLead);
 		// Did the params change? Navigate.
 		if (start !== params.toString())
 			goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
@@ -93,7 +111,7 @@
 
 	// The filtered list of comment IDs that we need to asynchronously load.
 	let latestCommentIDs = $derived(
-		statusFilteredChanges.map((change) => change.comments.at(-1))?.filter((c) => c !== undefined)
+		filteredChanges.map((change) => change.comments.at(-1))?.filter((c) => c !== undefined)
 	);
 	let latestComments = $state<CommentRow[]>([]);
 
@@ -120,6 +138,27 @@
 				value={filterStatus}
 			/>
 		</Labeled>
+		<Labeled label="Filter by lead">
+			<!-- An option of all leads specified in the changes -->
+			<Select
+				tip="Filter by lead"
+				selection={filterLead}
+				options={[
+					{ value: undefined, label: 'All' },
+					...changes
+						.map((change) =>
+							change.lead === null
+								? null
+								: {
+										value: change.lead,
+										label: org.getProfileNameOrEmail(change.lead) ?? '—'
+									}
+						)
+						.filter((change) => change !== null)
+				]}
+				change={(value) => (filterLead = value)}
+			/>
+		</Labeled>
 	</Flow>
 	<Table fixed>
 		<thead>
@@ -131,7 +170,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each statusFilteredChanges
+			{#each filteredChanges
 				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
 				.sort((a, b) => Levels[a.status] - Levels[b.status]) as change}
 				<!-- Get the most recent comment -->
@@ -152,7 +191,7 @@
 								>+</Button
 							>
 							{#if comment}
-								<em>{(org.getProfileWithPersonID(comment.who)?.name ?? '—').split(' ')[0]}</em>
+								<em>{(org.getPersonNameOrEmail(comment.who) ?? '—').split(' ')[0]}</em>
 								<TimeView time={false} date={timestampToDate(comment.when)} />
 								<MarkupView small markup={comment.what.split('\n')[0]} placeholder="status"
 								></MarkupView>

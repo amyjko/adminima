@@ -218,6 +218,18 @@ export default class Organization {
 		});
 	}
 
+	/** Get the name or email of the profile ID */
+	getPersonNameOrEmail(id: PersonID): string | null {
+		const profile = this.getProfileWithPersonID(id);
+		return profile === null ? null : profile.name === '' ? profile.email : profile.name;
+	}
+
+	/** Get the name or email of the profile ID */
+	getProfileNameOrEmail(id: PersonID): string | null {
+		const profile = this.getProfileWithID(id);
+		return profile === null ? null : profile.name === '' ? profile.email : profile.name;
+	}
+
 	/** Find the profile of the given person, or null if no match */
 	getProfileWithID(id: ProfileID): ProfileRow | null {
 		return this.data.profiles.find((person) => person.id === id) ?? null;
