@@ -114,9 +114,12 @@
 	// When the filters change, update the URL to match
 	$effect(() => {
 		const params = new URLSearchParams($page.url.searchParams.toString());
+		const start = params.toString();
 		if (filter === '') params.delete('words');
 		else params.set('words', encodeURI(filter));
-		goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
+		// If the query string changed, change the URL.
+		if (start !== params.toString())
+			goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
 	});
 </script>
 
