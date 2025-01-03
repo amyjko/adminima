@@ -24,9 +24,5 @@
 				}`
 			: `/org/${org.getPath()}/processes`}
 		kind="process"
-		>{process
-			? process.short.length > 0
-				? process.short[0].replace(/([A-Z]+)/g, ' $1').trim()
-				: process.title
-			: 'Processes'}</Link
+		>{#if process}{process.title}{:else}<em>unknown process</em>{/if}</Link
 	>{/if}
