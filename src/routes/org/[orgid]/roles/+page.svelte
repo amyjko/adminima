@@ -14,7 +14,7 @@
 	import ProfileLink from '$lib/ProfileLink.svelte';
 	import Oops from '$lib/Oops.svelte';
 	import type Organization from '$types/Organization';
-	import type { RoleRow } from '$database/OrganizationsDB';
+	import type { RoleRow, TeamRow } from '$database/OrganizationsDB';
 
 	const context = getOrg();
 	let org = $derived(context.org);
@@ -26,6 +26,7 @@
 	let filter: string = $state('');
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
 
+	/** Roles are visible if the org is public or the authenticated user is in the org. */
 	let visible = $derived(
 		($user === null && org.getVisibility() === 'public') ||
 			($user !== null && org.hasPerson($user.id))
@@ -65,6 +66,29 @@
 					: prof.name.toLocaleLowerCase().includes(lowerFilter) ||
 						prof.email.toLocaleLowerCase().includes(lowerFilter)
 			);
+	}
+
+	function filteredRoles(team: TeamRow | null, roles: RoleRow[]) {
+		// Otherwise, only include roles with a matching title or person with the role with a matching name.
+		return roles.filter(
+			(role) =>
+				// Now filter? Show all.
+				lowerFilter === '' ||
+				// Title has the filter? Show it.
+				role.title.toLocaleLowerCase().includes(lowerFilter) ||
+				// Short name has the filter? Show it.
+				role.short.some((name) => name.toLocaleLowerCase().includes(lowerFilter)) ||
+				// Team has the filter? Show it.
+				team?.name.toLocaleLowerCase().includes(filter) ||
+				// A person with the role has the filter? Show it.
+				org
+					.getRoleProfiles(role.id)
+					.filter(
+						(prof) =>
+							prof.email.toLocaleLowerCase().includes(lowerFilter) ||
+							prof.name.toLocaleLowerCase().includes(lowerFilter)
+					).length > 0
+		);
 	}
 </script>
 
@@ -111,39 +135,20 @@
 		</FormDialog>
 	{/if}
 </Flow>
-<Field label="Filter by role or person" bind:text={filter} />
+<Field label="Filter by role, person, or team" bind:text={filter} />
 
 {#if org.getRoles().length === 0 && org.getTeams().length === 0}
 	<Notice>There are no roles or teams yet.</Notice>
 {:else}
-	{@const teamless = org
-		.getRoles()
-		.filter((role) => role.team === null)
-		// If no filter, include all. Otherwise, only include roles with a matching title or person with the role with a matching name.
-		.filter(
-			(role) =>
-				lowerFilter === '' ||
-				role.title.toLocaleLowerCase().includes(lowerFilter) ||
-				org
-					.getRoleProfiles(role.id)
-					.filter(
-						(prof) =>
-							prof.email.toLocaleLowerCase().includes(lowerFilter) ||
-							prof.name.toLocaleLowerCase().includes(lowerFilter)
-					).length > 0
-		)}
+	{@const teamless = filteredRoles(
+		null,
+		org.getRoles().filter((role) => role.team === null)
+	)}
 	<ul>
 		{#each org
 			.getTeams()
 			.sort((a, b) => org.getTeamRoles(b.id).length - org.getTeamRoles(a.id).length) as team}
-			{@const teamRoles = org
-				.getTeamRoles(team.id)
-				.filter(
-					(role) =>
-						lowerFilter === '' ||
-						role.title.toLocaleLowerCase().includes(lowerFilter) ||
-						role.short.some((name) => name.toLocaleLowerCase().includes(lowerFilter))
-				)}
+			{@const teamRoles = filteredRoles(team, org.getTeamRoles(team.id))}
 			{#if teamRoles.length > 0 || filter.length === 0}
 				<ul>
 					<li><Header><TeamLink id={team.id} /></Header></li>

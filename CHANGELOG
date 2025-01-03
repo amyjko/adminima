@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Don't use vanity URL name for process title in links.
+- Fixed role filtering, so it works by role, person, or team.
 
 ### Maintenance
 
