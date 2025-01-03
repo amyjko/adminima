@@ -161,7 +161,7 @@
 	</FormDialog>
 {/if}
 
-<Field label="Filter" bind:text={filter} />
+<Field label="Filter by title" bind:text={filter} />
 
 {#each Array.from(new Set(org.getProcesses().map((process) => process.concern))) as concern}
 	<!-- Find the matching for this concern and the filter -->
