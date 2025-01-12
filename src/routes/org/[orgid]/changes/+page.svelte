@@ -7,7 +7,7 @@
 	import Tip from '$lib/Tip.svelte';
 
 	const context = getOrg();
-	let organization = $derived(context.org);
+	let organization = $derived(context?.org);
 </script>
 
 <Title title="Changes" kind="change" label={false} />

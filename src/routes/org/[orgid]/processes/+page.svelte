@@ -375,7 +375,7 @@
 	}
 
 	.me {
-		background: var(--warning-background);
+		background: var(--warning-light);
 	}
 
 	fieldset {

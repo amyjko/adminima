@@ -19,7 +19,7 @@
 	import FormDialog from '$lib/FormDialog.svelte';
 
 	const context = getOrg();
-	let organization = $derived(context.org);
+	let organization = $derived(context?.org);
 
 	const user = getUser();
 	const db = getDB();

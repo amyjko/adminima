@@ -13,7 +13,7 @@
 	import { getUser } from '$routes/+layout.svelte';
 
 	const context = getOrg();
-	let organization = $derived(context.org);
+	let organization = $derived(context?.org);
 	const user = getUser();
 	const db = getDB();
 

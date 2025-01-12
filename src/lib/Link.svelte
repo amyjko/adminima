@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import {
+		ChangeSymbol,
 		OrganizationSymbol,
 		PersonSymbol,
 		ProcessSymbol,
@@ -34,11 +35,29 @@
 	class:external
 	href={inactive ? null : to}
 	target={external ? '_blank' : ''}
-	><span class="emoji"
-		>{#if icon}{icon}{:else if kind === 'person'}{PersonSymbol}{:else if kind === 'role'}{RoleSymbol}{:else if kind === 'process'}{ProcessSymbol}{:else if kind === 'org'}{OrganizationSymbol}{:else if kind === 'change'}𝚫{:else if kind === 'team'}{TeamSymbol}{/if}</span
-	>
-	{@render children?.()}</a
->
+	>{#if icon || kind}
+		<span class="emoji">
+			{#if icon}
+				{icon}
+			{:else if kind === 'person'}
+				{PersonSymbol}
+			{:else if kind === 'role'}
+				{RoleSymbol}
+			{:else if kind === 'process'}
+				{ProcessSymbol}
+			{:else if kind === 'org'}
+				{OrganizationSymbol}
+			{:else if kind === 'change'}
+				{ChangeSymbol}
+			{:else if kind === 'team'}
+				{TeamSymbol}
+			{/if}
+		</span>
+	{/if}
+	<span class="label">
+		{@render children?.()}
+	</span>
+</a>
 
 <style>
 	a {
@@ -46,10 +65,13 @@
 		transition: transform 200ms;
 		display: inline-block;
 		border-radius: var(--padding);
-		text-decoration: underline;
-		text-decoration-color: var(--salient);
-		text-decoration-thickness: var(--thickness);
 		font-size: inherit;
+	}
+
+	.label {
+		text-decoration-style: none;
+		text-decoration-thickness: var(--thickness);
+		text-decoration-skip-ink: none;
 	}
 
 	a.inactive {
@@ -66,10 +88,13 @@
 
 	a:hover:not(.inactive),
 	a:focus:not(.inactive) {
-		text-decoration-thickness: var(--thickness);
-		text-decoration-skip-ink: none;
 		transform-origin: center;
-		transform: scaleY(1.1);
+		transform: rotate(-1deg);
+	}
+
+	a:hover:not(.inactive) .label,
+	a:focus:not(.inactive) .label {
+		text-decoration-line: underline;
 	}
 
 	a:focus {
@@ -77,47 +102,71 @@
 	}
 
 	.kinded {
-		color: var(--background);
+		color: var(--foreground);
 		white-space: nowrap;
-		padding-inline-start: var(--padding);
-		padding-inline-end: var(--padding);
 		text-decoration: none;
-		box-shadow: var(--border) 1px 1px;
 	}
 
 	.wrap {
 		white-space: wrap;
 	}
 
-	.kinded.inactive {
-		box-shadow: none;
+	.kinded.inactive .emoji {
+		background: none;
 	}
 
-	.person {
+	.person .emoji {
 		background-color: var(--person);
 	}
 
-	.role {
+	.person .label {
+		text-decoration-color: var(--person);
+	}
+
+	.role .emoji {
 		background-color: var(--warning);
 	}
 
-	.process {
+	.role .label {
+		text-decoration-color: var(--warning);
+	}
+
+	.process .emoji {
 		background-color: var(--error);
 	}
+	.process .label {
+		text-decoration-color: var(--error);
+	}
 
-	.org {
+	.org .emoji {
 		background-color: var(--foreground);
 	}
 
-	.change {
+	.change .emoji {
 		background-color: var(--salient);
 	}
+	.change .label {
+		text-decoration-color: var(--salient);
+	}
 
-	.team {
+	.team .emoji {
 		background-color: var(--foreground);
+	}
+	.team .label {
+		text-decoration-color: var(--foreground);
 	}
 
 	.emoji {
+		display: inline-block;
 		font-size: 75%;
+		box-shadow: var(--border) 1px 1px;
+		border-radius: 50%;
+		padding: 0.25em;
+		color: var(--background);
+		min-height: 1em;
+		min-width: 1.5em;
+		text-align: center;
+		vertical-align: middle;
+		margin-inline-end: 0.25em;
 	}
 </style>

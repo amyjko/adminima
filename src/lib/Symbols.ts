@@ -20,3 +20,4 @@ export const RoleSymbol = '⚙';
 export const ProcessSymbol = '☑';
 export const OrganizationSymbol = '▦';
 export const TeamSymbol = '𑗕';
+export const ChangeSymbol = '𝚫';

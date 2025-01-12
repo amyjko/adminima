@@ -25,7 +25,7 @@
 		<OrganizationLink id={organization.getPath()} name="" />
 	</span>
 	<span class="link">
-		<Link kind="role" to="/org/{organization.getPath()}/roles"
+		<Link bland kind="role" to="/org/{organization.getPath()}/roles"
 			><strong>{organization.getRoles().length}</strong> Role{organization.getRoles().length === 1
 				? ''
 				: 's'}</Link
@@ -33,14 +33,14 @@
 	</span>
 	{#if visible}
 		<span class="link">
-			<Link kind="person" to="/org/{organization.getPath()}/people"
+			<Link bland kind="person" to="/org/{organization.getPath()}/people"
 				><strong>{organization.getProfiles().length} </strong>
 				{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
 			>
 		</span>
 	{/if}
 	<span class="link">
-		<Link kind="process" to="/org/{organization.getPath()}/processes"
+		<Link bland kind="process" to="/org/{organization.getPath()}/processes"
 			><strong>{organization.getProcesses().length}</strong> Process{organization.getProcesses()
 				.length !== 1
 				? 'es'
@@ -48,7 +48,7 @@
 		>
 	</span>
 	<span class="link">
-		<Link kind="change" to="/org/{organization.getPath()}/changes"
+		<Link bland kind="change" to="/org/{organization.getPath()}/changes"
 			><strong>{organization.getChanges().length}</strong> Change{organization.getChanges()
 				.length !== 1
 				? 's'

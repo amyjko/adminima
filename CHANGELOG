@@ -9,6 +9,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - List view for processes.
 
+### Fixed
+
+- Less visually aggressive links.
+
 ### Maintenance
 
 - Updated minor versions of dependencies.
