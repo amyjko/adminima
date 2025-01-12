@@ -324,7 +324,7 @@
 							<ProcessLink processID={process.id}></ProcessLink>
 							{#if process.accountable}
 								<div class="process-people">
-									↳
+									<div class="arrow">↳</div>
 									{#each org.getRoleProfiles(process.accountable) as profile}
 										<ProfileLink {profile} />
 									{/each}
@@ -387,23 +387,30 @@
 	.processes {
 		display: flex;
 		flex-direction: column;
-		gap: var(--spacing);
+		gap: 1em;
 	}
 
 	.process {
 		display: flex;
 		flex-direction: column;
 		flex-wrap: wrap;
-		gap: var(--spacing);
-		row-gap: var(--spacing);
+		gap: calc(var(--spacing) / 2);
 		align-items: baseline;
 	}
 
 	.process-people {
 		display: flex;
 		flex-direction: row;
-		gap: var(--spacing);
+		gap: calc(var(--spacing) / 2);
 		font-size: var(--small-size);
+		align-items: center;
 		padding-inline-start: var(--spacing);
+	}
+
+	.arrow {
+		display: flex;
+		flex-direction: row;
+		align-items: start;
+		height: 1em;
 	}
 </style>
