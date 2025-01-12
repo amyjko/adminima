@@ -19,15 +19,7 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let {
-		to,
-		bland = false,
-		title = undefined,
-		kind = null,
-		icon,
-		wrap = false,
-		children
-	}: Props = $props();
+	let { to, bland = false, title = undefined, kind = null, icon, wrap, children }: Props = $props();
 
 	let external = $derived(to.startsWith('http'));
 	let inactive = $derived(to === $page.url.pathname);
@@ -71,9 +63,7 @@
 	a {
 		color: currentColor;
 		transition: transform 200ms;
-		display: flex;
-		flex-direction: row;
-		align-items: baseline;
+		display: inline-block;
 		border-radius: var(--padding);
 		font-size: inherit;
 		gap: 0.25em;
@@ -120,6 +110,9 @@
 
 	.wrap {
 		white-space: wrap;
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
 	}
 
 	.kinded.inactive .emoji {
