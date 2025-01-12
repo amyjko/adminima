@@ -1,15 +1,24 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import {
+		OrganizationSymbol,
+		PersonSymbol,
+		ProcessSymbol,
+		RoleSymbol,
+		TeamSymbol
+	} from './Symbols';
 
 	interface Props {
 		to: string;
 		bland?: boolean;
 		title?: string | undefined;
 		kind?: 'person' | 'role' | 'process' | 'org' | 'team' | 'change' | null;
+		icon?: string;
+		wrap?: boolean;
 		children?: import('svelte').Snippet;
 	}
 
-	let { to, bland = false, title = undefined, kind = null, children }: Props = $props();
+	let { to, bland = false, title = undefined, kind = null, icon, wrap, children }: Props = $props();
 
 	let external = $derived(to.startsWith('http'));
 	let inactive = $derived(to === $page.url.pathname);
@@ -19,13 +28,14 @@
 	class={kind}
 	class:inactive
 	class:bland
+	class:wrap
 	{title}
 	class:kinded={kind !== null}
 	class:external
 	href={inactive ? null : to}
 	target={external ? '_blank' : ''}
 	><span class="emoji"
-		>{#if kind === 'person'}⍜{:else if kind === 'role'}☑{:else if kind === 'process'}⚙{:else if kind === 'org'}▦{:else if kind === 'change'}𝚫{:else if kind === 'team'}𑗕{/if}</span
+		>{#if icon}{icon}{:else if kind === 'person'}{PersonSymbol}{:else if kind === 'role'}{RoleSymbol}{:else if kind === 'process'}{ProcessSymbol}{:else if kind === 'org'}{OrganizationSymbol}{:else if kind === 'change'}𝚫{:else if kind === 'team'}{TeamSymbol}{/if}</span
 	>
 	{@render children?.()}</a
 >
@@ -39,6 +49,7 @@
 		text-decoration: underline;
 		text-decoration-color: var(--salient);
 		text-decoration-thickness: var(--thickness);
+		font-size: inherit;
 	}
 
 	a.inactive {
@@ -74,6 +85,10 @@
 		box-shadow: var(--border) 1px 1px;
 	}
 
+	.wrap {
+		white-space: wrap;
+	}
+
 	.kinded.inactive {
 		box-shadow: none;
 	}
@@ -103,6 +118,6 @@
 	}
 
 	.emoji {
-		font-size: 100%;
+		font-size: 75%;
 	}
 </style>

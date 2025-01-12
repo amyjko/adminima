@@ -15,7 +15,7 @@
 	import { addError, queryOrError } from '$routes/errors.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Concern from '$lib/Concern.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Field from '$lib/Field.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import { setContext, tick } from 'svelte';
@@ -36,6 +36,7 @@
 	import Status from '$lib/Status.svelte';
 	import Period from '$lib/Period.svelte';
 	import type { default as PeriodType } from '$database/Period';
+	import { DraftSymbol } from '$lib/Symbols';
 
 	let deleteError: string | undefined = $state(undefined);
 
@@ -48,7 +49,7 @@
 	const States = { draft: 'Draft', active: 'Active', archived: 'Archived' };
 
 	let process = $derived(
-		org.getProcess($page.params.processid) ?? org.getProcessByShortName($page.params.processid)
+		org.getProcess(page.params.processid) ?? org.getProcessByShortName(page.params.processid)
 	);
 	let how = $derived(process && process.howid ? org.getHow(process.howid) : undefined);
 
@@ -186,7 +187,9 @@
 			>
 		</Flow>
 		<Flow>
-			<Note>Status</Note>
+			<Note
+				>Status {#if process.state === 'draft'}{DraftSymbol}{/if}
+			</Note>
 			{#if editable}
 				<Select
 					tip="Change the state of this process"
@@ -276,7 +279,7 @@
 
 	<Header>Who</Header>
 
-	<Paragraph>
+	<span>
 		{#if editable}
 			<Select
 				tip="Choose a role to be accountable for the processes outcomes."
@@ -295,7 +298,7 @@
 			/>{:else if process.accountable}<RoleLink roleID={process.accountable} />{:else}No one{/if} is
 		<Level level="accountable" verbose /> for this processes outcomes{#if how.responsible.length === 0}
 			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible){/if}.
-	</Paragraph>
+	</span>
 
 	<ARCI {how} verbose {editable} />
 

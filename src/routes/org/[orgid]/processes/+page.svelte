@@ -21,13 +21,20 @@
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from '$lib/ProcessDate.svelte';
 	import Visibility from '$lib/Visibility.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import ProfileLink from '$lib/ProfileLink.svelte';
 
 	const context = getOrg();
 	let org = $derived(context.org);
 
 	const user = getUser();
 	const db = getDB();
+
+	/** Which view to show */
+	const initialView = page.url.searchParams.get('view');
+	let view = $state<'table' | 'list'>(
+		initialView === 'table' || initialView === 'list' ? initialView : 'list'
+	);
 
 	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
 
@@ -40,6 +47,46 @@
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
 
 	let personRoles = $derived($user ? org.getPersonRoles($user.id) : []);
+
+	/** The filtered processes */
+	let filteredProcesses = $derived(
+		org
+			.getProcesses()
+			.filter(
+				(p) =>
+					lowerFilter.length === 0 ||
+					p.title.toLowerCase().includes(lowerFilter) ||
+					p.short.some((name) => name.toLowerCase().includes(lowerFilter)) ||
+					(p.accountable &&
+						org
+							.getRoleProfiles(p.accountable)
+							.some((profile) => profile.name.toLowerCase().includes(lowerFilter))) ||
+					(p.howid !== null &&
+						org
+							.getHow(p.howid)
+							?.responsible.some((role) =>
+								org
+									.getRoleProfiles(role)
+									.some((profile) => profile.name.toLowerCase().includes(lowerFilter))
+							))
+			)
+			.sort((a, b) => {
+				const howA = org.getHow(a.id);
+				const howB = org.getHow(b.id);
+				if (howA === undefined || howB === undefined) return 0;
+
+				return (
+					howB.responsible.length +
+					howB.consulted.length +
+					howB.informed.length -
+					(howA.responsible.length + howA.consulted.length + howA.informed.length)
+				);
+			})
+	);
+
+	let concerns = $derived(
+		Array.from(new Set(org.getProcesses().map((process) => process.concern)))
+	);
 
 	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
 		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
@@ -108,15 +155,19 @@
 	}
 
 	function getInitialTextFilter() {
-		return decodeURI($page.url.searchParams.get('words') || '');
+		return decodeURI(page.url.searchParams.get('words') || '');
 	}
 
 	// When the filters change, update the URL to match
 	$effect(() => {
-		const params = new URLSearchParams($page.url.searchParams.toString());
+		const params = new URLSearchParams(page.url.searchParams.toString());
 		const start = params.toString();
+
 		if (filter === '') params.delete('words');
 		else params.set('words', encodeURI(filter));
+
+		params.set('view', view);
+
 		// If the query string changed, change the URL.
 		if (start !== params.toString())
 			goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
@@ -161,97 +212,137 @@
 	</FormDialog>
 {/if}
 
-<Field label="Filter by title" bind:text={filter} />
+<Field label="Filter by title or accountable/responsible person" bind:text={filter} />
 
-{#each Array.from(new Set(org.getProcesses().map((process) => process.concern))) as concern}
-	<!-- Find the matching for this concern and the filter -->
-	{@const processes = sortProcessesByNextDate(
-		org
-			.getProcesses()
-			.filter((p) => p.concern === concern)
-			.filter(
-				(p) =>
-					lowerFilter.length === 0 ||
-					p.title.toLowerCase().includes(lowerFilter) ||
-					p.short.some((name) => name.toLowerCase().includes(lowerFilter))
-			)
-			.sort((a, b) => {
-				const howA = org.getHow(a.id);
-				const howB = org.getHow(b.id);
-				if (howA === undefined || howB === undefined) return 0;
+<fieldset>
+	<div>
+		<input type="radio" id="view-list" name="list" value="list" bind:group={view} />
+		<label for="view-list">List</label>
+	</div>
 
-				return (
-					howB.responsible.length +
-					howB.consulted.length +
-					howB.informed.length -
-					(howA.responsible.length + howA.consulted.length + howA.informed.length)
-				);
-			})
-	)}
+	<div>
+		<input type="radio" id="view-table" name="table" value="table" bind:group={view} />
+		<label for="view-table">Table</label>
+	</div>
+</fieldset>
 
-	{@const roles = getRolesByAccountability(processes)}
-
-	<!-- If there's no filter, or there is and there are processes that match, show the concern and it's matching processes. -->
-	{#if lowerFilter.length === 0 || processes.length > 0}
-		<div class="concern">
-			<Header
-				><Concern
-					{concern}
-					edit={isAdmin
-						? (newConcern) => db.renameConcern(org.getID(), concern, newConcern)
-						: undefined}
-				/></Header
-			>
-			<div class="processes">
-				<Table>
-					<thead>
-						<tr
-							><th>status</th><th>visibility</th><th>repeats</th><th>process</th
-							>{#each roles as role}<th class="role" class:me={personRoles.includes(role.id)}
-									><RoleLink roleID={role.id} /></th
-								>{:else}<th></th>{/each}
-						</tr>
-					</thead>
-					<tbody>
-						{#each processes as process}
-							{@const how = process.howid !== null ? org.getHow(process.howid) : undefined}
-							{@const hows = org.getProcessHows(process.id)}
-							<tr>
-								<td><Status status={process.state} /></td>
-								<td
-									>{#if how}<Visibility
-											tip="The visibility of tis process"
-											level={how.visibility}
-										/>{/if}</td
-								>
-								<td><ProcessDate {process} /></td>
-								<td><ProcessLink processID={process.id} /></td>
-								{#each roles as role}
-									<td class="level" class:me={personRoles.includes(role.id)}
-										><Level
-											level={process?.accountable === role.id
-												? 'accountable'
-												: hows.some((how) => how.responsible.includes(role.id))
-													? 'responsible'
-													: hows.some((how) => how.consulted.includes(role.id))
-														? 'consulted'
-														: hows.some((how) => how.informed.includes(role.id))
-															? 'informed'
-															: ''}
-										/></td
-									>{:else}<td><em>no roles</em></td>{/each}
-							</tr>
-						{/each}
-					</tbody>
-				</Table>
-			</div>
-		</div>
-	{:else}
-		<Notice>All processes filtered.</Notice>
-	{/if}
+{#if view === 'list'}
+	<Tip>Processes by concern, with those accountable.</Tip>
 {:else}
+	<Tip>Processes by concern, with status, visibility, and ARCI.</Tip>
+{/if}
+{#snippet ConcernHeader(concern: string)}
+	<Header
+		><Concern
+			{concern}
+			edit={isAdmin
+				? (newConcern) => db.renameConcern(org.getID(), concern, newConcern)
+				: undefined}
+		/></Header
+	>
+{/snippet}
+
+{#if org.getProcesses().length === 0}
 	<Notice>This organization has no processes.</Notice>
-{/each}
+{:else if filteredProcesses.length === 0}
+	<Notice>All processes filtered.</Notice>
+{:else if view === 'table'}
+	{#each concerns as concern}
+		<!-- Find the matching for this concern and the filter -->
+		{@const processes = sortProcessesByNextDate(
+			filteredProcesses.filter((p) => p.concern === concern)
+		)}
+
+		{@const roles = getRolesByAccountability(processes)}
+
+		{#if processes.length > 0}
+			<div class="concern">
+				{@render ConcernHeader(concern)}
+				<div class="processes">
+					<Table>
+						<thead>
+							<tr>
+								<th style:width="4em">status</th>
+								<th style:width="4em">visibility</th>
+								<th style:width="6em">repeats</th>
+								<th style:width="20em">process</th>
+								{#each roles as role}
+									<th class="role" class:me={personRoles.includes(role.id)}
+										><RoleLink roleID={role.id} />
+									</th>
+								{:else}
+									<th></th>
+								{/each}
+							</tr>
+						</thead>
+						<tbody>
+							{#each processes as process}
+								{@const how = process.howid !== null ? org.getHow(process.howid) : undefined}
+								{@const hows = org.getProcessHows(process.id)}
+								<tr>
+									<td><Status status={process.state} /></td>
+									<td width="4em"
+										>{#if how}<Visibility
+												tip="The visibility of tis process"
+												level={how.visibility}
+											/>{/if}</td
+									>
+									<td><ProcessDate {process} /></td>
+									<td><ProcessLink wrap processID={process.id} /></td>
+									{#each roles as role}
+										<td class="level" class:me={personRoles.includes(role.id)}
+											><Level
+												level={process?.accountable === role.id
+													? 'accountable'
+													: hows.some((how) => how.responsible.includes(role.id))
+														? 'responsible'
+														: hows.some((how) => how.consulted.includes(role.id))
+															? 'consulted'
+															: hows.some((how) => how.informed.includes(role.id))
+																? 'informed'
+																: ''}
+											/></td
+										>{:else}<td><em>no roles</em></td>{/each}
+								</tr>
+							{/each}
+						</tbody>
+					</Table>
+				</div>
+			</div>
+		{/if}
+	{/each}
+{:else}
+	<!-- The list view still groups by concerns -->
+	{#each concerns as concern}
+		{@const processes = filteredProcesses.filter((p) => p.concern === concern)}
+		{#if processes.length > 0}
+			<div class="concern">
+				{@render ConcernHeader(concern)}
+				<div class="processes">
+					{#each processes as process}
+						<div class="process">
+							<ProcessLink processID={process.id}></ProcessLink>
+							{#if process.accountable}
+								<div class="process-people">
+									↳
+									{#each org.getRoleProfiles(process.accountable) as profile}
+										<ProfileLink {profile} />
+									{/each}
+									{#each process.howid !== null ? (org
+												.getHow(process.howid)
+												?.responsible.map((r) => org.getRoleProfiles(r))
+												.flat() ?? []) : [] as profile}
+										<ProfileLink {profile} />
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
+	{/each}
+{/if}
 
 <style>
 	.concern {
@@ -285,5 +376,34 @@
 
 	.me {
 		background: var(--warning-background);
+	}
+
+	fieldset {
+		display: flex;
+		flex-direction: row;
+		gap: var(--spacing);
+	}
+
+	.processes {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing);
+	}
+
+	.process {
+		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
+		gap: var(--spacing);
+		row-gap: var(--spacing);
+		align-items: baseline;
+	}
+
+	.process-people {
+		display: flex;
+		flex-direction: row;
+		gap: var(--spacing);
+		font-size: var(--small-size);
+		padding-inline-start: var(--spacing);
 	}
 </style>

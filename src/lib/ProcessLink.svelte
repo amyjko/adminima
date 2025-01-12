@@ -3,12 +3,14 @@
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
+	import { DraftSymbol } from './Symbols';
 
 	interface Props {
 		processID: ProcessID | null;
+		wrap?: boolean;
 	}
 
-	let { processID }: Props = $props();
+	let { processID, wrap }: Props = $props();
 
 	const context = getOrg();
 	let org = $derived(context.org);
@@ -17,6 +19,7 @@
 </script>
 
 {#if process === null}<Oops inline text="We couldn't find this process" />{:else}<Link
+		{wrap}
 		title={process && process.short.length > 0 ? process.title : undefined}
 		to={processID
 			? `/org/${org.getPath()}/process/${
@@ -24,5 +27,10 @@
 				}`
 			: `/org/${org.getPath()}/processes`}
 		kind="process"
-		>{#if process}{process.title}{:else}<em>unknown process</em>{/if}</Link
+		icon={process && process.state === 'draft' ? DraftSymbol : undefined}
+		>{#if process}
+			{process.title}
+		{:else}
+			<em>unknown process</em>
+		{/if}</Link
 	>{/if}
