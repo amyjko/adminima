@@ -227,7 +227,7 @@
 </fieldset>
 
 {#if view === 'list'}
-	<Tip>Processes by concern, with those accountable.</Tip>
+	<Tip>Processes by concern, with those accountable and responsible.</Tip>
 {:else}
 	<Tip>Processes by concern, with status, visibility, and ARCI.</Tip>
 {/if}
