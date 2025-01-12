@@ -321,19 +321,21 @@
 				<div class="processes">
 					{#each processes as process}
 						<div class="process">
-							<ProcessLink processID={process.id}></ProcessLink>
+							<ProcessLink wrap processID={process.id}></ProcessLink>
 							{#if process.accountable}
 								<div class="process-people">
 									<div class="arrow">↳</div>
-									{#each org.getRoleProfiles(process.accountable) as profile}
-										<ProfileLink {profile} />
-									{/each}
-									{#each process.howid !== null ? (org
-												.getHow(process.howid)
-												?.responsible.map((r) => org.getRoleProfiles(r))
-												.flat() ?? []) : [] as profile}
-										<ProfileLink {profile} />
-									{/each}
+									<div class="people">
+										{#each org.getRoleProfiles(process.accountable) as profile}
+											<ProfileLink short {profile} />
+										{/each}
+										{#each process.howid !== null ? (org
+													.getHow(process.howid)
+													?.responsible.map((r) => org.getRoleProfiles(r))
+													.flat() ?? []) : [] as profile}
+											<ProfileLink short {profile} />
+										{/each}
+									</div>
 								</div>
 							{/if}
 						</div>
@@ -403,7 +405,7 @@
 		flex-direction: row;
 		gap: calc(var(--spacing) / 2);
 		font-size: var(--small-size);
-		align-items: center;
+		align-items: baseline;
 		padding-inline-start: var(--spacing);
 	}
 
@@ -412,5 +414,13 @@
 		flex-direction: row;
 		align-items: start;
 		height: 1em;
+	}
+
+	.people {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: calc(var(--spacing) / 2);
+		row-gap: calc(var(--spacing) / 2);
 	}
 </style>

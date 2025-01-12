@@ -19,7 +19,15 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let { to, bland = false, title = undefined, kind = null, icon, wrap, children }: Props = $props();
+	let {
+		to,
+		bland = false,
+		title = undefined,
+		kind = null,
+		icon,
+		wrap = false,
+		children
+	}: Props = $props();
 
 	let external = $derived(to.startsWith('http'));
 	let inactive = $derived(to === $page.url.pathname);
@@ -63,9 +71,12 @@
 	a {
 		color: currentColor;
 		transition: transform 200ms;
-		display: inline-block;
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
 		border-radius: var(--padding);
 		font-size: inherit;
+		gap: 0.25em;
 	}
 
 	.label {
@@ -167,6 +178,5 @@
 		min-width: 1.5em;
 		text-align: center;
 		vertical-align: middle;
-		margin-inline-end: 0.25em;
 	}
 </style>
