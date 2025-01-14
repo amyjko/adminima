@@ -78,5 +78,5 @@
 >
 
 {#each changes as change}
-	<ChangeLink id={change.id} />
+	<ChangeLink wrap id={change.id} />
 {/each}

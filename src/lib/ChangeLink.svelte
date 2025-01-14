@@ -8,9 +8,10 @@
 		id: ChangeID | null;
 		role?: RoleID | null;
 		process?: ProcessID | null;
+		wrap?: boolean;
 	}
 
-	let { id, role = null, process = null }: Props = $props();
+	let { id, role = null, process = null, wrap }: Props = $props();
 
 	const context = getOrg();
 	let org = $derived(context.org);
@@ -19,6 +20,7 @@
 </script>
 
 {#if id !== null && change === null}<Oops inline text="Unknown change" />{:else}<Link
+		{wrap}
 		kind="change"
 		to="/org/{org.getPath()}/{id ? 'change' : 'changes'}/{id ?? 'new'}{role
 			? `?role=${role}`
