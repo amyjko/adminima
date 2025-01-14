@@ -334,9 +334,13 @@
 								<div class="process-people">
 									<div class="arrow">↳</div>
 									<div class="people">
-										{#each accountable as profile}
-											<ProfileLink short {profile} />
-										{/each}
+										{#if accountable.length < 3}
+											{#each accountable as profile}
+												<ProfileLink short {profile} />
+											{/each}
+										{:else}
+											<span><strong>{accountable.length}</strong> accountable</span>
+										{/if}
 										{#if responsible.length <= 3}
 											{#each responsible as profile}
 												<ProfileLink short {profile} />
