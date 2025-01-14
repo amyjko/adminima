@@ -50,7 +50,7 @@
 	<Subheader>Accountable</Subheader>
 	{#each accountable as process}
 		<Flow>
-			<ProcessLink processID={process.id} />
+			<ProcessLink wrap processID={process.id} />
 			<ProcessDate {process} />
 		</Flow>
 	{/each}
@@ -59,7 +59,7 @@
 	<Subheader>Responsible</Subheader>
 	{#each responsible as process}
 		<Flow>
-			<ProcessLink processID={process.id} />
+			<ProcessLink wrap processID={process.id} />
 			<ProcessDate {process} />
 		</Flow>
 	{/each}
@@ -69,7 +69,7 @@
 		<Subheader>Consulted</Subheader>
 		{#each consulted as process}
 			<Flow>
-				<ProcessLink processID={process.id} />
+				<ProcessLink wrap processID={process.id} />
 				<ProcessDate {process} />
 			</Flow>
 		{/each}
@@ -78,7 +78,7 @@
 		<Subheader>Informed</Subheader>
 		{#each informed as process}
 			<Flow>
-				<ProcessLink processID={process.id} />
+				<ProcessLink wrap processID={process.id} />
 				<ProcessDate {process} />
 			</Flow>
 		{/each}

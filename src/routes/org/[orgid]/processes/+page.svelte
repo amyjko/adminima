@@ -323,18 +323,27 @@
 						<div class="process">
 							<ProcessLink wrap processID={process.id}></ProcessLink>
 							{#if process.accountable}
+								{@const accountable = org.getRoleProfiles(process.accountable)}
+								{@const responsible =
+									process.howid !== null
+										? (org
+												.getHow(process.howid)
+												?.responsible.map((r) => org.getRoleProfiles(r))
+												.flat() ?? [])
+										: []}
 								<div class="process-people">
 									<div class="arrow">↳</div>
 									<div class="people">
-										{#each org.getRoleProfiles(process.accountable) as profile}
+										{#each accountable as profile}
 											<ProfileLink short {profile} />
 										{/each}
-										{#each process.howid !== null ? (org
-													.getHow(process.howid)
-													?.responsible.map((r) => org.getRoleProfiles(r))
-													.flat() ?? []) : [] as profile}
-											<ProfileLink short {profile} />
-										{/each}
+										{#if responsible.length <= 3}
+											{#each responsible as profile}
+												<ProfileLink short {profile} />
+											{/each}
+										{:else}
+											<span>and <strong>{responsible.length}</strong> responsible</span>
+										{/if}
 									</div>
 								</div>
 							{/if}
