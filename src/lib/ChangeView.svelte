@@ -22,11 +22,10 @@
 	import Header from './Header.svelte';
 	import Visibility from './Visibility.svelte';
 	import Table from './Table.svelte';
-	import Labeled from './Labeled.svelte';
 	import StatusChooser from './StatusChooser.svelte';
 	import { isStatus } from './status';
-	import Form from './Form.svelte';
 	import NewComment from './NewComment.svelte';
+	import type { CommentID } from '$types/Organization';
 
 	interface Props {
 		change: ChangeRow;
@@ -59,9 +58,16 @@
 			.sort((a, b) => a.title.localeCompare(b.title))
 	);
 
-	let commentIDs: string[] = $state(change.comments);
+	async function loadComments(commentIDs: CommentID[]): Promise<CommentRow[] | null> {
+		const { data, error } = await db.getComments(commentIDs);
+		if (error) return null;
+		else return data;
+	}
+
+	// When change changes, reload the comments. undefined = loading, null = error.
+	let comments = $state<undefined | null | CommentRow[]>(undefined);
 	$effect(() => {
-		if (commentIDs.join('') !== change.comments.join('')) commentIDs = change.comments.slice();
+		loadComments(change.comments).then((newComments) => (comments = newComments));
 	});
 
 	let processSelection: string | undefined = $state(undefined);
@@ -244,30 +250,27 @@
 <Header>Discussion</Header>
 
 <div class="comments">
-	{#await db.getComments(commentIDs)}
+	<NewComment {change} />
+	{#if comments === undefined}
 		<Loading />
-	{:then comments}
-		{#if comments.data}
-			<NewComment {change} />
-
-			<Table full={false}>
-				<tbody>
-					{#each comments.data.sort((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment (comment.id)}
-						<CommentView
-							{comment}
-							remove={$user && comment.who === $user.id
-								? (comment) => db.deleteComment(change, 'suggestions', comment)
-								: undefined}
-						/>
-					{:else}
-						<tr><td>No changes yet.</td></tr>
-					{/each}
-				</tbody>
-			</Table>
-		{:else}
-			Unable to load comment history.
-		{/if}
-	{/await}
+	{:else if comments === null}
+		Unable to load comment history.
+	{:else}
+		<Table full={false}>
+			<tbody>
+				{#each comments.toSorted((a, b) => timestampToDate(b.when).getTime() - timestampToDate(a.when).getTime()) as comment (comment.id)}
+					<CommentView
+						{comment}
+						remove={$user && comment.who === $user.id
+							? (comment) => db.deleteComment(change, 'suggestions', comment)
+							: undefined}
+					/>
+				{:else}
+					<tr><td>No changes yet.</td></tr>
+				{/each}
+			</tbody>
+		</Table>
+	{/if}
 </div>
 
 {#if editable}
