@@ -14,7 +14,7 @@
 
 <Link to="/org/{organization.getPath()}/changes/new">Suggest a change…</Link>
 
-<Tip>These are changes people have made to change this organization</Tip>
+<Tip>These are changes people have proposed to make to this organization.</Tip>
 <Changes changes={organization.getChanges()}
 	><Paragraph>There are no changes suggested for this organization.</Paragraph></Changes
 >

@@ -106,7 +106,7 @@
 	{/if}
 </Title>
 
-<Tip admin>Use changes as a place to capture progress on a change and to document decisions.</Tip>
+<Tip admin>Use this page to capture progress on a change and to document decisions about it.</Tip>
 
 <Paragraph>
 	<PersonLink profile={org.getProfileWithPersonID(change.who)} /> reported this problem on <TimeView
