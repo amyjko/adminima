@@ -256,7 +256,7 @@
 		{@const roles = getRolesByAccountability(processes)}
 
 		{#if processes.length > 0}
-			<div class="concern">
+			<div class="concern full">
 				{@render ConcernHeader(concern)}
 				<div class="processes">
 					<Table>
@@ -360,7 +360,7 @@
 {/if}
 
 <style>
-	.concern {
+	.concern.full {
 		width: calc(100vw - 2em);
 		margin-left: calc(-1 * (100vw - 2em - 100%) / 2);
 	}
