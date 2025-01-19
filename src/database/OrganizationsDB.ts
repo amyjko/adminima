@@ -993,6 +993,14 @@ class OrganizationsDB {
 		return error;
 	}
 
+	async updateChangeReview(how: ChangeRow, review: string | null) {
+		const { error } = await this.supabase
+			.from('suggestions')
+			.update({ review: review })
+			.eq('id', how.id);
+		return error;
+	}
+
 	async udpateChangeWhat(change: ChangeRow, what: string) {
 		if (change.what === what) return null;
 		const { error } = await this.supabase.from('suggestions').update({ what }).eq('id', change.id);

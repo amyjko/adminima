@@ -26,6 +26,7 @@
 	import { isStatus } from './status';
 	import NewComment from './NewComment.svelte';
 	import type { CommentID } from '$types/Organization';
+	import Field from './Field.svelte';
 
 	interface Props {
 		change: ChangeRow;
@@ -133,6 +134,26 @@
 		/>{:else if change.lead}<PersonLink profile={org.getProfileWithID(change.lead)} />{:else}No one{/if}
 	is currently leading this change.</Paragraph
 >
+
+<Paragraph>
+	Review this change on <Field
+		text={change.review ? new Date(Date.parse(change.review)).toLocaleDateString() : ''}
+		placeholder="date"
+		invalid={(text: string) => {
+			if (text.length > 0 && isNaN(Date.parse(text))) return 'Not a valid date.';
+			return undefined;
+		}}
+		done={(text) => {
+			queryOrError(
+				db.updateChangeReview(
+					change,
+					text.length === 0 ? null : new Date(Date.parse(text)).toISOString()
+				),
+				"Couldn't update the change's review date."
+			);
+		}}
+	></Field>.
+</Paragraph>
 
 <Header>Problem</Header>
 

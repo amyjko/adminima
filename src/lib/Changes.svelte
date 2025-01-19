@@ -163,12 +163,14 @@
 				<th style="width: 3em">status</th>
 				<!-- <th>visibility</th> -->
 				<th style="width: 10%; min-width: 5em;">lead</th>
+				<td style="width: 5em">review</td>
 				<th>title</th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each filteredChanges
 				.sort((a, b) => timestampToDate(a.when).getTime() - timestampToDate(b.when).getTime())
+				.sort( (a, b) => (a.review === null ? (b.review === null ? 0 : -1) : b.review === null ? 1 : timestampToDate(a.review).getTime() - timestampToDate(b.review).getTime()) )
 				.sort((a, b) => Levels[a.status] - Levels[b.status]) as change}
 				<!-- Get the most recent comment -->
 				{@const comment = latestComments.find((c) => c.id === change.comments.at(-1))}
@@ -180,6 +182,14 @@
 								short
 								profile={org.getProfileWithID(change.lead)}
 							/>{:else}&mdash;{/if}</td
+					>
+					<td
+						class:overdue={change.review &&
+							new Date(Date.parse(change.review)).getTime() < Date.now()}
+						>{#if change.review}<TimeView
+								time={false}
+								date={new Date(Date.parse(change.review))}
+							/>{/if}</td
 					>
 					<td class="info">
 						<ChangeLink id={change.id} />
@@ -234,5 +244,10 @@
 		text-overflow: ellipsis;
 		overflow: hidden;
 		white-space: nowrap;
+	}
+
+	.overdue {
+		background: var(--error-light);
+		color: var(--background);
 	}
 </style>

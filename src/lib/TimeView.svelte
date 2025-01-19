@@ -11,7 +11,6 @@
 
 <style>
 	.time {
-		color: var(--inactive);
 		font-size: var(--small-size);
 	}
 </style>

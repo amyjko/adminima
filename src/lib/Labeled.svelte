@@ -15,7 +15,7 @@
 			{#if message}<span class="invalid">{message}</span>{/if}</span
 		>
 		{@render children?.()}</label
-	>{:else}{@render children?.()}{/if}
+	>{:else}{@render children?.()} <span class="invalid">{message}</span>{/if}
 
 <style>
 	label {

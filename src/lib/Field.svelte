@@ -30,7 +30,14 @@
 		autocomplete={autocomplete ? 'on' : 'off'}
 		disabled={!active}
 		bind:value={text}
-		onblur={done ? () => done(text) : undefined}
+		style:width={text.length + 'ch'}
+		onblur={done
+			? () => {
+					if (invalid === undefined || invalid(text) === undefined) {
+						done(text);
+					}
+				}
+			: undefined}
 		{placeholder}
 	/>
 </Labeled>
@@ -45,5 +52,6 @@
 		border: none;
 		font-family: var(--font);
 		font-size: var(--normal-size);
+		min-width: 5ch;
 	}
 </style>

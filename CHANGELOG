@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.8 2025-01-18
 
+### Added
+
+- Added a review field to changes to help remember when to check something next.
+
 ### Maintenance
 
 - Updated minor versions of dependencies.
