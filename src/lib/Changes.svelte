@@ -184,11 +184,11 @@
 							/>{:else}&mdash;{/if}</td
 					>
 					<td
-						class:overdue={change.review &&
-							new Date(Date.parse(change.review)).getTime() < Date.now()}
 						>{#if change.review}<TimeView
 								time={false}
 								date={new Date(Date.parse(change.review))}
+								warning={change.review !== null &&
+									new Date(Date.parse(change.review)).getTime() < Date.now()}
 							/>{/if}</td
 					>
 					<td class="info">
@@ -244,10 +244,5 @@
 		text-overflow: ellipsis;
 		overflow: hidden;
 		white-space: nowrap;
-	}
-
-	.overdue {
-		background: var(--error-light);
-		color: var(--background);
 	}
 </style>
