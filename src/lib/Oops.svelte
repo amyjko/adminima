@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { type Locale } from '../types/Locales';
-
 	interface Props {
 		text?: string | undefined;
 		inline?: boolean;

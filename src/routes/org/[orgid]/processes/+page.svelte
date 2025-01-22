@@ -20,7 +20,7 @@
 	import Status from '$lib/Status.svelte';
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from '$lib/ProcessDate.svelte';
-	import Visibility from '$lib/Visibility.svelte';
+	import Visibility from '$lib/VisibilityChooser.svelte';
 	import { page } from '$app/state';
 	import ProfileLink from '$lib/ProfileLink.svelte';
 

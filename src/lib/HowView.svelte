@@ -2,7 +2,7 @@
 	import HowView from './HowView.svelte';
 	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
 	import { getContext, tick } from 'svelte';
-	import Visibility from './Visibility.svelte';
+	import Visibility from './VisibilityChooser.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 	import { addError, queryOrError } from '$routes/errors.svelte';

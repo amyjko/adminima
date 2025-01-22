@@ -1,5 +1,3 @@
-import { writable } from 'svelte/store';
-
 export type Locale = {
 	name: string;
 	term: {

@@ -10,7 +10,9 @@
 	import Labeled from './Labeled.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Tip from './Tip.svelte';
-	import Select from './Select.svelte';
+	import Options from './Options.svelte';
+	import { RoleItem } from './RoleLink.svelte';
+	import { ProcessItem } from './ProcessLink.svelte';
 
 	interface Props {
 		process?: ProcessID | undefined;
@@ -55,6 +57,14 @@
 	}
 
 	let active = $derived(newRequestTitle.length > 0 && newRequestProblem.length > 0);
+
+	let roles = $derived(
+		organization.org.getRoles().toSorted((a, b) => a.title.localeCompare(b.title))
+	);
+
+	let processes = $derived(
+		organization.org.getProcesses().toSorted((a, b) => a.title.localeCompare(b.title))
+	);
 </script>
 
 <div class="form">
@@ -72,33 +82,42 @@
 	</Labeled>
 
 	<Labeled label="Affected Roles">
-		<Select
+		<Options
+			id="affected-role"
 			tip="Add a role that is affected by this suggestion."
+			view={RoleItem}
 			options={[
-				{ value: undefined, label: '—' },
-				...organization.org
-					.getRoles()
-					.toSorted((a, b) => a.title.localeCompare(b.title))
-					.map((role) => {
-						return { value: role.id, label: role.title };
-					})
+				undefined,
+				...roles.map((role) => {
+					return role.id;
+				})
 			]}
+			searchable={{
+				placeholder: 'role',
+				include: (item, query) =>
+					roles
+						.find((r) => r.id === item)
+						?.title.toLowerCase()
+						.includes(query.toLowerCase()) === true
+			}}
 			selection={role}
 			change={(r) => (role = r)}
 		/>
 	</Labeled>
 	<Labeled label="Affected Processes">
-		<Select
+		<Options
+			id="affected-process"
 			tip="Add a process that is affected by this suggestion."
-			options={[
-				{ value: undefined, label: '—' },
-				...organization.org
-					.getProcesses()
-					.toSorted((a, b) => a.title.localeCompare(b.title))
-					.map((process) => {
-						return { value: process.id, label: process.title };
-					})
-			]}
+			options={[undefined, ...processes.map((process) => process.id)]}
+			searchable={{
+				placeholder: 'process',
+				include: (item: string, query: string) =>
+					processes
+						.find((s) => s.id === item)
+						?.title.toLowerCase()
+						.includes(query.toLowerCase()) === true
+			}}
+			view={ProcessItem}
 			selection={process}
 			change={(p) => (process = p)}
 		/>

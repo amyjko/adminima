@@ -340,6 +340,10 @@ export default class Organization {
 		return this.data.profiles;
 	}
 
+	getProfile(id: ProfileID) {
+		return this.data.profiles.find((p) => p.id === id);
+	}
+
 	getPersonNamed(name: string) {
 		return this.data.profiles.filter((person) =>
 			person.name.toLocaleLowerCase().includes(name.toLocaleLowerCase())

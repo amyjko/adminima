@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { run, preventDefault } from 'svelte/legacy';
+	import { run } from 'svelte/legacy';
 
 	import Oops from './Oops.svelte';
 
@@ -21,8 +21,6 @@
 		children
 	}: Props = $props();
 
-	let form: HTMLFormElement | undefined = $state();
-
 	let showInactive = $state(false);
 	run(() => {
 		if (active) showInactive = false;
@@ -30,7 +28,6 @@
 </script>
 
 <form
-	bind:this={form}
 	onsubmit={(event) => {
 		if (action && active) {
 			event.preventDefault();

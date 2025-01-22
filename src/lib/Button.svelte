@@ -76,10 +76,7 @@
 		background: transparent;
 		border: none;
 		color: currentColor;
-	}
-
-	button.chromeless:hover {
-		color: var(--chrome);
+		padding: 0;
 	}
 
 	button:active {

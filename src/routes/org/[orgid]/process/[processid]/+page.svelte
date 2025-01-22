@@ -21,12 +21,11 @@
 	import { setContext, tick } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { browser } from '$app/environment';
-	import Select from '$lib/Select.svelte';
 	import Changes from '$lib/Changes.svelte';
-	import RoleLink from '$lib/RoleLink.svelte';
+	import RoleLink, { RoleItem } from '$lib/RoleLink.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import ChangeLink from '$lib/ChangeLink.svelte';
-	import Visibility from '$lib/Visibility.svelte';
+	import Visibility from '$lib/VisibilityChooser.svelte';
 	import Note from '$lib/Note.svelte';
 	import ARCI from '$lib/ARCI.svelte';
 	import type { HowRow } from '$database/OrganizationsDB';
@@ -36,7 +35,7 @@
 	import Status from '$lib/Status.svelte';
 	import Period from '$lib/Period.svelte';
 	import type { default as PeriodType } from '$database/Period';
-	import { DraftSymbol } from '$lib/Symbols';
+	import Options from '$lib/Options.svelte';
 
 	let deleteError: string | undefined = $state(undefined);
 
@@ -144,6 +143,12 @@
 	}
 </script>
 
+{#snippet concernView(value: string | undefined)}
+	{#if value}
+		<Concern concern={value} />
+	{/if}
+{/snippet}
+
 {#if process === null}
 	<Title title={org.getName()} />
 	<Oops
@@ -187,14 +192,17 @@
 			>
 		</Flow>
 		<Flow>
-			<Note
-				>Status {#if process.state === 'draft'}{DraftSymbol}{/if}
-			</Note>
+			<Note>Status</Note>
 			{#if editable}
-				<Select
+				{#snippet status(status: string | undefined)}
+					{#if status}
+						<Status {status} />
+					{/if}
+				{/snippet}
+				<Options
 					tip="Change the state of this process"
 					selection={process.state}
-					options={Object.entries(States).map(([key, value]) => ({ value: key, label: value }))}
+					options={Object.entries(States).map(([key, value]) => key)}
 					change={async (status) => {
 						if ($user && (status === 'draft' || status === 'active' || status === 'archived'))
 							return await queryOrError(
@@ -203,6 +211,8 @@
 							);
 						else return null;
 					}}
+					id="process-state"
+					view={status}
 				/>
 			{:else}
 				<Status status={process.state} />
@@ -210,17 +220,17 @@
 
 			<Note>Concern</Note>
 			{#if editable && $user && org.getConcerns().length > 0}
-				<Select
+				<Options
 					tip="Change this process's concern"
 					selection={process.concern}
-					options={org.getConcerns().map((c) => {
-						return { value: c, label: c };
-					})}
+					options={org.getConcerns()}
 					change={(concern) =>
 						queryOrError(
 							db.updateProcessConcern(process, concern ?? '', $user.id),
 							"Couldn't update process's concern"
 						)}
+					id="concer-chooser"
+					view={concernView}
 				/>{:else}
 				<Concern concern={process.concern} />
 			{/if}
@@ -279,27 +289,36 @@
 
 	<Header>Who</Header>
 
-	<span>
+	<div>
 		{#if editable}
-			<Select
+			{@const roles = org.getRoles().toSorted((a, b) => a.title.localeCompare(b.title))}
+			<Options
+				id="choose-accountable"
 				tip="Choose a role to be accountable for the processes outcomes."
-				fit
-				options={[
-					{ value: undefined, label: '—' },
-					...org
-						.getRoles()
-						.toSorted((a, b) => a.title.localeCompare(b.title))
-						.map((role) => {
-							return { value: role.id, label: role.title };
-						})
-				]}
+				options={[undefined, ...roles.map((role) => role.id)]}
+				searchable={{
+					placeholder: 'role',
+					include: (item: string, query: string) =>
+						roles
+							.find((r) => r.id === item)
+							?.title.toLowerCase()
+							.includes(query.toLowerCase()) === true
+				}}
+				view={RoleItem}
 				selection={process.accountable ?? undefined}
 				change={(value) => db.updateProcessAccountable(process, value ?? null)}
-			/>{:else if process.accountable}<RoleLink roleID={process.accountable} />{:else}No one{/if} is
-		<Level level="accountable" verbose /> for this processes outcomes{#if how.responsible.length === 0}
-			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible){/if}.
-	</span>
-
+			/>
+		{:else if process.accountable}
+			<RoleLink roleID={process.accountable} />
+		{:else}
+			No one
+		{/if}
+		is
+		<Level level="accountable" verbose /> for this processes outcomes
+		{#if how.responsible.length === 0}
+			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible)
+		{/if}
+	</div>
 	<ARCI {how} verbose {editable} />
 
 	<Header>When</Header>
@@ -309,29 +328,28 @@
 			>Setting one or more periods for when a process starts helps communicate when it should
 			happen.</Tip
 		>
-		<Select
+		{#snippet period(period: string | undefined)}
+			<div style:padding="var(--padding)">
+				{#if period === undefined}
+					add a period
+				{:else if period === 'annually-date'}
+					Annually on a specific date (e.g., every March 1st)
+				{:else if period === 'annually-week'}
+					Annually on a specific week and weekday (e.g., every 13th week on Monday)
+				{:else if period === 'monthly-date'}
+					Monthly on a specific day (e.g., every 1st of the month)
+				{:else if period === 'monthly-weekday'}
+					Monthly on a specific weekday (e.g., 2nd Monday of each month)
+				{:else if period === 'weekly'}
+					Every N weeks on a specific day (e.g., every 2 weeks on Monday)
+				{/if}
+			</div>
+		{/snippet}
+		<Options
+			id="choose-period"
 			tip="Add a frequency on which this process occurs"
-			options={[
-				{ value: undefined, label: 'Add a period …' },
-				{ value: 'annually-date', label: 'Annually on a specific date (e.g., every March 1st)' },
-				{
-					value: 'annually-week',
-					label: 'Annually on a specific week and weekday (e.g., every 13th week on Monday)'
-				},
-				{
-					value: 'monthly-date',
-					label: 'Monthly on a specific day (e.g., every 1st of the month)'
-				},
-				{
-					value: 'monthly-weekday',
-					label: 'Monthly on a specific weekday (e.g., 2nd Monday of each month'
-				},
-				{
-					value: 'weekly',
-					label:
-						'Every week or number of weeks on a specific weekday (e.g., every 2 weeks on Monday)'
-				}
-			]}
+			view={period}
+			options={['annually-date', 'annually-week', 'monthly-date', 'monthly-weekday', 'weekly']}
 			bind:selection={newPeriod}
 			change={addPeriod}
 		/>

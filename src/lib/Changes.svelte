@@ -2,7 +2,7 @@
 	import { type ChangeRow, type CommentRow } from '$database/OrganizationsDB';
 	import timestampToDate from '$database/timestampToDate';
 	import ChangeLink from './ChangeLink.svelte';
-	import ProfileLink from './ProfileLink.svelte';
+	import ProfileLink, { ProfileItem } from './ProfileLink.svelte';
 	import Status from './Status.svelte';
 	import { getDB, getOrg } from '$routes/+layout.svelte';
 	import { getUser } from '$routes/+layout.svelte';
@@ -21,7 +21,7 @@
 	import Dialog from './Dialog.svelte';
 	import NewComment from './NewComment.svelte';
 	import Button from './Button.svelte';
-	import Select from './Select.svelte';
+	import Options from './Options.svelte';
 
 	interface Props {
 		changes: ChangeRow[];
@@ -140,19 +140,19 @@
 		</Labeled>
 		<Labeled label="Filter by lead">
 			<!-- An option of all leads specified in the changes -->
-			<Select
+			<Options
+				id="lead-chooser"
 				tip="Filter by lead"
 				selection={filterLead}
 				options={[
-					{ value: undefined, label: 'All' },
+					undefined,
 					...[...new Set(changes.map((change) => change.lead))]
 						.filter((lead) => lead !== null)
-						.map((lead) => ({
-							value: lead,
-							label: org.getProfileNameOrEmail(lead) ?? '—'
-						}))
-						.sort((a, b) => a.label.localeCompare(b.label))
+						.sort((a, b) =>
+							(org.getProfileNameOrEmail(a) ?? '').localeCompare(org.getProfileNameOrEmail(b) ?? '')
+						)
 				]}
+				view={ProfileItem}
 				change={(value) => (filterLead = value)}
 			/>
 		</Labeled>

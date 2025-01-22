@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Select from './Select.svelte';
+	import Options from './Options.svelte';
 
 	interface Props {
 		num: number;
@@ -10,11 +10,10 @@
 	let { num, max, change }: Props = $props();
 </script>
 
-<Select
-	tip="Choose a week"
+<Options
+	id="number-chooser"
+	tip="Choose a count"
 	selection={`${num}`}
-	options={Array.from({ length: max }, (_, i) => i + 1).map((date) => {
-		return { value: `${date}`, label: `${date}` };
-	})}
+	options={Array.from({ length: max }, (_, i) => i + 1).map((num) => `${num}`)}
 	change={(value) => change(parseInt(value ?? '1'))}
 />

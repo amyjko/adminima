@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import { type Snippet } from 'svelte';
 	import {
 		ChangeSymbol,
 		OrganizationSymbol,
@@ -16,63 +17,88 @@
 		kind?: 'person' | 'role' | 'process' | 'org' | 'team' | 'change' | null;
 		icon?: string;
 		wrap?: boolean;
-		children?: import('svelte').Snippet;
+		children: Snippet;
+		action?: Snippet;
 	}
 
-	let { to, bland = false, title = undefined, kind = null, icon, wrap, children }: Props = $props();
+	let {
+		to,
+		bland = false,
+		title = undefined,
+		kind = null,
+		icon,
+		wrap,
+		children,
+		action
+	}: Props = $props();
 
 	let external = $derived(to.startsWith('http'));
-	let inactive = $derived(to === $page.url.pathname);
+	let inactive = $derived(to === page.url.pathname);
 </script>
 
-<a
-	class={kind}
-	class:inactive
-	class:bland
-	class:wrap
-	{title}
-	class:kinded={kind !== null}
-	class:external
-	href={inactive ? null : to}
-	target={external ? '_blank' : ''}
-	>{#if icon || kind}
-		<span class="emoji">
-			{#if icon}
-				{icon}
-			{:else if kind === 'person'}
-				{PersonSymbol}
-			{:else if kind === 'role'}
-				{RoleSymbol}
-			{:else if kind === 'process'}
-				{ProcessSymbol}
-			{:else if kind === 'org'}
-				{OrganizationSymbol}
-			{:else if kind === 'change'}
-				{ChangeSymbol}
-			{:else if kind === 'team'}
-				{TeamSymbol}
-			{/if}
+<span class="link">
+	<a
+		class={kind}
+		class:inactive
+		class:bland
+		class:wrap
+		{title}
+		class:kinded={kind !== null}
+		class:external
+		href={inactive ? null : to}
+		target={external ? '_blank' : ''}
+	>
+		{#if icon || kind}
+			<span class="emoji">
+				{#if icon}
+					{icon}
+				{:else if kind === 'person'}
+					{PersonSymbol}
+				{:else if kind === 'role'}
+					{RoleSymbol}
+				{:else if kind === 'process'}
+					{ProcessSymbol}
+				{:else if kind === 'org'}
+					{OrganizationSymbol}
+				{:else if kind === 'change'}
+					{ChangeSymbol}
+				{:else if kind === 'team'}
+					{TeamSymbol}
+				{/if}
+			</span>
+		{/if}
+		<span class="label">
+			{@render children()}
 		</span>
-	{/if}
-	<span class="label">
-		{@render children?.()}
-	</span>
-</a>
+	</a>
+	{@render action?.()}
+</span>
 
 <style>
+	.link {
+		display: inline-flex;
+		flex-direction: row;
+		align-items: center;
+		gap: var(--padding);
+	}
 	a {
 		color: currentColor;
 		transition: transform 200ms;
-		display: inline-block;
+		display: inline-flex;
 		border-radius: var(--padding);
 		font-size: inherit;
-		gap: 0.25em;
+		gap: var(--padding);
 	}
 
 	.label {
 		text-decoration-style: none;
 		text-decoration-thickness: var(--thickness);
 		text-decoration-skip-ink: none;
+		display: inline-flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: var(--padding);
 	}
 
 	a.inactive {
@@ -167,8 +193,8 @@
 		border-radius: 50%;
 		padding: 0.25em;
 		color: var(--background);
-		min-height: 1em;
-		min-width: 1.5em;
+		height: 1.5em;
+		width: 1.5em;
 		text-align: center;
 		vertical-align: middle;
 	}

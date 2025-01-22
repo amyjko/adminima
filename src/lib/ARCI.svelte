@@ -3,10 +3,10 @@
 	import type { HowRow } from '$database/OrganizationsDB';
 	import Button, { Delete } from './Button.svelte';
 	import Level from './Level.svelte';
-	import RoleLink from './RoleLink.svelte';
-	import Select from './Select.svelte';
+	import RoleLink, { RoleItem } from './RoleLink.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
 	import { getDB } from '$routes/+layout.svelte';
+	import Options from './Options.svelte';
 
 	interface Props {
 		how: HowRow;
@@ -22,7 +22,6 @@
 	const db = getDB();
 
 	let options = $derived([
-		{ value: undefined, label: '▼' },
 		...org
 			.getRoles()
 			// Exclude any alreaydy included in the how.
@@ -36,7 +35,7 @@
 			.toSorted((a, b) => a.title.localeCompare(b.title))
 			// Map to select options.
 			.map((role) => {
-				return { value: role.id, label: role.title };
+				return role.id;
 			})
 	]);
 
@@ -52,10 +51,12 @@
 				<Level level="responsible" />
 			{/if}
 			{#if editable}
-				<Select
+				<Options
+					id="responsible-chooser"
 					tip="Add a role to be responsible for completing this step."
 					{options}
-					fit={false}
+					view={RoleItem}
+					empty={false}
 					active={options.length > 1}
 					bind:selection={responsible}
 					change={(value) => {
@@ -90,12 +91,14 @@
 				<Level level="consulted" />
 			{/if}
 			{#if editable}
-				<Select
+				<Options
+					id="consulted-chooser"
 					tip="Add a role to be consulted in this step."
 					{options}
+					view={RoleItem}
+					empty={false}
 					active={options.length > 1}
 					bind:selection={consulted}
-					fit={false}
 					change={(value) => {
 						if (value) {
 							db.addHowRCI(how, value, 'consulted');
@@ -128,12 +131,14 @@
 				<Level level="informed" />
 			{/if}
 			{#if editable}
-				<Select
+				<Options
+					id="informed-chooser"
 					tip="Add a role to be informed in this step."
 					{options}
+					view={RoleItem}
+					empty={false}
 					bind:selection={informed}
 					active={options.length > 1}
-					fit={false}
 					change={(value) => {
 						if (value) {
 							db.addHowRCI(how, value, 'informed');

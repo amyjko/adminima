@@ -4,7 +4,7 @@
 	import Title from '$lib/Title.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 	import { addError, queryOrError } from '$routes/errors.svelte';
-	import Visibility from '$lib/Visibility.svelte';
+	import Visibility from '$lib/VisibilityChooser.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Note from '$lib/Note.svelte';
 	import { goto } from '$app/navigation';

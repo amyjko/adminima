@@ -1,22 +1,22 @@
 <script lang="ts">
 	import { getOrg } from '$routes/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { addError, queryOrError } from '$routes/errors.svelte';
+	import { queryOrError } from '$routes/errors.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
-	import PersonLink from '$lib/ProfileLink.svelte';
+	import PersonLink, { ProfileItem } from '$lib/ProfileLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import Checkbox from '$lib/Checkbox.svelte';
-	import RoleLink from '$lib/RoleLink.svelte';
+	import RoleLink, { RoleItem } from '$lib/RoleLink.svelte';
 	import { type PersonRow } from '$database/OrganizationsDB';
 	import TeamLink from '$lib/TeamLink.svelte';
-	import Select from '$lib/Select.svelte';
 	import validEmail, { validNameAndEmail } from '../../../validEmail';
 	import Notice from '$lib/Notice.svelte';
 	import Link from '$lib/Link.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import Table from '$lib/Table.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
+	import Options from '$lib/Options.svelte';
 
 	const context = getOrg();
 	let organization = $derived(context?.org);
@@ -137,14 +137,23 @@
 						{#if organization.getRoles().length === 0}
 							<em>&mdash;</em>
 						{:else if remainingRoles.length > 0}
-							<Select
+							<Options
+								id="profile-{profile.id}-role-chooser"
 								tip="Choose a role for this person."
 								bind:selection={newRole}
-								fit="1.5em"
+								searchable={{
+									placeholder: 'role',
+									include: (item, query) =>
+										remainingRoles
+											.find((r) => r.id === item)
+											?.title.toLowerCase()
+											.includes(query.toLowerCase()) === true
+								}}
+								view={RoleItem}
+								empty={false}
 								options={[
-									{ value: undefined, label: '▾' },
 									...remainingRoles.map((role) => {
-										return { value: role.id, label: role.title };
+										return role.id;
 									})
 								]}
 								change={async (roleID) => {
@@ -187,20 +196,22 @@
 				</td>
 				<td class="supervisor">
 					{#if isAdmin}
-						<Select
+						{@const eligibleSupervisors = organization
+							.getProfiles()
+							.filter((prof) => prof.id !== profile.id)}
+						<Options
+							id="profile-{profile.id}-supervisor-chooser"
 							tip="Choose a supervisor for this person."
-							options={[
-								{ value: undefined, label: '—' },
-								...organization
-									.getProfiles()
-									.filter((prof) => prof.id !== profile.id)
-									.map((prof) => {
-										return {
-											value: prof.id,
-											label: prof.name.length === 0 ? prof.email : prof.name
-										};
-									})
-							]}
+							searchable={{
+								placeholder: 'name',
+								include: (item, query) =>
+									eligibleSupervisors
+										.find((prof) => prof.id === item)
+										?.name.toLowerCase()
+										.includes(query.toLowerCase()) === true
+							}}
+							options={[undefined, ...eligibleSupervisors.map((prof) => prof.id)]}
+							view={ProfileItem}
 							selection={profile.supervisor ?? undefined}
 							change={(profileID) => {
 								queryOrError(
@@ -261,7 +272,7 @@
 
 	.roles {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 		flex-wrap: wrap;
 		gap: var(--padding);
 		align-items: baseline;

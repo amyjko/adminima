@@ -1,6 +1,4 @@
 <script module lang="ts">
-	import type { PostgrestError } from '@supabase/postgrest-js';
-
 	export const UserSymbol = Symbol('user');
 	export type UserContext = Writable<{ id: string; email: string | undefined } | null>;
 

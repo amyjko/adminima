@@ -1,9 +1,14 @@
+<script module lang="ts">
+	export { ProcessItem };
+</script>
+
 <script lang="ts">
 	import type { ProcessID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
 	import { getOrg } from '$routes/+layout.svelte';
 	import { DraftSymbol } from './Symbols';
+	import Self from './ProcessLink.svelte';
 
 	interface Props {
 		processID: ProcessID | null;
@@ -18,6 +23,18 @@
 	let process = $derived(processID ? org.getProcess(processID) : undefined);
 </script>
 
+{#snippet ProcessItem(process: string | undefined)}
+	<div class="process-view">
+		{#if process}<Self processID={process} />{:else}—{/if}
+	</div>
+	<style>
+		.process-view {
+			display: inline-block;
+			padding: var(--padding);
+		}
+	</style>
+{/snippet}
+
 {#if process === null}<Oops inline text="We couldn't find this process" />{:else}<Link
 		{wrap}
 		title={process && process.short.length > 0 ? process.title : undefined}
@@ -29,7 +46,7 @@
 		kind="process"
 		icon={process && process.state === 'draft' ? DraftSymbol : undefined}
 		>{#if process}
-			{process.title}
+			{process.title.substring(0, 25) + (process.title.length > 25 ? '…' : '')}
 		{:else}
 			<em>unknown process</em>
 		{/if}</Link

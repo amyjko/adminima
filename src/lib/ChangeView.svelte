@@ -1,9 +1,9 @@
 <script lang="ts">
-	import PersonLink from './ProfileLink.svelte';
+	import PersonLink, { ProfileItem } from './ProfileLink.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import MarkupView from './MarkupView.svelte';
-	import RoleLink from './RoleLink.svelte';
-	import ProcessLink from './ProcessLink.svelte';
+	import RoleLink, { RoleItem } from './RoleLink.svelte';
+	import ProcessLink, { ProcessItem } from './ProcessLink.svelte';
 	import TimeView from './TimeView.svelte';
 	import { type ChangeRow, type CommentRow } from '../database/OrganizationsDB';
 	import Oops from './Oops.svelte';
@@ -15,18 +15,18 @@
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { addError, queryOrError } from '$routes/errors.svelte';
 	import timestampToDate from '$database/timestampToDate';
-	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
 	import Loading from './Loading.svelte';
 	import CommentView from './CommentView.svelte';
 	import Header from './Header.svelte';
-	import Visibility from './Visibility.svelte';
+	import Visibility from './VisibilityChooser.svelte';
 	import Table from './Table.svelte';
 	import StatusChooser from './StatusChooser.svelte';
 	import { isStatus } from './status';
 	import NewComment from './NewComment.svelte';
 	import type { CommentID } from '$types/Organization';
 	import Field from './Field.svelte';
+	import Options from './Options.svelte';
 
 	interface Props {
 		change: ChangeRow;
@@ -83,7 +83,6 @@
 				queryOrError(db.udpateChangeWhat(change, text), "Couldn't update the change's title")
 		: undefined}
 >
-	<Status status={change.status} />
 	{#if editable}
 		<StatusChooser
 			tip="Change the status of this change"
@@ -98,7 +97,11 @@
 				else return null;
 			}}
 		/>
+	{:else}
+		<Status status={change.status} />
+	{/if}
 
+	{#if editable}
 		<Visibility
 			level={change.visibility}
 			tip="Edit this change's visibility"
@@ -115,25 +118,27 @@
 	/>.</Paragraph
 >
 
-<Paragraph>
-	{#if editable}<Select
+<div>
+	{#if editable}
+		<Options
+			id="lead-chooser"
 			tip="Choose who is leading this change"
 			selection={change.lead ?? undefined}
-			options={[
-				{ value: undefined, label: '—' },
-				...org.getProfiles().map((person) => {
-					return { value: person.id, label: person.name.length === 0 ? person.email : person.name };
-				})
-			]}
+			options={[undefined, ...org.getProfiles().map((person) => person.id)]}
+			view={ProfileItem}
 			change={(person) => {
 				queryOrError(
 					db.updateChangeLead(change, person ?? null),
 					"Couldn't update change processes."
 				);
 			}}
-		/>{:else if change.lead}<PersonLink profile={org.getProfileWithID(change.lead)} />{:else}No one{/if}
-	is currently leading this change.</Paragraph
->
+		/>
+	{:else if change.lead}
+		<PersonLink profile={org.getProfileWithID(change.lead)} />
+	{:else}
+		No one
+	{/if} is currently leading this change.
+</div>
 
 <Paragraph>
 	Review this change on <Field
@@ -199,19 +204,15 @@
 				{Delete}</Button
 			></RoleLink
 		>
-	{:else}
-		&mdash;
 	{/each}
 	{#if unselectedRoles.length > 0}
-		<Select
+		<Options
+			id="role-chooser"
 			tip="Add a role that is affected by this change."
-			options={[
-				{ value: undefined, label: '▼' },
-				...unselectedRoles.map((role) => {
-					return { value: role.id, label: role.title };
-				})
-			]}
+			options={[undefined, ...unselectedRoles.map((role) => role.id)]}
 			selection={roleSelection}
+			view={RoleItem}
+			empty={false}
 			change={(r) => {
 				if (r !== undefined) {
 					queryOrError(
@@ -231,6 +232,7 @@
 		<ProcessLink processID={process} />
 		<Button
 			tip="Remove this process from the affected processes."
+			chromeless
 			action={() =>
 				queryOrError(
 					db.updateChangeProcesses(
@@ -242,19 +244,15 @@
 		>
 			{Delete}</Button
 		>
-	{:else}
-		&mdash;
 	{/each}
 	{#if unselectedProcesses.length > 0}
-		<Select
+		<Options
+			id="process-chooser"
 			tip="Add a process that is affected by this change."
-			options={[
-				{ value: undefined, label: '▼' },
-				...unselectedProcesses.map((process) => {
-					return { value: process.id, label: process.title };
-				})
-			]}
+			options={[undefined, ...unselectedProcesses.map((process) => process.id)]}
 			selection={processSelection}
+			view={ProcessItem}
+			empty={false}
 			change={(p) => {
 				if (p !== undefined) {
 					queryOrError(

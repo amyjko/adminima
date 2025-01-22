@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Select from './Select.svelte';
 	import Weekdays from '../database/Weekdays';
+	import Options from './Options.svelte';
 
 	interface Props {
 		weekday: number;
@@ -10,11 +10,10 @@
 	let { weekday, change }: Props = $props();
 </script>
 
-<Select
+<Options
+	id="weekday-chooser"
 	tip="Choose a weekday"
-	selection={`${weekday}`}
-	options={Weekdays.map((day, index) => {
-		return { value: `${index + 1}`, label: day };
-	})}
-	change={(value) => change(parseInt(value ?? '1'))}
+	selection={Weekdays[weekday]}
+	options={Weekdays}
+	change={(value) => change(value === undefined ? 0 : Weekdays.indexOf(value))}
 />

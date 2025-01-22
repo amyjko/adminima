@@ -6,7 +6,6 @@
 	import WeekdayChooser from './WeekdayChooser.svelte';
 	import NumberChooser from './NumberChooser.svelte';
 	import Months from '../database/Months';
-	import { format } from 'date-fns';
 	import Note from './Note.svelte';
 
 	interface Props {
@@ -86,7 +85,7 @@
 			Every <strong
 				>{#if edit}<NumberChooser
 						num={period.weeks}
-						max={51}
+						max={12}
 						change={(value) => edit({ ...period, weeks: value })}
 					/>{:else}{period.weeks}{/if}</strong
 			>

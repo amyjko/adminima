@@ -12,11 +12,11 @@
 
 <style>
 	.status {
+		flex-grow: 1;
 		text-transform: none;
 		display: inline-block;
 		font-size: var(--small-size);
-		padding-left: var(--padding);
-		padding-right: var(--padding);
+		padding: var(--padding);
 		background: var(--warning);
 		color: var(--background);
 		box-shadow: var(--border) 1px 1px;

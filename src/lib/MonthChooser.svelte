@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Months from '../database/Months';
-	import Select from './Select.svelte';
+	import Options from './Options.svelte';
 
 	interface Props {
 		month: number;
@@ -10,11 +10,10 @@
 	let { month, change }: Props = $props();
 </script>
 
-<Select
+<Options
+	id="month-chooser"
 	tip="Choose a month"
-	selection={`${month}`}
-	options={Months.map((month, index) => {
-		return { value: `${index + 1}`, label: month };
-	})}
-	change={(value) => change(parseInt(value ?? '1'))}
+	selection={Months[month]}
+	options={Months}
+	change={(value) => change(value === undefined ? 0 : Months.indexOf(value))}
 />

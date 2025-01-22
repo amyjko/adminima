@@ -1,43 +1,19 @@
 <script lang="ts">
-	import type { PostgrestError } from '@supabase/supabase-js';
-	import { type Visibility as Vis, type Visibility } from '../database/OrganizationsDB';
-	import Select from './Select.svelte';
-
-	interface Props {
-		level: Vis;
-		tip: string;
-		edit?: undefined | ((level: string) => Promise<PostgrestError | null> | undefined);
-	}
-
-	let { level, tip, edit = undefined }: Props = $props();
-
-	const opts: { value: Visibility; label: string }[] = [
-		{ value: 'public', label: 'public' },
-		{ value: 'org', label: 'org' },
-		{ value: 'admin', label: 'admins' }
-	] as const;
+	let { state }: { state: string } = $props();
 </script>
 
-{#if edit}
-	<Select
-		{tip}
-		selection={level}
-		options={opts}
-		change={(value) => (value ? edit(value) : undefined)}
-	/>
-{:else}
-	<span class="visibility {level}">{level}</span>
-{/if}
+<span class="visibility {state}">{state}</span>
 
 <style>
 	.visibility {
+		flex-grow: 1;
 		text-transform: none;
 		display: inline-block;
 		font-size: var(--small-size);
-		padding-left: var(--padding);
-		padding-right: var(--padding);
+		padding: var(--padding);
 		background: var(--warning);
 		color: var(--background);
+		border: solid var(--border) 1px;
 	}
 
 	.public {

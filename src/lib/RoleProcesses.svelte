@@ -2,7 +2,7 @@
 	import Subheader from './Subheader.svelte';
 	import Flow from './Flow.svelte';
 	import ProcessLink from './ProcessLink.svelte';
-	import type { HowRow, ProcessRow, RoleRow } from '$database/OrganizationsDB';
+	import type { ProcessRow, RoleRow } from '$database/OrganizationsDB';
 	import { getOrg } from '$routes/+layout.svelte';
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from './ProcessDate.svelte';

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import Select from './Select.svelte';
+	import Options from './Options.svelte';
 	import { isStatus, Statuses, type StatusType } from './status';
+	import Status from './Status.svelte';
 
 	interface Props {
 		tip: string;
@@ -12,12 +13,15 @@
 	let { tip, change, none, value }: Props = $props();
 </script>
 
-<Select
+{#snippet StatusItem(status: string | undefined)}
+	{#if status}<Status {status}></Status>{:else}—{/if}
+{/snippet}
+
+<Options
+	id="status-chooser"
 	{tip}
 	selection={value}
-	options={[
-		...(none ? [{ value: undefined, label: 'All' }] : []),
-		...Object.entries(Statuses).map(([key, value]) => ({ value: key, label: value }))
-	]}
+	view={StatusItem}
+	options={[...(none ? [undefined] : []), ...Object.entries(Statuses).map(([key, value]) => key)]}
 	change={(value) => change(value === undefined ? undefined : isStatus(value) ? value : undefined)}
 />

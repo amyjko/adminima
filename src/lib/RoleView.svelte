@@ -10,15 +10,15 @@
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { addError, queryOrError } from '$routes/errors.svelte';
 	import Header from './Header.svelte';
-	import TeamLink from './TeamLink.svelte';
+	import TeamLink, { TeamItem } from './TeamLink.svelte';
 	import CommentsView from './CommentsView.svelte';
 	import Notice from './Notice.svelte';
 	import Changes from './Changes.svelte';
 	import ChangeLink from './ChangeLink.svelte';
-	import Select from './Select.svelte';
 	import Tip from './Tip.svelte';
 	import PathEditor from './PathEditor.svelte';
 	import RoleProcesses from './RoleProcesses.svelte';
+	import Options from './Options.svelte';
 
 	interface Props {
 		role: RoleRow;
@@ -48,17 +48,18 @@
 		? (text) => queryOrError(db.updateRoleTitle(role, text, $user.id), "Couldn't update role title")
 		: undefined}
 >
-	{#if role.team}<TeamLink id={role.team} />{:else}no team{/if}
 	{#if isAdmin}
-		<Select
+		<Options
+			id="team-chooser"
 			tip="Choose a team for this role"
 			selection={role.team ?? undefined}
 			options={[
-				{ value: undefined, label: 'No team' },
+				undefined,
 				...org.getTeams().map((team) => {
-					return { value: team.id, label: team.name };
+					return team.id;
 				})
 			]}
+			view={TeamItem}
 			change={async (team) => {
 				if (isAdmin && $user) {
 					return await queryOrError(
@@ -68,7 +69,9 @@
 				}
 				return null;
 			}}
-		/>{/if}
+		/>
+	{:else if role.team}<TeamLink id={role.team} />{:else}no team{/if}
+
 	{#if isAdmin}<PathEditor
 			short={role.short[0] ?? ''}
 			path={'...role/'}

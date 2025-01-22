@@ -1,8 +1,6 @@
 <script lang="ts">
 	import SegmentView from '$lib/SegmentView.svelte';
 	import type Heading from '../markup/Heading';
-	import Header from './Header.svelte';
-	import Subheader from './Subheader.svelte';
 
 	interface Props {
 		block: Heading;

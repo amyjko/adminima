@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import Button from '$lib/Button.svelte';
 	import Field from '$lib/Field.svelte';
