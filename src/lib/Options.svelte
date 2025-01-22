@@ -140,7 +140,7 @@
 		{/if}
 	</div>
 	<datalist id="{id}-list" class:expanded bind:this={list}>
-		{#each searchable ? options.filter((o) => empty || (o !== undefined ? searchable.include(o, query) : false)) : options as option}
+		{#each searchable ? options.filter((o) => (o === undefined && empty) || (o !== undefined ? searchable.include(o, query) : false)) : options as option}
 			<div
 				class="option"
 				role="option"
