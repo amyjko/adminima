@@ -12,7 +12,7 @@
 	import Flow from './Flow.svelte';
 	import StatusChooser from './StatusChooser.svelte';
 	import Labeled from './Labeled.svelte';
-	import { Statuses, type StatusType } from './status';
+	import { isStatus, Statuses, type StatusType } from './status';
 	import Notice from './Notice.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -22,6 +22,7 @@
 	import NewComment from './NewComment.svelte';
 	import Button from './Button.svelte';
 	import Options from './Options.svelte';
+	import { queryOrError } from '$routes/errors.svelte';
 
 	interface Props {
 		changes: ChangeRow[];
@@ -175,7 +176,24 @@
 				<!-- Get the most recent comment -->
 				{@const comment = latestComments.find((c) => c.id === change.comments.at(-1))}
 				<tr>
-					<td><Status status={change.status} /></td>
+					<td
+						>{#if visible}
+							<StatusChooser
+								tip="Change the status of this change"
+								value={change.status}
+								none={false}
+								change={async (status: string | undefined) => {
+									if ($user && status !== undefined && isStatus(status))
+										return await queryOrError(
+											db.updateChangeStatus(change, status, $user.id),
+											"Couldn't update the change's status."
+										);
+									else return null;
+								}}
+							/>
+						{:else}<Status status={change.status} />
+						{/if}
+					</td>
 					<!-- <td><Visibility level={change.visibility} tip="Visibility of the change" /></td> -->
 					<td
 						>{#if change.lead}<ProfileLink

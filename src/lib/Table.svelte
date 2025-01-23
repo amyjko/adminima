@@ -15,7 +15,9 @@
 <style>
 	.table {
 		overflow-x: auto;
+		overflow-y: visible;
 		width: 100%;
+		height: fit-content;
 	}
 
 	.fixed {
