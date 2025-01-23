@@ -33,6 +33,7 @@
 	let searching = $state(false);
 	let search = $state<HTMLInputElement | null>(null);
 	let list = $state<HTMLDataListElement | null>(null);
+	let dropdown = $state<HTMLDivElement | null>(null);
 
 	function choose(option: string | undefined) {
 		// Select the option.
@@ -47,13 +48,20 @@
 		if (!(event.currentTarget instanceof HTMLElement)) return;
 		switch (event.key) {
 			case 'Enter':
-				choose(option);
-				event.stopPropagation();
-				event.preventDefault();
-				break;
+			case ' ':
+				if (event.currentTarget === dropdown) {
+					expanded = !expanded;
+					event.stopPropagation();
+				} else {
+					choose(option);
+					event.stopPropagation();
+					event.preventDefault();
+					break;
+				}
 			case 'ArrowDown':
-				if (event.currentTarget === search) {
+				if (event.currentTarget === search || event.currentTarget === dropdown) {
 					if (list?.firstElementChild instanceof HTMLElement) {
+						expanded = true;
 						list.firstElementChild.focus();
 					}
 				} else if (event.currentTarget.parentElement === list) {
@@ -67,7 +75,7 @@
 				if (event.currentTarget.parentElement === list) {
 					const prev = event.currentTarget.previousElementSibling;
 					if (prev instanceof HTMLElement) prev.focus();
-					else search?.focus();
+					else search !== undefined ? search?.focus() : dropdown?.focus();
 				}
 				event.stopPropagation();
 				event.preventDefault();
@@ -111,12 +119,21 @@
 				data-active-option="{id}-{options.findIndex((s) => s === selection)}"
 			/>
 		{:else if selection !== undefined || empty}
-			<!-- Otherwise, show the item -->
-			{#if item}
-				{@render item(selection)}
-			{:else}
-				{selection}
-			{/if}
+			<div
+				role="button"
+				class="dropdown"
+				tabindex="0"
+				bind:this={dropdown}
+				onpointerdown={() => (expanded = !expanded)}
+				onkeydown={(event) => handleKey(event, undefined)}
+			>
+				<!-- Otherwise, show the item -->
+				{#if item}
+					{@render item(selection)}
+				{:else}
+					{selection}
+				{/if}
+			</div>
 		{/if}
 		{#if searchable}
 			<Button
@@ -191,7 +208,8 @@
 	}
 
 	input:focus,
-	.option:focus {
+	.option:focus,
+	.dropdown:focus {
 		outline: var(--thickness) solid var(--focus);
 	}
 
