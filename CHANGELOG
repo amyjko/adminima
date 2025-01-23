@@ -3,6 +3,12 @@
 sWe'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.7.9 2025-01-22
+
+### Added
+
+- Added custom combo box for all drop downs, allowing searching and visual consistency.
+
 ## v0.7.8 2025-01-18
 
 ### Added

@@ -126,6 +126,11 @@
 			selection={change.lead ?? undefined}
 			options={[undefined, ...org.getProfiles().map((person) => person.id)]}
 			view={ProfileItem}
+			searchable={{
+				placeholder: 'name',
+				include: (person, query) =>
+					(org.getProfileNameOrEmail(person) ?? '').toLowerCase().includes(query.toLowerCase())
+			}}
 			change={(person) => {
 				queryOrError(
 					db.updateChangeLead(change, person ?? null),
