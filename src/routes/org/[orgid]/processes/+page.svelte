@@ -212,7 +212,7 @@
 	</FormDialog>
 {/if}
 
-<Field label="Filter by title or accountable/responsible person" bind:text={filter} />
+<Field fill label="Filter by title or accountable/responsible person" bind:text={filter} />
 
 <fieldset>
 	<div>

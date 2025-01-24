@@ -16,6 +16,7 @@
 		flex-wrap: wrap;
 		justify-content: left;
 		align-items: baseline;
+		width: 100%;
 	}
 
 	.spaced {

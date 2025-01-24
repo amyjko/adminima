@@ -9,6 +9,8 @@
 		autocomplete?: boolean;
 		invalid?: ((text: string) => string | undefined) | undefined;
 		done?: ((text: string) => void) | undefined;
+		/** Fill remaining space of container */
+		fill?: boolean;
 	}
 
 	let {
@@ -18,31 +20,37 @@
 		placeholder = undefined,
 		autocomplete = false,
 		invalid = undefined,
-		done = undefined
+		done = undefined,
+		fill = false
 	}: Props = $props();
 
 	let message = $derived(invalid ? invalid(text) : undefined);
 </script>
 
-<Labeled label={label ?? ''} {message}>
-	<input
-		type="text"
-		autocomplete={autocomplete ? 'on' : 'off'}
-		disabled={!active}
-		bind:value={text}
-		style:width={text.length + 'ch'}
-		onblur={done
-			? () => {
-					if (invalid === undefined || invalid(text) === undefined) {
-						done(text);
+<div class="field" class:fill>
+	<Labeled label={label ?? ''} {message}>
+		<input
+			type="text"
+			autocomplete={autocomplete ? 'on' : 'off'}
+			disabled={!active}
+			bind:value={text}
+			style:width={fill ? 'auto' : text.length + 'ch'}
+			onblur={done
+				? () => {
+						if (invalid === undefined || invalid(text) === undefined) {
+							done(text);
+						}
 					}
-				}
-			: undefined}
-		{placeholder}
-	/>
-</Labeled>
+				: undefined}
+			{placeholder}
+		/>
+	</Labeled>
+</div>
 
 <style>
+	.field.fill {
+		flex-grow: 1;
+	}
 	input:focus {
 		outline: var(--focus) solid var(--thickness);
 	}

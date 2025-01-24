@@ -130,7 +130,7 @@
 
 {#if changes.length > 0}
 	<Flow>
-		<Field label="Filter by title" bind:text={filterText} />
+		<Field fill label="Filter by title" bind:text={filterText} />
 		<Labeled label="Filter by status">
 			<StatusChooser
 				none={true}
