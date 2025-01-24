@@ -48,7 +48,6 @@
 		if (!(event.currentTarget instanceof HTMLElement)) return;
 		switch (event.key) {
 			case 'Enter':
-			case ' ':
 				if (event.currentTarget === dropdown) {
 					expanded = !expanded;
 					event.stopPropagation();
