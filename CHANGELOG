@@ -9,6 +9,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Added custom combo box for all drop downs, allowing searching and visual consistency.
 
+### Fixed
+
+- Fixed issue where larger columns would not be included in real time updates, causing data to seem to disappear until refresh.
+
 ## v0.7.8 2025-01-18
 
 ### Added

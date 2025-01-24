@@ -29,6 +29,10 @@ export default class Organization {
 		this.data = data;
 	}
 
+	getOrg() {
+		return this.data.organization;
+	}
+
 	getID() {
 		return this.data.organization.id;
 	}

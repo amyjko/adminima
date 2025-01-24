@@ -124,7 +124,7 @@ class OrganizationsDB {
 
 					// Otherwise, update the organization.
 					if (payload.eventType === 'UPDATE') {
-						this.notify(org.withUpdate(payload.new));
+						this.notify(org.withUpdate({ ...org.getOrg(), ...payload.new }));
 					}
 				}
 			)
@@ -142,7 +142,8 @@ class OrganizationsDB {
 					this.synchronizeRow(
 						orgid,
 						payload,
-						(org, role) => org.withProfile(role),
+						// Updates don't always get every column, so we merge with the existing value, if there is one.
+						(org, role) => org.withProfile({ ...(org.getProfile(role.id) ?? {}), ...role }),
 						(org, role) => (role.id ? org.withoutProfile(role.id) : org)
 					);
 				}
@@ -161,7 +162,8 @@ class OrganizationsDB {
 					this.synchronizeRow(
 						orgid,
 						payload,
-						(org, role) => org.withRole(role),
+						// Updates don't always get every column, so we merge with the existing value, if there is one.
+						(org, role) => org.withRole({ ...(org.getRole(role.id) ?? {}), ...role }),
 						(org, role) => (role.id ? org.withoutRole(role.id) : org)
 					);
 				}
@@ -207,7 +209,8 @@ class OrganizationsDB {
 					this.synchronizeRow(
 						orgid,
 						payload,
-						(org, newTeam) => org.withTeam(newTeam),
+						// Updates don't always get every column, so we merge with the existing value, if there is one.
+						(org, newTeam) => org.withTeam({ ...(org.getTeam(newTeam.id) ?? {}), ...newTeam }),
 						(org, team) => (team.id ? org.withoutTeam(team.id) : org)
 					);
 				}
@@ -226,7 +229,9 @@ class OrganizationsDB {
 					this.synchronizeRow(
 						orgid,
 						payload,
-						(org, newProcess) => org.withProcess(newProcess),
+						// Updates don't always get every column, so we merge with the existing value, if there is one.
+						(org, newProcess) =>
+							org.withProcess({ ...(org.getProcess(newProcess.id) ?? {}), ...newProcess }),
 						(org, process) => (process.id ? org.withoutProcess(process.id) : org)
 					);
 				}
@@ -245,7 +250,8 @@ class OrganizationsDB {
 					this.synchronizeRow(
 						orgid,
 						payload,
-						(org, how) => org.withHow(how),
+						// Updates don't always get every column, so we merge with the existing value, if there is one.
+						(org, how) => org.withHow({ ...(org.getHow(how.id) ?? {}), ...how }),
 						(org, how) => (how.id ? org.withoutHow(how.id) : org)
 					);
 				}
@@ -264,7 +270,8 @@ class OrganizationsDB {
 					this.synchronizeRow(
 						orgid,
 						payload,
-						(org, change) => org.withChange(change),
+						// Updates don't always get every column, so we merge with the existing value, if there is one.
+						(org, change) => org.withChange({ ...(org.getChange(change.id) ?? {}), ...change }),
 						(org, change) => (change.id ? org.withoutChange(change.id) : org)
 					);
 				}
@@ -283,7 +290,9 @@ class OrganizationsDB {
 		if (!org) return;
 
 		// Otherwise, update the organization's profile.
-		if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+		if (payload.eventType === 'UPDATE') {
+			this.notify(update(org, payload.new));
+		} else if (payload.eventType === 'INSERT') {
 			this.notify(update(org, payload.new));
 		} else if (payload.eventType === 'DELETE' && payload.old.id) {
 			// Supabase doesn't allow filtering on delete events, so we have to filter here.
@@ -992,11 +1001,11 @@ class OrganizationsDB {
 		return error;
 	}
 
-	async updateChangeReview(how: ChangeRow, review: string | null) {
+	async updateChangeReview(change: ChangeRow, review: string | null) {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ review: review })
-			.eq('id', how.id);
+			.eq('id', change.id);
 		return error;
 	}
 
