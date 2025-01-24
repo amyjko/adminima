@@ -32,6 +32,7 @@
 			newComment = '';
 			submitted?.();
 		}
+		newComment = '';
 		return result;
 	}
 </script>
