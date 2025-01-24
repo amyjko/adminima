@@ -48,6 +48,10 @@
 </div>
 
 <style>
+	.field {
+		display: inline-block;
+	}
+
 	.field.fill {
 		flex-grow: 1;
 	}
