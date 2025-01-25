@@ -25,40 +25,48 @@
 	const db = getDB();
 	const user = getUser();
 
+	// Feedback on deletion.
+	let deleting = $state(false);
+
 	let admin = $derived($user && org.hasAdminPerson($user.id));
 </script>
 
-<tr class="comment">
-	<td width="20%">
-		<div class="meta">
-			<PersonLink profile={org.getProfileWithPersonID(comment.who)} />
-			<TimeView date={timestampToDate(comment.when)} />
-		</div>
-	</td>
-	<td
-		><Quote>
-			{#if admin || ($user && comment.who === $user.id)}
-				<MarkupView
-					markup={comment.what}
-					placeholder="—"
-					edit={async (text) =>
-						queryOrError(db.updateComment(comment, text), 'Unable to save comment.')}
-				/>
-			{:else}
-				{comment.what}
-			{/if}
-		</Quote>
-	</td>
-	{#if remove}
-		<td width="10%">
-			<Button
-				tip="Delete this comment"
-				warning
-				action={() => queryOrError(remove(comment.id), 'Unable to delete comment.')}
-				>{Delete}</Button
-			>
-		</td>{/if}
-</tr>
+{#if !deleting}
+	<tr class="comment">
+		<td width="20%">
+			<div class="meta">
+				<PersonLink profile={org.getProfileWithPersonID(comment.who)} />
+				<TimeView date={timestampToDate(comment.when)} />
+			</div>
+		</td>
+		<td
+			><Quote>
+				{#if admin || ($user && comment.who === $user.id)}
+					<MarkupView
+						markup={comment.what}
+						placeholder="—"
+						edit={async (text) =>
+							queryOrError(db.updateComment(comment, text), 'Unable to save comment.')}
+					/>
+				{:else}
+					{comment.what}
+				{/if}
+			</Quote>
+		</td>
+		{#if remove}
+			<td width="10%">
+				<Button
+					tip="Delete this comment"
+					warning
+					action={() => {
+						deleting = true;
+						queryOrError(remove(comment.id), 'Unable to delete comment.');
+						deleting = false;
+					}}>{Delete}</Button
+				>
+			</td>{/if}
+	</tr>
+{/if}
 
 <style>
 	.meta {

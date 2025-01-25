@@ -583,23 +583,34 @@ class OrganizationsDB {
 		comments: CommentID[]
 	) {
 		// Insert the new comment.
-		const { data, error: insertError } = await this.supabase
+		const { data: comment, error: insertError } = await this.supabase
 			.from('comments')
 			.insert({ orgid, what, who })
 			.select()
 			.single();
 		if (insertError) return insertError;
 
-		const commentID = data?.id ?? null;
+		const commentID = comment?.id ?? null;
 
 		// If we succeeded, update the list of comments for the table.
 		if (commentID) {
-			const { error: updateError } = await this.supabase
+			const newComments = [...comments, commentID];
+			const { data: row, error: updateError } = await this.supabase
 				.from(table)
-				.update({ comments: [...comments, commentID] })
+				.update({ comments: newComments })
 				.eq('id', id);
-			return updateError;
-		} else return null;
+			if (updateError) return updateError;
+
+			// If we succeeded, notify the organization of the change.
+			if (row) {
+				if (table === 'suggestions') {
+					const org = this.organizations.get(orgid);
+					const change = org?.getChange(id);
+					if (org && change) this.notify(org.withChange({ ...change, comments: newComments }));
+				}
+			}
+		}
+		return null;
 	}
 
 	async deleteRole(orgid: OrganizationID, id: RoleID): Promise<PostgrestError | null> {
