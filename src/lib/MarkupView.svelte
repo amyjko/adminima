@@ -38,9 +38,16 @@
 	let scrollHeight = $derived(revisedText ? (input ? input.scrollHeight : height) : height);
 	let saving = $state(false);
 
-	// No edit function? Immediately update the markup.
+	// No edit function and revised text changes, update the markup.
 	$effect(() => {
 		if (edit === undefined) markup = revisedText;
+	});
+
+	// If the markup changes, update the revised text of the text area.
+	$effect(() => {
+		if (markup !== revisedText) {
+			revisedText = markup;
+		}
 	});
 
 	async function startEditing() {
