@@ -45,7 +45,7 @@
 
 	// If the markup changes, update the revised text of the text area.
 	$effect(() => {
-		if (markup !== revisedText) {
+		if (edit === undefined && markup !== revisedText) {
 			revisedText = markup;
 		}
 	});
