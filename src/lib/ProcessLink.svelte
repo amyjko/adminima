@@ -1,5 +1,7 @@
 <script module lang="ts">
 	export { ProcessItem };
+
+	const MaxLength = 100;
 </script>
 
 <script lang="ts">
@@ -46,7 +48,7 @@
 		kind="process"
 		icon={process && process.state === 'draft' ? DraftSymbol : undefined}
 		>{#if process}
-			{process.title.substring(0, 25) + (process.title.length > 25 ? '…' : '')}
+			{process.title.substring(0, MaxLength) + (process.title.length > MaxLength ? '…' : '')}
 		{:else}
 			<em>unknown process</em>
 		{/if}</Link
