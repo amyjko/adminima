@@ -27,6 +27,7 @@
 	import type { CommentID } from '$types/Organization';
 	import Field from './Field.svelte';
 	import Options from './Options.svelte';
+	import Flow from './Flow.svelte';
 
 	interface Props {
 		change: ChangeRow;
@@ -145,7 +146,7 @@
 	{/if} is currently leading this change.
 </div>
 
-<Paragraph>
+<Flow>
 	Review this change on <Field
 		text={change.review ? new Date(Date.parse(change.review)).toLocaleDateString() : ''}
 		placeholder="date"
@@ -163,7 +164,7 @@
 			);
 		}}
 	></Field>.
-</Paragraph>
+</Flow>
 
 <Header>Problem</Header>
 
