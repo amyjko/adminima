@@ -104,6 +104,11 @@
 		cursor: default;
 	}
 
+	button.chromeless[aria-disabled='true'] {
+		border: none;
+		color: var(--chrome);
+	}
+
 	button:focus {
 		outline: var(--focus) solid var(--thickness);
 	}

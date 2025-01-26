@@ -98,7 +98,7 @@
 >
 	<div class="selection">
 		<!-- Searching? Show the search box. -->
-		{#if searchable && searching}
+		{#if searchable && searching && active}
 			<input
 				type="text"
 				bind:value={query}
@@ -107,7 +107,6 @@
 				title={tip}
 				aria-label={tip}
 				role="combobox"
-				disabled={!active}
 				onfocus={() => {
 					expanded = true;
 				}}
@@ -122,6 +121,7 @@
 				role="button"
 				class="dropdown"
 				tabindex="0"
+				aria-disabled={active ? 'false' : 'true'}
 				bind:this={dropdown}
 				onpointerdown={() => (expanded = !expanded)}
 				onkeydown={(event) => handleKey(event, undefined)}
@@ -134,7 +134,7 @@
 				{/if}
 			</div>
 		{/if}
-		{#if searchable}
+		{#if searchable && active}
 			<Button
 				chromeless
 				tip="search"
@@ -147,6 +147,7 @@
 			<Button
 				chromeless
 				{tip}
+				{active}
 				action={() => {
 					expanded = !expanded;
 				}}
@@ -201,15 +202,15 @@
 		height: 1.5em;
 	}
 
-	input[disabled] {
-		color: var(--inactive);
-		cursor: default;
-	}
-
 	input:focus,
 	.option:focus,
 	.dropdown:focus {
 		outline: var(--thickness) solid var(--focus);
+	}
+
+	.dropdown[aria-disabled='true'] {
+		color: var(--inactive);
+		cursor: default;
 	}
 
 	datalist {

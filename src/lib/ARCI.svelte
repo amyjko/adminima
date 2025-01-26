@@ -42,6 +42,14 @@
 	let responsible: string | undefined = $state(undefined);
 	let consulted: string | undefined = $state(undefined);
 	let informed: string | undefined = $state(undefined);
+
+	let roleSearch = {
+		placeholder: 'role',
+		include: (item: string, query: string) => {
+			const role = org.getRole(item);
+			return role?.title.toLowerCase().includes(query.toLowerCase()) ?? false;
+		}
+	};
 </script>
 
 <div class="arci" class:verbose>
@@ -57,7 +65,8 @@
 					{options}
 					view={RoleItem}
 					empty={false}
-					active={options.length > 1}
+					searchable={roleSearch}
+					active={options.length >= 1}
 					bind:selection={responsible}
 					change={(value) => {
 						if (value) {
@@ -97,8 +106,9 @@
 					{options}
 					view={RoleItem}
 					empty={false}
-					active={options.length > 1}
+					active={options.length >= 1}
 					bind:selection={consulted}
+					searchable={roleSearch}
 					change={(value) => {
 						if (value) {
 							db.addHowRCI(how, value, 'consulted');
@@ -137,8 +147,9 @@
 					{options}
 					view={RoleItem}
 					empty={false}
+					searchable={roleSearch}
 					bind:selection={informed}
-					active={options.length > 1}
+					active={options.length >= 1}
 					change={(value) => {
 						if (value) {
 							db.addHowRCI(how, value, 'informed');
