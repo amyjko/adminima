@@ -187,15 +187,15 @@
 	}
 
 	.emoji {
-		display: inline-block;
-		font-size: 75%;
-		box-shadow: var(--border) 1px 1px;
-		border-radius: 50%;
-		padding: 0.25em;
-		color: var(--background);
+		display: flex;
 		height: 1.5em;
 		width: 1.5em;
-		text-align: center;
-		vertical-align: middle;
+		border-radius: 50%;
+		padding: 0.25em;
+		justify-content: center;
+		align-items: center;
+		font-size: 75%;
+		box-shadow: var(--border) 1px 1px;
+		color: var(--background);
 	}
 </style>
