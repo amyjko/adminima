@@ -49,10 +49,11 @@
 	</span>
 	<span class="link">
 		<Link bland kind="change" to="/org/{organization.getPath()}/changes"
-			><strong>{organization.getChanges().length}</strong> Change{organization.getChanges()
-				.length !== 1
-				? 's'
-				: ''}</Link
+			><strong
+				>{organization.getChanges().filter((c) => c.status !== 'done' && c.status !== 'declined')
+					.length}</strong
+			>
+			Change{organization.getChanges().length !== 1 ? 's' : ''}</Link
 		>
 	</span>
 </div>
