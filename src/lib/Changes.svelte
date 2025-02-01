@@ -23,6 +23,7 @@
 	import Button from './Button.svelte';
 	import Options from './Options.svelte';
 	import { queryOrError } from '$routes/errors.svelte';
+	import Checkbox from './Checkbox.svelte';
 
 	interface Props {
 		changes: ChangeRow[];
@@ -71,7 +72,16 @@
 			: statusFilteredChanges.filter((change) => change.lead === filterLead)
 	);
 
-	let filteredChanges = $derived(leadFilteredChanges);
+	let showDone = $state(false);
+	let showDeclined = $state(false);
+
+	let filteredChanges = $derived(
+		leadFilteredChanges.filter((change) => {
+			if (showDone && change.status === 'done') return true;
+			if (showDeclined && change.status === 'declined') return true;
+			return change.status !== 'done' && change.status !== 'declined';
+		})
+	);
 
 	/** The change for which a comment is being submitted */
 	let submittingComment: ChangeRow | undefined = $state(undefined);
@@ -156,6 +166,17 @@
 				view={ProfileItem}
 				change={(value) => (filterLead = value)}
 			/>
+		</Labeled>
+		<Labeled label="Show done">
+			<Checkbox tip="Show or hide done changes." on={showDone} change={(on) => (showDone = on)}
+			></Checkbox>
+		</Labeled>
+		<Labeled label="Show declined">
+			<Checkbox
+				tip="Show or hide declined changes."
+				on={showDeclined}
+				change={(on) => (showDeclined = on)}
+			></Checkbox>
 		</Labeled>
 	</Flow>
 	<Table fixed>
