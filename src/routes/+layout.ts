@@ -13,6 +13,11 @@ export const load = async ({ fetch, data, depends }: LayoutLoadEvent) => {
 		? createBrowserClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {
 				global: {
 					fetch
+				},
+				// Enable a worker to monitor connections in the background and reconnect.
+				realtime: {
+					worker: true,
+					heartbeatIntervalMs: 15000
 				}
 			})
 		: createServerClient(PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY, {

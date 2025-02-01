@@ -10,6 +10,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Only show non-done, non-declined changes in count in header.
 - Hide done and declined unless requested.
 
+### Fixed
+
+- Resolve dead realtime connections using worker refresh support for channels.
+
 ### Maintainence
 
 - Updated minor versions of dependencies.
