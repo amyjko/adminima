@@ -78,13 +78,14 @@
 	.link {
 		display: inline-flex;
 		flex-direction: row;
-		align-items: center;
+		align-items: baseline;
 		gap: var(--padding);
 	}
 	a {
 		color: currentColor;
 		transition: transform 200ms;
 		display: inline-flex;
+		align-items: center;
 		border-radius: var(--padding);
 		font-size: inherit;
 		gap: var(--padding);
@@ -188,13 +189,13 @@
 
 	.emoji {
 		display: flex;
-		height: 1.5em;
-		width: 1.5em;
+		height: 1.25em;
+		width: 1.25em;
 		border-radius: 50%;
 		padding: 0.25em;
 		justify-content: center;
 		align-items: center;
-		font-size: 75%;
+		font-size: 60%;
 		box-shadow: var(--border) 1px 1px;
 		color: var(--background);
 	}
