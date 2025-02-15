@@ -132,12 +132,11 @@
 				include: (person, query) =>
 					(org.getProfileNameOrEmail(person) ?? '').toLowerCase().includes(query.toLowerCase())
 			}}
-			change={(person) => {
-				queryOrError(
+			change={async (person) =>
+				(await queryOrError(
 					db.updateChangeLead(change, person ?? null),
 					"Couldn't update change processes."
-				);
-			}}
+				)) === null}
 		/>
 	{:else if change.lead}
 		<PersonLink profile={org.getProfileWithID(change.lead)} />
@@ -219,14 +218,15 @@
 			selection={roleSelection}
 			view={RoleItem}
 			empty={false}
-			change={(r) => {
+			change={async (r) => {
 				if (r !== undefined) {
-					queryOrError(
+					const error = await queryOrError(
 						db.updateChangeRoles(change, Array.from(new Set([...change.roles, r]))),
 						"Couldn't update change roles."
 					);
 					roleSelection = undefined;
-				}
+					return error === null;
+				} else return true;
 			}}
 		/>
 	{/if}
@@ -239,14 +239,14 @@
 		<Button
 			tip="Remove this process from the affected processes."
 			chromeless
-			action={() =>
-				queryOrError(
+			action={async () =>
+				(await queryOrError(
 					db.updateChangeProcesses(
 						change,
 						change.processes.filter((p) => p !== process)
 					),
 					"Couldn't update change processes."
-				)}
+				)) !== null}
 		>
 			{Delete}</Button
 		>
@@ -259,14 +259,16 @@
 			selection={processSelection}
 			view={ProcessItem}
 			empty={false}
-			change={(p) => {
+			change={async (p) => {
 				if (p !== undefined) {
-					queryOrError(
+					const error = await queryOrError(
 						db.updateChangeProcesses(change, Array.from(new Set([...change.processes, p]))),
 						"Couldn't update change processes."
 					);
 					processSelection = undefined;
+					return error === null;
 				}
+				return true;
 			}}
 		/>
 	{/if}

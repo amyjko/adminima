@@ -4,7 +4,7 @@
 
 	interface Props {
 		month: number;
-		change: (value: number) => void;
+		change: (value: number) => Promise<boolean>;
 	}
 
 	let { month, change }: Props = $props();

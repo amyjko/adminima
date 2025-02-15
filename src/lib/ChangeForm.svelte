@@ -101,7 +101,10 @@
 						.includes(query.toLowerCase()) === true
 			}}
 			selection={role}
-			change={(r) => (role = r)}
+			change={(r) => {
+				role = r;
+				return true;
+			}}
 		/>
 	</Labeled>
 	<Labeled label="Affected Processes">
@@ -119,7 +122,10 @@
 			}}
 			view={ProcessItem}
 			selection={process}
-			change={(p) => (process = p)}
+			change={(p) => {
+				process = p;
+				return true;
+			}}
 		/>
 	</Labeled>
 

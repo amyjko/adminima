@@ -30,7 +30,7 @@
 		{tip}
 		selection={level}
 		options={opts.map((o) => o.value)}
-		change={(value) => (value ? edit(value) : undefined)}
+		change={async (value) => (value ? (await edit(value)) === null : true)}
 		id="visibility"
 		view={viz}
 	></Options>

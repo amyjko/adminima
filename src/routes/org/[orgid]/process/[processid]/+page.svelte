@@ -122,7 +122,7 @@
 		// Reset the selection
 		newPeriod = undefined;
 
-		if (process === null) return;
+		if (process === null) return true;
 		// Create an initial period based on the type chosen.
 		const periodToAdd: PeriodType | undefined =
 			kind === 'annually-date'
@@ -139,7 +139,9 @@
 		if (periodToAdd) {
 			const error = await db.addProcessPeriod(process, periodToAdd);
 			if (error) addError('Unable to add period.', error);
+			return error === null;
 		}
+		return true;
 	}
 </script>
 
@@ -205,11 +207,13 @@
 					options={Object.entries(States).map(([key, value]) => key)}
 					change={async (status) => {
 						if ($user && (status === 'draft' || status === 'active' || status === 'archived'))
-							return await queryOrError(
-								db.updateProcessState(process, status, $user.id),
-								"Couldn't update the process's state"
+							return (
+								(await queryOrError(
+									db.updateProcessState(process, status, $user.id),
+									"Couldn't update the process's state"
+								)) === null
 							);
-						else return null;
+						else return true;
 					}}
 					id="process-state"
 					view={status}
@@ -224,11 +228,11 @@
 					tip="Change this process's concern"
 					selection={process.concern}
 					options={org.getConcerns()}
-					change={(concern) =>
-						queryOrError(
+					change={async (concern) =>
+						(await queryOrError(
 							db.updateProcessConcern(process, concern ?? '', $user.id),
 							"Couldn't update process's concern"
-						)}
+						)) === null}
 					id="concer-chooser"
 					view={concernView}
 				/>{:else}
@@ -306,7 +310,8 @@
 				}}
 				view={RoleItem}
 				selection={process.accountable ?? undefined}
-				change={(value) => db.updateProcessAccountable(process, value ?? null)}
+				change={async (value) =>
+					(await db.updateProcessAccountable(process, value ?? null)) === null}
 			/>
 		{:else if process.accountable}
 			<RoleLink roleID={process.accountable} />
@@ -362,12 +367,14 @@
 					? async (period) => {
 							const error = await db.updateProcessPeriod(process, period, index);
 							if (error) addError("Couldn't update period.", error);
+							return error === null;
 						}
 					: undefined}
 				remove={editable
 					? async () => {
 							const error = await db.removeProcessPeriod(process, index);
 							if (error) addError("Coudln't remove period");
+							return error === null;
 						}
 					: undefined}
 			/>

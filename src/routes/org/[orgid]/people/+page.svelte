@@ -159,10 +159,13 @@
 								change={async (roleID) => {
 									newRole = undefined;
 									if (roleID !== undefined)
-										await queryOrError(
-											db.assignPerson(organization.getID(), profile.id, roleID),
-											'Could not assign role.'
+										return (
+											(await queryOrError(
+												db.assignPerson(organization.getID(), profile.id, roleID),
+												'Could not assign role.'
+											)) === null
 										);
+									return true;
 								}}
 							/>
 						{/if}
@@ -213,12 +216,11 @@
 							options={[undefined, ...eligibleSupervisors.map((prof) => prof.id)]}
 							view={ProfileItem}
 							selection={profile.supervisor ?? undefined}
-							change={(profileID) => {
-								queryOrError(
+							change={async (profileID) =>
+								(await queryOrError(
 									db.updateProfileSupervisor(organization.getID(), profile.id, profileID ?? null),
 									"Couldn't update supervisor."
-								);
-							}}
+								)) === null}
 						/>
 					{:else if profile.supervisor}<PersonLink
 							profile={organization.getProfileWithID(profile.supervisor)}

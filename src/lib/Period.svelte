@@ -10,7 +10,7 @@
 
 	interface Props {
 		period: Period;
-		edit?: ((period: Period) => void) | undefined;
+		edit?: ((period: Period) => Promise<boolean>) | undefined;
 		remove?: (() => void) | undefined;
 	}
 

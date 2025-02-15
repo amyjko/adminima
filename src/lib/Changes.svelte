@@ -164,7 +164,10 @@
 						)
 				]}
 				view={ProfileItem}
-				change={(value) => (filterLead = value)}
+				change={(value) => {
+					filterLead = value;
+					return true;
+				}}
 			/>
 		</Labeled>
 		<Labeled label="Show done">

@@ -68,11 +68,13 @@
 					searchable={roleSearch}
 					active={options.length >= 1}
 					bind:selection={responsible}
-					change={(value) => {
+					change={async (value) => {
 						if (value) {
-							db.addHowRCI(how, value, 'responsible');
+							const error = await db.addHowRCI(how, value, 'responsible');
+							if (error) return false;
 							responsible = undefined;
 						}
+						return true;
 					}}
 				/>
 			{/if}
@@ -109,11 +111,13 @@
 					active={options.length >= 1}
 					bind:selection={consulted}
 					searchable={roleSearch}
-					change={(value) => {
+					change={async (value) => {
 						if (value) {
-							db.addHowRCI(how, value, 'consulted');
+							const error = await db.addHowRCI(how, value, 'consulted');
+							if (error) return false;
 							consulted = undefined;
 						}
+						return true;
 					}}
 				/>
 			{/if}
@@ -150,11 +154,13 @@
 					searchable={roleSearch}
 					bind:selection={informed}
 					active={options.length >= 1}
-					change={(value) => {
+					change={async (value) => {
 						if (value) {
-							db.addHowRCI(how, value, 'informed');
+							const error = await db.addHowRCI(how, value, 'informed');
+							if (error) return false;
 							informed = undefined;
 						}
+						return true;
 					}}
 				/>
 			{/if}

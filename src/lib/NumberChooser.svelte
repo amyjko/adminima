@@ -4,7 +4,7 @@
 	interface Props {
 		num: number;
 		max: number;
-		change: (date: number) => void;
+		change: (date: number) => Promise<boolean>;
 	}
 
 	let { num, max, change }: Props = $props();

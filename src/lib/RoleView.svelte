@@ -62,12 +62,19 @@
 			view={TeamItem}
 			change={async (team) => {
 				if (isAdmin && $user) {
-					return await queryOrError(
-						db.updateRoleTeam(role, team ?? null, org.getTeams().find((t) => t.id)?.name, $user.id),
-						"Couldn't update role team"
+					return (
+						(await queryOrError(
+							db.updateRoleTeam(
+								role,
+								team ?? null,
+								org.getTeams().find((t) => t.id)?.name,
+								$user.id
+							),
+							"Couldn't update role team"
+						)) === null
 					);
 				}
-				return null;
+				return true;
 			}}
 		/>
 	{:else if role.team}<TeamLink id={role.team} />{:else}no team{/if}

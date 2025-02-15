@@ -7,7 +7,8 @@
 		searchable?: { placeholder: string; include: (item: string, query: string) => boolean };
 		selection: string | undefined;
 		tip: string;
-		change: (value: string | undefined) => any;
+		/** Optionally async change handler that returns false if there was an error. */
+		change: (value: string | undefined) => boolean | Promise<boolean>;
 		active?: boolean;
 		empty?: boolean;
 		id: string;
@@ -35,13 +36,18 @@
 	let list = $state<HTMLDataListElement | null>(null);
 	let dropdown = $state<HTMLDivElement | null>(null);
 
-	function choose(option: string | undefined) {
+	async function choose(option: string | undefined) {
+		const original = selection;
+		selection = option;
 		// Select the option.
-		change(option);
-		// Hide the list
-		expanded = false;
-		// Stop searching if searching.
-		searching = false;
+		if ((await change(option)) === false) {
+			selection = original;
+		} else {
+			// Hide the list
+			expanded = false;
+			// Stop searching if searching.
+			searching = false;
+		}
 	}
 
 	function handleKey(event: KeyboardEvent, option: string | undefined) {
