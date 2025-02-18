@@ -12,7 +12,6 @@
 
 <style>
 	.status {
-		flex-grow: 1;
 		text-transform: none;
 		display: inline-block;
 		font-size: var(--small-size);

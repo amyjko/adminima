@@ -3,6 +3,12 @@
 sWe'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.7.12 2025-02-18
+
+### Fixed
+
+- Fixed layout of visibility and status when not editable.
+
 ## v0.7.11 2025-02-14
 
 ### Fixed

@@ -35,5 +35,13 @@
 		view={viz}
 	></Options>
 {:else}
-	{@render viz(level)}
+	<div class="status">
+		{@render viz(level)}
+	</div>
 {/if}
+
+<style>
+	.status {
+		display: inline-block;
+	}
+</style>
