@@ -51,6 +51,7 @@
 		org.getProcess(page.params.processid) ?? org.getProcessByShortName(page.params.processid)
 	);
 	let how = $derived(process && process.howid ? org.getHow(process.howid) : undefined);
+	let repeat = $derived(process !== null ? process.repeat : undefined) as PeriodType[];
 
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
 	let personRoles = $derived($user ? org.getPersonRoles($user.id) : []);
@@ -359,8 +360,8 @@
 			change={addPeriod}
 		/>
 	{/if}
-	{#if process.repeat && process.repeat.length > 0}
-		{#each process.repeat as period, index}
+	{#if repeat && repeat.length > 0}
+		{#each repeat as period, index}
 			<Period
 				{period}
 				edit={editable

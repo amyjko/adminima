@@ -82,18 +82,20 @@ export function getNextPeriodDate(timestamp: number, period: Period): Date {
 
 export function sortProcessesByNextDate(processes: ProcessRow[]): ProcessRow[] {
 	return processes.toSorted((a, b) => {
-		if (a.repeat.length === 0) {
-			if (b.repeat.length === 0) return a.title.localeCompare(b.title);
+		const aRepeat = a.repeat as Period[];
+		const bRepeat = b.repeat as Period[];
+		if (aRepeat.length === 0) {
+			if (bRepeat.length === 0) return a.title.localeCompare(b.title);
 			else return 1;
 		} else {
-			if (b.repeat.length === 0) return -1;
+			if (bRepeat.length === 0) return -1;
 			else {
 				return (
 					Math.min.apply(
-						a.repeat.map((period) => getNextPeriodDate(new Date().getTime(), period).getTime())
+						aRepeat.map((period) => getNextPeriodDate(new Date().getTime(), period).getTime())
 					) -
 					Math.min.apply(
-						b.repeat.map((period) => getNextPeriodDate(new Date().getTime(), period).getTime())
+						bRepeat.map((period) => getNextPeriodDate(new Date().getTime(), period).getTime())
 					)
 				);
 			}
@@ -102,7 +104,7 @@ export function sortProcessesByNextDate(processes: ProcessRow[]): ProcessRow[] {
 }
 
 export function getNextProcessDate(process: ProcessRow): Date | undefined {
-	return process.repeat
+	return (process.repeat as Period[])
 		.map((period) => getNextPeriodDate(Date.now(), period))
 		.toSorted((a, b) => a.getTime() - b.getTime())[0];
 }

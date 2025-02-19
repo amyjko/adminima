@@ -14,7 +14,7 @@ import {
 	type RealtimeChannel,
 	type RealtimePostgresChangesPayload
 } from '@supabase/supabase-js';
-import type { Database } from './database.types.extended';
+import type { Database } from './database.types';
 import type Period from './Period';
 import { type Markup } from '$types/Organization';
 
@@ -802,27 +802,29 @@ class OrganizationsDB {
 	async addProcessPeriod(process: ProcessRow, period: Period) {
 		const { error } = await this.supabase
 			.from('processes')
-			.update({ repeat: [...(process.repeat ? process.repeat : []), period] })
+			.update({ repeat: [...(process.repeat ? (process.repeat as Period[]) : []), period] })
 			.eq('id', process.id);
 		return error;
 	}
 
 	async updateProcessPeriod(process: ProcessRow, period: Period, index: number) {
-		if (process.repeat === null || process.repeat.length <= index) return null;
+		const repeat = process.repeat as Period[];
+		if (process.repeat === null || repeat.length <= index) return null;
 		const { error } = await this.supabase
 			.from('processes')
 			.update({
-				repeat: [...process.repeat.slice(0, index), period, ...process.repeat.slice(index + 1)]
+				repeat: [...repeat.slice(0, index), period, ...repeat.slice(index + 1)]
 			})
 			.eq('id', process.id);
 		return error;
 	}
 
 	async removeProcessPeriod(process: ProcessRow, index: number) {
-		if (process.repeat === null || process.repeat.length <= index || index < 0) return null;
+		const repeat = process.repeat as Period[];
+		if (process.repeat === null || repeat.length <= index || index < 0) return null;
 		const { error } = await this.supabase
 			.from('processes')
-			.update({ repeat: process.repeat.filter((_, i) => i !== index) })
+			.update({ repeat: repeat.filter((_, i) => i !== index) })
 			.eq('id', process.id);
 		return error;
 	}

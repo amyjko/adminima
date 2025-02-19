@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Fixed layout of visibility and status when not editable.
+- Reenabled database query type checking by injecting some Typescript as.
 
 ## v0.7.11 2025-02-14
 
