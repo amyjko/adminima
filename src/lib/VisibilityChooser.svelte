@@ -28,7 +28,7 @@
 {#if edit}
 	<Options
 		{tip}
-		selection={level}
+		bind:selection={level}
 		options={opts.map((o) => o.value)}
 		change={async (value) => (value ? (await edit(value)) === null : true)}
 		id="visibility"

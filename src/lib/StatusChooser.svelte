@@ -20,7 +20,7 @@
 <Options
 	id="status-chooser"
 	{tip}
-	selection={value}
+	bind:selection={value}
 	view={StatusItem}
 	options={[...(none ? [undefined] : []), ...Object.entries(Statuses).map(([key]) => key)]}
 	change={(value) => change(value === undefined ? undefined : isStatus(value) ? value : undefined)}

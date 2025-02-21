@@ -154,7 +154,7 @@
 			<Options
 				id="lead-chooser"
 				tip="Filter by lead"
-				selection={filterLead}
+				bind:selection={filterLead}
 				options={[
 					undefined,
 					...[...new Set(changes.map((change) => change.lead))]

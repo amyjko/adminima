@@ -215,7 +215,7 @@
 			id="role-chooser"
 			tip="Add a role that is affected by this change."
 			options={[undefined, ...unselectedRoles.map((role) => role.id)]}
-			selection={roleSelection}
+			bind:selection={roleSelection}
 			view={RoleItem}
 			empty={false}
 			change={async (r) => {
@@ -256,7 +256,7 @@
 			id="process-chooser"
 			tip="Add a process that is affected by this change."
 			options={[undefined, ...unselectedProcesses.map((process) => process.id)]}
-			selection={processSelection}
+			bind:selection={processSelection}
 			view={ProcessItem}
 			empty={false}
 			change={async (p) => {

@@ -100,7 +100,7 @@
 						?.title.toLowerCase()
 						.includes(query.toLowerCase()) === true
 			}}
-			selection={role}
+			bind:selection={role}
 			change={(r) => {
 				role = r;
 				return true;
@@ -121,7 +121,7 @@
 						.includes(query.toLowerCase()) === true
 			}}
 			view={ProcessItem}
-			selection={process}
+			bind:selection={process}
 			change={(p) => {
 				process = p;
 				return true;
