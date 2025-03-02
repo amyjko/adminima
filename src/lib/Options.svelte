@@ -52,41 +52,49 @@
 
 	function handleKey(event: KeyboardEvent, option: string | undefined) {
 		if (!(event.currentTarget instanceof HTMLElement)) return;
+		const isOption = event.currentTarget.classList.contains('option');
 		switch (event.key) {
 			case 'Enter':
-				if (event.currentTarget === dropdown) {
+				if (!isOption) {
 					expanded = !expanded;
 					event.stopPropagation();
 				} else {
 					choose(option);
 					event.stopPropagation();
 					event.preventDefault();
+					dropdown?.focus();
 					break;
 				}
 			case 'ArrowDown':
-				if (event.currentTarget === search || event.currentTarget === dropdown) {
+				if (!isOption) {
 					if (list?.firstElementChild instanceof HTMLElement) {
 						expanded = true;
 						list.firstElementChild.focus();
+						event.stopPropagation();
+						event.preventDefault();
 					}
-				} else if (event.currentTarget.parentElement === list) {
+				} else {
 					const next = event.currentTarget.nextElementSibling;
 					if (next instanceof HTMLElement) next.focus();
+					event.stopPropagation();
+					event.preventDefault();
 				}
-				event.stopPropagation();
-				event.preventDefault();
 				break;
 			case 'ArrowUp':
-				if (event.currentTarget.parentElement === list) {
+				if (isOption) {
 					const prev = event.currentTarget.previousElementSibling;
 					if (prev instanceof HTMLElement) prev.focus();
 					else search !== undefined ? search?.focus() : dropdown?.focus();
+					event.stopPropagation();
+					event.preventDefault();
 				}
-				event.stopPropagation();
-				event.preventDefault();
 				break;
 			case 'Escape':
 				expanded = false;
+				dropdown?.focus();
+				event.stopPropagation();
+				event.preventDefault();
+				break;
 		}
 	}
 </script>
@@ -144,6 +152,7 @@
 			<Button
 				chromeless
 				tip="search"
+				onkeydown={(event) => handleKey(event, undefined)}
 				action={() => {
 					searching = !searching;
 					tick().then(() => search?.focus());
@@ -154,6 +163,7 @@
 				chromeless
 				{tip}
 				{active}
+				onkeydown={(event) => handleKey(event, undefined)}
 				action={() => {
 					expanded = !expanded;
 				}}

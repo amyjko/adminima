@@ -149,6 +149,8 @@
 {#snippet concernView(value: string | undefined)}
 	{#if value}
 		<Concern concern={value} />
+	{:else}
+		&mdash;
 	{/if}
 {/snippet}
 

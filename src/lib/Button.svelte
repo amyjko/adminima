@@ -13,6 +13,7 @@
 		end?: boolean;
 		chromeless?: boolean;
 		children?: import('svelte').Snippet;
+		onkeydown?: (event: KeyboardEvent) => void;
 	}
 
 	let {
@@ -23,7 +24,8 @@
 		warning = false,
 		end = false,
 		chromeless = false,
-		children
+		children,
+		onkeydown
 	}: Props = $props();
 
 	let confirm = $state(false);
@@ -34,6 +36,7 @@
 		<button onclick={() => (confirm = false)}>{Delete}</button><button
 			type={submit ? 'submit' : null}
 			class:warning
+			{onkeydown}
 			onclick={action}>{Confirm}</button
 		>
 	</div>
@@ -46,6 +49,7 @@
 		aria-disabled={!active}
 		title={tip}
 		aria-label={tip}
+		{onkeydown}
 		onclick={(event) => {
 			if (warning) confirm = true;
 			else if (active) {
