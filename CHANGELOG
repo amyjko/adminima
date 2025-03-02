@@ -3,6 +3,12 @@
 sWe'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.7.13 2025-03-02
+
+### Fixed
+
+- Replaced how delete button with confirm button, to prevent data loss.
+
 ## v0.7.12 2025-02-18
 
 ### Fixed

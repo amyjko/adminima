@@ -248,7 +248,9 @@
 					active={getIndent() !== undefined}>⏵</Button
 				>
 				<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
-				<Button tip="Delete this step" action={deleteHow} active={canDelete()}>{Delete}</Button>
+				<Button warning tip="Delete this step" action={deleteHow} active={canDelete()}
+					>{Delete}</Button
+				>
 			{/if}
 		</div>
 	{/if}
