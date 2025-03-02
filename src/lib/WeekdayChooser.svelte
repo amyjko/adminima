@@ -3,6 +3,7 @@
 	import Options from './Options.svelte';
 
 	interface Props {
+		/** 1-7 */
 		weekday: number;
 		change: (value: number) => Promise<boolean>;
 	}
@@ -13,7 +14,7 @@
 <Options
 	id="weekday-chooser"
 	tip="Choose a weekday"
-	selection={Weekdays[weekday]}
+	selection={Weekdays[weekday - 1]}
 	options={Weekdays}
-	change={(value) => change(value === undefined ? 0 : Weekdays.indexOf(value))}
+	change={(value) => change(value === undefined ? 1 : Weekdays.indexOf(value) + 1)}
 />

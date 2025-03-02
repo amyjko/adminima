@@ -1,9 +1,9 @@
 import { addDays, addWeeks, format, getDay, getWeek } from 'date-fns';
 import type { ProcessRow } from './OrganizationsDB';
 
-/** e.g., Every March 1st. Month 1-2, date 1-31 */
+/** e.g., Every March 1st. Month 1-12, date 1-31 */
 export type AnnualDate = { type: 'annually-date'; month: number; date: number };
-/** e.g., Every 13th week on Monday. Week 1-52 */
+/** e.g., Every 13th week on Monday. Week 1-52, day 1-7 */
 export type AnnuallyWeek = { type: 'annually-week'; week: number; day: number };
 /** e.g., Every 1st of the month. Day 1-31 */
 export type MonthlyDate = { type: 'monthly-date'; day: number };
@@ -31,7 +31,7 @@ export function getNextPeriodDate(timestamp: number, period: Period): Date {
 				const yearWeek = getWeek(nextDate, { weekStartsOn: 1 });
 				const weekDay = getDay(nextDate);
 				// Note that the day of weeks in the library starts at 0 on Sunday, but we number starting on Monday at 1, so no conversion is needed.
-				if (yearWeek === period.week && weekDay === period.day) break;
+				if (yearWeek === period.week && weekDay === period.day - 1) break;
 				else nextDate = addDays(nextDate, 1);
 			} while (nextDate);
 			return nextDate;

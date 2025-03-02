@@ -23,7 +23,7 @@
 
 <div class="period">
 	{#if remove}
-		<Button tip="Remove this period from the process" action={remove}>{Delete}</Button>
+		<Button warning tip="Remove this period from the process" action={remove}>{Delete}</Button>
 	{/if}
 	<div class="dates">
 		{#if period.type === 'annually-date'}

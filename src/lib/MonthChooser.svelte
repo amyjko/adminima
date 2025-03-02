@@ -3,6 +3,7 @@
 	import Options from './Options.svelte';
 
 	interface Props {
+		/** 1-12 */
 		month: number;
 		change: (value: number) => Promise<boolean>;
 	}
@@ -13,7 +14,7 @@
 <Options
 	id="month-chooser"
 	tip="Choose a month"
-	selection={Months[month]}
+	selection={Months[month - 1]}
 	options={Months}
-	change={(value) => change(value === undefined ? 0 : Months.indexOf(value))}
+	change={(value) => change(value === undefined ? 1 : Months.indexOf(value) + 1)}
 />
