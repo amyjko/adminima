@@ -11,6 +11,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Fixed incorrect next date in periods computations. All off by one.
 - Fixed keyboard accessibility of dropdowns.
 
+### Maintenance
+
+- Updated all minor versions.
+
 ## v0.7.12 2025-02-18
 
 ### Fixed
