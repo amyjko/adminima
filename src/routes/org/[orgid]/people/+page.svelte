@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getOrg } from '$routes/+layout.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getDB } from '$routes/+layout.svelte';
 	import { queryOrError } from '$routes/errors.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
@@ -8,7 +8,7 @@
 	import Title from '$lib/Title.svelte';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink, { RoleItem } from '$lib/RoleLink.svelte';
-	import { type PersonRow } from '$database/OrganizationsDB';
+	import { type PersonRow } from '$database/Organization';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import validEmail, { validNameAndEmail } from '../../../validEmail';
 	import Notice from '$lib/Notice.svelte';
@@ -17,18 +17,23 @@
 	import Table from '$lib/Table.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import Options from '$lib/Options.svelte';
+	import Organization from '$database/Organization';
 
+	const { data } = $props();
+	const profiles = $derived(data.profiles);
+	const allRoles = $derived(data.roles);
+	const assignments = $derived(data.assignments);
+	const teams = $derived(data.teams);
+
+	const db = getDB();
 	const context = getOrg();
 	let organization = $derived(context?.org);
 
-	const user = getUser();
-	const db = getDB();
-
-	let isAdmin = $derived($user && organization.hasAdminPerson($user.id));
+	let isAdmin = $derived(context.admin);
 
 	let newPersonEmail: string = $state('');
 	let match: PersonRow | undefined | null = undefined;
-	let existing = $derived(organization.getProfileWithEmail(newPersonEmail));
+	let existing = $derived(Organization.getProfileWithEmail(profiles, newPersonEmail));
 
 	let filter = $state('');
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
@@ -47,9 +52,9 @@
 		match = undefined;
 		match = await db.getPersonWithEmail(email);
 		await (match === null
-			? queryOrError(db.addPersonByEmail(organization.getID(), email, name), "Couldn't add person.")
+			? queryOrError(db.addPersonByEmail(organization.id, email, name), "Couldn't add person.")
 			: match !== null && match !== undefined
-				? queryOrError(db.addPersonByID(organization.getID(), match.id), "Couldn't add person.")
+				? queryOrError(db.addPersonByID(organization.id, match.id), "Couldn't add person.")
 				: undefined);
 		newPersonEmail = '';
 
@@ -65,10 +70,10 @@
 	roles. Select a person to see the roles they have.</Tip
 >
 
-{#if isAdmin && organization.getRoles().length === 0}
+{#if isAdmin && context.counts.roles === 0}
 	<Notice
-		>Want to give people roles? First you'll need to <Link to="/org/{organization.getPath()}/roles"
-			>define some</Link
+		>Want to give people roles? First you'll need to <Link
+			to="/org/{Organization.getPath(organization)}/roles">define some</Link
 		>.</Notice
 	>
 {/if}
@@ -116,25 +121,22 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each organization
-			.getProfiles()
-			.filter((prof) => lowerFilter === '' || prof.name
-						.toLowerCase()
-						.includes(lowerFilter) || prof.email.toLowerCase().includes(lowerFilter)) as profile}
-			{@const roles = organization
-				.getProfileRoles(profile.id)
-				.sort((a, b) => a.title.localeCompare(b.title))}
+		{#each profiles.filter((prof) => lowerFilter === '' || prof.name
+					.toLowerCase()
+					.includes(lowerFilter) || prof.email.toLowerCase().includes(lowerFilter)) as profile}
+			{@const roles = Organization.getProfileRoles(profile.id, assignments, allRoles).sort((a, b) =>
+				a.title.localeCompare(b.title)
+			)}
 			<tr>
 				<td>
 					<PersonLink {profile} />
 				</td>
 				<td class="roles">
 					{#if isAdmin}
-						{@const remainingRoles = organization
-							.getRoles()
+						{@const remainingRoles = allRoles
 							.filter((r) => !roles.some((currentRole) => currentRole.id === r.id))
 							.sort((a, b) => a.title.localeCompare(b.title))}
-						{#if organization.getRoles().length === 0}
+						{#if allRoles.length === 0}
 							<em>&mdash;</em>
 						{:else if remainingRoles.length > 0}
 							<Options
@@ -149,7 +151,7 @@
 											?.title.toLowerCase()
 											.includes(query.toLowerCase()) === true
 								}}
-								view={RoleItem}
+								view={{ snippet: RoleItem, data: remainingRoles }}
 								empty={false}
 								options={[
 									...remainingRoles.map((role) => {
@@ -161,7 +163,7 @@
 									if (roleID !== undefined)
 										return (
 											(await queryOrError(
-												db.assignPerson(organization.getID(), profile.id, roleID),
+												db.assignPerson(organization.id, profile.id, roleID),
 												'Could not assign role.'
 											)) === null
 										);
@@ -173,13 +175,13 @@
 					<div class="role-list">
 						{#each roles as role}
 							<span class="role"
-								><RoleLink roleID={role.id}
+								><RoleLink {role}
 									>{#if isAdmin}<Button
 											tip="Unassign this role from this person"
 											chromeless
 											action={async () => {
 												const error = await queryOrError(
-													db.unassignPerson(organization.getID(), profile.id, role.id),
+													db.unassignPerson(organization.id, profile.id, role.id),
 													'Could not unassign role.'
 												);
 												if (error) return;
@@ -193,15 +195,13 @@
 				<td>
 					<div class="teams">
 						{#each roles.map((role) => role.team).filter((team) => team !== null) as team}<TeamLink
-								id={team}
+								team={teams.find((t) => t.id === team)}
 							/>{:else}<em>&mdash;</em>{/each}
 					</div>
 				</td>
 				<td class="supervisor">
 					{#if isAdmin}
-						{@const eligibleSupervisors = organization
-							.getProfiles()
-							.filter((prof) => prof.id !== profile.id)}
+						{@const eligibleSupervisors = profiles.filter((prof) => prof.id !== profile.id)}
 						<Options
 							id="profile-{profile.id}-supervisor-chooser"
 							tip="Choose a supervisor for this person."
@@ -214,32 +214,33 @@
 										.includes(query.toLowerCase()) === true
 							}}
 							options={[undefined, ...eligibleSupervisors.map((prof) => prof.id)]}
-							view={ProfileItem}
+							view={{ snippet: ProfileItem, data: profiles }}
 							selection={profile.supervisor ?? undefined}
 							change={async (profileID) =>
 								(await queryOrError(
-									db.updateProfileSupervisor(organization.getID(), profile.id, profileID ?? null),
+									db.updateProfileSupervisor(organization.id, profile.id, profileID ?? null),
 									"Couldn't update supervisor."
 								)) === null}
 						/>
 					{:else if profile.supervisor}<PersonLink
-							profile={organization.getProfileWithID(profile.supervisor)}
+							profile={Organization.getProfileWithID(profiles, profile.supervisor) ?? undefined}
 						/>{/if}
 				</td>
 				<td>
 					{#if isAdmin}
 						<Checkbox
 							tip={isAdmin ? "Remove this person's admin status" : 'Make this person an admin.'}
-							on={organization.hasAdminProfile(profile.id)}
+							on={Organization.hasAdminProfile(profiles, profile.id)}
 							enabled={isAdmin &&
-								(organization.getAdminCount() > 1 || !organization.hasAdminProfile(profile.id))}
+								(Organization.getAdminCount(profiles) > 1 ||
+									!Organization.hasAdminProfile(profiles, profile.id))}
 							change={(on) =>
 								queryOrError(
-									db.updateAdmin(organization.getID(), profile.id, on),
+									db.updateAdmin(organization.id, profile.id, on),
 									"Couldn't update admin status."
 								)}
 						/>
-					{:else if organization.hasAdminProfile(profile.id)}&check;{/if}
+					{:else if Organization.hasAdminProfile(profiles, profile.id)}&check;{/if}
 				</td>
 
 				{#if isAdmin}
@@ -247,7 +248,7 @@
 						<Button
 							tip="Remove this person from the organization."
 							action={() => queryOrError(db.removeProfile(profile.id), "Couldn't remove person.")}
-							active={!organization.hasAdminProfile(profile.id)}>{Delete}</Button
+							active={!Organization.hasAdminProfile(profiles, profile.id)}>{Delete}</Button
 						>
 					</td>
 				{/if}

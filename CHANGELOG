@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.14 2025-05-23
 
+### Fixed
+
+- Improved performance of page loading.
+
 ### Maintenance
 
 - Updated all minor versions.

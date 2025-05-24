@@ -2,24 +2,22 @@
 	import Subheader from './Subheader.svelte';
 	import Flow from './Flow.svelte';
 	import ProcessLink from './ProcessLink.svelte';
-	import type { ProcessRow, RoleRow } from '$database/OrganizationsDB';
-	import { getOrg } from '$routes/+layout.svelte';
+	import type { HowRow, ProcessRow, RoleRow } from '$database/Organization';
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from './ProcessDate.svelte';
 	import type Period from '$database/Period';
+	import Organization from '$database/Organization';
 
 	interface Props {
 		role: RoleRow;
 		processes: ProcessRow[];
+		hows: HowRow[];
 		onlyPeriodic?: boolean;
 	}
 
-	let { role, processes, onlyPeriodic = false }: Props = $props();
+	let { role, processes, hows, onlyPeriodic = false }: Props = $props();
 
 	let sorted = $derived(sortProcessesByNextDate(processes));
-
-	const context = getOrg();
-	let org = $derived(context.org);
 
 	let accountable = $derived(
 		sorted.filter(
@@ -30,23 +28,21 @@
 	);
 	let responsible = $derived(
 		sorted.filter((process) =>
-			org
-				.getProcessHows(process.id)
-				.some(
-					(how) =>
-						how.responsible.includes(role.id) &&
-						(!onlyPeriodic || (process.repeat as Period[]).length > 0)
-				)
+			Organization.getProcessHows(hows, process.id).some(
+				(how) =>
+					how.responsible.includes(role.id) &&
+					(!onlyPeriodic || (process.repeat as Period[]).length > 0)
+			)
 		)
 	);
 	let consulted = $derived(
 		sorted.filter((process) =>
-			org.getProcessHows(process.id).some((how) => how.consulted.includes(role.id))
+			Organization.getProcessHows(hows, process.id).some((how) => how.consulted.includes(role.id))
 		)
 	);
 	let informed = $derived(
 		sorted.filter((process) =>
-			org.getProcessHows(process.id).some((how) => how.informed.includes(role.id))
+			Organization.getProcessHows(hows, process.id).some((how) => how.informed.includes(role.id))
 		)
 	);
 </script>
@@ -55,7 +51,7 @@
 	<Subheader>Accountable</Subheader>
 	{#each accountable as process}
 		<Flow>
-			<ProcessLink wrap processID={process.id} />
+			<ProcessLink wrap {process} />
 			<ProcessDate {process} />
 		</Flow>
 	{/each}
@@ -64,7 +60,7 @@
 	<Subheader>Responsible</Subheader>
 	{#each responsible as process}
 		<Flow>
-			<ProcessLink wrap processID={process.id} />
+			<ProcessLink wrap {process} />
 			<ProcessDate {process} />
 		</Flow>
 	{/each}
@@ -74,7 +70,7 @@
 		<Subheader>Consulted</Subheader>
 		{#each consulted as process}
 			<Flow>
-				<ProcessLink wrap processID={process.id} />
+				<ProcessLink wrap {process} />
 				<ProcessDate {process} />
 			</Flow>
 		{/each}
@@ -83,7 +79,7 @@
 		<Subheader>Informed</Subheader>
 		{#each informed as process}
 			<Flow>
-				<ProcessLink wrap processID={process.id} />
+				<ProcessLink wrap {process} />
 				<ProcessDate {process} />
 			</Flow>
 		{/each}

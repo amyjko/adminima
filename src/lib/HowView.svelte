@@ -1,9 +1,8 @@
 <script lang="ts">
 	import HowView from './HowView.svelte';
-	import type { HowRow, ProcessRow } from '$database/OrganizationsDB';
+	import type { HowRow, ProcessRow, RoleRow } from '$database/Organization';
 	import { getContext, tick } from 'svelte';
 	import Visibility from './VisibilityChooser.svelte';
-	import { getOrg } from '$routes/+layout.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 	import { addError, queryOrError } from '$routes/errors.svelte';
 	import Button, { Delete } from './Button.svelte';
@@ -11,26 +10,28 @@
 	import ARCI from './ARCI.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Status from './Status.svelte';
+	import Organization from '$database/Organization';
 
 	interface Props {
 		how: HowRow;
+		hows: HowRow[];
+		roles: RoleRow[];
 		process: ProcessRow;
 		editable: boolean;
 	}
 
-	let { how, process, editable }: Props = $props();
-
-	const context = getOrg();
-	let org = $derived(context.org);
+	let { how, hows, roles, process, editable }: Props = $props();
 
 	const db = getDB();
 
 	const focusID = getContext<Writable<string | undefined>>('focusID');
 
-	let parent = $derived(org.getHowParent(how.id));
+	let parent = $derived(Organization.getHowParent(hows, how.id));
 	let index = $derived(parent?.how.indexOf(how.id) ?? -1);
 	let length = $derived(parent?.how.length ?? -1);
-	let subhows = $derived(how.how.map((h) => org.getHow(h)).filter((h) => h !== undefined));
+	let subhows = $derived(
+		how.how.map((h) => Organization.getHow(hows, h)).filter((h) => h !== undefined)
+	);
 
 	let text = how.what;
 	// Helps us keep track of whether to give this an HTML ID for purposes of focusing.
@@ -89,7 +90,7 @@
 	function getIndent() {
 		if (parent && index > 0) {
 			const previousID = parent.how[index - 1];
-			const previousHow = org.getHow(previousID);
+			const previousHow = Organization.getHow(hows, previousID);
 			if (previousHow) return [parent, previousHow];
 		}
 		return undefined;
@@ -112,7 +113,7 @@
 
 	function getUnindent() {
 		if (parent) {
-			const grandparent = org.getHowParent(parent.id);
+			const grandparent = Organization.getHowParent(hows, parent.id);
 			if (grandparent) {
 				return [parent, grandparent];
 			}
@@ -160,7 +161,7 @@
 	// }
 
 	async function moveVertically(dir: -1 | 1) {
-		const parent = org.getHowParent(how.id);
+		const parent = Organization.getHowParent(hows, how.id);
 		if (parent) {
 			if (index >= 0 && index + dir < parent.how.length) {
 				const error = await queryOrError(
@@ -267,12 +268,12 @@
 		{:else}
 			<Status status={how.visibility} />
 		{/if}
-		<ARCI {how} verbose={false} {editable} />
+		<ARCI {how} {roles} verbose={false} {editable} />
 	</div>
 	{#if subhows.length > 0}
 		<div class="steps">
 			{#each subhows as subhow (subhow.id)}
-				<HowView how={subhow} {process} {editable} />
+				<HowView how={subhow} {hows} {roles} {process} {editable} />
 			{/each}
 		</div>
 	{/if}

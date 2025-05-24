@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="ItemType">
 	import { tick, type Snippet } from 'svelte';
 	import Button from './Button.svelte';
 
@@ -13,7 +13,10 @@
 		empty?: boolean;
 		id: string;
 		/** An optional snippet for rendering items */
-		view?: Snippet<[string | undefined]>;
+		view?: {
+			snippet: Snippet<[string | undefined, ItemType[]]>;
+			data: ItemType[];
+		};
 	}
 
 	let {
@@ -142,7 +145,7 @@
 			>
 				<!-- Otherwise, show the item -->
 				{#if item}
-					{@render item(selection)}
+					{@render item.snippet(selection, item.data)}
 				{:else}
 					{selection}
 				{/if}
@@ -184,7 +187,7 @@
 				aria-selected={selection === option}
 			>
 				{#if item}
-					{@render item(option)}
+					{@render item.snippet(option, item.data)}
 				{:else}
 					<option>{option}</option>
 				{/if}

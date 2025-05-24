@@ -3,29 +3,30 @@
 </script>
 
 <script lang="ts">
-	import type { RoleID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import { getOrg } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { type Snippet } from 'svelte';
 	import Self from './RoleLink.svelte';
+	import type { RoleRow } from '$database/Organization';
+	import Organization, { type RoleID } from '$database/Organization';
 	interface Props {
-		roleID: RoleID | null;
+		/** Undefined means not found, null means link to all roles */
+		role: { id: RoleID; title: string; short: string[] } | null | undefined;
 		children?: Snippet;
 	}
 
-	let { roleID, children }: Props = $props();
+	let { role, children }: Props = $props();
 
 	const context = getOrg();
 	let org = $derived(context.org);
 
-	let role = $derived(roleID ? org.getRole(roleID) : undefined);
 	let path = $derived(role ? (role.short.length > 0 ? role.short : role.id) : undefined);
 </script>
 
-{#snippet RoleItem(role: string | undefined)}
+{#snippet RoleItem(role: string | undefined, roles: RoleRow[])}
 	<div class="role-view">
-		{#if role}<Self roleID={role} />{:else}—{/if}
+		{#if role}<Self role={roles.find((r) => r.id === role)} />{:else}—{/if}
 	</div>
 	<style>
 		.role-view {
@@ -35,9 +36,11 @@
 	</style>
 {/snippet}
 
-{#if role === null}<Oops inline text="Unknown role" />{:else}<Link
-		title={role !== undefined && role.short.length > 0 ? role.title : undefined}
-		to={roleID ? `/org/${org.getPath()}/role/${path}` : `/org/${org.getPath()}/roles`}
+{#if role === undefined}<Oops inline text="Unknown role" />{:else}<Link
+		title={role !== null && role.short.length > 0 ? role.title : undefined}
+		to={role
+			? `/org/${Organization.getPath(org)}/role/${path}`
+			: `/org/${Organization.getPath(org)}/roles`}
 		kind="role"
 		>{role
 			? role.short.length > 0

@@ -4,26 +4,25 @@
 
 <script lang="ts">
 	import Link from './Link.svelte';
-	import { getOrg } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import Oops from './Oops.svelte';
-	import type { TeamID } from '$types/Organization';
 	import Self from './TeamLink.svelte';
+	import type { TeamRow } from '$database/Organization';
+	import Organization from '$database/Organization';
 
 	interface Props {
-		id: TeamID;
+		team: TeamRow | undefined;
 	}
 
-	let { id }: Props = $props();
+	let { team }: Props = $props();
 
 	const context = getOrg();
 	let org = $derived(context.org);
-
-	let team = $derived(org.getTeam(id));
 </script>
 
-{#snippet TeamItem(team: string | undefined)}
+{#snippet TeamItem(team: string | undefined, teams: TeamRow[])}
 	<div class="item">
-		{#if team}<Self id={team} />{:else}no team{/if}
+		{#if team}<Self team={teams.find((t) => t.id === team)} />{:else}no team{/if}
 	</div>
 	<style>
 		.item {
@@ -33,7 +32,7 @@
 	</style>
 {/snippet}
 
-{#if team === null}<Oops inline text="Unknown team" />{:else}<Link
-		to="/org/{org.getPath()}/team/{id}"
+{#if team === undefined}<Oops inline text="Unknown team" />{:else}<Link
+		to="/org/{Organization.getPath(org)}/team/{team.id}"
 		kind="team">{team.name}</Link
 	>{/if}

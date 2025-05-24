@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { getOrg } from '$routes/+layout.svelte';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import EditableText from './EditableText.svelte';
 	import OrgNav from './OrgNav.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 
 	// The title to show in the header
 	// The kind of page this is, to determine background
@@ -10,7 +10,16 @@
 	// An optional function for editing the title
 	interface Props {
 		title: string;
-		kind?: 'process' | 'change' | 'team' | 'person' | 'role' | 'organization' | 'error' | undefined;
+		kind?:
+			| 'process'
+			| 'change'
+			| 'team'
+			| 'person'
+			| 'profile'
+			| 'role'
+			| 'organization'
+			| 'error'
+			| undefined;
 		label?: boolean;
 		edit?: undefined | ((text: string) => Promise<PostgrestError | null>);
 		children?: import('svelte').Snippet;
@@ -18,8 +27,7 @@
 
 	let { title, kind = undefined, label = true, edit = undefined, children }: Props = $props();
 
-	const context = getOrg();
-	let org = $derived(context?.org);
+	const org = getOrg();
 </script>
 
 <svelte:head>
@@ -29,7 +37,7 @@
 <div class="title">
 	<div class="background {kind}">
 		{#if org}
-			<OrgNav organization={org} />
+			<OrgNav />
 		{/if}
 		<div>
 			{#if kind && label}
@@ -104,13 +112,14 @@
 		color: var(--background);
 	}
 
-	.person {
+	.person,
+	.profile {
 		background: var(--person);
 		color: var(--background);
 	}
 
 	.person .kind {
-		color: var(--inactive);
+		color: var(--background);
 	}
 
 	.org {

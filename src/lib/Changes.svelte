@@ -1,10 +1,15 @@
 <script lang="ts">
-	import { type ChangeRow, type CommentRow } from '$database/OrganizationsDB';
+	import Organization, {
+		type ChangeRow,
+		type CommentRow,
+		type ProfileRow
+	} from '$database/Organization';
 	import timestampToDate from '$database/timestampToDate';
 	import ChangeLink from './ChangeLink.svelte';
 	import ProfileLink, { ProfileItem } from './ProfileLink.svelte';
 	import Status from './Status.svelte';
-	import { getDB, getOrg } from '$routes/+layout.svelte';
+	import { getDB } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getUser } from '$routes/+layout.svelte';
 	import Table from './Table.svelte';
 	import Field from './Field.svelte';
@@ -24,13 +29,15 @@
 	import Options from './Options.svelte';
 	import { queryOrError } from '$routes/errors.svelte';
 	import Checkbox from './Checkbox.svelte';
+	import { type Snippet } from 'svelte';
 
 	interface Props {
 		changes: ChangeRow[];
-		children?: import('svelte').Snippet;
+		profiles: ProfileRow[];
+		children?: Snippet;
 	}
 
-	let { changes, children }: Props = $props();
+	let { changes, profiles, children }: Props = $props();
 
 	const context = getOrg();
 	let org = $derived(context.org);
@@ -41,8 +48,7 @@
 	const Levels = { triage: 0, active: 1, blocked: 2, done: 4, backlog: 3, declined: 5 };
 
 	let visible = $derived(
-		($user === null && org.getVisibility() === 'public') ||
-			($user !== null && org.hasPerson($user.id))
+		($user === null && org.visibility === 'public') || ($user !== null && context.member)
 	);
 
 	let filterText = $state(getInitialTextFilter());
@@ -160,10 +166,12 @@
 					...[...new Set(changes.map((change) => change.lead))]
 						.filter((lead) => lead !== null)
 						.sort((a, b) =>
-							(org.getProfileNameOrEmail(a) ?? '').localeCompare(org.getProfileNameOrEmail(b) ?? '')
+							(Organization.getProfileWithNameOrEmail(profiles, a) ?? '').localeCompare(
+								Organization.getProfileWithNameOrEmail(profiles, b) ?? ''
+							)
 						)
 				]}
-				view={ProfileItem}
+				view={{ snippet: ProfileItem, data: profiles }}
 				change={(value) => {
 					filterLead = value;
 					return true;
@@ -171,13 +179,18 @@
 			/>
 		</Labeled>
 		<Labeled label="Show done">
-			<Checkbox tip="Show or hide done changes." on={showDone} change={(on) => (showDone = on)}
+			<Checkbox
+				tip="Show or hide done changes."
+				on={changes.some((c) => c.status === 'done') && showDone}
+				enabled={changes.some((c) => c.status === 'done')}
+				change={(on) => (showDone = on)}
 			></Checkbox>
 		</Labeled>
 		<Labeled label="Show declined">
 			<Checkbox
 				tip="Show or hide declined changes."
-				on={showDeclined}
+				on={changes.some((c) => c.status === 'declined') && showDeclined}
+				enabled={changes.some((c) => c.status === 'declined')}
 				change={(on) => (showDeclined = on)}
 			></Checkbox>
 		</Labeled>
@@ -222,7 +235,7 @@
 					<td
 						>{#if change.lead}<ProfileLink
 								short
-								profile={org.getProfileWithID(change.lead)}
+								profile={Organization.getProfileWithID(profiles, change.lead) ?? undefined}
 							/>{:else}&mdash;{/if}</td
 					>
 					<td
@@ -234,13 +247,17 @@
 							/>{/if}</td
 					>
 					<td class="info">
-						<ChangeLink id={change.id} />
+						<ChangeLink {change} />
 						<div class="update">
 							<Button tip="Add comment to change" action={() => (submittingComment = change)}
 								>+</Button
 							>
 							{#if comment}
-								<em>{(org.getPersonNameOrEmail(comment.who) ?? '—').split(' ')[0]}</em>
+								<em
+									>{(Organization.getPersonNameOrEmail(profiles, comment.who) ?? '—').split(
+										' '
+									)[0]}</em
+								>
 								<TimeView time={false} date={timestampToDate(comment.when)} />
 								<MarkupView small markup={comment.what.split('\n')[0]} placeholder="status"
 								></MarkupView>

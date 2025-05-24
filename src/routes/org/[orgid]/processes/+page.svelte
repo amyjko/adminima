@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { getOrg } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { addError } from '$routes/errors.svelte';
 	import ProcessLink from '$lib/ProcessLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Level from '$lib/Level.svelte';
-	import type { ProcessRow, RoleRow } from '$database/OrganizationsDB';
-	import type { RoleID } from '$types/Organization';
+	import type { ProcessRow, RoleRow } from '$database/Organization';
+	import type { RoleID } from '$database/Organization.js';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import Field from '$lib/Field.svelte';
 	import { goto } from '$app/navigation';
@@ -23,6 +23,15 @@
 	import Visibility from '$lib/VisibilityChooser.svelte';
 	import { page } from '$app/state';
 	import ProfileLink from '$lib/ProfileLink.svelte';
+	import Organization from '$database/Organization';
+
+	const { data } = $props();
+
+	const processes = $derived(data.processes);
+	const hows = $derived(data.hows);
+	const assignments = $derived(data.assignments);
+	const profiles = $derived(data.profiles);
+	const roles = $derived(data.roles);
 
 	const context = getOrg();
 	let org = $derived(context.org);
@@ -36,43 +45,41 @@
 		initialView === 'table' || initialView === 'list' ? initialView : 'list'
 	);
 
-	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
+	let isAdmin = $derived($user && context.admin);
 
 	let visible = $derived(
-		($user === null && org.getVisibility() === 'public') ||
-			($user !== null && org.hasPerson($user.id))
+		($user === null && org.visibility === 'public') || ($user !== null && context.member)
 	);
 
 	let filter = $state(getInitialTextFilter());
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
 
-	let personRoles = $derived($user ? org.getPersonRoles($user.id) : []);
+	let personRoles = $derived(
+		$user ? Organization.getPersonRoles(profiles, assignments, $user.id) : []
+	);
 
 	/** The filtered processes */
 	let filteredProcesses = $derived(
-		org
-			.getProcesses()
+		processes
 			.filter(
 				(p) =>
 					lowerFilter.length === 0 ||
 					p.title.toLowerCase().includes(lowerFilter) ||
 					p.short.some((name) => name.toLowerCase().includes(lowerFilter)) ||
 					(p.accountable &&
-						org
-							.getRoleProfiles(p.accountable)
-							.some((profile) => profile.name.toLowerCase().includes(lowerFilter))) ||
+						Organization.getRoleProfiles(p.accountable, assignments, profiles).some((profile) =>
+							profile.name.toLowerCase().includes(lowerFilter)
+						)) ||
 					(p.howid !== null &&
-						org
-							.getHow(p.howid)
-							?.responsible.some((role) =>
-								org
-									.getRoleProfiles(role)
-									.some((profile) => profile.name.toLowerCase().includes(lowerFilter))
-							))
+						Organization.getHow(hows, p.howid)?.responsible.some((role) =>
+							Organization.getRoleProfiles(role, assignments, profiles).some((profile) =>
+								profile.name.toLowerCase().includes(lowerFilter)
+							)
+						))
 			)
 			.sort((a, b) => {
-				const howA = org.getHow(a.id);
-				const howB = org.getHow(b.id);
+				const howA = Organization.getHow(hows, a.id);
+				const howB = Organization.getHow(hows, b.id);
 				if (howA === undefined || howB === undefined) return 0;
 
 				return (
@@ -84,51 +91,51 @@
 			})
 	);
 
-	let concerns = $derived(
-		Array.from(new Set(org.getProcesses().map((process) => process.concern)))
-	);
+	let concerns = $derived(Array.from(new Set(processes.map((process) => process.concern))));
 
 	function getRolesByAccountability(processes: ProcessRow[]): RoleRow[] {
-		const roles: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
+		const rolesByARCI: Map<RoleID, { a: number; r: number; c: number; i: number }> = new Map();
 
 		for (const process of processes) {
-			const hows = org.getProcessHows(process.id);
+			const processHows = Organization.getProcessHows(hows, process.id);
 
-			if (process.accountable && !roles.has(process.accountable))
-				roles.set(process.accountable, { a: 0, r: 0, c: 0, i: 0 });
+			if (process.accountable && !rolesByARCI.has(process.accountable))
+				rolesByARCI.set(process.accountable, { a: 0, r: 0, c: 0, i: 0 });
 
-			let tally = process.accountable ? roles.get(process.accountable) : { a: 0, r: 0, c: 0, i: 0 };
+			let tally = process.accountable
+				? rolesByARCI.get(process.accountable)
+				: { a: 0, r: 0, c: 0, i: 0 };
 			if (tally) tally.a++;
 
-			for (const how of hows) {
+			for (const how of processHows) {
 				for (const role of how.responsible) {
-					if (!roles.has(role)) roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
-					tally = roles.get(role);
+					if (!rolesByARCI.has(role)) rolesByARCI.set(role, { a: 0, r: 0, c: 0, i: 0 });
+					tally = rolesByARCI.get(role);
 					if (tally) tally.r++;
 				}
 
 				for (const role of how.consulted) {
-					if (!roles.has(role)) {
-						roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
+					if (!rolesByARCI.has(role)) {
+						rolesByARCI.set(role, { a: 0, r: 0, c: 0, i: 0 });
 					}
-					tally = roles.get(role);
+					tally = rolesByARCI.get(role);
 					if (tally) tally.c++;
 				}
 
 				for (const role of how.informed) {
-					if (!roles.has(role)) {
-						roles.set(role, { a: 0, r: 0, c: 0, i: 0 });
+					if (!rolesByARCI.has(role)) {
+						rolesByARCI.set(role, { a: 0, r: 0, c: 0, i: 0 });
 					}
-					tally = roles.get(role);
+					tally = rolesByARCI.get(role);
 					if (tally) tally.i++;
 				}
 			}
 		}
 
-		return Array.from(roles.keys())
+		return Array.from(rolesByARCI.keys())
 			.sort((a, b) => {
-				const ao = roles.get(a);
-				const bo = roles.get(b);
+				const ao = rolesByARCI.get(a);
+				const bo = rolesByARCI.get(b);
 				if (ao === undefined || bo === undefined) return 0;
 				return (
 					bo.a * 1000 +
@@ -138,18 +145,18 @@
 					(ao.a * 1000 + ao.r * 100 + ao.c * 10 + ao.i)
 				);
 			})
-			.map((id) => org.getRole(id))
+			.map((id) => Organization.getRoleByID(roles, id))
 			.filter((r): r is RoleRow => r !== undefined);
 	}
 
 	let title = $state('');
 	async function newProcess() {
-		const { error, id } = await db.addProcess(org.getID(), title, org.getVisibility());
+		const { error, id } = await db.addProcess(org.id, title, org.visibility);
 		if (error) {
 			addError("Couldn't add new process", error);
 			return false;
 		} else {
-			goto(`/org/${org.getPath()}/process/${id}`);
+			await goto(`/org/${Organization.getPath(org)}/process/${id}`);
 			return true;
 		}
 	}
@@ -196,7 +203,7 @@
 	<Oops text="Only showing public processes of this private organization." />
 {/if}
 
-{#if $user && org.hasPerson($user.id)}
+{#if $user && context.member}
 	<FormDialog
 		button="Create process …"
 		showTip="Create a new process."
@@ -235,14 +242,12 @@
 	<Header
 		><Concern
 			{concern}
-			edit={isAdmin
-				? (newConcern) => db.renameConcern(org.getID(), concern, newConcern)
-				: undefined}
+			edit={isAdmin ? (newConcern) => db.renameConcern(org.id, concern, newConcern) : undefined}
 		/></Header
 	>
 {/snippet}
 
-{#if org.getProcesses().length === 0}
+{#if processes.length === 0}
 	<Notice>This organization has no processes.</Notice>
 {:else if filteredProcesses.length === 0}
 	<Notice>All processes filtered.</Notice>
@@ -268,7 +273,7 @@
 								<th style:width="20em">process</th>
 								{#each roles as role}
 									<th class="role" class:me={personRoles.includes(role.id)}
-										><RoleLink roleID={role.id} />
+										><RoleLink {role} />
 									</th>
 								{:else}
 									<th></th>
@@ -277,8 +282,9 @@
 						</thead>
 						<tbody>
 							{#each processes as process}
-								{@const how = process.howid !== null ? org.getHow(process.howid) : undefined}
-								{@const hows = org.getProcessHows(process.id)}
+								{@const how =
+									process.howid !== null ? Organization.getHow(hows, process.howid) : undefined}
+								{@const processHows = Organization.getProcessHows(hows, process.id)}
 								<tr>
 									<td><Status status={process.state} /></td>
 									<td width="4em"
@@ -288,17 +294,17 @@
 											/>{/if}</td
 									>
 									<td><ProcessDate {process} /></td>
-									<td><ProcessLink wrap processID={process.id} /></td>
+									<td><ProcessLink wrap {process} /></td>
 									{#each roles as role}
 										<td class="level" class:me={personRoles.includes(role.id)}
 											><Level
 												level={process?.accountable === role.id
 													? 'accountable'
-													: hows.some((how) => how.responsible.includes(role.id))
+													: processHows.some((how) => how.responsible.includes(role.id))
 														? 'responsible'
-														: hows.some((how) => how.consulted.includes(role.id))
+														: processHows.some((how) => how.consulted.includes(role.id))
 															? 'consulted'
-															: hows.some((how) => how.informed.includes(role.id))
+															: processHows.some((how) => how.informed.includes(role.id))
 																? 'informed'
 																: ''}
 											/></td
@@ -321,14 +327,19 @@
 				<div class="processes">
 					{#each processes as process}
 						<div class="process">
-							<ProcessLink wrap processID={process.id}></ProcessLink>
+							<ProcessLink wrap {process}></ProcessLink>
 							{#if process.accountable}
-								{@const accountable = org.getRoleProfiles(process.accountable)}
+								{@const accountable = Organization.getRoleProfiles(
+									process.accountable,
+									assignments,
+									profiles
+								)}
 								{@const responsible =
 									process.howid !== null
-										? (org
-												.getHow(process.howid)
-												?.responsible.map((r) => org.getRoleProfiles(r))
+										? (Organization.getHow(hows, process.howid)
+												?.responsible.map((r) =>
+													Organization.getRoleProfiles(r, assignments, profiles)
+												)
 												.flat() ?? [])
 										: []}
 								<div class="process-people">

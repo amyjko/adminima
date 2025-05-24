@@ -1,29 +1,25 @@
 <!-- Represents ARCI for a processes's how to -->
 <script lang="ts">
-	import type { HowRow } from '$database/OrganizationsDB';
+	import type { HowRow, RoleRow } from '$database/Organization';
 	import Button, { Delete } from './Button.svelte';
 	import Level from './Level.svelte';
 	import RoleLink, { RoleItem } from './RoleLink.svelte';
-	import { getOrg } from '$routes/+layout.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 	import Options from './Options.svelte';
 
 	interface Props {
 		how: HowRow;
+		roles: RoleRow[];
 		verbose: boolean;
 		editable: boolean;
 	}
 
-	let { how, verbose, editable }: Props = $props();
-
-	const context = getOrg();
-	let org = $derived(context.org);
+	let { roles, how, verbose, editable }: Props = $props();
 
 	const db = getDB();
 
 	let options = $derived([
-		...org
-			.getRoles()
+		...roles
 			// Exclude any alreaydy included in the how.
 			.filter(
 				(r) =>
@@ -46,7 +42,7 @@
 	let roleSearch = {
 		placeholder: 'role',
 		include: (item: string, query: string) => {
-			const role = org.getRole(item);
+			const role = roles.find((r) => r.id === item);
 			return role?.title.toLowerCase().includes(query.toLowerCase()) ?? false;
 		}
 	};
@@ -63,7 +59,7 @@
 					id="responsible-chooser"
 					tip="Add a role to be responsible for completing this step."
 					{options}
-					view={RoleItem}
+					view={{ snippet: RoleItem, data: roles }}
 					empty={false}
 					searchable={roleSearch}
 					active={options.length >= 1}
@@ -81,7 +77,7 @@
 		</div>
 		<div class="roles">
 			{#each how.responsible as responsible}
-				<RoleLink roleID={responsible}
+				<RoleLink role={roles.find((r) => r.id === responsible)}
 					>{#if editable}
 						<Button
 							chromeless
@@ -106,7 +102,7 @@
 					id="consulted-chooser"
 					tip="Add a role to be consulted in this step."
 					{options}
-					view={RoleItem}
+					view={{ snippet: RoleItem, data: roles }}
 					empty={false}
 					active={options.length >= 1}
 					bind:selection={consulted}
@@ -124,7 +120,7 @@
 		</div>
 		<div class="roles">
 			{#each how.consulted as consulted}
-				<RoleLink roleID={consulted}
+				<RoleLink role={roles.find((r) => r.id === consulted)}
 					>{#if editable}
 						<Button
 							chromeless
@@ -149,7 +145,7 @@
 					id="informed-chooser"
 					tip="Add a role to be informed in this step."
 					{options}
-					view={RoleItem}
+					view={{ snippet: RoleItem, data: roles }}
 					empty={false}
 					searchable={roleSearch}
 					bind:selection={informed}
@@ -167,7 +163,7 @@
 		</div>
 		<div class="roles">
 			{#each how.informed as informed}
-				<RoleLink roleID={informed}
+				<RoleLink role={roles.find((r) => r.id === informed)}
 					>{#if editable}
 						<Button
 							chromeless

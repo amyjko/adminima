@@ -10,12 +10,11 @@
 	import { goto } from '$app/navigation';
 	import Title from '$lib/Title.svelte';
 	import Level from '$lib/Level.svelte';
-	import { getOrg } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { addError, queryOrError } from '$routes/errors.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Concern from '$lib/Concern.svelte';
-	import { page } from '$app/state';
 	import Field from '$lib/Field.svelte';
 	import FormDialog from '$lib/FormDialog.svelte';
 	import { setContext, tick } from 'svelte';
@@ -28,14 +27,25 @@
 	import Visibility from '$lib/VisibilityChooser.svelte';
 	import Note from '$lib/Note.svelte';
 	import ARCI from '$lib/ARCI.svelte';
-	import type { HowRow } from '$database/OrganizationsDB';
-	import type { HowID } from '$types/Organization';
+	import type { HowRow } from '$database/Organization';
+	import type { HowID } from '$database/Organization.js';
 	import Flow from '$lib/Flow.svelte';
 	import PathEditor from '$lib/PathEditor.svelte';
 	import Status from '$lib/Status.svelte';
 	import Period from '$lib/Period.svelte';
 	import type { default as PeriodType } from '$database/Period';
 	import Options from '$lib/Options.svelte';
+	import Organization from '$database/Organization';
+
+	const { data } = $props();
+
+	const process = $derived(data.process);
+	const hows = $derived(data.hows);
+	const roles = $derived(data.roles);
+	const changes = $derived(data.changes);
+	const concerns = $derived(data.concerns);
+	const personRoles = $derived(data.personRoles);
+	const profiles = $derived(data.profiles);
 
 	let deleteError: string | undefined = $state(undefined);
 
@@ -47,15 +57,13 @@
 
 	const States = { draft: 'Draft', active: 'Active', archived: 'Archived' };
 
-	let process = $derived(
-		org.getProcess(page.params.processid) ?? org.getProcessByShortName(page.params.processid)
+	let how = $derived(
+		process && process.howid ? Organization.getHow(hows, process.howid) : undefined
 	);
-	let how = $derived(process && process.howid ? org.getHow(process.howid) : undefined);
 	let repeat = $derived(process !== null ? process.repeat : undefined) as PeriodType[];
 
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
-	let personRoles = $derived($user ? org.getPersonRoles($user.id) : []);
-	let isAdmin = $derived($user !== null && org.hasAdminPerson($user.id));
+	let isAdmin = $derived(context.admin);
 	let accountable = $derived(
 		$user !== null &&
 			process !== null &&
@@ -66,9 +74,9 @@
 			process !== null &&
 			(isAdmin ||
 				accountable ||
-				org
-					.getProcessHows(process.id)
-					.some((how) => how.responsible.filter((r) => personRoles.includes(r)).length > 0))
+				Organization.getProcessHows(hows, process.id).some(
+					(how) => how.responsible.filter((r) => personRoles.includes(r)).length > 0
+				))
 	);
 	let editable = $derived(process !== null && $user !== null && responsible);
 
@@ -103,17 +111,17 @@
 		function enumerate(how: HowRow, list: HowID[] = []) {
 			list.push(how.id);
 			for (const subhow of how.how
-				.map((id) => org.getHow(id))
+				.map((id) => Organization.getHow(hows, id))
 				.filter((h): h is HowRow => h !== undefined)) {
 				enumerate(subhow, list);
 			}
 			return list;
 		}
 		if (how === undefined) return;
-		const hows = enumerate(how);
+		const subhows = enumerate(how);
 		await Promise.all(
-			hows.map((h) => {
-				const sub = org.getHow(h);
+			subhows.map((h) => {
+				const sub = Organization.getHow(hows, h);
 				if (sub) db.updateHowDone(sub, uncheck ? 'no' : 'yes');
 			})
 		);
@@ -154,15 +162,10 @@
 	{/if}
 {/snippet}
 
-{#if process === null}
-	<Title title={org.getName()} />
-	<Oops
-		text="This process does not exist or is not public. If you believe you should have access, ensure you're logged in."
-	/>
-{:else if how === undefined}
+{#if how === undefined}
 	<Oops text="Unable to load this process." />
-{:else if how.visibility !== 'public' && ($user === null || !org.hasPerson($user.id))}
-	<Title title={org.getName()} />
+{:else if how.visibility !== 'public' && ($user === null || !context.member)}
+	<Title title={org.name} />
 	<Oops
 		text="This process is only visible to people in the organization. If you believe you have access, ensure you're logged in."
 	/>
@@ -219,25 +222,25 @@
 						else return true;
 					}}
 					id="process-state"
-					view={status}
+					view={{ snippet: status, data: [] }}
 				/>
 			{:else}
 				<Status status={process.state} />
 			{/if}
 
 			<Note>Concern</Note>
-			{#if editable && $user && org.getConcerns().length > 0}
+			{#if editable && $user && concerns.length > 0}
 				<Options
 					tip="Change this process's concern"
 					selection={process.concern}
-					options={org.getConcerns()}
+					options={concerns}
 					change={async (concern) =>
 						(await queryOrError(
 							db.updateProcessConcern(process, concern ?? '', $user.id),
 							"Couldn't update process's concern"
 						)) === null}
 					id="concer-chooser"
-					view={concernView}
+					view={{ snippet: concernView, data: [] }}
 				/>{:else}
 				<Concern concern={process.concern} />
 			{/if}
@@ -250,7 +253,7 @@
 					header="Set a new concern"
 					explanation="Set a new concern to group processes."
 					inactive="Fill in a concern that doesn't exist yet."
-					valid={() => newConcern.length > 0 && org.getConcerns().indexOf(newConcern) === -1}
+					valid={() => newConcern.length > 0 && concerns.indexOf(newConcern) === -1}
 					action={async () => {
 						const error = await queryOrError(
 							db.updateProcessConcern(process, newConcern, $user.id),
@@ -272,9 +275,12 @@
 							db.updateProcessShortName(process, text),
 							"Couldn't update process's short name"
 						);
-						goto(`/org/${org.getPath()}/process/${text.length > 0 ? text : process.id}`, {
-							replaceState: true
-						});
+						await goto(
+							`/org/${Organization.getPath(org)}/process/${text.length > 0 ? text : process.id}`,
+							{
+								replaceState: true
+							}
+						);
 						return null;
 					}}
 				/>{/if}
@@ -298,26 +304,26 @@
 
 	<div>
 		{#if editable}
-			{@const roles = org.getRoles().toSorted((a, b) => a.title.localeCompare(b.title))}
+			{@const sortedRoles = roles.toSorted((a, b) => a.title.localeCompare(b.title))}
 			<Options
 				id="choose-accountable"
 				tip="Choose a role to be accountable for the processes outcomes."
-				options={[undefined, ...roles.map((role) => role.id)]}
+				options={[undefined, ...sortedRoles.map((role) => role.id)]}
 				searchable={{
 					placeholder: 'role',
 					include: (item: string, query: string) =>
-						roles
+						sortedRoles
 							.find((r) => r.id === item)
 							?.title.toLowerCase()
 							.includes(query.toLowerCase()) === true
 				}}
-				view={RoleItem}
+				view={{ snippet: RoleItem, data: roles }}
 				selection={process.accountable ?? undefined}
 				change={async (value) =>
 					(await db.updateProcessAccountable(process, value ?? null)) === null}
 			/>
 		{:else if process.accountable}
-			<RoleLink roleID={process.accountable} />
+			<RoleLink role={roles.find((r) => r.id === process.accountable)} />
 		{:else}
 			No one
 		{/if}
@@ -327,7 +333,7 @@
 			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible)
 		{/if}
 	</div>
-	<ARCI {how} verbose {editable} />
+	<ARCI {how} {roles} verbose {editable} />
 
 	<Header>When</Header>
 
@@ -356,7 +362,7 @@
 		<Options
 			id="choose-period"
 			tip="Add a frequency on which this process occurs"
-			view={period}
+			view={{ snippet: period, data: [] }}
 			options={['annually-date', 'annually-week', 'monthly-date', 'monthly-weekday', 'weekly']}
 			bind:selection={newPeriod}
 			change={addPeriod}
@@ -408,8 +414,8 @@
 			></Flow
 		>
 		<div class="steps">
-			{#each how.how.map((h) => org.getHow(h)) as subHow, index (subHow?.id ?? index)}
-				{#if subHow}<HowView how={subHow} {process} {editable} />{:else}<Note
+			{#each how.how.map( (h) => Organization.getHow(hows, h) ) as subHow, index (subHow?.id ?? index)}
+				{#if subHow}<HowView how={subHow} {hows} {roles} {process} {editable} />{:else}<Note
 						>This step is not visible to you.</Note
 					>{/if}
 			{/each}
@@ -418,15 +424,12 @@
 
 	<Header>Changes</Header>
 
-	<ChangeLink id={null} process={process.id} />
+	<ChangeLink change={null} process={process.id} />
 
 	<Tip member
 		>These are changes people have suggested that might affect this process that aren't yet done.</Tip
 	>
-	<Changes
-		changes={org
-			.getChanges()
-			.filter((change) => change.status !== 'done' && change.processes.includes(process.id))}
+	<Changes changes={changes.filter((change) => change.status !== 'done')} {profiles}
 		><Paragraph>There are no active changes suggested for this process.</Paragraph></Changes
 	>
 
@@ -434,6 +437,7 @@
 
 	<CommentsView
 		comments={process.comments}
+		{profiles}
 		remove={isAdmin ? (comment) => db.deleteComment(process, 'processes', comment) : undefined}
 	/>
 
@@ -449,7 +453,7 @@
 				try {
 					const { error } = await db.deleteProcess(process.id);
 					if (error) addError("Couldn't delete this", error);
-					else goto(`/org/${org.getPath()}/processes`);
+					else await goto(`/org/${Organization.getPath(org)}/processes`);
 				} catch (_) {
 					deleteError = "We couldn't delete this";
 				}

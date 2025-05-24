@@ -1,13 +1,3 @@
-import Organization, {
-	type ChangeID,
-	type CommentID,
-	type OrganizationID,
-	type PersonID,
-	type ProcessID,
-	type ProfileID,
-	type RoleID,
-	type TeamID
-} from '$types/Organization';
 import {
 	type SupabaseClient,
 	type PostgrestError,
@@ -16,7 +6,6 @@ import {
 } from '@supabase/supabase-js';
 import type { Database } from './database.types';
 import type Period from './Period';
-import { type Markup } from '$types/Organization';
 
 type Tables = Database['public']['Tables'];
 export type PersonRow = Tables['people']['Row'];
@@ -34,27 +23,23 @@ export type Completion = Database['public']['Enums']['completion'];
 export type Status = Database['public']['Enums']['status'];
 export type State = Database['public']['Enums']['state'];
 
-/** A serializable version of all organization data, used to store raw data from the database. */
-export type OrganizationPayload = {
-	organization: OrganizationRow;
-	profiles: ProfileRow[];
-	roles: RoleRow[];
-	assignments: AssignmentRow[];
-	teams: TeamRow[];
-	processes: ProcessRow[];
-	hows: HowRow[];
-	suggestions: ChangeRow[];
-};
+export type OrganizationID = string;
+export type ProcessID = string;
+export type TeamID = string;
+export type RoleID = string;
+export type PersonID = string;
+export type ProfileID = string;
+export type HowID = string;
+export type ChangeID = string;
+export type CommentID = string;
+export type Markup = string;
 
-/** A front end interface to the backing store, caching data loaded from the database and offering operations for modifying the database. */
-class OrganizationsDB {
+/** Encapsulates functionality related to querying the database and manipulating organization data. */
+class Organization {
 	private supabase: SupabaseClient<Database>;
 
-	/** A map of organizations */
-	private organizations = new Map<OrganizationID, Organization>();
-
 	/** A list of listeners to notify of realtime updates. */
-	private listeners: { id: OrganizationID; listener: (org: Organization) => void }[] = [];
+	private listeners: { id: OrganizationID; listener: () => void }[] = [];
 
 	/** Organization specific Supabase realtime channels */
 	readonly channels = new Map<OrganizationID, RealtimeChannel>();
@@ -62,6 +47,8 @@ class OrganizationsDB {
 	constructor(supabase: SupabaseClient<Database>) {
 		this.supabase = supabase;
 	}
+
+	// Authentication
 
 	async getUser() {
 		return this.supabase.auth.getUser();
@@ -75,25 +62,19 @@ class OrganizationsDB {
 		this.supabase = client;
 	}
 
+	// Realtime
+
 	private getOrgChannel(orgid: OrganizationID): string {
 		return `orgs:${orgid}`;
 	}
 
-	notify(org: Organization) {
-		this.cache(org);
-		for (const listener of this.listeners) if (listener.id === org.getID()) listener.listener(org);
-	}
-
-	cache(org: Organization) {
-		this.organizations.set(org.getID(), org);
+	notify(orgid: OrganizationID) {
+		for (const listener of this.listeners) if (listener.id === orgid) listener.listener();
 	}
 
 	/** Subscribe to an organization-specific channel, listening to all modifications to organization-related tables  */
-	listen(org: Organization, listener: (org: Organization) => void) {
-		const orgid = org.getID();
-
-		// Remember the organization's value.
-		this.organizations.set(orgid, org);
+	listen(org: OrganizationRow, listener: () => void) {
+		const orgid = org.id;
 
 		// Add the listener to the list of listeners.
 		this.listeners.push({ id: orgid, listener });
@@ -118,17 +99,11 @@ class OrganizationsDB {
 					filter: `id=eq.${orgid}`
 				},
 				(payload: RealtimePostgresChangesPayload<OrganizationRow>) => {
-					// Get the current object, if it exists.
-					const org = this.organizations.get(orgid);
-					if (!org) return;
-
 					// Otherwise, update the organization.
-					if (payload.eventType === 'UPDATE') {
-						this.notify(org.withUpdate({ ...org.getOrg(), ...payload.new }));
-					}
+					if (payload.eventType === 'UPDATE') this.notify(orgid);
 				}
 			)
-			/** When a profile for this organization changes, update it's client-side store. */
+			/** When a profile for this organization changes, refresh */
 			.on(
 				'postgres_changes',
 				{
@@ -138,14 +113,8 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<ProfileRow>) => {
-					this.synchronizeRow(
-						orgid,
-						payload,
-						// Updates don't always get every column, so we merge with the existing value, if there is one.
-						(org, role) => org.withProfile({ ...(org.getProfile(role.id) ?? {}), ...role }),
-						(org, role) => (role.id ? org.withoutProfile(role.id) : org)
-					);
+				() => {
+					this.notify(orgid);
 				}
 			)
 			/** When a role for this organization changes, update it's client-side store. */
@@ -158,14 +127,8 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<RoleRow>) => {
-					this.synchronizeRow(
-						orgid,
-						payload,
-						// Updates don't always get every column, so we merge with the existing value, if there is one.
-						(org, role) => org.withRole({ ...(org.getRole(role.id) ?? {}), ...role }),
-						(org, role) => (role.id ? org.withoutRole(role.id) : org)
-					);
+				() => {
+					this.notify(orgid);
 				}
 			)
 			/** When an assignment for this organization changes, update it's client-side store. */
@@ -178,21 +141,8 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<AssignmentRow>) => {
-					const org = this.organizations.get(orgid);
-					if (!org) return;
-
-					// Otherwise, update the organization's profile.
-					if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-						this.notify(org.withAssignment(payload.new));
-					} else if (
-						payload.eventType === 'DELETE' &&
-						payload.old.roleid &&
-						payload.old.profileid
-					) {
-						// Supabase doesn't allow filtering on delete events, so we have to filter here.
-						this.notify(org.withoutAssignment(payload.old.roleid, payload.old.profileid));
-					}
+				() => {
+					this.notify(orgid);
 				}
 			)
 			/** When a team for this organization changes, update it's client-side store. */
@@ -205,14 +155,8 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<TeamRow>) => {
-					this.synchronizeRow(
-						orgid,
-						payload,
-						// Updates don't always get every column, so we merge with the existing value, if there is one.
-						(org, newTeam) => org.withTeam({ ...(org.getTeam(newTeam.id) ?? {}), ...newTeam }),
-						(org, team) => (team.id ? org.withoutTeam(team.id) : org)
-					);
+				() => {
+					this.notify(orgid);
 				}
 			)
 			/** When an process for this organization changes, update it's client-side store. */
@@ -225,15 +169,8 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<ProcessRow>) => {
-					this.synchronizeRow(
-						orgid,
-						payload,
-						// Updates don't always get every column, so we merge with the existing value, if there is one.
-						(org, newProcess) =>
-							org.withProcess({ ...(org.getProcess(newProcess.id) ?? {}), ...newProcess }),
-						(org, process) => (process.id ? org.withoutProcess(process.id) : org)
-					);
+				() => {
+					this.notify(orgid);
 				}
 			)
 			/** When a how for this organization changes, update it's client-side store. */
@@ -246,14 +183,8 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<HowRow>) => {
-					this.synchronizeRow(
-						orgid,
-						payload,
-						// Updates don't always get every column, so we merge with the existing value, if there is one.
-						(org, how) => org.withHow({ ...(org.getHow(how.id) ?? {}), ...how }),
-						(org, how) => (how.id ? org.withoutHow(how.id) : org)
-					);
+				() => {
+					this.notify(orgid);
 				}
 			)
 			/** When a how for this organization changes, update it's client-side store. */
@@ -266,137 +197,157 @@ class OrganizationsDB {
 					/** Only listen to rows for this organization id */
 					filter: `orgid=eq.${orgid}`
 				},
-				(payload: RealtimePostgresChangesPayload<ChangeRow>) => {
-					this.synchronizeRow(
-						orgid,
-						payload,
-						// Updates don't always get every column, so we merge with the existing value, if there is one.
-						(org, change) => org.withChange({ ...(org.getChange(change.id) ?? {}), ...change }),
-						(org, change) => (change.id ? org.withoutChange(change.id) : org)
-					);
+				() => {
+					this.notify(orgid);
 				}
 			)
 			.subscribe();
 	}
 
-	private synchronizeRow<T extends { [key: string]: unknown }>(
-		orgid: OrganizationID,
-		payload: RealtimePostgresChangesPayload<T>,
-		update: (org: Organization, row: T) => Organization,
-		remove: (org: Organization, row: Partial<T>) => Organization
-	) {
-		// Get the current object, if it exists.
-		const org = this.organizations.get(orgid);
-		if (!org) return;
-
-		// Otherwise, update the organization's profile.
-		if (payload.eventType === 'UPDATE') {
-			this.notify(update(org, payload.new));
-		} else if (payload.eventType === 'INSERT') {
-			this.notify(update(org, payload.new));
-		} else if (payload.eventType === 'DELETE' && payload.old.id) {
-			// Supabase doesn't allow filtering on delete events, so we have to filter here.
-			this.notify(remove(org, payload.old));
-		}
-	}
-
 	/** Unsubscribe from the organization specific channel, if there is one. */
-	ignore(orgid: OrganizationID, listener: (org: Organization) => void) {
+	ignore(orgid: OrganizationID, listener: () => void) {
 		const channel = this.channels.get(this.getOrgChannel(orgid));
 		if (channel) this.supabase.removeChannel(channel);
 
 		this.listeners = this.listeners.filter((l) => l.listener !== listener);
 	}
 
+	// Organizations
+
 	/** Update an organization's description. Rely on Realtime to refresh. */
 	async updateOrgDescription(
-		org: Organization,
+		org: OrganizationRow,
 		text: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
 		const { error } = await this.supabase
 			.from('orgs')
 			.update({ description: text })
-			.eq('id', org.getID());
+			.eq('id', org.id);
 		if (error) return error;
 		const commentError = await this.addComment(
-			org.getID(),
+			org.id,
 			who,
 			'Updated organization description',
 			'orgs',
-			org.getID(),
-			org.getComments()
+			org.id,
+			org.comments
 		);
 		return commentError;
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
-	async addOrgPath(org: Organization, path: string): Promise<PostgrestError | null> {
+	async addOrgPath(org: OrganizationRow, path: string): Promise<PostgrestError | null> {
 		const { error } = await this.supabase
 			.from('orgs')
-			.update({ paths: [path, ...org.getPaths()] })
-			.eq('id', org.getID());
+			.update({ paths: [path, ...org.paths] })
+			.eq('id', org.id);
 		return error;
 	}
 
 	async updateOrgPrompt(
-		org: Organization,
+		org: OrganizationRow,
 		text: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		const { error } = await this.supabase
-			.from('orgs')
-			.update({ prompt: text })
-			.eq('id', org.getID());
+		const { error } = await this.supabase.from('orgs').update({ prompt: text }).eq('id', org.id);
 		if (error) return error;
 		const commentError = await this.addComment(
-			org.getID(),
+			org.id,
 			who,
 			'Updated organization change prompt',
 			'orgs',
-			org.getID(),
-			org.getComments()
+			org.id,
+			org.comments
 		);
 		return commentError;
 	}
 
 	async updateOrgName(
-		org: Organization,
+		org: OrganizationRow,
 		name: string,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		if (org.getName() === name) return null;
-		const { error } = await this.supabase.from('orgs').update({ name }).eq('id', org.getID());
+		if (org.name === name) return null;
+		const { error } = await this.supabase.from('orgs').update({ name }).eq('id', org.id);
 		if (error) return error;
 
 		this.addComment(
-			org.getID(),
+			org.id,
 			who,
 			`Updated organization name to ${name}`,
 			'orgs',
-			org.getID(),
-			org?.getComments()
+			org.id,
+			org.comments
 		);
 
 		return null;
 	}
 
 	async updateOrgVisibility(
-		org: Organization,
+		org: OrganizationRow,
 		visibility: Visibility,
 		who: PersonID
 	): Promise<PostgrestError | null> {
-		const { error } = await this.supabase.from('orgs').update({ visibility }).eq('id', org.getID());
+		const { error } = await this.supabase.from('orgs').update({ visibility }).eq('id', org.id);
 		if (error) return error;
 
 		return await this.addComment(
-			org.getID(),
+			org.id,
 			who,
 			`Updated organization visibility to ${visibility}`,
 			'orgs',
-			org.getID(),
-			org?.getComments()
+			org.id,
+			org.comments
 		);
+	}
+
+	static getPath(org: OrganizationRow) {
+		return org.paths[0] ?? org.id;
+	}
+
+	static getAdmins(profiles: ProfileRow[]): ProfileRow[] {
+		return profiles.filter((profile) => profile.admin);
+	}
+
+	static hasAdminProfile(profiles: ProfileRow[], profileid: ProfileID): boolean {
+		return Organization.getAdmins(profiles).some((profile) => profile.id === profileid);
+	}
+
+	static getAdminCount(profiles: ProfileRow[]): number {
+		return Organization.getAdmins(profiles).length;
+	}
+
+	// Profiles
+
+	static async queryProfiles(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		return supabase.from('profiles').select('*').eq('orgid', orgid);
+	}
+
+	static async queryProfile(
+		supabase: SupabaseClient<Database>,
+		orgid: OrganizationID,
+		profile: ProfileID
+	) {
+		return supabase.from('profiles').select('*').eq('orgid', orgid).eq('id', profile).single();
+	}
+
+	async updateProfileName(profile: ProfileRow, name: string): Promise<PostgrestError | null> {
+		const { error } = await this.supabase
+			.from('profiles')
+			.update({ name })
+			.eq('email', profile.email)
+			.eq('orgid', profile.orgid);
+		return error;
+	}
+
+	async updateProfileBio(profile: ProfileRow, text: string) {
+		const { error } = await this.supabase
+			.from('profiles')
+			.update({ bio: text })
+			.eq('email', profile.email)
+			.eq('orgid', profile.orgid);
+		return error;
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */
@@ -439,6 +390,25 @@ class OrganizationsDB {
 		return data;
 	}
 
+	// Assignments
+
+	static async queryAssignments(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		return supabase.from('assignments').select('*').eq('orgid', orgid);
+	}
+
+	/** Get the roleids to which the given person's profile is assigned */
+	static async queryPersonRoles(
+		supabase: SupabaseClient<Database>,
+		orgid: OrganizationID,
+		personid: PersonID
+	) {
+		return supabase
+			.from('assignments')
+			.select('roleid, profiles!inner(*)')
+			.eq('orgid', orgid)
+			.eq('profiles.personid', personid);
+	}
+
 	async assignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
 		const { error } = await this.supabase.from('assignments').insert({ orgid, profileid, roleid });
 		return error;
@@ -453,19 +423,115 @@ class OrganizationsDB {
 			.eq('roleid', roleid);
 
 		// No error? Update the organization on the front end.
-		if (error === null) {
-			const org = this.organizations.get(orgid);
-			if (!org) return error;
-
-			this.notify(org.withoutAssignment(roleid, profileid));
-		}
+		if (error === null) this.notify(orgid);
 
 		return error;
+	}
+
+	// Roles
+
+	static async queryRole(
+		supabase: SupabaseClient<Database>,
+		orgid: OrganizationID,
+		roleid: RoleID
+	) {
+		const { data } = await supabase
+			.from('roles')
+			.select('*')
+			.eq('orgid', orgid)
+			.eq('id', roleid)
+			.single();
+		return data;
+	}
+
+	/** Get the role by short name */
+	static async queryRoleByShortName(
+		supabase: SupabaseClient<Database>,
+		orgid: OrganizationID,
+		name: string
+	) {
+		const { data } = await supabase
+			.from('roles')
+			.select('*')
+			.eq('orgid', orgid)
+			.contains('short', [name])
+			.single();
+		return data;
+	}
+
+	static async queryRoles(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		return supabase.from('roles').select('*').eq('orgid', orgid);
+	}
+
+	static getRoleByID(roles: RoleRow[], id: RoleID): RoleRow | null {
+		return roles.find((role) => role.id === id) ?? null;
+	}
+
+	static getRoleProfiles(role: RoleID, assignments: AssignmentRow[], profiles: ProfileRow[]) {
+		return assignments
+			.filter((ass) => ass.roleid === role)
+			.map((ass) => profiles.find((profile) => profile.id === ass.profileid))
+			.filter((profile): profile is ProfileRow => profile !== undefined);
+	}
+
+	static getRoleProcesses(role: RoleID, hows: HowRow[], processes: ProcessRow[]): ProcessRow[] {
+		return [
+			...new Set([
+				...hows
+					.filter(
+						(task) =>
+							task.responsible?.includes(role) ||
+							task.consulted?.includes(role) ||
+							task.informed?.includes(role)
+					)
+					.map((how) => processes.find((process) => process.id === how.processid))
+					.filter((process): process is ProcessRow => process !== undefined),
+				...processes.filter((p) => p.accountable === role)
+			])
+		];
+	}
+
+	static getPersonRoles(profiles: ProfileRow[], assignments: AssignmentRow[], id: PersonID) {
+		const profile = profiles.find((prof) => prof.personid === id);
+		if (profile === undefined) return [];
+		return assignments.filter((ass) => ass.profileid === profile.id).map((ass) => ass.roleid);
 	}
 
 	async getPersonWithEmail(email: string) {
 		const { data } = await this.supabase.from('people').select().eq('email', email).single();
 		return data;
+	}
+
+	static getProfileWithEmail(profiles: ProfileRow[], email: string): ProfileRow | null {
+		return profiles.find((person) => person.email === email) ?? null;
+	}
+
+	static getProfileWithPersonID(profiles: ProfileRow[], id: PersonID): ProfileRow | null {
+		return profiles.find((person) => person.personid === id) ?? null;
+	}
+
+	/** Get the name or email of the profile ID */
+	static getPersonNameOrEmail(profiles: ProfileRow[], id: PersonID): string | null {
+		const profile = profiles.find((p) => p.personid === id) ?? null;
+		return profile === null ? null : profile.name === '' ? profile.email : profile.name;
+	}
+
+	static getProfileWithNameOrEmail(profiles: ProfileRow[], id: ProfileID) {
+		const profile = profiles.find((profile) => profile.id === id) ?? null;
+		return profile === null ? null : profile.name === '' ? profile.email : profile.name;
+	}
+
+	static getProfileWithID(profiles: ProfileRow[], id: ProfileID): ProfileRow | null {
+		return profiles.find((person) => person.id === id) ?? null;
+	}
+
+	/** Get the roles that the given person has */
+	static getProfileRoles(id: ProfileID, assignments: AssignmentRow[], roles: RoleRow[]): RoleRow[] {
+		// Get the assignments for the person, and convert them into roles.
+		return assignments
+			.filter((assignment) => assignment.profileid === id)
+			.map((assignment) => roles.find((role) => assignment.roleid === role.id))
+			.filter((role): role is RoleRow => role !== undefined);
 	}
 
 	async updateProfileSupervisor(
@@ -556,23 +622,7 @@ class OrganizationsDB {
 		return error;
 	}
 
-	async updateProfileName(profile: ProfileRow, name: string): Promise<PostgrestError | null> {
-		const { error } = await this.supabase
-			.from('profiles')
-			.update({ name })
-			.eq('email', profile.email)
-			.eq('orgid', profile.orgid);
-		return error;
-	}
-
-	async updateProfileBio(profile: ProfileRow, text: string) {
-		const { error } = await this.supabase
-			.from('profiles')
-			.update({ bio: text })
-			.eq('email', profile.email)
-			.eq('orgid', profile.orgid);
-		return error;
-	}
+	// Comments
 
 	async addComment(
 		orgid: OrganizationID,
@@ -603,11 +653,7 @@ class OrganizationsDB {
 
 			// If we succeeded, notify the organization of the change.
 			if (row) {
-				if (table === 'suggestions') {
-					const org = this.organizations.get(orgid);
-					const change = org?.getChange(id);
-					if (org && change) this.notify(org.withChange({ ...change, comments: newComments }));
-				}
+				if (table === 'suggestions') this.notify(orgid);
 			}
 		}
 		return null;
@@ -645,6 +691,28 @@ class OrganizationsDB {
 
 		const { error } = await this.supabase.from('roles').delete().eq('id', id);
 		return error;
+	}
+
+	// Teams
+
+	static getTeamRoles(roles: RoleRow[], teamID: TeamID): RoleRow[] {
+		return roles.filter((role) => role.team === teamID);
+	}
+
+	static async queryTeams(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		return supabase.from('teams').select('*').eq('orgid', orgid);
+	}
+
+	static async queryTeam(
+		supabase: SupabaseClient<Database>,
+		orgid: OrganizationID,
+		teamid: TeamID
+	) {
+		return supabase.from('teams').select('*').eq('orgid', orgid).eq('id', teamid).single();
+	}
+
+	static queryTeamRoles(supabase: SupabaseClient<Database>, orgid: OrganizationID, teamid: TeamID) {
+		return supabase.from('roles').select('*').eq('orgid', orgid).eq('team', teamid);
 	}
 
 	async createTeam(orgid: OrganizationID, name: string) {
@@ -737,6 +805,48 @@ class OrganizationsDB {
 			.eq('profiles.personid', personid);
 	}
 
+	// Processes
+
+	static async queryProcesses(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		return supabase.from('processes').select('*').eq('orgid', orgid);
+	}
+
+	static async queryProcess(supabase: SupabaseClient<Database>, processid: ProcessID) {
+		const { data } = await supabase.from('processes').select('*').eq('id', processid).single();
+		return data;
+	}
+
+	static async queryConcerns(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		const { data } = await supabase
+			.from('processes')
+			.select('concern')
+			.eq('orgid', orgid)
+			.neq('concern', '');
+		return data ? Array.from(new Set(data.map((process) => process.concern))) : null;
+	}
+
+	static async queryProcessByShortName(
+		supabase: SupabaseClient<Database>,
+		orgid: OrganizationID,
+		name: string
+	) {
+		const { data } = await supabase
+			.from('processes')
+			.select('*')
+			.eq('orgid', orgid)
+			.contains('short', [name])
+			.single();
+		return data;
+	}
+
+	static async queryHows(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		return await supabase.from('hows').select('*').eq('orgid', orgid);
+	}
+
+	static async queryProcessHows(supabase: SupabaseClient<Database>, processid: ProcessID) {
+		return supabase.from('hows').select('*').eq('processid', processid);
+	}
+
 	/** Create a new process, relying on Realtime for refresh */
 	async addProcess(orgid: OrganizationID, title: string, visibility: Visibility) {
 		const { data: processData, error } = await this.supabase
@@ -761,6 +871,10 @@ class OrganizationsDB {
 			.eq('id', processData.id);
 		if (updateError) return { error: updateError, id: null };
 		return { error, id: processData.id };
+	}
+
+	static getProcessHows(hows: HowRow[], id: ProcessID) {
+		return hows.filter((how) => how.processid === id);
 	}
 
 	async updateProcessTitle(process: ProcessRow, title: string, who: PersonID) {
@@ -856,12 +970,20 @@ class OrganizationsDB {
 		else return null;
 	}
 
+	static getHowParent(hows: HowRow[], id: HowID) {
+		return hows.find((how) => how.how.includes(id));
+	}
+
 	async createHow(process: ProcessRow, visibility: Visibility) {
 		return await this.supabase
 			.from('hows')
 			.insert({ orgid: process.orgid, processid: process.id, what: '', visibility })
 			.select()
 			.single();
+	}
+
+	static getHow(hows: HowRow[], id: HowID) {
+		return hows.find((how) => how.id === id);
 	}
 
 	async updateHowText(how: HowRow, text: Markup) {
@@ -970,6 +1092,27 @@ class OrganizationsDB {
 	/** Delete this process, relying on Realtime for refresh. */
 	async deleteProcess(id: ProcessID) {
 		return await this.supabase.from('processes').delete().eq('id', id);
+	}
+
+	// Changes
+	static async queryChanges(supabase: SupabaseClient<Database>, orgid: OrganizationID) {
+		return supabase.from('suggestions').select('*').eq('orgid', orgid);
+	}
+
+	static async queryChange(supabase: SupabaseClient<Database>, changeid: ChangeID) {
+		return supabase.from('suggestions').select('*').eq('id', changeid).single();
+	}
+
+	static async queryLeadChanges(
+		supabase: SupabaseClient<Database>,
+		orgid: OrganizationID,
+		profileid: ProfileID
+	) {
+		return supabase.from('suggestions').select('*').eq('orgid', orgid).eq('lead', profileid);
+	}
+
+	static async queryProcessChanges(supabase: SupabaseClient<Database>, processid: ProcessID) {
+		return supabase.from('suggestions').select('*').contains('processes', [processid]);
 	}
 
 	async createChange(
@@ -1109,4 +1252,4 @@ class OrganizationsDB {
 	}
 }
 
-export default OrganizationsDB;
+export default Organization;

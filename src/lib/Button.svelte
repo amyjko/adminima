@@ -37,7 +37,7 @@
 			type={submit ? 'submit' : null}
 			class:warning
 			{onkeydown}
-			onclick={action}>{Confirm}</button
+			onclick={action}>{Confirm} {@render children?.()}</button
 		>
 	</div>
 {:else}

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { type ChangeRow } from '$database/OrganizationsDB';
-	import { getDB, getOrg, getUser } from '$routes/+layout.svelte';
+	import { type ChangeRow } from '$database/Organization';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { addError } from '$routes/errors.svelte';
 	import Button from './Button.svelte';
 	import Form from './Form.svelte';
@@ -11,7 +12,7 @@
 
 	const db = getDB();
 	const context = getOrg();
-	let org = $derived(context?.org);
+	let org = $derived(context.org);
 	let newComment: string = $state('');
 
 	const user = getUser();
@@ -19,7 +20,7 @@
 	async function submitComment() {
 		if (!$user) return null;
 		const result = await db.addComment(
-			org.getID(),
+			org.id,
 			$user.id,
 			newComment,
 			'suggestions',
@@ -36,7 +37,7 @@
 	}
 </script>
 
-{#if $user && org.hasPerson($user.id)}
+{#if $user && context.member}
 	<Form active inactiveMessage={undefined} action={() => submitComment()}>
 		<Labeled label="Have a comment?">
 			<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />

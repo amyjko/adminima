@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { ProcessRow } from '$database/OrganizationsDB';
-	import { getOrg } from '$routes/+layout.svelte';
+	import type { ProcessRow } from '$database/Organization';
+	import Organization from '$database/Organization';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import Link from './Link.svelte';
 
 	interface Props {
@@ -15,7 +16,7 @@
 </script>
 
 <div class="process" style:left="{left}px">
-	<Link bland to="/org/{org.getPath()}/process/{process.id}">{process.title}</Link>
+	<Link bland to="/org/{Organization.getPath(org)}/process/{process.id}">{process.title}</Link>
 </div>
 
 <style>

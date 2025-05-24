@@ -5,29 +5,28 @@
 </script>
 
 <script lang="ts">
-	import type { ProcessID } from '$types/Organization';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import { getOrg } from '$routes/+layout.svelte';
 	import { DraftSymbol } from './Symbols';
 	import Self from './ProcessLink.svelte';
+	import type { ProcessRow } from '$database/Organization';
+	import Organization, { type ProcessID } from '$database/Organization';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 
 	interface Props {
-		processID: ProcessID | null;
+		process: { id: ProcessID; title: string; short: string[]; state: string } | null | undefined;
 		wrap?: boolean;
 	}
 
-	let { processID, wrap }: Props = $props();
+	let { process, wrap }: Props = $props();
 
 	const context = getOrg();
 	let org = $derived(context.org);
-
-	let process = $derived(processID ? org.getProcess(processID) : undefined);
 </script>
 
-{#snippet ProcessItem(process: string | undefined)}
+{#snippet ProcessItem(process: string | undefined, processes: ProcessRow[])}
 	<div class="process-view">
-		{#if process}<Self processID={process} />{:else}—{/if}
+		{#if process}<Self process={processes.find((p) => p.id === process)} />{:else}—{/if}
 	</div>
 	<style>
 		.process-view {
@@ -37,14 +36,14 @@
 	</style>
 {/snippet}
 
-{#if process === null}<Oops inline text="We couldn't find this process" />{:else}<Link
+{#if process === undefined}<Oops inline text="We couldn't find this process" />{:else}<Link
 		{wrap}
 		title={process && process.short.length > 0 ? process.title : undefined}
-		to={processID
-			? `/org/${org.getPath()}/process/${
-					process && process.short.length > 0 ? process.short[0] : processID
+		to={process
+			? `/org/${Organization.getPath(org)}/process/${
+					process && process.short.length > 0 ? process.short[0] : process.id
 				}`
-			: `/org/${org.getPath()}/processes`}
+			: `/org/${Organization.getPath(org)}/processes`}
 		kind="process"
 		icon={process && process.state === 'draft' ? DraftSymbol : undefined}
 		>{#if process}

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Oops from '$lib/Oops.svelte';
-	import { getOrg, getDB, getUser } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { queryOrError } from '$routes/errors.svelte';
 	import Title from '$lib/Title.svelte';
-	import { page } from '$app/stores';
 	import MarkupView from '$lib/MarkupView.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
@@ -11,6 +11,11 @@
 	import Notice from '$lib/Notice.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import Header from '$lib/Header.svelte';
+	import Organization from '$database/Organization';
+
+	const { data } = $props();
+	const team = $derived(data.team);
+	const teamRoles = $derived(data.roles);
 
 	const user = getUser();
 	const context = getOrg();
@@ -18,9 +23,7 @@
 
 	const db = getDB();
 
-	let teamID = $derived($page.params.teamid);
-	let team = $derived(org.getTeam(teamID));
-	let isAdmin = $derived($user && org.hasAdminPerson($user.id));
+	let isAdmin = $derived($user && context.admin);
 </script>
 
 {#if team}
@@ -53,8 +56,8 @@
 			: undefined}
 	/>
 
-	{#each org.getTeamRoles(team.id).sort((a, b) => a.title.localeCompare(b.title)) as role}
-		<RoleLink roleID={role.id} />
+	{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
+		<RoleLink {role} />
 	{:else}
 		<Notice>This team has no roles.</Notice>
 	{/each}
@@ -68,8 +71,8 @@
 	<Button
 		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {
-			const error = await queryOrError(db.deleteTeam(teamID), "Couldn't delete the team.");
-			if (error === null) goto(`/org/${org.getPath()}/roles`);
+			const error = await queryOrError(db.deleteTeam(team.id), "Couldn't delete the team.");
+			if (error === null) await goto(`/org/${Organization.getPath(org)}/roles`);
 		}}
 		warning>{Delete} Delete this team</Button
 	>

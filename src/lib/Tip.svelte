@@ -1,21 +1,19 @@
 <script lang="ts">
-	import { getOrg } from '$routes/+layout.svelte';
-	import { getUser } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		admin?: boolean;
 		member?: boolean;
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
 	let { admin = false, member = false, children }: Props = $props();
 
-	const user = getUser();
 	const context = getOrg();
-	let org = $derived(context?.org);
 
-	let isMember = $derived($user && org?.hasPerson($user.id));
-	let isAdmin = $derived($user && org?.hasAdminPerson($user.id));
+	let isMember = $derived(context?.member === true);
+	let isAdmin = $derived(context?.admin === true);
 </script>
 
 {#if (admin === false && member === false) || (admin && isAdmin) || (member && isMember)}

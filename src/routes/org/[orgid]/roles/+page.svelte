@@ -2,7 +2,8 @@
 	import { goto } from '$app/navigation';
 	import RoleLink from '$lib/RoleLink.svelte';
 	import Field from '$lib/Field.svelte';
-	import { getOrg, getDB, getUser } from '$routes/+layout.svelte';
+	import { getDB, getUser } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { addError } from '$routes/errors.svelte';
 	import Title from '$lib/Title.svelte';
 	import Flow from '$lib/Flow.svelte';
@@ -13,8 +14,14 @@
 	import Tip from '$lib/Tip.svelte';
 	import ProfileLink from '$lib/ProfileLink.svelte';
 	import Oops from '$lib/Oops.svelte';
-	import type Organization from '$types/Organization';
-	import type { RoleRow, TeamRow } from '$database/OrganizationsDB';
+	import type { RoleRow, TeamRow } from '$database/Organization';
+	import Organization from '$database/Organization';
+
+	const { data } = $props();
+	const roles = $derived(data.roles);
+	const teams = $derived(data.teams);
+	const assignments = $derived(data.assignments);
+	const profiles = $derived(data.profiles);
 
 	const context = getOrg();
 	let org = $derived(context.org);
@@ -25,17 +32,17 @@
 	let newRole: string = $state('');
 	let filter: string = $state('');
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
+	let path = $derived(Organization.getPath(org));
 
 	/** Roles are visible if the org is public or the authenticated user is in the org. */
 	let visible = $derived(
-		($user === null && org.getVisibility() === 'public') ||
-			($user !== null && org.hasPerson($user.id))
+		($user === null && org.visibility === 'public') || ($user !== null && context.member)
 	);
 
 	async function createRole() {
-		const { data, error } = await db.createRole(org.getID(), newRole);
+		const { data, error } = await db.createRole(org.id, newRole);
 		if (data) {
-			goto(`/org/${org.getPath()}/role/${data.id}`);
+			goto(`/org/${path}/role/${data.id}`);
 			return true;
 		} else if (error) {
 			addError("We couldn't create the new role.", error);
@@ -46,26 +53,24 @@
 	let newTeam = $state('');
 
 	async function createTeam() {
-		const { data, error } = await db.createTeam(org.getID(), newTeam);
+		const { data, error } = await db.createTeam(org.id, newTeam);
 		if (error) {
 			addError("We couldn't create the new team.", error);
 			return false;
 		} else if (data) {
-			goto(`/org/${org.getPath()}/team/${data.id}`);
+			await goto(`/org/${path}/team/${data.id}`);
 			return true;
 		}
 		return false;
 	}
 
-	function filteredProfiles(org: Organization, role: RoleRow) {
-		return org
-			.getRoleProfiles(role.id)
-			.filter((prof) =>
-				lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter)
-					? true
-					: prof.name.toLocaleLowerCase().includes(lowerFilter) ||
-						prof.email.toLocaleLowerCase().includes(lowerFilter)
-			);
+	function filteredProfiles(role: RoleRow) {
+		return Organization.getRoleProfiles(role.id, assignments, profiles).filter((prof) =>
+			lowerFilter === '' || role.title.toLocaleLowerCase().includes(lowerFilter)
+				? true
+				: prof.name.toLocaleLowerCase().includes(lowerFilter) ||
+					prof.email.toLocaleLowerCase().includes(lowerFilter)
+		);
 	}
 
 	function filteredRoles(team: TeamRow | null, roles: RoleRow[]) {
@@ -81,13 +86,11 @@
 				// Team has the filter? Show it.
 				team?.name.toLocaleLowerCase().includes(filter) ||
 				// A person with the role has the filter? Show it.
-				org
-					.getRoleProfiles(role.id)
-					.filter(
-						(prof) =>
-							prof.email.toLocaleLowerCase().includes(lowerFilter) ||
-							prof.name.toLocaleLowerCase().includes(lowerFilter)
-					).length > 0
+				Organization.getRoleProfiles(role.id, assignments, profiles).filter(
+					(prof) =>
+						prof.email.toLocaleLowerCase().includes(lowerFilter) ||
+						prof.name.toLocaleLowerCase().includes(lowerFilter)
+				).length > 0
 		);
 	}
 </script>
@@ -105,7 +108,7 @@
 {/if}
 
 <Flow>
-	{#if $user && org.hasAdminPerson($user.id)}
+	{#if context.admin}
 		<FormDialog
 			button="Create role …"
 			showTip="Create a new role."
@@ -137,26 +140,24 @@
 </Flow>
 <Field label="Filter by role, person, or team" bind:text={filter} />
 
-{#if org.getRoles().length === 0 && org.getTeams().length === 0}
+{#if roles.length === 0 && teams.length === 0}
 	<Notice>There are no roles or teams yet.</Notice>
 {:else}
 	{@const teamless = filteredRoles(
 		null,
-		org.getRoles().filter((role) => role.team === null)
+		roles.filter((role) => role.team === null)
 	)}
 	<ul>
-		{#each org
-			.getTeams()
-			.sort((a, b) => org.getTeamRoles(b.id).length - org.getTeamRoles(a.id).length) as team}
-			{@const teamRoles = filteredRoles(team, org.getTeamRoles(team.id))}
+		{#each teams.sort((a, b) => Organization.getTeamRoles(roles, b.id).length - Organization.getTeamRoles(roles, a.id).length) as team}
+			{@const teamRoles = filteredRoles(team, Organization.getTeamRoles(roles, team.id))}
 			{#if teamRoles.length > 0 || filter.length === 0}
 				<ul>
-					<li><Header><TeamLink id={team.id} /></Header></li>
+					<li><Header><TeamLink {team} /></Header></li>
 					<ul class="roles">
 						{#each teamRoles.sort((a, b) => a.title.localeCompare(b.title)) as role}
-							{@const profiles = filteredProfiles(org, role)}
+							{@const profiles = filteredProfiles(role)}
 							{#if profiles.length > 0 || filter.length === 0}
-								<li><RoleLink roleID={role.id} /></li>
+								<li><RoleLink {role} /></li>
 								{#if profiles.length > 0}
 									<ul class="people">
 										{#each profiles as profile}
@@ -180,8 +181,8 @@
 		<ul>
 			<li><Header>No team</Header></li>
 			{#each teamless as role}
-				{@const profiles = filteredProfiles(org, role)}
-				<li><RoleLink roleID={role.id} /></li>
+				{@const profiles = filteredProfiles(role)}
+				<li><RoleLink {role} /></li>
 				{#if profiles.length > 0}
 					<ul class="people">
 						{#each profiles as profile}

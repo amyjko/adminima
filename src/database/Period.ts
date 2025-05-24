@@ -1,5 +1,5 @@
 import { addDays, addWeeks, format, getDay, getWeek } from 'date-fns';
-import type { ProcessRow } from './OrganizationsDB';
+import type { ProcessRow } from './Organization';
 
 /** e.g., Every March 1st. Month 1-12, date 1-31 */
 export type AnnualDate = { type: 'annually-date'; month: number; date: number };

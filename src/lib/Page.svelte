@@ -1,9 +1,9 @@
 <script>
 	import { navigating, updated } from '$app/stores';
+	import { page } from '$app/state';
 	import Link from './Link.svelte';
 	import Loading from './Loading.svelte';
 	import Logo from './Logo';
-	import Note from './Note.svelte';
 	import { getUser } from '$routes/+layout.svelte';
 
 	/** @type {{children?: import('svelte').Snippet}} */
@@ -13,14 +13,9 @@
 </script>
 
 <div class="header">
-	<Link to="/">{Logo}</Link>
-	<span style="white-space: nowrap"
-		><Note
-			>Adminima is in <strong>beta</strong>. <Link
-				to="https://github.com/amyjko/adminima/issues/new/choose">Feedback</Link
-			>?
-		</Note>
-	</span>
+	<span
+		>{#if page.url.pathname !== '/'}<Link to="/">{Logo}</Link> Adminima{/if}</span
+	>
 	{#if $navigating}<Loading inline={false} />{/if}
 	<span class="account"
 		>{#if $user}<Link to="/person/{$user.id}">{$user.email}</Link>{:else}<Link to="/login"

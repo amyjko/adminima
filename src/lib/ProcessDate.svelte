@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ProcessRow } from '$database/OrganizationsDB';
+	import type { ProcessRow } from '$database/Organization';
 	import { formatNextDate, getNextProcessDate } from '$database/Period';
 	import Note from './Note.svelte';
 

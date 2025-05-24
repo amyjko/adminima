@@ -11,14 +11,8 @@
 
 	export const DBSymbol = Symbol('db');
 
-	export function getDB(): OrganizationsDB {
-		return getContext<OrganizationsDB>(DBSymbol);
-	}
-
-	export const OrgSymbol = Symbol('organization');
-	export type OrgContext = { org: Organization };
-	export function getOrg(): OrgContext {
-		return getContext<OrgContext>(OrgSymbol);
+	export function getDB(): Organization {
+		return getContext<Organization>(DBSymbol);
 	}
 </script>
 
@@ -26,14 +20,14 @@
 	import Page from '$lib/Page.svelte';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import OrganizationsDB from '$database/OrganizationsDB';
+	import Organization from '$database/Organization';
 	import Error from '$lib/Error.svelte';
 	import { goto, invalidate } from '$app/navigation';
 	import Note from '$lib/Note.svelte';
 	import Link from '$lib/Link.svelte';
 	import type { User } from '@supabase/supabase-js';
 	import type { LayoutData } from './$types';
-	import Organization from '$types/Organization';
+
 	import { type Snippet } from 'svelte';
 	import { errors } from './errors.svelte';
 
@@ -44,7 +38,7 @@
 
 	let { data, children }: Props = $props();
 
-	let db = $state(new OrganizationsDB(data.supabase));
+	let db = $state(new Organization(data.supabase));
 	setContext(DBSymbol, db);
 
 	// Update client when data updates.
@@ -97,6 +91,10 @@
 	<hr />
 
 	<div style="display: flex; flex-direction:row; justify-content: center; width: 100%">
-		<Note><Link to="https://amyjko.phd">Amy</Link> built this.</Note>
+		<Note
+			><Link to="https://amyjko.phd">Amy</Link> built this. Submit <Link
+				to="https://github.com/amyjko/adminima/issues/new/choose">Feedback</Link
+			>?
+		</Note>
 	</div>
 </Page>

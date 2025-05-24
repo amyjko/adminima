@@ -8,20 +8,15 @@
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { addError } from '$routes/errors.svelte';
 	import OrganizationLink from '$lib/OrganizationLink.svelte';
-	import PersonLink from '$lib/ProfileLink.svelte';
+	import ProfileLink from '$lib/ProfileLink.svelte';
 	import NewOrganization from '$lib/NewOrganization.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import Link from '$lib/Link.svelte';
 	import Table from '$lib/Table.svelte';
 	import { page } from '$app/stores';
 	import Header from '$lib/Header.svelte';
-	import type { PageData } from './$types';
 
-	interface Props {
-		data: PageData;
-	}
-
-	let { data }: Props = $props();
+	let { data } = $props();
 
 	const user = getUser();
 	const db = getDB();
@@ -36,7 +31,7 @@
 	}
 </script>
 
-<Title title={isSelf ? 'You' : 'Person'}>
+<Title title={isSelf ? 'You' : 'Person'} kind="person">
 	{#if isSelf}<Button action={logout} tip="Log out of the application.">Log out</Button>{/if}
 </Title>
 
@@ -63,7 +58,7 @@
 					<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
 					<td
 						>{#if org.profiles.length > 0}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
-								<PersonLink {profile} />
+								<ProfileLink profile={profile ?? undefined} />
 							{/await}{/if}
 					</td>
 				</tr>

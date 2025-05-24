@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PostgrestError } from '@supabase/supabase-js';
-	import { type Visibility } from '../database/OrganizationsDB';
+	import { type Visibility } from '../database/Organization';
 	import Options from './Options.svelte';
 	import Vis from './Visibility.svelte';
 
@@ -32,7 +32,7 @@
 		options={opts.map((o) => o.value)}
 		change={async (value) => (value ? (await edit(value)) === null : true)}
 		id="visibility"
-		view={viz}
+		view={{ snippet: viz, data: opts }}
 	></Options>
 {:else}
 	<div class="status">

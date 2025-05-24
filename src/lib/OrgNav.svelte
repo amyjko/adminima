@@ -1,59 +1,54 @@
 <script lang="ts">
-	import type Organization from '$types/Organization';
 	import { getUser } from '$routes/+layout.svelte';
+	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import Link from './Link.svelte';
 	import OrganizationLink from './OrganizationLink.svelte';
-
-	interface Props {
-		organization: Organization;
-	}
-
-	let { organization }: Props = $props();
+	import Organization from '$database/Organization';
 
 	const user = getUser();
 
+	const org = getOrg();
+	let organization = $derived(org.org);
+	let admin = $derived(org.admin);
+	let member = $derived(org.member);
+	let counts = $derived(org.counts);
+
 	let visible = $derived(
-		organization.getVisibility() === 'public' ||
+		organization.visibility === 'public' ||
 			($user &&
-				((organization.getVisibility() === 'org' && organization.hasPerson($user.id)) ||
-					(organization.getVisibility() === 'admin' && organization.hasAdminPerson($user.id))))
+				((organization.visibility === 'org' && member) ||
+					(organization.visibility === 'admin' && admin)))
 	);
+
+	let path = $derived(Organization.getPath(organization));
 </script>
 
 <div class="links">
 	<span class="link">
-		<OrganizationLink id={organization.getPath()} name="" />
+		<OrganizationLink id={path} name="" />
 	</span>
 	<span class="link">
-		<Link bland kind="role" to="/org/{organization.getPath()}/roles"
-			><strong>{organization.getRoles().length}</strong> Role{organization.getRoles().length === 1
-				? ''
-				: 's'}</Link
+		<Link bland kind="role" to="/org/{path}/roles"
+			><strong>{counts.roles}</strong> Role{counts.roles === 1 ? '' : 's'}</Link
 		>
 	</span>
 	{#if visible}
 		<span class="link">
-			<Link bland kind="person" to="/org/{organization.getPath()}/people"
-				><strong>{organization.getProfiles().length} </strong>
-				{organization.getProfiles().length !== 1 ? 'People' : 'Person'}</Link
+			<Link bland kind="person" to="/org/{Organization.getPath(organization)}/people"
+				><strong>{counts.profiles} </strong>
+				{counts.profiles !== 1 ? 'People' : 'Person'}</Link
 			>
 		</span>
 	{/if}
 	<span class="link">
-		<Link bland kind="process" to="/org/{organization.getPath()}/processes"
-			><strong>{organization.getProcesses().length}</strong> Process{organization.getProcesses()
-				.length !== 1
-				? 'es'
-				: ''}</Link
+		<Link bland kind="process" to="/org/{path}/processes"
+			><strong>{counts.processes}</strong> Process{counts.processes !== 1 ? 'es' : ''}</Link
 		>
 	</span>
 	<span class="link">
-		<Link bland kind="change" to="/org/{organization.getPath()}/changes"
-			><strong
-				>{organization.getChanges().filter((c) => c.status !== 'done' && c.status !== 'declined')
-					.length}</strong
-			>
-			Change{organization.getChanges().length !== 1 ? 's' : ''}</Link
+		<Link bland kind="change" to="/org/{path}/changes"
+			><strong>{counts.changes}</strong>
+			Change{counts.changes !== 1 ? 's' : ''}</Link
 		>
 	</span>
 </div>

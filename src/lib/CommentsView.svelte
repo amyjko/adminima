@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type CommentID } from '$types/Organization';
+	import { type CommentID } from '$database/Organization';
 	import type { PostgrestError } from '@supabase/supabase-js';
 	import Button from './Button.svelte';
 	import CommentView from './CommentView.svelte';
@@ -8,13 +8,15 @@
 	import Loading from './Loading.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 	import Table from './Table.svelte';
+	import type { ProfileRow } from '$database/Organization';
 
 	interface Props {
 		comments: CommentID[];
+		profiles: ProfileRow[];
 		remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
 	}
 
-	let { comments, remove }: Props = $props();
+	let { comments, profiles, remove }: Props = $props();
 
 	const db = getDB();
 
@@ -32,7 +34,7 @@
 				<Table full={false}>
 					<tbody>
 						{#each comments.data.reverse() as comment (comment.id)}
-							<CommentView {comment} {remove} />
+							<CommentView {profiles} {comment} {remove} />
 						{:else}
 							<tr><td>No changes yet.</td></tr>
 						{/each}
