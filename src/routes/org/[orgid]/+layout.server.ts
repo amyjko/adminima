@@ -3,7 +3,8 @@ import { validate as isValidUUID } from 'uuid';
 
 export async function load({ params, locals }) {
 	const { supabase } = locals;
-	const { data: user } = await supabase.auth.getUser();
+	const { data: userRecord } = await supabase.auth.getUser();
+	const user = userRecord ? userRecord.user : null;
 
 	// Find the org corresponding to the orgid or the path string
 	let { data: org } = isValidUUID(params.orgid)
@@ -32,7 +33,7 @@ export async function load({ params, locals }) {
 			.from('profiles')
 			.select('*')
 			.eq('orgid', org.id)
-			.eq('personid', user.user ? user.user.id : 0)
+			.eq('personid', user ? user.id : 0)
 			.single(),
 		supabase.from('roles').select('id', { count: 'exact', head: true }).eq('orgid', org.id),
 		supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('orgid', org.id),
@@ -56,18 +57,19 @@ export async function load({ params, locals }) {
 		roles === null ||
 		profiles === null ||
 		processes === null ||
-		changes === null ||
-		shortRoles === null ||
-		shortProcesses === null
+		changes === null
 	) {
 		error(404, {
-			message: 'Unable to retrieve organization data.'
+			message:
+				user === null
+					? `Unable to show this organization. Try logging in with your organization email address, in case this organization restricted to members.`
+					: `Unable to retrieve organization data.`
 		});
 	}
 
 	return {
 		org,
-		uid: user.user.id,
+		uid: user ? user.id : null,
 		member: profile !== null,
 		admin: profile !== null && profile.admin,
 		counts: {
@@ -76,7 +78,7 @@ export async function load({ params, locals }) {
 			processes: processes,
 			changes: changes
 		},
-		shortRoles: shortRoles,
-		shortProcesses: shortProcesses
+		shortRoles: shortRoles ?? [],
+		shortProcesses: shortProcesses ?? []
 	};
 }

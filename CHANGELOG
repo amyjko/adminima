@@ -8,6 +8,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 ### Fixed
 
 - Improved performance of page loading.
+- Fixed public access to organizations.
 
 ### Maintenance
 
