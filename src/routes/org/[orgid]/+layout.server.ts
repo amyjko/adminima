@@ -1,8 +1,10 @@
+import type { Database } from '$database/database.types.js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { error } from '@sveltejs/kit';
 import { validate as isValidUUID } from 'uuid';
 
 export async function load({ params, locals }) {
-	const { supabase } = locals;
+	const { supabase } = locals as { supabase: SupabaseClient<Database> };
 	const { data: userRecord } = await supabase.auth.getUser();
 	const user = userRecord ? userRecord.user : null;
 
@@ -14,9 +16,43 @@ export async function load({ params, locals }) {
 	// No org? Error out.
 	if (org === null) {
 		error(404, {
-			message: 'Organization not found.'
+			message: 'Unable to show organization. It may not exist or may not be visible to you.'
 		});
 	}
+
+	const profileQuery = supabase
+		.from('profiles')
+		.select('*')
+		.eq('orgid', org.id)
+		.eq('personid', user ? user.id : '00000000-0000-0000-0000-000000000000')
+		.single();
+
+	const roleCountQuery = supabase
+		.from('roles')
+		.select('id', { count: 'exact', head: true })
+		.eq('orgid', org.id);
+	const profileCountQuery = supabase
+		.from('profiles')
+		.select('id', { count: 'exact', head: true })
+		.eq('orgid', org.id);
+
+	const processCountQuery = supabase
+		.from('processes')
+		.select('id', { count: 'exact', head: true })
+		.eq('orgid', org.id);
+
+	const changeCountQuery = supabase
+		.from('suggestions')
+		.select('id', { count: 'exact', head: true })
+		.eq('orgid', org.id)
+		.neq('status', 'done')
+		.neq('status', 'declined');
+
+	const rolesQuery = supabase.from('roles').select('id, short, title').eq('orgid', org.id);
+	const processesQuery = supabase
+		.from('processes')
+		.select('id, short, title, state')
+		.eq('orgid', org.id);
 
 	// Get this user's profile in the org and the counts.
 	// Also get any roles and processses with short names.
@@ -29,54 +65,25 @@ export async function load({ params, locals }) {
 		{ data: shortRoles },
 		{ data: shortProcesses }
 	] = await Promise.all([
-		supabase
-			.from('profiles')
-			.select('*')
-			.eq('orgid', org.id)
-			.eq('personid', user ? user.id : 0)
-			.single(),
-		supabase.from('roles').select('id', { count: 'exact', head: true }).eq('orgid', org.id),
-		supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('orgid', org.id),
-		supabase.from('processes').select('id', { count: 'exact', head: true }).eq('orgid', org.id),
-		supabase
-			.from('suggestions')
-			.select('id', { count: 'exact', head: true })
-			.eq('orgid', org.id)
-			.neq('status', 'done')
-			.neq('status', 'declined'),
-		supabase.from('roles').select('id, short, title').neq('short', '{}').eq('orgid', org.id),
-		supabase
-			.from('processes')
-			.select('id, short, title, state')
-			.neq('short', '{}')
-			.eq('orgid', org.id)
+		profileQuery,
+		roleCountQuery,
+		profileCountQuery,
+		processCountQuery,
+		changeCountQuery,
+		rolesQuery,
+		processesQuery
 	]);
-
-	if (
-		profile === null ||
-		roles === null ||
-		profiles === null ||
-		processes === null ||
-		changes === null
-	) {
-		error(404, {
-			message:
-				user === null
-					? `Unable to show this organization. Try logging in with your organization email address, in case this organization restricted to members.`
-					: `Unable to retrieve organization data.`
-		});
-	}
 
 	return {
 		org,
 		uid: user ? user.id : null,
 		member: profile !== null,
-		admin: profile !== null && profile.admin,
+		admin: profile !== null && 'admin' in profile && profile.admin,
 		counts: {
-			roles: roles,
-			profiles: profiles,
-			processes: processes,
-			changes: changes
+			roles: roles ?? 0,
+			profiles: profiles ?? 0,
+			processes: processes ?? 0,
+			changes: changes ?? 0
 		},
 		shortRoles: shortRoles ?? [],
 		shortProcesses: shortProcesses ?? []

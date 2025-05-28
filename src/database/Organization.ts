@@ -400,13 +400,15 @@ class Organization {
 	static async queryPersonRoles(
 		supabase: SupabaseClient<Database>,
 		orgid: OrganizationID,
-		personid: PersonID
+		personid: PersonID | null
 	) {
-		return supabase
-			.from('assignments')
-			.select('roleid, profiles!inner(*)')
-			.eq('orgid', orgid)
-			.eq('profiles.personid', personid);
+		return personid
+			? supabase
+					.from('assignments')
+					.select('roleid, profiles!inner(*)')
+					.eq('orgid', orgid)
+					.eq('profiles.personid', personid)
+			: { data: [] };
 	}
 
 	async assignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {

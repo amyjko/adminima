@@ -57,7 +57,7 @@
 				<tr>
 					<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
 					<td
-						>{#if org.profiles.length > 0}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
+						>{#if org.profiles.length > 0 && org.profiles[0].personid !== null}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
 								<ProfileLink profile={profile ?? undefined} />
 							{/await}{/if}
 					</td>
