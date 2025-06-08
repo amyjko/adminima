@@ -5,6 +5,11 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.15 2025-06-08
 
+### Fixed
+
+- Set search paths to empty string and fully qualified table references to close security hole
+- Created missing indices on foreign keys.
+
 ### Maintenance
 
 - Updated Supabase, Svelte, SvelteKit, eslint, vitest minor versions.
