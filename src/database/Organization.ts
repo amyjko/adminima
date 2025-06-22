@@ -201,6 +201,20 @@ class Organization {
 					this.notify(orgid);
 				}
 			)
+			/** When a comment for this organization changes, update it's client-side store. */
+			.on(
+				'postgres_changes',
+				{
+					event: '*',
+					schema: 'public',
+					table: 'comments',
+					/** Only listen to rows for this organization id */
+					filter: `orgid=eq.${orgid}`
+				},
+				() => {
+					this.notify(orgid);
+				}
+			)
 			.subscribe();
 	}
 

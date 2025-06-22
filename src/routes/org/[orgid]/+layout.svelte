@@ -51,7 +51,7 @@
 		context.shortProcesses = data.shortProcesses;
 	});
 
-	// When realtime has a revised org, update the context.
+	// When realtime reports revised data, reload all data and render accordingly.
 	function updateOrg() {
 		invalidateAll();
 	}
