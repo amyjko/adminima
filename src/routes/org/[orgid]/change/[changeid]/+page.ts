@@ -2,7 +2,11 @@ import Organization from '$database/Organization.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
+	console.log(Date.now(), 'Awaiting change parent data.');
+
 	const { supabase, org } = await parent();
+
+	console.log(Date.now(), 'Loading change data');
 
 	const [
 		{ data: change, error: changeError },
@@ -20,6 +24,8 @@ export async function load({ parent, params }) {
 		error(404, {
 			message: 'Unable to retrieve this change.' + changeError?.message || ''
 		});
+
+	console.log(Date.now(), 'Returning change data');
 
 	return {
 		change,

@@ -8,6 +8,8 @@ export async function load({ params, locals }) {
 	const { data: userRecord } = await supabase.auth.getUser();
 	const user = userRecord ? userRecord.user : null;
 
+	console.log(Date.now(), 'Loading org layout', params.orgid);
+
 	// Find the org corresponding to the orgid or the path string
 	let { data: org } = isValidUUID(params.orgid)
 		? await supabase.from('orgs').select('*').eq('id', params.orgid).single()
@@ -19,6 +21,8 @@ export async function load({ params, locals }) {
 			message: 'Unable to show organization. It may not exist or may not be visible to you.'
 		});
 	}
+
+	console.log(Date.now(), 'Loading org data');
 
 	const profileQuery = supabase
 		.from('profiles')
@@ -73,6 +77,8 @@ export async function load({ params, locals }) {
 		rolesQuery,
 		processesQuery
 	]);
+
+	console.log(Date.now(), 'Returning org data');
 
 	return {
 		org,
