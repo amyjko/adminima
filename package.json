@@ -22,7 +22,6 @@
 	"devDependencies": {
 		"@playwright/test": "^1",
 		"@supabase/supabase-js": "^2",
-		"supabase": "^2",
 		"@sveltejs/adapter-auto": "^6",
 		"@sveltejs/kit": "^2",
 		"@sveltejs/vite-plugin-svelte": "^5",
@@ -34,6 +33,7 @@
 		"eslint-plugin-svelte": "^3",
 		"prettier": "^3",
 		"prettier-plugin-svelte": "^3",
+		"supabase": "^2",
 		"svelte": "^5",
 		"svelte-check": "^4",
 		"tslib": "^2",
@@ -45,6 +45,7 @@
 	"dependencies": {
 		"@supabase/ssr": "^0",
 		"@sveltejs/adapter-vercel": "^5",
+		"@vercel/speed-insights": "^1.2.0",
 		"date-fns": "^4",
 		"fast-csv": "^5",
 		"uuid": "^11",
