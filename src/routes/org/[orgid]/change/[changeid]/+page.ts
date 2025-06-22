@@ -6,8 +6,6 @@ export async function load({ parent, params }) {
 
 	const { supabase, org } = await parent();
 
-	console.log(Date.now(), 'Loading change data');
-
 	const [
 		{ data: change, error: changeError },
 		{ data: roles },
@@ -24,8 +22,6 @@ export async function load({ parent, params }) {
 		error(404, {
 			message: 'Unable to retrieve this change.' + changeError?.message || ''
 		});
-
-	console.log(Date.now(), 'Returning change data');
 
 	return {
 		change,
