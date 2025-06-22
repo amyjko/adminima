@@ -1,5 +1,5 @@
 <script>
-	import { navigating, updated } from '$app/stores';
+	import { navigating, updated } from '$app/state';
 	import { page } from '$app/state';
 	import Link from './Link.svelte';
 	import Loading from './Loading.svelte';
@@ -16,14 +16,14 @@
 	<span
 		>{#if page.url.pathname !== '/'}<Link to="/">{Logo}</Link> Adminima{/if}</span
 	>
-	{#if $navigating}<Loading inline={false} />{/if}
+	{#if navigating.to !== null}<Loading inline={false} />{/if}
 	<span class="account"
 		>{#if $user}<Link to="/person/{$user.id}">{$user.email}</Link>{:else}<Link to="/login"
 				>Login</Link
 			>{/if}</span
 	>
 </div>
-<main class="page" data-sveltekit-reload={$updated ? '' : 'off'}>
+<main class="page" data-sveltekit-reload={updated.current ? '' : 'off'}>
 	{@render children?.()}
 </main>
 

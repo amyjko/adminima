@@ -16,7 +16,6 @@
 <style>
 	div {
 		display: flex;
-		width: 100%;
 		height: 1em;
 		flex-direction: row;
 		align-items: center;
@@ -26,6 +25,7 @@
 	.inline {
 		display: inline;
 		width: auto;
+		white-space: nowrap;
 	}
 
 	.dots {

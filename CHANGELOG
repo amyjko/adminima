@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.16 2025-06-22
 
+### Fixed
+
+- Prevent wrap on navigation loading feedback.
+
 ### Maintenance
 
 - Updated Playwright, Svelte, SvelteKit, vitest, eslint, supabase
