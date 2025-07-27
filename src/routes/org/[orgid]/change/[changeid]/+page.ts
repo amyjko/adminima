@@ -2,8 +2,6 @@ import Organization from '$database/Organization.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
-	console.log(Date.now(), 'Awaiting change parent data.');
-
 	const { supabase, org } = await parent();
 
 	const [
