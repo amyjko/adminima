@@ -30,14 +30,11 @@
 
 	import { type Snippet } from 'svelte';
 	import { errors } from './errors.svelte';
-	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 
 	interface Props {
 		data: LayoutData;
 		children?: Snippet;
 	}
-
-	injectSpeedInsights();
 
 	let { data, children }: Props = $props();
 
