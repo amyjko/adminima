@@ -14,7 +14,7 @@ export async function load({ parent, params }) {
 
 	if (change === null || roles === null || profiles === null || processes === null)
 		error(404, {
-			message: 'Unable to retrieve this change.'
+			message: 'Unable to retrieve this change. It may not exist or you may not have access to it.'
 		});
 
 	return {

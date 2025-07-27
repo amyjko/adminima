@@ -9,6 +9,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Removed errant client-side logs.
 - Prevent clash between realtime update invalidate and navigation.
+- Added title for 404 pages.
 
 ### Maintenance
 
