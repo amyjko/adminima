@@ -23,6 +23,7 @@
 	import { getContext, onMount, setContext } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { type OrganizationRow } from '$database/Organization';
+	import { navigating } from '$app/state';
 
 	let { data, children } = $props();
 
@@ -51,9 +52,9 @@
 		context.shortProcesses = data.shortProcesses;
 	});
 
-	// When realtime reports revised data, reload all data and render accordingly.
+	// When realtime reports revised data, and we aren't navigating, reload all data and render accordingly.
 	function updateOrg() {
-		invalidateAll();
+		if (navigating.to === null) invalidateAll();
 	}
 
 	onMount(() => {

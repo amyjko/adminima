@@ -308,8 +308,9 @@
 		action={async () => {
 			const { error } = await db.deleteChange(change.id);
 			if (error) addError("Couldn't delete this change.", error);
-			else
-				await goto(`/org/${Organization.getPath(organization)}/changes`, { invalidateAll: true });
+			else {
+				goto(`/org/${Organization.getPath(organization)}/changes`);
+			}
 		}}
 		warning>{Delete} Delete this change</Button
 	>

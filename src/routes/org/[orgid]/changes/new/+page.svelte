@@ -52,7 +52,7 @@
 			);
 			if (error) addError("Couldn't create the change.", error);
 			else if (change) {
-				await goto(`/org/${Organization.getPath(org)}/change/${change.id}`);
+				goto(`/org/${Organization.getPath(org)}/change/${change.id}`, { invalidateAll: true });
 			}
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";

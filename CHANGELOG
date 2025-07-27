@@ -5,6 +5,11 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.17
 
+### Fixed
+
+- Removed errant client-side logs.
+- Prevent clash between realtime update invalidate and navigation.
+
 ### Maintenance
 
 - Updated minor versions of Playrought, Supbase, Svelte, SvelteKit, eslint, prettier, and write-excel-file.
