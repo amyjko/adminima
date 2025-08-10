@@ -3,6 +3,12 @@
 sWe'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.7.18
+
+### Maintenance
+
+- Updated minor versions of Svelte, SvelteKit, Supabase, Vite, write-excel-file, fast-csv, and Playwright.
+
 ## v0.7.17
 
 ### Fixed
@@ -13,7 +19,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ### Maintenance
 
-- Updated minor versions of Playrought, Supbase, Svelte, SvelteKit, eslint, prettier, and write-excel-file.
+- Updated minor versions of Playwright, Supbase, Svelte, SvelteKit, eslint, prettier, and write-excel-file.
 - Updated point releases of vite and vite-plugin-svelte.
 
 ## v0.7.16 2025-06-22
