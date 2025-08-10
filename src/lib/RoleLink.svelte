@@ -37,14 +37,10 @@
 {/snippet}
 
 {#if role === undefined}<Oops inline text="Unknown role" />{:else}<Link
-		title={role !== null && role.short.length > 0 ? role.title : undefined}
+		title={role !== null ? role.title : undefined}
 		to={role
 			? `/org/${Organization.getPath(org)}/role/${path}`
 			: `/org/${Organization.getPath(org)}/roles`}
 		kind="role"
-		>{role
-			? role.short.length > 0
-				? role.short[0].replace(/([A-Z]+)/g, ' $1').trim()
-				: role.title
-			: 'roles'}{#snippet action()}{@render children?.()}{/snippet}</Link
+		>{role ? role.title : 'roles'}{#snippet action()}{@render children?.()}{/snippet}</Link
 	>{/if}
