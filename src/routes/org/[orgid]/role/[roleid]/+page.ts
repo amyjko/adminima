@@ -35,7 +35,7 @@ export async function load({ parent, params }) {
 		hows === null
 	)
 		error(404, {
-			message: 'Unable to retrieve this role.'
+			message: "This role doesn't exist or isn't visible to you."
 		});
 
 	return {

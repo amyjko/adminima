@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.18
 
+### Fixed
+
+- Improved error messages when data isn't visible to a user.
+
 ### Maintenance
 
 - Updated minor versions of Svelte, SvelteKit, Supabase, Vite, write-excel-file, fast-csv, and Playwright.

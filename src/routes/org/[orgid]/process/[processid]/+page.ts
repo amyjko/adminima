@@ -11,7 +11,7 @@ export async function load({ parent, params }) {
 
 	if (process === null)
 		error(404, {
-			message: 'Unable to retrieve this process.'
+			message: "This process either isn't visible to you or doesn't exist."
 		});
 
 	const [
@@ -39,7 +39,7 @@ export async function load({ parent, params }) {
 		profiles === null
 	)
 		error(404, {
-			message: 'Unable to retrieve this process.'
+			message: "This process either isn't visible to you or doesn't exist."
 		});
 
 	return {

@@ -11,7 +11,7 @@ export async function load({ parent, params }) {
 
 	if (team === null || roles === null)
 		error(404, {
-			message: 'Unable to retrieve roles for this organization.'
+			message: "This team doesn't exist or isn't visible to you."
 		});
 
 	return {

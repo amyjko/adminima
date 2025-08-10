@@ -29,7 +29,7 @@ export async function load({ parent, params }) {
 		changes === null
 	)
 		error(404, {
-			message: 'Unable to retrieve this person.'
+			message: "This profile doesn't exist or isn't visible to you."
 		});
 
 	return {
