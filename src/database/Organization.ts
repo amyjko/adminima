@@ -661,21 +661,14 @@ class Organization {
 		// If we succeeded, update the list of comments for the table.
 		if (commentID) {
 			const newComments = [...comments, commentID];
-			const { data: row, error: updateError } = await this.supabase
+			const { error: updateError } = await this.supabase
 				.from(table)
 				.update({ comments: newComments })
 				.eq('id', id);
 			if (updateError) return updateError;
 
-			// If we succeeded, notify the organization of the change.
-			if (row) {
-				if (table === 'suggestions') {
-					console.log('Notifying of changes');
-					this.notify(orgid);
-				} else console.log('Not notifying, not changes comment');
-			}
-
-			console.log('Added comment');
+			// If we succeeded, notify the organization of the change, since it's
+			this.notify(orgid);
 		}
 		return null;
 	}
