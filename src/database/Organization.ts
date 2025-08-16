@@ -767,7 +767,7 @@ class Organization {
 		const { error } = await this.supabase.from('teams').update({ name }).eq('id', team.id);
 		if (error) return error;
 
-		return this.addComment(
+		const comment = await this.addComment(
 			team.orgid,
 			who,
 			`Updated team name to ${name}`,
@@ -775,10 +775,15 @@ class Organization {
 			team.id,
 			team.comments
 		);
+
+		if (!comment) this.notify(team.orgid);
+
+		return comment;
 	}
 
 	async deleteTeam(id: TeamID): Promise<PostgrestError | null> {
 		const { error } = await this.supabase.from('teams').delete().eq('id', id);
+		if (!error) this.notify(id);
 		return error;
 	}
 
@@ -886,6 +891,9 @@ class Organization {
 			.update({ howid: newHow.id })
 			.eq('id', processData.id);
 		if (updateError) return { error: updateError, id: null };
+
+		this.notify(orgid);
+
 		return { error, id: processData.id };
 	}
 
@@ -897,7 +905,7 @@ class Organization {
 		const { error } = await this.supabase.from('processes').update({ title }).eq('id', process.id);
 		if (error) return error;
 
-		return this.addComment(
+		const comment = await this.addComment(
 			process.orgid,
 			who,
 			`Updated process title to ${title}`,
@@ -905,6 +913,9 @@ class Organization {
 			process.id,
 			process.comments
 		);
+
+		this.notify(process.orgid);
+		return comment;
 	}
 
 	async updateProcessShortName(process: ProcessRow, short: string) {
@@ -912,6 +923,7 @@ class Organization {
 			.from('processes')
 			.update({ short: Array.from(new Set([short, ...process.short].filter((s) => s !== ''))) })
 			.eq('id', process.id);
+		this.notify(process.orgid);
 		return error;
 	}
 
@@ -919,7 +931,7 @@ class Organization {
 		const { error } = await this.supabase.from('processes').update({ state }).eq('id', process.id);
 		if (error) return error;
 
-		return this.addComment(
+		const comment = await this.addComment(
 			process.orgid,
 			who,
 			`Updated state to ${state}`,
@@ -927,6 +939,9 @@ class Organization {
 			process.id,
 			process.comments
 		);
+
+		this.notify(process.orgid);
+		return comment;
 	}
 
 	async addProcessPeriod(process: ProcessRow, period: Period) {
@@ -934,6 +949,9 @@ class Organization {
 			.from('processes')
 			.update({ repeat: [...(process.repeat ? (process.repeat as Period[]) : []), period] })
 			.eq('id', process.id);
+
+		this.notify(process.orgid);
+
 		return error;
 	}
 
@@ -946,6 +964,9 @@ class Organization {
 				repeat: [...repeat.slice(0, index), period, ...repeat.slice(index + 1)]
 			})
 			.eq('id', process.id);
+
+		this.notify(process.orgid);
+
 		return error;
 	}
 
@@ -956,6 +977,9 @@ class Organization {
 			.from('processes')
 			.update({ repeat: repeat.filter((_, i) => i !== index) })
 			.eq('id', process.id);
+
+		this.notify(process.orgid);
+
 		return error;
 	}
 
@@ -966,7 +990,7 @@ class Organization {
 			.eq('id', process.id);
 		if (error) return error;
 
-		return this.addComment(
+		const comment = this.addComment(
 			process.orgid,
 			who,
 			`Updated concern to ${concern}`,
@@ -974,6 +998,9 @@ class Organization {
 			process.id,
 			process.comments
 		);
+
+		this.notify(process.orgid);
+		return comment;
 	}
 
 	async renameConcern(orgid: OrganizationID, oldConcern: string, newConcern: string) {
@@ -983,7 +1010,8 @@ class Organization {
 			.eq('orgid', orgid)
 			.eq('concern', oldConcern);
 		if (error) return error;
-		else return null;
+		this.notify(orgid);
+		return null;
 	}
 
 	static getHowParent(hows: HowRow[], id: HowID) {
@@ -991,11 +1019,14 @@ class Organization {
 	}
 
 	async createHow(process: ProcessRow, visibility: Visibility) {
-		return await this.supabase
+		const how = await this.supabase
 			.from('hows')
 			.insert({ orgid: process.orgid, processid: process.id, what: '', visibility })
 			.select()
 			.single();
+
+		this.notify(process.orgid);
+		return how;
 	}
 
 	static getHow(hows: HowRow[], id: HowID) {
@@ -1004,11 +1035,13 @@ class Organization {
 
 	async updateHowText(how: HowRow, text: Markup) {
 		const { error } = await this.supabase.from('hows').update({ what: text }).eq('id', how.id);
+		this.notify(how.orgid);
 		return error;
 	}
 
 	async updateHowVisibility(how: HowRow, vis: Visibility) {
 		const { error } = await this.supabase.from('hows').update({ visibility: vis }).eq('id', how.id);
+		this.notify(how.orgid);
 		return error;
 	}
 
@@ -1017,6 +1050,7 @@ class Organization {
 			.from('hows')
 			.update({ done: completion })
 			.eq('id', how.id);
+		this.notify(how.orgid);
 		return error;
 	}
 
@@ -1025,7 +1059,9 @@ class Organization {
 			.from('processes')
 			.update({ accountable: role })
 			.eq('id', process.id);
-		return error;
+		if (error) return error;
+		this.notify(process.orgid);
+		return null;
 	}
 
 	async addHowRCI(how: HowRow, role: RoleID, rci: 'responsible' | 'consulted' | 'informed') {
@@ -1039,6 +1075,7 @@ class Organization {
 						: { informed: [...how.informed, role] }
 			)
 			.eq('id', how.id);
+		this.notify(how.orgid);
 		return error;
 	}
 
@@ -1053,6 +1090,7 @@ class Organization {
 						: { informed: how.informed.filter((i) => i !== role) }
 			)
 			.eq('id', how.id);
+		this.notify(how.orgid);
 		return error;
 	}
 
@@ -1063,6 +1101,7 @@ class Organization {
 			.from('hows')
 			.update({ how: [...how.how.slice(0, index), newHow.id, ...how.how.slice(index)] })
 			.eq('id', how.id);
+		this.notify(process.orgid);
 		return { error, id: newHow.id };
 	}
 
@@ -1078,6 +1117,9 @@ class Organization {
 			.from('hows')
 			.update({ how: [...newParent.how.slice(0, index), how.id, ...newParent.how.slice(index)] })
 			.eq('id', newParent.id);
+
+		if (!newError) this.notify(how.orgid);
+
 		return newError;
 	}
 
@@ -1089,6 +1131,9 @@ class Organization {
 			.from('hows')
 			.update({ how: [...hows.slice(0, index), how.id, ...hows.slice(index)] })
 			.eq('id', parent.id);
+
+		if (!newError) this.notify(how.orgid);
+
 		return newError;
 	}
 
@@ -1102,6 +1147,7 @@ class Organization {
 		// Remove the how
 		const { error: deleteError } = await this.supabase.from('hows').delete().eq('id', how.id);
 
+		if (!deleteError) this.notify(how.orgid);
 		return deleteError;
 	}
 
@@ -1162,6 +1208,8 @@ class Organization {
 			.from('suggestions')
 			.update({ visibility: vis as Visibility })
 			.eq('id', change.id);
+
+		if (!error) this.notify(change.orgid);
 		return error;
 	}
 
@@ -1170,6 +1218,7 @@ class Organization {
 			.from('suggestions')
 			.update({ lead: lead })
 			.eq('id', how.id);
+		if (!error) this.notify(how.orgid);
 		return error;
 	}
 
@@ -1178,12 +1227,14 @@ class Organization {
 			.from('suggestions')
 			.update({ review: review })
 			.eq('id', change.id);
+		if (!error) this.notify(change.orgid);
 		return error;
 	}
 
 	async udpateChangeWhat(change: ChangeRow, what: string) {
 		if (change.what === what) return null;
 		const { error } = await this.supabase.from('suggestions').update({ what }).eq('id', change.id);
+		if (!error) this.notify(change.orgid);
 		return error;
 	}
 
@@ -1193,6 +1244,7 @@ class Organization {
 			.from('suggestions')
 			.update({ description })
 			.eq('id', change.id);
+		if (!error) this.notify(change.orgid);
 		return error;
 	}
 
@@ -1202,6 +1254,7 @@ class Organization {
 			.from('suggestions')
 			.update({ proposal })
 			.eq('id', change.id);
+		if (!error) this.notify(change.orgid);
 		return error;
 	}
 
@@ -1213,7 +1266,7 @@ class Organization {
 			.eq('id', change.id);
 		if (error) return error;
 
-		return this.addComment(
+		const comment = this.addComment(
 			change.orgid,
 			who,
 			`Updated status to ${status}`,
@@ -1221,10 +1274,14 @@ class Organization {
 			change.id,
 			change.comments
 		);
+
+		if (!error) this.notify(change.orgid);
+		return comment;
 	}
 
 	async updateChangeRoles(change: ChangeRow, roles: RoleID[]) {
 		const { error } = await this.supabase.from('suggestions').update({ roles }).eq('id', change.id);
+		if (!error) this.notify(change.orgid);
 		return error;
 	}
 
@@ -1233,6 +1290,7 @@ class Organization {
 			.from('suggestions')
 			.update({ processes })
 			.eq('id', change.id);
+		if (!error) this.notify(change.orgid);
 		return error;
 	}
 
@@ -1249,6 +1307,7 @@ class Organization {
 			.from('comments')
 			.update({ what: text })
 			.eq('id', comment.id);
+		if (!error) this.notify(comment.orgid);
 		return error;
 	}
 
@@ -1264,6 +1323,7 @@ class Organization {
 			.eq('id', process.id);
 		if (error) return error;
 		const { error: deleteError } = await this.supabase.from('comments').delete().eq('id', comment);
+		if (!deleteError) this.notify('orgid' in process ? process.orgid : process.id);
 		return deleteError;
 	}
 }

@@ -275,23 +275,7 @@
 <Header>Discussion</Header>
 
 <div class="comments">
-	<NewComment
-		{change}
-		submitted={(newComment) => {
-			// If the submission was successful, immediately add the comment on the client side rather than waiting for a realtime refresh.
-			if (comments)
-				comments = [
-					...comments,
-					{
-						id: '',
-						orgid: organization.id,
-						what: newComment,
-						when: new Date().toISOString(),
-						who: $user?.id ?? ''
-					}
-				];
-		}}
-	/>
+	<NewComment {change} />
 	{#if comments === undefined}
 		<Loading />
 	{:else if comments === null}
