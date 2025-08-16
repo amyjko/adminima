@@ -54,7 +54,9 @@
 
 	// When realtime reports revised data, and we aren't navigating, reload all data and render accordingly.
 	function updateOrg() {
-		if (navigating.to === null) invalidateAll();
+		if (navigating.to === null) {
+			invalidateAll();
+		}
 	}
 
 	onMount(() => {

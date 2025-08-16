@@ -8,17 +8,22 @@
 	import Labeled from './Labeled.svelte';
 	import MarkupView from './MarkupView.svelte';
 
-	let { change, submitted = undefined }: { change: ChangeRow; submitted?: () => void } = $props();
+	let {
+		change,
+		submitted = undefined
+	}: { change: ChangeRow; submitted?: (comment: string) => void } = $props();
 
 	const db = getDB();
 	const context = getOrg();
 	let org = $derived(context.org);
 	let newComment: string = $state('');
+	let submitting = $state(false);
 
 	const user = getUser();
 
 	async function submitComment() {
 		if (!$user) return null;
+		submitting = true;
 		const result = await db.addComment(
 			org.id,
 			$user.id,
@@ -30,20 +35,25 @@
 		if (result) {
 			addError(result.message);
 		} else {
+			submitted?.(newComment);
 			newComment = '';
-			submitted?.();
 		}
+		submitting = false;
 		return result;
 	}
 </script>
 
 {#if $user && context.member}
-	<Form active inactiveMessage={undefined} action={() => submitComment()}>
+	<Form active={!submitting} inactiveMessage={undefined} action={() => submitComment()}>
 		<Labeled label="Have a comment?">
 			<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
 		</Labeled>
-		<Button end submit tip="Add a comment to this change." action={() => submitComment()}
-			>Submit</Button
+		<Button
+			end
+			submit
+			active={!submitting}
+			tip="Add a comment to this change."
+			action={() => submitComment()}>Submit</Button
 		>
 	</Form>
 {/if}
