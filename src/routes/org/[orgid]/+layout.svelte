@@ -55,6 +55,7 @@
 	// When realtime reports revised data, and we aren't navigating, reload all data and render accordingly.
 	function updateOrg() {
 		if (navigating.to === null) {
+			console.log('Invalidating load to refresh data.');
 			invalidateAll();
 		}
 	}
