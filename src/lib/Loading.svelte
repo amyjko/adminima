@@ -6,12 +6,10 @@
 		text?: string;
 	}
 
-	let { inline = true, text = 'Loading...' }: Props = $props();
+	let { inline = true }: Props = $props();
 </script>
 
-<div class:inline>
-	{text} <span class="dots">{Logo}</span>
-</div>
+<div class:inline><span class="dots">{Logo}</span></div>
 
 <style>
 	div {
@@ -30,17 +28,20 @@
 
 	.dots {
 		display: inline-block;
-		text-align: center;
+		text-align: baseline;
 		transform-origin: center;
-		animation: spin 1s infinite linear;
+		animation: spin 1s infinite ease-in-out;
 	}
 
 	@keyframes spin {
-		from {
-			transform: rotate(0deg);
+		0% {
+			transform: translateX(-0.5em);
 		}
-		to {
-			transform: rotate(360deg);
+		50% {
+			transform: translateX(0.5em);
+		}
+		100% {
+			transform: translateX(-0.5em);
 		}
 	}
 </style>

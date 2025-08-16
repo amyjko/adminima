@@ -24,8 +24,11 @@
 	import { invalidateAll } from '$app/navigation';
 	import { type OrganizationRow } from '$database/Organization';
 	import { navigating } from '$app/state';
+	import Loading from '$lib/Loading.svelte';
 
 	let { data, children } = $props();
+
+	let loading = $state(false);
 
 	const db = getDB();
 
@@ -55,7 +58,8 @@
 	// When realtime reports revised data, and we aren't navigating, reload all data and render accordingly.
 	function updateOrg() {
 		if (navigating.to === null) {
-			invalidateAll();
+			loading = true;
+			invalidateAll().then(() => (loading = false));
 		}
 	}
 
@@ -74,3 +78,21 @@
 </script>
 
 {@render children()}
+{#if loading}
+	<div class="banner">
+		<Loading />
+	</div>
+{/if}
+
+<style>
+	.banner {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: var(--spacing);
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+</style>

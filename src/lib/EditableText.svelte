@@ -55,7 +55,7 @@
 			/>{:else}<span class="text"
 				>{#if text.length === 0}&mdash;{:else}{text}{/if}</span
 			>{/if}
-		{#if saving}<Loading text="" />{:else}<Button tip="Save this edit" action={save}
+		{#if saving}<Loading />{:else}<Button tip="Save this edit" action={save}
 				>{#if editing}&checkmark;{:else}✎{/if}</Button
 			>{/if}
 	</form>

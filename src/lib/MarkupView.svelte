@@ -118,7 +118,7 @@
 		</div>
 	{/if}
 	{#if edit}<div class="control">
-			{#if saving}<Loading text="" />
+			{#if saving}<Loading />
 			{:else}
 				<Button
 					tip={editing ? 'Save your edits.' : 'Start editing this markup.'}
