@@ -9,6 +9,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Immediate feedback on database changes.
 - Fixed label on confirm buttons.
+- Fixed unknown commenter defect.
 
 ### Maintenance
 

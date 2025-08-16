@@ -27,7 +27,7 @@ export async function load({ parent, params }) {
 		Organization.queryProcessChanges(supabase, org.id),
 		Organization.queryConcerns(supabase, org.id),
 		Organization.queryPersonRoles(supabase, org.id, uid),
-		Organization.queryProfiles(supabase, process.id)
+		Organization.queryProfiles(supabase, org.id)
 	]);
 
 	if (
