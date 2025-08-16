@@ -58,7 +58,6 @@ export function getNextPeriodDate(timestamp: number, period: Period): Date {
 				nextDate = addDays(nextDate, period.day < day ? 7 - (day - period.day) : day - period.day);
 				// Add the preferred weeks, minus one to account for the first week.
 				nextDate = addWeeks(nextDate, period.week - 1);
-				console.log(nextDate);
 				return nextDate;
 			}
 			return nextDate;
