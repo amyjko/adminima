@@ -66,6 +66,7 @@
 	// When change changes, reload the comments. undefined = loading, null = error.
 	let comments = $state<undefined | null | CommentRow[]>(undefined);
 	$effect(() => {
+		console.log('Reloading comments');
 		loadComments(change.comments).then((newComments) => (comments = newComments));
 	});
 

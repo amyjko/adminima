@@ -669,8 +669,13 @@ class Organization {
 
 			// If we succeeded, notify the organization of the change.
 			if (row) {
-				if (table === 'suggestions') this.notify(orgid);
+				if (table === 'suggestions') {
+					console.log('Notifying of changes');
+					this.notify(orgid);
+				} else console.log('Not notifying, not changes comment');
 			}
+
+			console.log('Added comment');
 		}
 		return null;
 	}

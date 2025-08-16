@@ -24,7 +24,7 @@
 	async function submitComment() {
 		if (!$user) return null;
 		submitting = true;
-		const result = await db.addComment(
+		const error = await db.addComment(
 			org.id,
 			$user.id,
 			newComment,
@@ -32,14 +32,14 @@
 			change.id,
 			change.comments
 		);
-		if (result) {
-			addError(result.message);
+		if (error) {
+			addError(error.message);
 		} else {
 			submitted?.(newComment);
 			newComment = '';
 		}
 		submitting = false;
-		return result;
+		return error;
 	}
 </script>
 
