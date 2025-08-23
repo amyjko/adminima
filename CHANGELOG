@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.20
 
+### Fixed
+
+- Fixed alignment of links with icons.
+
 ### Maintenance
 
 - Updated Playright, Supabase, Svelte, SvelteKit, vite.
