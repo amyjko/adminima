@@ -85,7 +85,7 @@
 		color: currentColor;
 		transition: transform 200ms;
 		display: inline-flex;
-		align-items: center;
+		align-items: baseline;
 		border-radius: var(--padding);
 		font-size: inherit;
 		gap: var(--padding);
@@ -189,12 +189,12 @@
 
 	.emoji {
 		display: flex;
-		height: 1.25em;
-		width: 1.25em;
+		height: 1em;
+		width: 1em;
 		border-radius: 50%;
 		padding: 0.25em;
 		justify-content: center;
-		align-items: center;
+		align-items: baseline;
 		font-size: 60%;
 		box-shadow: var(--border) 1px 1px;
 		color: var(--background);
