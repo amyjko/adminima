@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.7.21
 
+### Fixed
+
+- Don't include emoji or controls in links in text selection.
+
 ### Maintenance
 
 - Updated Supabase, Svelte.

@@ -36,43 +36,41 @@
 	let inactive = $derived(to === page.url.pathname);
 </script>
 
-<span class="link">
-	<a
-		class={kind}
-		class:inactive
-		class:bland
-		class:wrap
-		{title}
-		class:kinded={kind !== null}
-		class:external
-		href={inactive ? null : to}
-		target={external ? '_blank' : ''}
-	>
-		{#if icon || kind}
-			<span class="emoji">
-				{#if icon}
-					{icon}
-				{:else if kind === 'person'}
-					{PersonSymbol}
-				{:else if kind === 'role'}
-					{RoleSymbol}
-				{:else if kind === 'process'}
-					{ProcessSymbol}
-				{:else if kind === 'org'}
-					{OrganizationSymbol}
-				{:else if kind === 'change'}
-					{ChangeSymbol}
-				{:else if kind === 'team'}
-					{TeamSymbol}
-				{/if}
-			</span>
-		{/if}
-		<span class="label">
-			{@render children()}
+<a
+	class={kind}
+	class:inactive
+	class:bland
+	class:wrap
+	{title}
+	class:kinded={kind !== null}
+	class:external
+	href={inactive ? null : to}
+	target={external ? '_blank' : ''}
+>
+	{#if icon || kind}
+		<span class="emoji">
+			{#if icon}
+				{icon}
+			{:else if kind === 'person'}
+				{PersonSymbol}
+			{:else if kind === 'role'}
+				{RoleSymbol}
+			{:else if kind === 'process'}
+				{ProcessSymbol}
+			{:else if kind === 'org'}
+				{OrganizationSymbol}
+			{:else if kind === 'change'}
+				{ChangeSymbol}
+			{:else if kind === 'team'}
+				{TeamSymbol}
+			{/if}
 		</span>
-	</a>
-	{@render action?.()}
-</span>
+	{/if}
+	<span class="label">
+		{@render children()}
+	</span>
+</a>
+{@render action?.()}
 
 <style>
 	.link {
@@ -188,7 +186,7 @@
 	}
 
 	.emoji {
-		display: flex;
+		display: inline-flex;
 		height: 1em;
 		width: 1em;
 		border-radius: 50%;
@@ -198,5 +196,6 @@
 		font-size: 60%;
 		box-shadow: var(--border) 1px 1px;
 		color: var(--background);
+		user-select: none;
 	}
 </style>

@@ -74,6 +74,7 @@
 		white-space: nowrap;
 		display: inline-flex;
 		align-items: center;
+		user-select: none;
 	}
 
 	button.chromeless {
