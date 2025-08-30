@@ -3,6 +3,12 @@
 sWe'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.7.21
+
+### Maintenance
+
+- Updated Supabase, Svelte.
+
 ## v0.7.20
 
 ### Fixed
