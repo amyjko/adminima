@@ -22,7 +22,7 @@ export function getNextPeriodDate(timestamp: number, period: Period): Date {
 			// Before the date? Choose this year's date. Otherwise, choose next year's date.
 			return date.getMonth() < period.month - 1 ||
 				(date.getMonth() === period.month - 1 && date.getDate() <= period.date)
-				? new Date(date.getFullYear(), date.getMonth(), period.date)
+				? new Date(date.getFullYear(), period.month - 1, period.date)
 				: new Date(date.getFullYear() + 1, period.month - 1, period.date);
 		case 'annually-week': {
 			// Increment through days until we find the desired week and day.
