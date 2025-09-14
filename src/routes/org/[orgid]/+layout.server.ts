@@ -1,4 +1,4 @@
-import type { Database } from '$database/database.types.js';
+import type Database from '$database/Database';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { error } from '@sveltejs/kit';
 import { validate as isValidUUID } from 'uuid';

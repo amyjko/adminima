@@ -5,7 +5,6 @@
 	import type { HowRow, ProcessRow, RoleRow } from '$database/Organization';
 	import { sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from './ProcessDate.svelte';
-	import type Period from '$database/Period';
 	import Organization from '$database/Organization';
 
 	interface Props {
@@ -21,17 +20,13 @@
 
 	let accountable = $derived(
 		sorted.filter(
-			(process) =>
-				role.id === process.accountable &&
-				(!onlyPeriodic || (process.repeat as Period[]).length > 0)
+			(process) => role.id === process.accountable && (!onlyPeriodic || process.repeat.length > 0)
 		)
 	);
 	let responsible = $derived(
 		sorted.filter((process) =>
 			Organization.getProcessHows(hows, process.id).some(
-				(how) =>
-					how.responsible.includes(role.id) &&
-					(!onlyPeriodic || (process.repeat as Period[]).length > 0)
+				(how) => how.responsible.includes(role.id) && (!onlyPeriodic || process.repeat.length > 0)
 			)
 		)
 	);

@@ -18,7 +18,7 @@
 	import Header from '$lib/Header.svelte';
 	import Table from '$lib/Table.svelte';
 	import Status from '$lib/Status.svelte';
-	import { sortProcessesByNextDate } from '$database/Period';
+	import { getNextProcessDate, sortProcessesByNextDate } from '$database/Period';
 	import ProcessDate from '$lib/ProcessDate.svelte';
 	import Visibility from '$lib/VisibilityChooser.svelte';
 	import { page } from '$app/state';
@@ -41,8 +41,10 @@
 
 	/** Which view to show */
 	const initialView = page.url.searchParams.get('view');
-	let view = $state<'table' | 'list'>(
-		initialView === 'table' || initialView === 'list' ? initialView : 'list'
+	let view = $state<'table' | 'list' | 'timeline'>(
+		initialView === 'table' || initialView === 'list' || initialView === 'timeline'
+			? initialView
+			: 'list'
 	);
 
 	let isAdmin = $derived($user && context.admin);
@@ -226,18 +228,16 @@
 		<input type="radio" id="view-list" name="list" value="list" bind:group={view} />
 		<label for="view-list">List</label>
 	</div>
-
 	<div>
 		<input type="radio" id="view-table" name="table" value="table" bind:group={view} />
 		<label for="view-table">Table</label>
 	</div>
+	<div>
+		<input type="radio" id="view-timeline" name="timeline" value="timeline" bind:group={view} />
+		<label for="view-timeline">Timeline</label>
+	</div>
 </fieldset>
 
-{#if view === 'list'}
-	<Tip>Processes by concern, with those accountable and responsible.</Tip>
-{:else}
-	<Tip>Processes by concern, with status, visibility, and ARCI.</Tip>
-{/if}
 {#snippet ConcernHeader(concern: string)}
 	<Header
 		><Concern
@@ -252,6 +252,7 @@
 {:else if filteredProcesses.length === 0}
 	<Notice>All processes filtered.</Notice>
 {:else if view === 'table'}
+	<Tip>Processes by concern, with status, visibility, and ARCI.</Tip>
 	{#each concerns as concern}
 		<!-- Find the matching for this concern and the filter -->
 		{@const processes = sortProcessesByNextDate(
@@ -317,7 +318,8 @@
 			</div>
 		{/if}
 	{/each}
-{:else}
+{:else if view === 'list'}
+	<Tip>Processes by concern, with those accountable and responsible.</Tip>
 	<!-- The list view still groups by concerns -->
 	{#each concerns as concern}
 		{@const processes = filteredProcesses.filter((p) => p.concern === concern)}
@@ -368,6 +370,36 @@
 			</div>
 		{/if}
 	{/each}
+{:else if view === 'timeline'}
+	{@const timedProcesses = filteredProcesses
+		.filter((p) => p.repeat.length > 0)
+		.toSorted((p1, p2) => {
+			const d1 = getNextProcessDate(p1);
+			const d2 = getNextProcessDate(p2);
+			if (d1 === undefined && d2 === undefined) return 0;
+			if (d1 === undefined) return 1;
+			if (d2 === undefined) return -1;
+			return d1.getTime() - d2.getTime();
+		})}
+	<Tip>Timed processes, in order of when they are next due.</Tip>
+	<table>
+		<thead>
+			<tr>
+				<th>next date</th>
+				<th>in</th>
+				<th>process</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each timedProcesses as process (process.id)}
+				<tr>
+					<td><ProcessDate {process} /></td>
+					<td><ProcessDate delta {process} /></td>
+					<td><ProcessLink {process} /></td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
 {/if}
 
 <style>

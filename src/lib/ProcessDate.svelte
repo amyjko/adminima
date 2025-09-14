@@ -5,14 +5,20 @@
 
 	interface Props {
 		process: ProcessRow;
+		delta?: boolean;
 	}
 
-	let { process }: Props = $props();
+	let { process, delta = false }: Props = $props();
 
 	let nextDate = $derived(getNextProcessDate(process));
 </script>
 
-{#if nextDate}<Note><span>⟳ {formatNextDate(nextDate)}</span></Note>{/if}
+{#if nextDate}<Note
+		><span
+			>{#if delta}+{Math.floor((nextDate.getTime() - Date.now()) / 1000 / 60 / 60 / 24)} days{:else}⟳
+				{formatNextDate(nextDate)}{/if}</span
+		></Note
+	>{/if}
 
 <style>
 	span {

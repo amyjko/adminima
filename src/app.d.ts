@@ -1,4 +1,4 @@
-import { type Database } from '$database/database.types';
+import { type Database } from '$database/Database';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces

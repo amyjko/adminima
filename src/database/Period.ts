@@ -81,8 +81,8 @@ export function getNextPeriodDate(timestamp: number, period: Period): Date {
 
 export function sortProcessesByNextDate(processes: ProcessRow[]): ProcessRow[] {
 	return processes.toSorted((a, b) => {
-		const aRepeat = a.repeat as Period[];
-		const bRepeat = b.repeat as Period[];
+		const aRepeat = a.repeat;
+		const bRepeat = b.repeat;
 		if (aRepeat.length === 0) {
 			if (bRepeat.length === 0) return a.title.localeCompare(b.title);
 			else return 1;
@@ -103,7 +103,7 @@ export function sortProcessesByNextDate(processes: ProcessRow[]): ProcessRow[] {
 }
 
 export function getNextProcessDate(process: ProcessRow): Date | undefined {
-	return (process.repeat as Period[])
+	return process.repeat
 		.map((period) => getNextPeriodDate(Date.now(), period))
 		.toSorted((a, b) => a.getTime() - b.getTime())[0];
 }

@@ -3,7 +3,11 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
-## v0.7.22
+## v0.8.0
+
+### Added
+
+- Added a timeline view to the process page to see the year.
 
 ### Fixed
 
@@ -11,6 +15,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ### Maintenance
 
+- Properly typed Period.
 - Updated minor versions of `@supabase`, `@supabase/supabase-js`
 - Updated minor versions of `svelte`, `@sveltejs/kit`
 - Updated minor versions of `vite`, `@sveltejs/vite-plugin-svelte`
