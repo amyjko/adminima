@@ -1,7 +1,15 @@
 # Changes
 
-sWe'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
+We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
+
+## v0.7.22
+
+- Updated minor versions of `@supabase`, `@supabase/supabase-js`
+- Updated minor versions of `svelte`, `@sveltejs/kit`
+- Updated minor versions of `vite`, `@sveltejs/vite-plugin-svelte`
+- Updated minor versions of `write-excel-file`
+- Updated major version of `uuid`
 
 ## v0.7.21
 

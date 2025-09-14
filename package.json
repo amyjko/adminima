@@ -1,6 +1,6 @@
 {
 	"name": "adminima",
-	"version": "0.7.20",
+	"version": "0.7.22",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -42,7 +42,7 @@
 		"@vercel/speed-insights": "^1.2.0",
 		"date-fns": "^4",
 		"fast-csv": "^5",
-		"uuid": "^11",
+		"uuid": "^13",
 		"write-excel-file": "^2"
 	}
 }
