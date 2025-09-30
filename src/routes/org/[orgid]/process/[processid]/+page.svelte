@@ -440,28 +440,26 @@
 		{profiles}
 		remove={isAdmin ? (comment) => db.deleteComment(process, 'processes', comment) : undefined}
 	/>
-
-	{#if isAdmin || accountable}
-		<Header>Delete</Header>
-		<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
-		<Tip admin
-			>Only admins and those role <Level level="accountable" verbose /> roles can delete.</Tip
-		>
-		<Button
-			tip="Permantently delete this process and all of it's steps."
-			action={async () => {
-				try {
-					const { error } = await db.deleteProcess(process.id);
-					if (error) addError("Couldn't delete this", error);
-					else await goto(`/org/${Organization.getPath(org)}/processes`);
-				} catch (_) {
-					deleteError = "We couldn't delete this";
-				}
-			}}
-			warning>{Delete} Delete this process</Button
-		>
-		{#if deleteError}<Oops text={deleteError} />{/if}
-	{/if}
+{/if}
+{#if isAdmin || accountable}
+	<Header>Delete</Header>
+	<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
+	<Tip admin>Only admins and those role <Level level="accountable" verbose /> roles can delete.</Tip
+	>
+	<Button
+		tip="Permantently delete this process and all of it's steps."
+		action={async () => {
+			try {
+				const { error } = await db.deleteProcess(process.id);
+				if (error) addError("Couldn't delete this", error);
+				else await goto(`/org/${Organization.getPath(org)}/processes`);
+			} catch (_) {
+				deleteError = "We couldn't delete this";
+			}
+		}}
+		warning>{Delete} Delete this process</Button
+	>
+	{#if deleteError}<Oops text={deleteError} />{/if}
 {/if}
 
 <style>
