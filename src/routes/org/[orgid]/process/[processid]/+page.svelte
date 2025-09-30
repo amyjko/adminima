@@ -163,7 +163,8 @@
 {/snippet}
 
 {#if how === undefined}
-	<Oops text="Unable to load this process." />
+	<Title title={process.title} kind="process" />
+	<Oops text="This process could not be fully loaded." />
 {:else if how.visibility !== 'public' && ($user === null || !context.member)}
 	<Title title={org.name} />
 	<Oops
