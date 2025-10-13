@@ -69,8 +69,7 @@
 	<span class="label">
 		{@render children()}
 	</span>
-</a>
-{@render action?.()}
+</a>{@render action?.()}
 
 <style>
 	.link {

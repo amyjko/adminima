@@ -93,8 +93,8 @@
 	<div style="display: flex; flex-direction:row; justify-content: center; width: 100%">
 		<Note
 			><Link to="https://amyjko.phd">Amy</Link> built this. Submit <Link
-				to="https://github.com/amyjko/adminima/issues/new/choose">Feedback</Link
-			>?
+				to="https://github.com/amyjko/adminima/issues/new/choose">feedback</Link
+			>.
 		</Note>
 	</div>
 </Page>
