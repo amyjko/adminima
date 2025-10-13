@@ -298,7 +298,6 @@
 					process.title
 						.toLowerCase()
 						.split(/\W+/)
-						.slice(1) // Skip the first word, which is usually a verb, and not revealing of the topic
 						.filter((w) => w.length > 3 && !StopWords.includes(w))
 						.toSorted()
 				)
@@ -313,8 +312,9 @@
 				const common = processWords[a].words.filter((word) => processWords[b].words.includes(word));
 				// If >=75% of the words are in common, count as a duplicate.
 				if (
+					common.length > 2 &&
 					common.length / Math.min(processWords[a].words.length, processWords[b].words.length) >=
-					0.75
+						0.75
 				) {
 					// See if we already have this combination of processes
 					const existing = duplicates.find((d) => d.words.join(',') === common.join(','));
