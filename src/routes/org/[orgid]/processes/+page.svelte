@@ -311,7 +311,11 @@
 		for (let a = 0; a < processWords.length; a++) {
 			for (let b = a + 1; b < processWords.length; b++) {
 				const common = processWords[a].words.filter((word) => processWords[b].words.includes(word));
-				if (common.length >= 2) {
+				// If >=75% of the words are in common, count as a duplicate.
+				if (
+					common.length / Math.min(processWords[a].words.length, processWords[b].words.length) >=
+					0.75
+				) {
 					// See if we already have this combination of processes
 					const existing = duplicates.find((d) => d.words.join(',') === common.join(','));
 					if (existing) existing.processes.add(processWords[b].process);
