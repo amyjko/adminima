@@ -1,3 +1,7 @@
+<script module lang="ts">
+	type ProcessesMode = 'table' | 'list' | 'timeline' | 'duplicates';
+</script>
+
 <script lang="ts">
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
@@ -41,8 +45,11 @@
 
 	/** Which view to show */
 	const initialView = page.url.searchParams.get('view');
-	let view = $state<'table' | 'list' | 'timeline'>(
-		initialView === 'table' || initialView === 'list' || initialView === 'timeline'
+	let view = $state<ProcessesMode>(
+		initialView === 'table' ||
+			initialView === 'list' ||
+			initialView === 'timeline' ||
+			initialView === 'duplicates'
 			? initialView
 			: 'list'
 	);
@@ -151,6 +158,39 @@
 			.filter((r): r is RoleRow => r !== undefined);
 	}
 
+	function getDuplicates(processes: ProcessRow[]): { words: string[]; processes: ProcessRow[] }[] {
+		const processWords: { words: string[]; process: ProcessRow }[] = [];
+		for (const process of processes) {
+			// Split title by words, lowercase, filter out short words, sort alphabetically.
+			const words = process.title
+				.toLowerCase()
+				.split(/\W+/)
+				.filter((w) => w.length > 2)
+				.toSorted();
+			processWords.push({ words, process });
+		}
+
+		const duplicates: { words: string[]; processes: ProcessRow[] }[] = [];
+
+		for (let a = 0; a < processWords.length; a++) {
+			for (let b = a + 1; b < processWords.length; b++) {
+				const common = processWords[a].words.filter((word) => processWords[b].words.includes(word));
+				if (common.length >= 2) {
+					// See if we already have this combination of processes
+					const existing = duplicates.find((d) => d.words.join(',') === common.join(','));
+					if (existing) existing.processes.push(processWords[b].process);
+					else
+						duplicates.push({
+							words: common,
+							processes: [processWords[a].process, processWords[b].process]
+						});
+				}
+			}
+		}
+
+		return Array.from(duplicates);
+	}
+
 	let title = $state('');
 	async function newProcess() {
 		const { error, id } = await db.addProcess(org.id, title, org.visibility);
@@ -235,6 +275,16 @@
 	<div>
 		<input type="radio" id="view-timeline" name="timeline" value="timeline" bind:group={view} />
 		<label for="view-timeline">Timeline</label>
+	</div>
+	<div>
+		<input
+			type="radio"
+			id="view-duplicates"
+			name="duplicates"
+			value="duplicates"
+			bind:group={view}
+		/>
+		<label for="view-duplicates">Duplicates</label>
 	</div>
 </fieldset>
 
@@ -400,6 +450,25 @@
 			{/each}
 		</tbody>
 	</table>
+{:else if view === 'duplicates'}
+	<Tip>Potentially duplicate processes with titles that overlap by two or more words.</Tip>
+
+	<!-- Compute all of the processes for which there are two or more processes with two overlapping words -->
+	{@const duplicates = getDuplicates(filteredProcesses)}
+	{#if duplicates.length === 0}{:else}
+		<ul>
+			{#each duplicates as duplicate}
+				<li><em>{duplicate.words.join(', ')}</em></li>
+				<ul>
+					{#each duplicate.processes as process}
+						<li><ProcessLink {process} /></li>
+					{/each}
+				</ul>
+			{:else}
+				<Notice>No duplicate or overlapping process titles found.</Notice>
+			{/each}
+		</ul>
+	{/if}
 {/if}
 
 <style>
