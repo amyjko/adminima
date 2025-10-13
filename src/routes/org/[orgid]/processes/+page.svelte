@@ -298,6 +298,7 @@
 					process.title
 						.toLowerCase()
 						.split(/\W+/)
+						.slice(1) // Skip the first word, which is usually a verb, and not revealing of the topic
 						.filter((w) => w.length > 3 && !StopWords.includes(w))
 						.toSorted()
 				)
