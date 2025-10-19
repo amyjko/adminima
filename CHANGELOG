@@ -14,6 +14,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 - Check for duplicates on new process creation.
 - Basic changes Excel export.
 
+### Maintenance
+
+- Updated minor versions of Playwright, Supabase, Svelte, SvelteKit, Supabase, Vite
+
 ## v0.8.1
 
 ### Added
