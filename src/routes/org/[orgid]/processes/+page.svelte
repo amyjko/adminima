@@ -1,134 +1,5 @@
 <script module lang="ts">
 	type ProcessesMode = 'table' | 'list' | 'timeline' | 'duplicates';
-	const StopWords = [
-		'i',
-		'me',
-		'my',
-		'myself',
-		'we',
-		'our',
-		'ours',
-		'ourselves',
-		'you',
-		'your',
-		'yours',
-		'yourself',
-		'yourselves',
-		'he',
-		'him',
-		'his',
-		'himself',
-		'she',
-		'her',
-		'hers',
-		'herself',
-		'it',
-		'its',
-		'itself',
-		'they',
-		'them',
-		'their',
-		'theirs',
-		'themselves',
-		'what',
-		'which',
-		'who',
-		'whom',
-		'this',
-		'that',
-		'these',
-		'those',
-		'am',
-		'is',
-		'are',
-		'was',
-		'were',
-		'be',
-		'been',
-		'being',
-		'have',
-		'has',
-		'had',
-		'having',
-		'do',
-		'does',
-		'did',
-		'doing',
-		'a',
-		'an',
-		'the',
-		'and',
-		'but',
-		'if',
-		'or',
-		'because',
-		'as',
-		'until',
-		'while',
-		'of',
-		'at',
-		'by',
-		'for',
-		'with',
-		'about',
-		'against',
-		'between',
-		'into',
-		'through',
-		'during',
-		'before',
-		'after',
-		'above',
-		'below',
-		'to',
-		'from',
-		'up',
-		'down',
-		'in',
-		'out',
-		'on',
-		'off',
-		'over',
-		'under',
-		'again',
-		'further',
-		'then',
-		'once',
-		'here',
-		'there',
-		'when',
-		'where',
-		'why',
-		'how',
-		'all',
-		'any',
-		'both',
-		'each',
-		'few',
-		'more',
-		'most',
-		'other',
-		'some',
-		'such',
-		'no',
-		'nor',
-		'not',
-		'only',
-		'own',
-		'same',
-		'so',
-		'than',
-		'too',
-		'very',
-		's',
-		't',
-		'can',
-		'will',
-		'just',
-		'don',
-		'should',
-		'now'
-	];
 </script>
 
 <script lang="ts">
@@ -157,6 +28,7 @@
 	import { page } from '$app/state';
 	import ProfileLink from '$lib/ProfileLink.svelte';
 	import Organization from '$database/Organization';
+	import getProcessDuplicates from '$database/possibleProcessOverlap.js';
 
 	const { data } = $props();
 
@@ -287,50 +159,6 @@
 			.filter((r): r is RoleRow => r !== undefined);
 	}
 
-	function getDuplicates(
-		processes: ProcessRow[]
-	): { words: string[]; processes: Set<ProcessRow> }[] {
-		const processWords: { words: string[]; process: ProcessRow }[] = [];
-		for (const process of processes) {
-			// Split title by words, lowercase, filter out short words, sort alphabetically.
-			const words = [
-				...new Set(
-					process.title
-						.toLowerCase()
-						.split(/\W+/)
-						.filter((w) => w.length > 3 && !StopWords.includes(w))
-						.toSorted()
-				)
-			];
-			processWords.push({ words, process });
-		}
-
-		const duplicates: { words: string[]; processes: Set<ProcessRow> }[] = [];
-
-		for (let a = 0; a < processWords.length; a++) {
-			for (let b = a + 1; b < processWords.length; b++) {
-				const common = processWords[a].words.filter((word) => processWords[b].words.includes(word));
-				// If >=75% of the words are in common, count as a duplicate.
-				if (
-					common.length > 2 &&
-					common.length / Math.min(processWords[a].words.length, processWords[b].words.length) >=
-						0.75
-				) {
-					// See if we already have this combination of processes
-					const existing = duplicates.find((d) => d.words.join(',') === common.join(','));
-					if (existing) existing.processes.add(processWords[b].process);
-					else
-						duplicates.push({
-							words: common,
-							processes: new Set([processWords[a].process, processWords[b].process])
-						});
-				}
-			}
-		}
-
-		return Array.from(duplicates);
-	}
-
 	let title = $state('');
 	async function newProcess() {
 		const { error, id } = await db.addProcess(org.id, title, org.visibility);
@@ -398,6 +226,35 @@
 		valid={() => title.length > 0}
 	>
 		<Field active={true} label="title" bind:text={title} />
+
+		<!-- Compute all of the processes for which there are two or more processes with two overlapping words -->
+		{@const duplicates = getProcessDuplicates([
+			...processes,
+			{
+				id: 'new',
+				title,
+				orgid: '0',
+				accountable: null,
+				comments: [],
+				short: [],
+				concern: '',
+				state: 'draft',
+				howid: null,
+				icon: '',
+				when: '',
+				repeat: []
+			}
+		]).filter((dupes) => Array.from(dupes.processes).some((p) => p.id === 'new'))}
+		{#if duplicates.length > 0}
+			<Tip>These processes have similar titles. Sure it's not a duplicate?</Tip>
+			{#each duplicates as duplicate}
+				<ul>
+					{#each Array.from(duplicate.processes).filter((p) => p.id !== 'new') as process}
+						<li><ProcessLink {process} /></li>
+					{/each}
+				</ul>
+			{/each}
+		{/if}
 	</FormDialog>
 {/if}
 
@@ -594,8 +451,8 @@
 	<Tip>Potentially duplicate processes with titles that overlap by two or more words.</Tip>
 
 	<!-- Compute all of the processes for which there are two or more processes with two overlapping words -->
-	{@const duplicates = getDuplicates(filteredProcesses)}
-	{#if duplicates.length === 0}{:else}
+	{@const duplicates = getProcessDuplicates(filteredProcesses)}
+	{#if duplicates.length === 0}<Oops>No duplicates found.</Oops>{:else}
 		<ul>
 			{#each duplicates as duplicate}
 				<li><em>{duplicate.words.join(', ')}</em></li>

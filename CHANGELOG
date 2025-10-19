@@ -9,6 +9,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Allow person assigned to lead a change to edit change.
 
+### Added
+
+- Check for duplicates on new process creation.
+
 ## v0.8.1
 
 ### Added
