@@ -9,13 +9,15 @@ export async function load({ parent }) {
 		{ data: processes },
 		{ data: hows },
 		{ data: assignments },
-		{ data: profiles }
+		{ data: profiles },
+		{ data: changes }
 	] = await Promise.all([
 		Organization.queryRoles(supabase, org.id),
 		Organization.queryProcesses(supabase, org.id),
 		Organization.queryHows(supabase, org.id),
 		Organization.queryAssignments(supabase, org.id),
-		Organization.queryProfiles(supabase, org.id)
+		Organization.queryProfiles(supabase, org.id),
+		Organization.queryChanges(supabase, org.id)
 	]);
 
 	if (
@@ -23,7 +25,8 @@ export async function load({ parent }) {
 		processes === null ||
 		hows === null ||
 		assignments === null ||
-		profiles === null
+		profiles === null ||
+		changes === null
 	)
 		error(404, {
 			message: 'Unable to retrieve data to export this organization.'
@@ -34,6 +37,7 @@ export async function load({ parent }) {
 		processes,
 		hows,
 		assignments,
-		profiles
+		profiles,
+		changes
 	};
 }

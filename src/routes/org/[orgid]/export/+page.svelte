@@ -14,6 +14,7 @@
 	const hows = $derived(data.hows);
 	const assignments = $derived(data.assignments);
 	const profiles = $derived(data.profiles);
+	const changes = $derived(data.changes);
 
 	function howToString(how: HowRow, depth = 0): string {
 		return `\n${'\t'.repeat(depth)}${depth > 0 ? '•' : ''} ${how.what}${how.how.map((id) => {
@@ -24,7 +25,7 @@
 	}
 
 	async function exportOrg() {
-		const headers = [
+		const processHeaders = [
 			{
 				value: 'Process',
 				fontWeight: 'bold' as const
@@ -71,15 +72,64 @@
 			];
 		});
 
-		const data: SheetData = [headers, ...processRows];
-		await writeXlsxFile(data, {
+		const processData: SheetData = [processHeaders, ...processRows];
+
+		const changeHeaders = [
+			{
+				value: 'What',
+				fontWeight: 'bold' as const
+			},
+			{
+				value: 'Status',
+				fontWeight: 'bold' as const
+			},
+			{
+				value: 'Visiblity',
+				fontWeight: 'bold' as const
+			},
+			{
+				value: 'Description',
+				fontWeight: 'bold' as const
+			},
+			{
+				value: 'Proposal',
+				fontWeight: 'bold' as const
+			},
+			{
+				value: 'Lead',
+				fontWeight: 'bold' as const
+			}
+		];
+
+		const changesRows = changes.map((change) => {
+			return [
+				{ value: change.what, wrap: true, alignVertical: 'top' as const },
+				{ value: change.status, wrap: true, alignVertical: 'top' as const },
+				{ value: change.visibility, wrap: true, alignVertical: 'top' as const },
+				{ value: change.description, wrap: true, alignVertical: 'top' as const },
+				{ value: change.proposal, wrap: true, alignVertical: 'top' as const },
+				{
+					value: profiles.find((profile) => profile.id === change.lead)?.name || '—',
+					wrap: true,
+					alignVertical: 'top' as const
+				}
+			];
+		});
+
+		const changeData: SheetData = [changeHeaders, ...changesRows];
+
+		await writeXlsxFile([processData, changeData], {
 			columns: [
-				{ width: 30 },
-				{ width: 60 },
-				...roles.map(() => {
-					return { width: 3 };
-				})
+				[
+					{ width: 30 },
+					{ width: 60 },
+					...roles.map(() => {
+						return { width: 3 };
+					})
+				],
+				[{ width: 30 }, { width: 60 }, { width: 60 }, { width: 20 }]
 			],
+			sheets: ['processes', 'changes'],
 			fileName: 'export.xlsx'
 		});
 	}
