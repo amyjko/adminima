@@ -44,9 +44,12 @@
 	const user = getUser();
 	const db = getDB();
 
+	let userProfile = $derived(
+		$user ? profiles.find((profile) => profile.personid === $user.id) : null
+	);
 	let isAdmin = $derived($user && context.admin);
 	let editable = $derived(
-		$user && (isAdmin || change.who === $user.id || change.lead === $user.id)
+		$user && (isAdmin || change.who === $user.id || change.lead === userProfile?.id)
 	);
 	let unselectedRoles = $derived(
 		roles.filter((r) => !change.roles.includes(r.id)).sort((a, b) => a.title.localeCompare(b.title))
