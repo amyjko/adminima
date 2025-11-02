@@ -83,9 +83,11 @@
 			view={{ snippet: RoleItem, data: roles }}
 			options={[
 				undefined,
-				...roles.map((role) => {
-					return role.id;
-				})
+				...roles
+					.toSorted((a, b) => a.title.localeCompare(b.title))
+					.map((role) => {
+						return role.id;
+					})
 			]}
 			searchable={{
 				placeholder: 'role',
@@ -106,7 +108,10 @@
 		<Options
 			id="affected-process"
 			tip="Add a process that is affected by this suggestion."
-			options={[undefined, ...processes.map((process) => process.id)]}
+			options={[
+				undefined,
+				...processes.toSorted((a, b) => a.title.localeCompare(b.title)).map((process) => process.id)
+			]}
 			searchable={{
 				placeholder: 'process',
 				include: (item: string, query: string) =>

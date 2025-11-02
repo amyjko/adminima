@@ -5,6 +5,11 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.8.3
 
+### Fixed
+
+- Sorted all drop downs in sensible ways.
+- Support search in change's affected roles and processes.
+
 ### Maintenance
 
 - Updated minor versions of Supabase, Svelte, SvelteKit, vite, vitest.

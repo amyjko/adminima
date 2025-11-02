@@ -56,9 +56,11 @@
 			selection={role.team ?? undefined}
 			options={[
 				undefined,
-				...teams.map((team) => {
-					return team.id;
-				})
+				...teams
+					.toSorted((a, b) => a.name.localeCompare(b.name))
+					.map((team) => {
+						return team.id;
+					})
 			]}
 			view={{ snippet: TeamItem, data: teams }}
 			change={async (team) => {

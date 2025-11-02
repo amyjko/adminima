@@ -27,7 +27,7 @@
 					!how.consulted.includes(r.id) &&
 					!how.informed.includes(r.id)
 			)
-			// Sort by ttile.
+			// Sort by title.
 			.toSorted((a, b) => a.title.localeCompare(b.title))
 			// Map to select options.
 			.map((role) => {

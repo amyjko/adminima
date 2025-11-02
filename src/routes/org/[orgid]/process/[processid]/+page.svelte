@@ -234,7 +234,7 @@
 				<Options
 					tip="Change this process's concern"
 					selection={process.concern}
-					options={concerns}
+					options={concerns.toSorted()}
 					change={async (concern) =>
 						(await queryOrError(
 							db.updateProcessConcern(process, concern ?? '', $user.id),
@@ -309,7 +309,10 @@
 			<Options
 				id="choose-accountable"
 				tip="Choose a role to be accountable for the processes outcomes."
-				options={[undefined, ...sortedRoles.map((role) => role.id)]}
+				options={[
+					undefined,
+					...sortedRoles.toSorted((a, b) => a.title.localeCompare(b.title)).map((role) => role.id)
+				]}
 				searchable={{
 					placeholder: 'role',
 					include: (item: string, query: string) =>

@@ -124,7 +124,16 @@
 			id="lead-chooser"
 			tip="Choose who is leading this change"
 			selection={change.lead ?? undefined}
-			options={[undefined, ...profiles.map((person) => person.id)]}
+			options={[
+				undefined,
+				...profiles
+					.map((person) => person.id)
+					.toSorted((a, b) =>
+						(Organization.getProfileWithNameOrEmail(profiles, a) ?? '').localeCompare(
+							Organization.getProfileWithNameOrEmail(profiles, b) ?? ''
+						)
+					)
+			]}
 			view={{ snippet: ProfileItem, data: profiles }}
 			searchable={{
 				placeholder: 'name',
@@ -215,10 +224,20 @@
 		<Options
 			id="role-chooser"
 			tip="Add a role that is affected by this change."
-			options={[undefined, ...unselectedRoles.map((role) => role.id)]}
+			options={[
+				undefined,
+				...unselectedRoles.toSorted((a, b) => a.title.localeCompare(b.title)).map((role) => role.id)
+			]}
 			bind:selection={roleSelection}
 			view={{ snippet: RoleItem, data: roles }}
 			empty={false}
+			searchable={{
+				placeholder: 'role',
+				include: (role, query) =>
+					(Organization.getRoleByID(roles, role)?.title ?? '')
+						.toLowerCase()
+						.includes(query.toLowerCase())
+			}}
 			change={async (r) => {
 				if (r !== undefined) {
 					const error = await queryOrError(
@@ -256,10 +275,22 @@
 		<Options
 			id="process-chooser"
 			tip="Add a process that is affected by this change."
-			options={[undefined, ...unselectedProcesses.map((process) => process.id)]}
+			options={[
+				undefined,
+				...unselectedProcesses
+					.toSorted((a, b) => a.title.localeCompare(b.title))
+					.map((process) => process.id)
+			]}
 			bind:selection={processSelection}
 			view={{ snippet: ProcessItem, data: processes }}
 			empty={false}
+			searchable={{
+				placeholder: 'process',
+				include: (process, query) =>
+					(processes.find((p) => p.id === process)?.title ?? '')
+						.toLowerCase()
+						.includes(query.toLowerCase())
+			}}
 			change={async (p) => {
 				if (p !== undefined) {
 					const error = await queryOrError(

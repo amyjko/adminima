@@ -154,9 +154,11 @@
 								view={{ snippet: RoleItem, data: remainingRoles }}
 								empty={false}
 								options={[
-									...remainingRoles.map((role) => {
-										return role.id;
-									})
+									...remainingRoles
+										.toSorted((a, b) => a.title.localeCompare(b.title))
+										.map((role) => {
+											return role.id;
+										})
 								]}
 								change={async (roleID) => {
 									newRole = undefined;
@@ -213,7 +215,12 @@
 										?.name.toLowerCase()
 										.includes(query.toLowerCase()) === true
 							}}
-							options={[undefined, ...eligibleSupervisors.map((prof) => prof.id)]}
+							options={[
+								undefined,
+								...eligibleSupervisors
+									.toSorted((a, b) => a.name.localeCompare(b.name))
+									.map((prof) => prof.id)
+							]}
 							view={{ snippet: ProfileItem, data: profiles }}
 							selection={profile.supervisor ?? undefined}
 							change={async (profileID) =>
