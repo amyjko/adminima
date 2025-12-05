@@ -33,7 +33,7 @@
 	const db = getDB();
 
 	// Create a state to store the current organization. We'll store this as context.
-	let context: OrgContext = $state({
+	let context: OrgContext = $derived({
 		org: data.org,
 		admin: data.admin,
 		member: data.member,

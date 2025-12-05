@@ -16,6 +16,7 @@
 	}
 </script>
 
+<!-- svelte-ignore state_referenced_locally -->
 <script lang="ts">
 	import Page from '$lib/Page.svelte';
 	import { getContext, onMount, setContext } from 'svelte';
@@ -38,7 +39,7 @@
 
 	let { data, children }: Props = $props();
 
-	let db = $state(new Organization(data.supabase));
+	let db = $derived(new Organization(data.supabase));
 	setContext(DBSymbol, db);
 
 	// Update client when data updates.
@@ -50,12 +51,17 @@
 		return user ? { id: user.id, email: user.email } : null;
 	}
 
+	function getSessionUser() {
+		return data.session ? getUserMetadata(data.session.user) : null;
+	}
+
 	// Start with the user, unless we're on the browser, in which case we get a fresh token.
 	// Keep the store up to date if the user changes.
-	const user: UserContext = writable(data.session ? getUserMetadata(data.session.user) : null);
+	const user: UserContext = writable(getSessionUser());
 	setContext(UserSymbol, user);
+
 	$effect(() => {
-		user.set(data.session ? getUserMetadata(data.session.user) : null);
+		user.set(getSessionUser());
 	});
 
 	let { supabase, session } = $derived(data);

@@ -33,7 +33,7 @@
 		how.how.map((h) => Organization.getHow(hows, h)).filter((h) => h !== undefined)
 	);
 
-	let text = how.what;
+	let text = $derived(how.what);
 	// Helps us keep track of whether to give this an HTML ID for purposes of focusing.
 	let deleted = $state(false);
 
