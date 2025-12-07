@@ -19,7 +19,9 @@
 	let { data } = $props();
 
 	const user = getUser();
-	const db = getDB();
+
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	let orgs = $derived(data.orgs);
 	let isSelf = $derived($user && $user.id === $page.params.personid);

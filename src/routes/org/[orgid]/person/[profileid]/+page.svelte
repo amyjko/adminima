@@ -20,9 +20,10 @@
 	const user = getUser();
 	const context = getOrg();
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
-	let isAdmin = $derived(context.admin);
+	let isAdmin = $derived(context().admin);
 	let roles = $derived(Organization.getProfileRoles(profile.id, data.assignments, data.roles));
 </script>
 

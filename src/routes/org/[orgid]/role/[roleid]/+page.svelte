@@ -30,15 +30,18 @@
 	const processes = $derived(data.processes);
 
 	const user = getUser();
-	const db = getDB();
-	const context = getOrg();
-	let org = $derived(context.org);
+
+	const dbContext = getDB();
+	const db = $derived(dbContext());
+
+	const orgContext = getOrg();
+	let org = $derived(orgContext().org);
 
 	let profiles = $derived(Organization.getRoleProfiles(role.id, assignments, allProfiles));
-	let isAdmin = $derived($user && context.admin);
+	let isAdmin = $derived($user && orgContext().admin);
 
 	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && context.member)
+		($user === null && org.visibility === 'public') || ($user !== null && orgContext().member)
 	);
 </script>
 
@@ -91,8 +94,8 @@
 </Title>
 
 <Tip admin
-	>This is a role in the organization. <strong>Admins</strong> can update it's description and team.
-	Set a short name to use in URLs and links.</Tip
+	>This is a role in the organization. <strong>Admins</strong> can update it's description and team. Set
+	a short name to use in URLs and links.</Tip
 >
 
 <MarkupView

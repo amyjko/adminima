@@ -25,11 +25,13 @@
 	const assignments = $derived(data.assignments);
 	const teams = $derived(data.teams);
 
-	const db = getDB();
-	const context = getOrg();
-	let organization = $derived(context?.org);
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
-	let isAdmin = $derived(context.admin);
+	const orgContext = getOrg();
+	let organization = $derived(orgContext().org);
+
+	let isAdmin = $derived(orgContext().admin);
 
 	let newPersonEmail: string = $state('');
 	let match: PersonRow | undefined | null = undefined;
@@ -70,7 +72,7 @@
 	roles. Select a person to see the roles they have.</Tip
 >
 
-{#if isAdmin && context.counts.roles === 0}
+{#if isAdmin && orgContext().counts.roles === 0}
 	<Notice
 		>Want to give people roles? First you'll need to <Link
 			to="/org/{Organization.getPath(organization)}/roles">define some</Link

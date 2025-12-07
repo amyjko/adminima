@@ -12,8 +12,8 @@
 
 	const context = getOrg();
 
-	let isMember = $derived(context?.member === true);
-	let isAdmin = $derived(context?.admin === true);
+	let isMember = $derived(context().member === true);
+	let isAdmin = $derived(context().admin === true);
 </script>
 
 {#if (admin === false && member === false) || (admin && isAdmin) || (member && isMember)}

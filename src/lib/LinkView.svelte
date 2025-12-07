@@ -17,7 +17,7 @@
 
 	// Does the link correspond to a role short name?
 	let role = $derived(
-		context.shortRoles.find(
+		context().shortRoles.find(
 			(role) =>
 				role.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
 				role.title.toLocaleLowerCase() === lowerURL
@@ -25,7 +25,7 @@
 	);
 	// Does the link correspond to a process short name?
 	let process = $derived(
-		context.shortProcesses.find(
+		context().shortProcesses.find(
 			(process) =>
 				process.short.some((name) => name.toLocaleLowerCase() === lowerURL) ||
 				process.title.toLocaleLowerCase() === lowerURL

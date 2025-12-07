@@ -8,10 +8,10 @@
 	const user = getUser();
 
 	const org = getOrg();
-	let organization = $derived(org.org);
-	let admin = $derived(org.admin);
-	let member = $derived(org.member);
-	let counts = $derived(org.counts);
+	let organization = $derived(org().org);
+	let admin = $derived(org().admin);
+	let member = $derived(org().member);
+	let counts = $derived(org().counts);
 
 	let visible = $derived(
 		organization.visibility === 'public' ||

@@ -36,7 +36,7 @@
 
 <div class="title">
 	<div class="background {kind}">
-		{#if org}
+		{#if org()}
 			<OrgNav />
 		{/if}
 		<div>

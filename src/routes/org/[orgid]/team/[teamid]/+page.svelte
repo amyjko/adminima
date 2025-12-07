@@ -19,11 +19,12 @@
 
 	const user = getUser();
 	const context = getOrg();
-	const org = $derived(context.org);
+	const org = $derived(context().org);
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
-	let isAdmin = $derived($user && context.admin);
+	let isAdmin = $derived($user && context().admin);
 </script>
 
 {#if team}

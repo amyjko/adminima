@@ -19,7 +19,7 @@
 	let { role, children }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context().org);
 
 	let path = $derived(role ? (role.short.length > 0 ? role.short : role.id) : undefined);
 </script>

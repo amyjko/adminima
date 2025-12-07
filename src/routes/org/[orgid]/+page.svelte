@@ -19,9 +19,14 @@
 	let profiles = $derived(data.profiles);
 
 	const user = getUser();
-	const db = getDB();
+
+	const dbContext = getDB();
+	const db = $derived(dbContext());
+
 	const organization = getOrg();
-	let org = $derived(organization.org);
+	let org = $derived(organization().org);
+
+	$inspect(org.visibility);
 
 	let editable = $derived(admin);
 </script>

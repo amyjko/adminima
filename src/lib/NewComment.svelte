@@ -13,9 +13,12 @@
 		submitted = undefined
 	}: { change: ChangeRow; submitted?: (comment: string) => void } = $props();
 
-	const db = getDB();
-	const context = getOrg();
-	let org = $derived(context.org);
+	const dbContext = getDB();
+	const db = $derived(dbContext());
+
+	const orgContext = getOrg();
+	let org = $derived(orgContext().org);
+
 	let newComment: string = $state('');
 	let submitting = $state(false);
 
@@ -43,7 +46,7 @@
 	}
 </script>
 
-{#if $user && context.member}
+{#if $user && orgContext().member}
 	<Form active={!submitting} inactiveMessage={undefined} action={() => submitComment()}>
 		<Labeled label="Have a comment?">
 			<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />

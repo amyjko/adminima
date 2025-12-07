@@ -18,7 +18,8 @@
 
 	let { comments, profiles, remove }: Props = $props();
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	let show = $state(false);
 </script>

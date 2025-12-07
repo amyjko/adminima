@@ -17,7 +17,7 @@
 	let { change, role = null, process = null, wrap }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context().org);
 </script>
 
 {#if change === undefined}<Oops inline text="Unknown change" />{:else}<Link

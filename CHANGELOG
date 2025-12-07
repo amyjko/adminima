@@ -5,6 +5,10 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 ## v0.8.4
 
+### Fixed
+
+- Fixed stale state references.
+
 ### Maintenance
 
 - Updated minor versions of Supabase, Svelte, SvelteKit, vite, vitest.

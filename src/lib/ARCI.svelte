@@ -16,7 +16,8 @@
 
 	let { roles, how, verbose, editable }: Props = $props();
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	let options = $derived([
 		...roles

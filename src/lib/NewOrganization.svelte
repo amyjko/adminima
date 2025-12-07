@@ -8,7 +8,9 @@
 	import { addError } from '$routes/errors.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
+
 	const user = getUser();
 
 	let submitting = $state(false);

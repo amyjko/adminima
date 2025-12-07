@@ -31,12 +31,14 @@
 	let newRequestProblem = $state('');
 	let newRequestError: string | undefined = $state(undefined);
 
-	const context = getOrg();
-	const org = $derived(context.org);
+	const orgContext = getOrg();
+	const org = $derived(orgContext().org);
 	const user = getUser();
-	const db = getDB();
 
-	let isAdmin = $derived($user && context.admin);
+	const dbContext = getDB();
+	const db = $derived(dbContext());
+
+	let isAdmin = $derived($user && orgContext().admin);
 
 	async function createChange() {
 		if ($user === null) return;

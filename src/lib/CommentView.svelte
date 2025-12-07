@@ -22,13 +22,16 @@
 	let { comment, profiles, remove }: Props = $props();
 
 	const context = getOrg();
-	const db = getDB();
+
+	const dbContext = getDB();
+	const db = $derived(dbContext());
+
 	const user = getUser();
 
 	// Feedback on deletion.
 	let deleting = $state(false);
 
-	let admin = $derived($user && context.admin);
+	let admin = $derived($user && context().admin);
 </script>
 
 {#if !deleting}

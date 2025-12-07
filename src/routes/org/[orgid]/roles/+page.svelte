@@ -23,10 +23,12 @@
 	const assignments = $derived(data.assignments);
 	const profiles = $derived(data.profiles);
 
-	const context = getOrg();
-	let org = $derived(context.org);
+	const orgContext = getOrg();
+	let org = $derived(orgContext().org);
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
+
 	const user = getUser();
 
 	let newRole: string = $state('');
@@ -36,7 +38,7 @@
 
 	/** Roles are visible if the org is public or the authenticated user is in the org. */
 	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && context.member)
+		($user === null && org.visibility === 'public') || ($user !== null && orgContext().member)
 	);
 
 	async function createRole() {
@@ -108,7 +110,7 @@
 {/if}
 
 <Flow>
-	{#if context.admin}
+	{#if orgContext().admin}
 		<FormDialog
 			button="Create role …"
 			showTip="Create a new role."

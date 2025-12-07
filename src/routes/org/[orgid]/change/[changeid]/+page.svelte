@@ -37,17 +37,19 @@
 	const processes = $derived(data.processes);
 
 	const context = getOrg();
-	let organization = $derived(context.org);
+	let organization = $derived(context().org);
 
 	let deleteError: string | undefined = undefined;
 
 	const user = getUser();
-	const db = getDB();
+
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	let userProfile = $derived(
 		$user ? profiles.find((profile) => profile.personid === $user.id) : null
 	);
-	let isAdmin = $derived($user && context.admin);
+	let isAdmin = $derived($user && context().admin);
 	let editable = $derived(
 		$user && (isAdmin || change.who === $user.id || change.lead === userProfile?.id)
 	);

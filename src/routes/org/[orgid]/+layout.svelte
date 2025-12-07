@@ -13,8 +13,8 @@
 		shortRoles: { id: string; short: string[]; title: string }[];
 		shortProcesses: { id: string; short: string[]; title: string; state: string }[];
 	};
-	export function getOrg(): OrgContext {
-		return getContext<OrgContext>(OrgSymbol);
+	export function getOrg(): () => OrgContext {
+		return getContext<() => OrgContext>(OrgSymbol);
 	}
 </script>
 
@@ -30,7 +30,8 @@
 
 	let loading = $state(false);
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	// Create a state to store the current organization. We'll store this as context.
 	let context: OrgContext = $derived({
@@ -43,17 +44,7 @@
 	});
 
 	// svelte-ignore state_referenced_locally
-	setContext(OrgSymbol, context);
-
-	// When the payload changes, update the organization state and all views dependent on it.
-	$effect(() => {
-		context.admin = data.admin;
-		context.org = data.org;
-		context.member = data.member;
-		context.counts = data.counts;
-		context.shortRoles = data.shortRoles;
-		context.shortProcesses = data.shortProcesses;
-	});
+	setContext(OrgSymbol, () => context);
 
 	// When realtime reports revised data, and we aren't navigating, reload all data and render accordingly.
 	function updateOrg() {

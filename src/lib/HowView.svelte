@@ -22,7 +22,8 @@
 
 	let { how, hows, roles, process, editable }: Props = $props();
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	const focusID = getContext<Writable<string | undefined>>('focusID');
 

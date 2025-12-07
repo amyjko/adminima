@@ -17,7 +17,7 @@
 	let { team }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context().org);
 </script>
 
 {#snippet TeamItem(team: string | undefined, teams: TeamRow[])}

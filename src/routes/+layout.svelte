@@ -11,8 +11,8 @@
 
 	export const DBSymbol = Symbol('db');
 
-	export function getDB(): Organization {
-		return getContext<() => Organization>(DBSymbol)();
+	export function getDB(): () => Organization {
+		return getContext<() => Organization>(DBSymbol);
 	}
 </script>
 

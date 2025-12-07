@@ -40,15 +40,16 @@
 	let { changes, profiles, children }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context().org);
 
-	const db = getDB();
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	const user = getUser();
 	const Levels = { triage: 0, active: 1, blocked: 2, done: 4, backlog: 3, declined: 5 };
 
 	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && context.member)
+		($user === null && org.visibility === 'public') || ($user !== null && context().member)
 	);
 
 	let filterText = $state(getInitialTextFilter());

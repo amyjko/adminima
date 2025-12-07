@@ -49,11 +49,13 @@
 
 	let deleteError: string | undefined = $state(undefined);
 
-	const context = getOrg();
-	let org = $derived(context.org);
+	const orgContext = getOrg();
+	let org = $derived(orgContext().org);
 
 	const user = getUser();
-	const db = getDB();
+
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	const States = { draft: 'Draft', active: 'Active', archived: 'Archived' };
 
@@ -63,7 +65,7 @@
 	let repeat = $derived(process !== null ? process.repeat : undefined) as PeriodType[];
 
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
-	let isAdmin = $derived(context.admin);
+	let isAdmin = $derived(orgContext().admin);
 	let accountable = $derived(
 		$user !== null &&
 			process !== null &&
@@ -165,7 +167,7 @@
 {#if how === undefined}
 	<Title title={process.title} kind="process" />
 	<Oops text="This process could not be fully loaded." />
-{:else if how.visibility !== 'public' && ($user === null || !context.member)}
+{:else if how.visibility !== 'public' && ($user === null || !orgContext().member)}
 	<Title title={org.name} />
 	<Oops
 		text="This process is only visible to people in the organization. If you believe you have access, ensure you're logged in."
@@ -402,8 +404,8 @@
 		>If you want to provide more detail about how to do this process, you can add a list of tasks
 		and subtasks, and specify for each, who is <Level level="responsible" verbose /> for doing it, and
 		who is <Level level="consulted" verbose /> and <Level level="informed" verbose /> about it. Adding
-		this level of detail will let you track progress and make sure everyone knows who is responsible
-		for what.
+		this level of detail will let you track progress and make sure everyone knows who is responsible for
+		what.
 	</Tip>
 
 	{#if how.how.length === 0}

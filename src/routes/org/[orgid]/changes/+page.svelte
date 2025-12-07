@@ -14,7 +14,7 @@
 
 <Title title="Changes" kind="change" label={false} />
 
-<Link to="/org/{Organization.getPath(context.org)}/changes/new">Suggest a change…</Link>
+<Link to="/org/{Organization.getPath(context().org)}/changes/new">Suggest a change…</Link>
 
 <Tip>These are changes people have proposed to make to this organization.</Tip>
 <Changes changes={data.changes} profiles={data.profiles}

@@ -18,7 +18,7 @@
 	let { profile, short = false }: Props = $props();
 
 	const context = getOrg();
-	let org: OrganizationRow | undefined = $derived(context?.org ?? undefined);
+	let org: OrganizationRow | undefined = $derived(context().org ?? undefined);
 </script>
 
 {#snippet ProfileItem(profile: string | undefined, profiles: ProfileRow[])}

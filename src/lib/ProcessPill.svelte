@@ -12,7 +12,7 @@
 	let { process, left = undefined }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context().org);
 </script>
 
 <div class="process" style:left="{left}px">

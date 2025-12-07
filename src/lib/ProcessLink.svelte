@@ -21,7 +21,7 @@
 	let { process, wrap }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context.org);
+	let org = $derived(context().org);
 </script>
 
 {#snippet ProcessItem(process: string | undefined, processes: ProcessRow[])}

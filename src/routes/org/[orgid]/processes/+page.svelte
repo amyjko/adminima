@@ -38,11 +38,13 @@
 	const profiles = $derived(data.profiles);
 	const roles = $derived(data.roles);
 
-	const context = getOrg();
-	let org = $derived(context.org);
+	const orgContext = getOrg();
+	let org = $derived(orgContext().org);
 
 	const user = getUser();
-	const db = getDB();
+
+	const dbContext = getDB();
+	const db = $derived(dbContext());
 
 	/** Which view to show */
 	const initialView = page.url.searchParams.get('view');
@@ -55,10 +57,10 @@
 			: 'list'
 	);
 
-	let isAdmin = $derived($user && context.admin);
+	let isAdmin = $derived($user && orgContext().admin);
 
 	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && context.member)
+		($user === null && org.visibility === 'public') || ($user !== null && orgContext().member)
 	);
 
 	let filter = $state(getInitialTextFilter());
@@ -213,7 +215,7 @@
 	<Oops text="Only showing public processes of this private organization." />
 {/if}
 
-{#if $user && context.member}
+{#if $user && orgContext().member}
 	<FormDialog
 		button="Create process …"
 		showTip="Create a new process."
