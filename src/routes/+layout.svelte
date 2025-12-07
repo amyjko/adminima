@@ -12,11 +12,10 @@
 	export const DBSymbol = Symbol('db');
 
 	export function getDB(): Organization {
-		return getContext<Organization>(DBSymbol);
+		return getContext<() => Organization>(DBSymbol)();
 	}
 </script>
 
-<!-- svelte-ignore state_referenced_locally -->
 <script lang="ts">
 	import Page from '$lib/Page.svelte';
 	import { getContext, onMount, setContext } from 'svelte';
@@ -40,7 +39,7 @@
 	let { data, children }: Props = $props();
 
 	let db = $derived(new Organization(data.supabase));
-	setContext(DBSymbol, db);
+	setContext(DBSymbol, () => db);
 
 	// Update client when data updates.
 	$effect(() => {
