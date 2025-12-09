@@ -36,7 +36,7 @@
 
 <div class="title">
 	<div class="background {kind}">
-		{#if org()}
+		{#if typeof org === 'function'}
 			<OrgNav />
 		{/if}
 		<div>
