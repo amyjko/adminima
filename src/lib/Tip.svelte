@@ -19,7 +19,7 @@
 {#if (admin === false && member === false) || (admin && isAdmin) || (member && isMember)}
 	<div class="tip">
 		<div>💡</div>
-		<div>{@render children?.()}</div>
+		<div class="text">{@render children?.()}</div>
 	</div>
 {/if}
 
@@ -29,9 +29,12 @@
 		width: 100%;
 		flex-direction: row;
 		gap: var(--padding);
-		font-style: italic;
 		padding: var(--padding);
 		font-size: var(--small-size);
 		border-left: var(--thickness) var(--border) solid;
+	}
+
+	.text {
+		font-style: italic;
 	}
 </style>
