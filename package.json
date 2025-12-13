@@ -16,7 +16,8 @@
 		"stop": "cp .env.prod .env; supabase stop",
 		"reset": "supabase db reset; npm run types",
 		"diff": "supabase db diff --local --use-migra -f rename_me",
-		"types": "supabase gen types typescript --local > src/database/database.types.ts"
+		"types": "supabase gen types typescript --local > src/database/database.types.ts",
+		"outdated": "npx check-outdated --ignore-pre-releases --columns name,type,current,latest,changes"
 	},
 	"engines": {
 		"node": ">=20.0.0"
