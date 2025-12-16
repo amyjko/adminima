@@ -1,4 +1,5 @@
 import Organization from '$database/Organization';
+import { noAccess } from '$types/Locales';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent }) {
@@ -14,7 +15,7 @@ export async function load({ parent }) {
 
 	if (roles === null || profiles === null || assignments === null || teams === null)
 		error(404, {
-			message: "This role doesn't exist or isn't visible to you."
+			message: noAccess('person list')
 		});
 
 	return {

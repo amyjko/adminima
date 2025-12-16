@@ -35,3 +35,7 @@ export type Locale = {
 		noTeam: string;
 	};
 };
+
+export function noAccess(type: string) {
+	return `This ${type} either isn't visible to you or doesn't exist. Expect to have access? Make sure you're logged in.`;
+}

@@ -1,4 +1,5 @@
 import Organization from '$database/Organization.js';
+import { noAccess } from '$types/Locales.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
@@ -14,7 +15,7 @@ export async function load({ parent, params }) {
 
 	if (change === null || roles === null || profiles === null || processes === null)
 		error(404, {
-			message: "This change doesn't exist or isn't visible to you."
+			message: noAccess('change')
 		});
 
 	return {

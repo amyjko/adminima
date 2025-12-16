@@ -1,4 +1,5 @@
 import Organization from '$database/Organization';
+import { noAccess } from '$types/Locales.js';
 import { error } from '@sveltejs/kit';
 import { validate as isValidUUID } from 'uuid';
 
@@ -11,7 +12,7 @@ export async function load({ parent, params }) {
 
 	if (process === null)
 		error(404, {
-			message: "This process either isn't visible to you or doesn't exist."
+			message: noAccess('process')
 		});
 
 	const [
@@ -39,7 +40,7 @@ export async function load({ parent, params }) {
 		profiles === null
 	)
 		error(404, {
-			message: "This process either isn't visible to you or doesn't exist."
+			message: noAccess('process')
 		});
 
 	return {

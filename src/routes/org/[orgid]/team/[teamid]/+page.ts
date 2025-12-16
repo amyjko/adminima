@@ -1,4 +1,5 @@
 import Organization from '$database/Organization';
+import { noAccess } from '$types/Locales.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
@@ -11,7 +12,7 @@ export async function load({ parent, params }) {
 
 	if (team === null || roles === null)
 		error(404, {
-			message: "This team doesn't exist or isn't visible to you."
+			message: noAccess('team')
 		});
 
 	return {

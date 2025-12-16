@@ -1,4 +1,5 @@
 import Organization from '$database/Organization';
+import { noAccess } from '$types/Locales.js';
 import { error } from '@sveltejs/kit';
 import { validate as isValidUUID } from 'uuid';
 
@@ -35,7 +36,7 @@ export async function load({ parent, params }) {
 		hows === null
 	)
 		error(404, {
-			message: "This role doesn't exist or isn't visible to you."
+			message: noAccess('role')
 		});
 
 	return {
