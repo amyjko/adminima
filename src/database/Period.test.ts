@@ -13,7 +13,7 @@ test.each([
 	[new Date(2024, 0, 18), { type: 'monthly-weekday', week: 3, day: 3 }, new Date(2024, 1, 21)],
 	[new Date(2024, 0, 1), { type: 'weekly', weeks: 1, day: 7 }, new Date(2024, 0, 7)],
 	[new Date(2024, 0, 8), { type: 'weekly', weeks: 1, day: 7 }, new Date(2024, 0, 14)]
-] as [Date, Period, Date][])(
+] satisfies [Date, Period, Date][])(
 	'%s + %s should be %s',
 	(now: Date, period: Period, expected: Date) => {
 		expect(getNextPeriodDate(now.getTime(), period).getTime() === expected.getTime()).toBe(true);

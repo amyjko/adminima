@@ -9,6 +9,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Updated minor dependencies.
 - Updated to `write-excel-file` 3.0.
+- Fixed annual week and day period logic.
 
 ## v0.8.7 2026-02-08
 
