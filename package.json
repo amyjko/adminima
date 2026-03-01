@@ -1,6 +1,6 @@
 {
 	"name": "adminima",
-	"version": "0.8.7",
+	"version": "0.8.8",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -47,6 +47,6 @@
 		"date-fns": "^4",
 		"fast-csv": "^5",
 		"uuid": "^13",
-		"write-excel-file": "^2"
+		"write-excel-file": "^3"
 	}
 }

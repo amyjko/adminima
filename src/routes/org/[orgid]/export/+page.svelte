@@ -1,5 +1,5 @@
 <script lang="ts">
-	import writeXlsxFile, { type SheetData } from 'write-excel-file';
+	import writeXlsxFile, { type SheetData } from 'write-excel-file/browser';
 	import Button from '$lib/Button.svelte';
 	import Tip from '$lib/Tip.svelte';
 	import type { HowRow } from '$database/Organization';
