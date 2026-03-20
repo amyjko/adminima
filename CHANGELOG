@@ -9,6 +9,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Improved layout of headers.
 - Allow for consecutive block quotes as a single block quote.
+- Update node version.
 
 ## v0.8.8 2026-03-01
 
