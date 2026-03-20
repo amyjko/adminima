@@ -3,6 +3,12 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.8.9 2026-03-20
+
+### Changed
+
+- Improved layout of headers.
+
 ## v0.8.8 2026-03-01
 
 ### Changed

@@ -12,6 +12,7 @@
 	import { getUser } from '$routes/+layout.svelte';
 	import Link from '$lib/Link.svelte';
 	import Organization from '$database/Organization';
+	import Row from '$lib/Row.svelte';
 
 	let { data } = $props();
 
@@ -40,7 +41,7 @@
 		: undefined}
 >
 	<div class="meta">
-		<div class="links">
+		<Row name="Visibility">
 			<Visibility
 				tip="Change the visibility of this organization"
 				level={org.visibility}
@@ -60,22 +61,26 @@
 					private processes and changes.{:else if org.visibility === 'admin'}Only admins can see
 					this organization's details.{/if}</Note
 			>
-		</div>
-		{#if admin}<PathEditor
-				short={org.paths[0] ?? ''}
-				path={'https://adminima.app/org/'}
-				update={async (text) => {
-					if (text === '') return null;
-					const available = await db.pathIsAvailable(text);
+		</Row>
+		{#if admin}
+			<Row name="Link">
+				<PathEditor
+					short={org.paths[0] ?? ''}
+					path={'https://adminima.app/org/'}
+					update={async (text) => {
+						if (text === '') return null;
+						const available = await db.pathIsAvailable(text);
 
-					if (available) {
-						await queryOrError(db.addOrgPath(org, text), "Couldn't update path.");
-						goto(`/org/${text}`, { replaceState: true });
-					} else addError('This path is not available');
+						if (available) {
+							await queryOrError(db.addOrgPath(org, text), "Couldn't update path.");
+							goto(`/org/${text}`, { replaceState: true });
+						} else addError('This path is not available');
 
-					return null;
-				}}
-			/>{/if}
+						return null;
+					}}
+				/>
+			</Row>
+		{/if}
 	</div></Title
 >
 
@@ -100,12 +105,5 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--padding);
-	}
-	.links {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: var(--spacing);
 	}
 </style>

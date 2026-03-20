@@ -36,6 +36,7 @@
 	import type { default as PeriodType } from '$database/Period';
 	import Options from '$lib/Options.svelte';
 	import Organization from '$database/Organization';
+	import Row from '$lib/Row.svelte';
 
 	const { data } = $props();
 
@@ -185,68 +186,71 @@
 			: undefined}
 	>
 		<Flow>
-			<Note>Visibility</Note>
-			<Visibility
-				tip="Change visibility of this process"
-				level={how.visibility}
-				edit={editable
-					? (vis) =>
-							vis === 'public' || vis === 'org' || vis === 'admin'
-								? db.updateHowVisibility(how, vis)
-								: undefined
-					: undefined}
-			/>
-			<Note inline
-				>{#if how.visibility === 'public'}Everyone on the internet can see this process{:else if how.visibility === 'org'}Only
-					members can see this process.{:else if how.visibility === 'admin'}Only admins can see this
-					process.{/if}</Note
-			>
+			<Row name="Visibility">
+				<Visibility
+					tip="Change visibility of this process"
+					level={how.visibility}
+					edit={editable
+						? (vis) =>
+								vis === 'public' || vis === 'org' || vis === 'admin'
+									? db.updateHowVisibility(how, vis)
+									: undefined
+						: undefined}
+				/>
+				<Note inline
+					>{#if how.visibility === 'public'}Everyone on the internet can see this process{:else if how.visibility === 'org'}Only
+						members can see this process.{:else if how.visibility === 'admin'}Only admins can see
+						this process.{/if}</Note
+				>
+			</Row>
 		</Flow>
 		<Flow>
-			<Note>Status</Note>
-			{#if editable}
-				{#snippet status(status: string | undefined)}
-					{#if status}
-						<Status {status} />
-					{/if}
-				{/snippet}
-				<Options
-					tip="Change the state of this process"
-					selection={process.state}
-					options={Object.entries(States).map(([key, value]) => key)}
-					change={async (status) => {
-						if ($user && (status === 'draft' || status === 'active' || status === 'archived'))
-							return (
-								(await queryOrError(
-									db.updateProcessState(process, status, $user.id),
-									"Couldn't update the process's state"
-								)) === null
-							);
-						else return true;
-					}}
-					id="process-state"
-					view={{ snippet: status, data: [] }}
-				/>
-			{:else}
-				<Status status={process.state} />
-			{/if}
+			<Row name="Status">
+				{#if editable}
+					{#snippet status(status: string | undefined)}
+						{#if status}
+							<Status {status} />
+						{/if}
+					{/snippet}
+					<Options
+						tip="Change the state of this process"
+						selection={process.state}
+						options={Object.entries(States).map(([key, value]) => key)}
+						change={async (status) => {
+							if ($user && (status === 'draft' || status === 'active' || status === 'archived'))
+								return (
+									(await queryOrError(
+										db.updateProcessState(process, status, $user.id),
+										"Couldn't update the process's state"
+									)) === null
+								);
+							else return true;
+						}}
+						id="process-state"
+						view={{ snippet: status, data: [] }}
+					/>
+				{:else}
+					<Status status={process.state} />
+				{/if}
+			</Row>
 
-			<Note>Concern</Note>
-			{#if editable && $user && concerns.length > 0}
-				<Options
-					tip="Change this process's concern"
-					selection={process.concern}
-					options={concerns.toSorted()}
-					change={async (concern) =>
-						(await queryOrError(
-							db.updateProcessConcern(process, concern ?? '', $user.id),
-							"Couldn't update process's concern"
-						)) === null}
-					id="concer-chooser"
-					view={{ snippet: concernView, data: [] }}
-				/>{:else}
-				<Concern concern={process.concern} />
-			{/if}
+			<Row name="Concern">
+				{#if editable && $user && concerns.length > 0}
+					<Options
+						tip="Change this process's concern"
+						selection={process.concern}
+						options={concerns.toSorted()}
+						change={async (concern) =>
+							(await queryOrError(
+								db.updateProcessConcern(process, concern ?? '', $user.id),
+								"Couldn't update process's concern"
+							)) === null}
+						id="concer-chooser"
+						view={{ snippet: concernView, data: [] }}
+					/>{:else}
+					<Concern concern={process.concern} />
+				{/if}
+			</Row>
 			{#if editable && $user}
 				<FormDialog
 					submit="Create new concern"
@@ -270,23 +274,27 @@
 					<Field label="new concern" bind:text={newConcern} />
 				</FormDialog>
 			{/if}
-			{#if isAdmin}<Note>Link</Note><PathEditor
-					short={process.short[0] ?? ''}
-					path={'...process/'}
-					update={async (text) => {
-						await queryOrError(
-							db.updateProcessShortName(process, text),
-							"Couldn't update process's short name"
-						);
-						await goto(
-							`/org/${Organization.getPath(org)}/process/${text.length > 0 ? text : process.id}`,
-							{
-								replaceState: true
-							}
-						);
-						return null;
-					}}
-				/>{/if}
+			{#if isAdmin}
+				<Row name="Link"
+					><PathEditor
+						short={process.short[0] ?? ''}
+						path={'...process/'}
+						update={async (text) => {
+							await queryOrError(
+								db.updateProcessShortName(process, text),
+								"Couldn't update process's short name"
+							);
+							await goto(
+								`/org/${Organization.getPath(org)}/process/${text.length > 0 ? text : process.id}`,
+								{
+									replaceState: true
+								}
+							);
+							return null;
+						}}
+					/>
+				</Row>
+			{/if}
 		</Flow>
 	</Title>
 
