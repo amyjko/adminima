@@ -9,7 +9,13 @@
 	let { block }: Props = $props();
 </script>
 
-<blockquote><SegmentsView segments={block.segments} /></blockquote>
+<blockquote>
+	{#each block.blocks as segments}
+		<p>
+			<SegmentsView {segments} />
+		</p>
+	{/each}
+</blockquote>
 
 <style>
 	blockquote {

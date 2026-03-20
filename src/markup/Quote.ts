@@ -2,15 +2,15 @@ import Block from './Block';
 import type Segment from './Segment';
 
 class Quote extends Block {
-	readonly segments: Segment[];
+	readonly blocks: Segment[][];
 
-	constructor(segments: Segment[]) {
+	constructor(blocks: Segment[][]) {
 		super();
-		this.segments = segments;
+		this.blocks = blocks;
 	}
 
 	toString() {
-		return `Quote[${this.segments.map((s) => s.toString()).join(', ')}]`;
+		return `Quote[${this.blocks.map((s) => s.toString()).join(', ')}]`;
 	}
 }
 

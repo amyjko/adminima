@@ -27,9 +27,15 @@ export function parse(markup: string): Markup {
 	let index = 0;
 	while (index < lines.length) {
 		const line = lines[index];
-		if (line.startsWith('"') && line.endsWith('"')) {
-			blocks.push(new Quote(parseSegments(line.slice(1, -1))));
+		if (line.startsWith('"')) {
+			let segmentList: Segment[][] = [];
+			do {
+				const segments = parseSegments(line.slice(1, -1));
+				segmentList.push(segments);
+				index++;
+			} while (index < lines.length && lines[index].startsWith('"'));
 			index++;
+			blocks.push(new Quote(segmentList));
 		} else if (isBullets(line)) {
 			const bulletLines = [];
 			while (index < lines.length && isBullets(lines[index])) {
