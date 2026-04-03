@@ -3,6 +3,13 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.8.10 2026-04-02
+
+### Changed
+
+- Updated minor dependencies
+- Updated to TypeScript 6.0.
+
 ## v0.8.9 2026-03-20
 
 ### Changed

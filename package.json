@@ -1,6 +1,6 @@
 {
 	"name": "adminima",
-	"version": "0.8.9",
+	"version": "0.8.10",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -34,8 +34,8 @@
 		"svelte": "^5",
 		"svelte-check": "^4",
 		"tslib": "^2",
-		"type-fest": "^5.0.0",
-		"typescript": "^5",
+		"type-fest": "^5",
+		"typescript": "^6",
 		"vite": "^8",
 		"vitest": "^4"
 	},
@@ -43,7 +43,7 @@
 	"dependencies": {
 		"@supabase/ssr": "^0",
 		"@sveltejs/adapter-vercel": "^6",
-		"@vercel/speed-insights": "^1.2.0",
+		"@vercel/speed-insights": "^2",
 		"date-fns": "^4",
 		"fast-csv": "^5",
 		"uuid": "^13",
