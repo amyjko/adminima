@@ -27,7 +27,7 @@
 		"@supabase/supabase-js": "^2",
 		"@sveltejs/kit": "^2",
 		"@sveltejs/vite-plugin-svelte": "^7",
-		"@types/uuid": "^10.0",
+		"@types/uuid": "^10",
 		"prettier": "^3",
 		"prettier-plugin-svelte": "^3",
 		"supabase": "^2",
@@ -35,7 +35,7 @@
 		"svelte-check": "^4",
 		"tslib": "^2",
 		"type-fest": "^5",
-		"typescript": "^6",
+		"typescript": "^5",
 		"vite": "^8",
 		"vitest": "^4"
 	},
@@ -43,7 +43,6 @@
 	"dependencies": {
 		"@supabase/ssr": "^0",
 		"@sveltejs/adapter-vercel": "^6",
-		"@vercel/speed-insights": "^2",
 		"date-fns": "^4",
 		"fast-csv": "^5",
 		"uuid": "^13",
