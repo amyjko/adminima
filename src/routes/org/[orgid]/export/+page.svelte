@@ -133,7 +133,14 @@
 			{
 				data: changeData,
 				sheet: 'changes',
-				columns: [{ width: 30 }, { width: 60 }, { width: 60 }, { width: 20 }]
+				columns: [
+					{ width: 30 },
+					{ width: 15 },
+					{ width: 15 },
+					{ width: 60 },
+					{ width: 60 },
+					{ width: 20 }
+				]
 			}
 		]).toFile('export.xlsx');
 	}
