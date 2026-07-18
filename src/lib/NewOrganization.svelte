@@ -5,7 +5,7 @@
 	import Link from './Link.svelte';
 	import Paragraph from './Paragraph.svelte';
 	import { getUser } from '$routes/+layout.svelte';
-	import { addError } from '$routes/errors.svelte';
+	import { addError, mutate } from '$routes/errors.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 
 	const dbContext = getDB();
@@ -22,15 +22,16 @@
 		}
 		submitting = false;
 
-		const id = await db.createOrganization(orgName, name, invite, $user.id, $user.email);
+		const { data: id } = await mutate(
+			db.createOrganization(orgName, name, invite, $user.id, $user.email),
+			"Couldn't create a new organization with this invite code",
+			{ refresh: false }
+		);
 
 		if (typeof id === 'string') {
 			goto(`/org/${id}`);
 			return true;
-		} else {
-			addError("Couldn't create a new organization with this invite code", id ?? undefined);
-			return false;
-		}
+		} else return false;
 	}
 
 	let name = $state('');

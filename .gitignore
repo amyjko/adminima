@@ -3,11 +3,15 @@ node_modules
 /build
 /.svelte-kit
 /package
-.env
-.env.local
-.env.prod
-!.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vercel
 test-results
+
+# Every env file is local-only. The Vercel CLI appends a VERCEL_OIDC_TOKEN to .env.local on
+# `vercel link` and `vercel env pull`, and this repository is public.
+.env*
+
+# ...except the template of local defaults. This negation has to come after the .env* rule above:
+# gitignore applies the last matching pattern, so putting it earlier silently has no effect.
+!.env.example

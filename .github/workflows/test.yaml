@@ -1,0 +1,82 @@
+name: Test
+
+# The whole suite, in one place, called by both the pull request workflow and the deploy workflow so
+# the checks that gate a deploy are exactly the checks that ran on the pull request.
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Use the CLI from devDependencies rather than supabase/setup-cli, so CI and developers run
+      # the exact version pinned in package-lock.json. Type generation output varies between CLI
+      # releases, and a floating version would fail the drift check below on unrelated changes.
+      #
+      # `supabase start`, not `supabase db start`: the e2e harness creates accounts through
+      # auth.admin.createUser and reads through PostgREST, so those services have to be running.
+      #
+      # Everything the tests do not touch is excluded, which skips those image pulls -- worth doing
+      # because Docker Hub rate limits have failed runs here. The tests need the database, the API
+      # gateway, PostgREST and auth; nothing exercises realtime, email, storage or edge functions.
+      # Use the CLI's own service names (`supabase start --help`): unrecognised names, which this
+      # repo previously had, are silently ignored and exclude nothing.
+      - name: Start Supabase
+        run: >
+          npx supabase start
+          -x studio,inbucket,imgproxy,storage,analytics,vector,edge-runtime,functions,meta,realtime
+
+      # Regenerate into the committed path and fail if it differs. Writing to any other filename
+      # makes this check silently pass, because git diff ignores untracked files.
+      - name: Verify generated types are up to date
+        run: |
+          npm run types
+          if ! git diff --ignore-space-at-eol --exit-code -- src/database/database.types.ts; then
+            echo "::error::src/database/database.types.ts is out of date. Run 'npm run types' and commit the result."
+            exit 1
+          fi
+
+      # svelte-kit sync generates the $env/static/public module from the environment it can see, so
+      # .env has to exist before it runs or PUBLIC_SUPABASE_* are missing from the generated types
+      # and every file importing them fails to check. Values come from the running stack rather than
+      # .env.example so a port change cannot make CI disagree with reality.
+      - name: Write .env from the running stack
+        run: |
+          eval "$(npx supabase status -o env | sed 's/^/export SUPABASE_/')"
+          {
+            echo "PUBLIC_SUPABASE_API_URL=$SUPABASE_API_URL"
+            echo "PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY"
+          } > .env
+
+      # sync also generates .svelte-kit/tsconfig.json and the ./$types for each route. A working
+      # copy usually has them from a previous dev or build run; a fresh checkout does not, and
+      # svelte-check cannot resolve anything without them.
+      - name: Check types
+        run: |
+          npx svelte-kit sync
+          npx svelte-check --tsconfig ./tsconfig.json
+
+      - name: Unit tests
+        run: npx vitest run
+
+      # The harness defaults to the local stack, and reads SUPABASE_URL / SUPABASE_ANON_KEY /
+      # SUPABASE_SERVICE_ROLE_KEY when they are set. Pass them explicitly so a change to the
+      # local defaults can't silently point the suite somewhere unexpected.
+      - name: End-to-end tests
+        run: |
+          eval "$(npx supabase status -o env | sed 's/^/export SUPABASE_/')"
+          SUPABASE_URL="$SUPABASE_API_URL" npm run test:e2e
+
+      # Build last, so a broken build is not discovered during a deploy. It reads .env written above.
+      - name: Build
+        run: npm run build

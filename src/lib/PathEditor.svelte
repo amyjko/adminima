@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { PostgrestError } from '@supabase/supabase-js';
+	import type { MutationResult } from '$database/Organization';
 	import EditableText from './EditableText.svelte';
 	import Flow from './Flow.svelte';
 
 	interface Props {
 		short: string;
 		path: string;
-		update: (text: string) => Promise<PostgrestError | null>;
+		update: (text: string) => Promise<MutationResult>;
 	}
 
 	let { short = $bindable(), path, update }: Props = $props();

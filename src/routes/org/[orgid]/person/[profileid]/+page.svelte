@@ -5,7 +5,7 @@
 	import RoleLink from '$lib/RoleLink.svelte';
 	import RoleProcesses from '$lib/RoleProcesses.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import MarkupView from '$lib/MarkupView.svelte';
 	import Notice from '$lib/Notice.svelte';
 	import Tip from '$lib/Tip.svelte';
@@ -31,7 +31,7 @@
 	title={profile.name.length === 0 ? '(no name)' : profile.name}
 	kind="profile"
 	edit={$user && (profile.personid === $user.id || isAdmin)
-		? (text) => queryOrError(db.updateProfileName(profile, text), "Couldn't update name")
+		? (text) => mutate(db.updateProfileName(profile, text), "Couldn't update name")
 		: undefined}
 >
 	{profile.email}
@@ -49,7 +49,7 @@
 	markup={profile.bio}
 	placeholder="No bio"
 	edit={$user
-		? (text) => queryOrError(db.updateProfileBio(profile, text), "Couldn't update profile bio.")
+		? (text) => mutate(db.updateProfileBio(profile, text), "Couldn't update profile bio.")
 		: undefined}
 />
 

@@ -12,7 +12,7 @@
 	import Level from '$lib/Level.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { addError, queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Concern from '$lib/Concern.svelte';
 	import Field from '$lib/Field.svelte';
@@ -35,7 +35,7 @@
 	import Period from '$lib/Period.svelte';
 	import type { default as PeriodType } from '$database/Period';
 	import Options from '$lib/Options.svelte';
-	import Organization from '$database/Organization';
+	import Organization, { ok } from '$database/Organization';
 	import Row from '$lib/Row.svelte';
 
 	const { data } = $props();
@@ -105,9 +105,11 @@
 
 	async function createFirstSubtask(how: HowRow) {
 		if (process === null) return;
-		const { error, id } = await db.insertHow(process, how.visibility, how, 0);
-		if (error) addError('Unable to insert how.', error);
-		else if (id) focusID.set(id);
+		const { error, data: id } = await mutate(
+			db.insertHow(process, how.visibility, how, 0),
+			'Unable to insert how.'
+		);
+		if (!error && id) focusID.set(id);
 	}
 
 	async function uncheckAll(uncheck: boolean) {
@@ -125,7 +127,12 @@
 		await Promise.all(
 			subhows.map((h) => {
 				const sub = Organization.getHow(hows, h);
-				if (sub) db.updateHowDone(sub, uncheck ? 'no' : 'yes');
+				return sub
+					? mutate(
+							db.updateHowDone(sub, uncheck ? 'no' : 'yes'),
+							"Couldn't update step completion."
+						)
+					: undefined;
 			})
 		);
 	}
@@ -149,8 +156,10 @@
 								? { type: kind, weeks: 1, day: 1 }
 								: undefined;
 		if (periodToAdd) {
-			const error = await db.addProcessPeriod(process, periodToAdd);
-			if (error) addError('Unable to add period.', error);
+			const { error } = await mutate(
+				db.addProcessPeriod(process, periodToAdd),
+				'Unable to add period.'
+			);
 			return error === null;
 		}
 		return true;
@@ -179,10 +188,7 @@
 		kind="process"
 		edit={$user && editable
 			? (text) =>
-					queryOrError(
-						db.updateProcessTitle(process, text, $user.id),
-						"Couldn't update process title."
-					)
+					mutate(db.updateProcessTitle(process, text, $user.id), "Couldn't update process title.")
 			: undefined}
 	>
 		<Flow>
@@ -193,7 +199,7 @@
 					edit={editable
 						? (vis) =>
 								vis === 'public' || vis === 'org' || vis === 'admin'
-									? db.updateHowVisibility(how, vis)
+									? mutate(db.updateHowVisibility(how, vis), "Couldn't update step visibility.")
 									: undefined
 						: undefined}
 				/>
@@ -219,10 +225,12 @@
 						change={async (status) => {
 							if ($user && (status === 'draft' || status === 'active' || status === 'archived'))
 								return (
-									(await queryOrError(
-										db.updateProcessState(process, status, $user.id),
-										"Couldn't update the process's state"
-									)) === null
+									(
+										await mutate(
+											db.updateProcessState(process, status, $user.id),
+											"Couldn't update the process's state"
+										)
+									).error === null
 								);
 							else return true;
 						}}
@@ -241,10 +249,12 @@
 						selection={process.concern}
 						options={concerns.toSorted()}
 						change={async (concern) =>
-							(await queryOrError(
-								db.updateProcessConcern(process, concern ?? '', $user.id),
-								"Couldn't update process's concern"
-							)) === null}
+							(
+								await mutate(
+									db.updateProcessConcern(process, concern ?? '', $user.id),
+									"Couldn't update process's concern"
+								)
+							).error === null}
 						id="concer-chooser"
 						view={{ snippet: concernView, data: [] }}
 					/>{:else}
@@ -262,7 +272,7 @@
 					inactive="Fill in a concern that doesn't exist yet."
 					valid={() => newConcern.length > 0 && concerns.indexOf(newConcern) === -1}
 					action={async () => {
-						const error = await queryOrError(
+						const { error } = await mutate(
 							db.updateProcessConcern(process, newConcern, $user.id),
 							"Couldn't update concern."
 						);
@@ -280,9 +290,11 @@
 						short={process.short[0] ?? ''}
 						path={'...process/'}
 						update={async (text) => {
-							await queryOrError(
+							// The goto below reloads; refreshing here would fetch the old path.
+							await mutate(
 								db.updateProcessShortName(process, text),
-								"Couldn't update process's short name"
+								"Couldn't update process's short name",
+								{ refresh: false }
 							);
 							await goto(
 								`/org/${Organization.getPath(org)}/process/${text.length > 0 ? text : process.id}`,
@@ -290,7 +302,7 @@
 									replaceState: true
 								}
 							);
-							return null;
+							return ok();
 						}}
 					/>
 				</Row>
@@ -308,7 +320,9 @@
 	<MarkupView
 		markup={how.what}
 		placeholder="No description yet."
-		edit={editable ? (text) => db.updateHowText(how, text) : undefined}
+		edit={editable
+			? (text) => mutate(db.updateHowText(how, text), "Couldn't update step text.")
+			: undefined}
 	/>
 
 	<Header>Who</Header>
@@ -334,7 +348,12 @@
 				view={{ snippet: RoleItem, data: roles }}
 				selection={process.accountable ?? undefined}
 				change={async (value) =>
-					(await db.updateProcessAccountable(process, value ?? null)) === null}
+					(
+						await mutate(
+							db.updateProcessAccountable(process, value ?? null),
+							"Couldn't update who's accountable."
+						)
+					).error === null}
 			/>
 		{:else if process.accountable}
 			<RoleLink role={roles.find((r) => r.id === process.accountable)} />
@@ -388,15 +407,19 @@
 				{period}
 				edit={editable
 					? async (period) => {
-							const error = await db.updateProcessPeriod(process, period, index);
-							if (error) addError("Couldn't update period.", error);
+							const { error } = await mutate(
+								db.updateProcessPeriod(process, period, index),
+								"Couldn't update period."
+							);
 							return error === null;
 						}
 					: undefined}
 				remove={editable
 					? async () => {
-							const error = await db.removeProcessPeriod(process, index);
-							if (error) addError("Coudln't remove period");
+							const { error } = await mutate(
+								db.removeProcessPeriod(process, index),
+								"Couldn't remove period."
+							);
 							return error === null;
 						}
 					: undefined}
@@ -464,9 +487,10 @@
 		tip="Permantently delete this process and all of it's steps."
 		action={async () => {
 			try {
-				const { error } = await db.deleteProcess(process.id);
-				if (error) addError("Couldn't delete this", error);
-				else await goto(`/org/${Organization.getPath(org)}/processes`);
+				const { error } = await mutate(db.deleteProcess(process.id), "Couldn't delete this", {
+					refresh: false
+				});
+				if (!error) await goto(`/org/${Organization.getPath(org)}/processes`);
 			} catch (_) {
 				deleteError = "We couldn't delete this";
 			}

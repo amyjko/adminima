@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB } from '$routes/+layout.svelte';
-	import { queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button, { Delete } from '$lib/Button.svelte';
 	import PersonLink, { ProfileItem } from '$lib/ProfileLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import Checkbox from '$lib/Checkbox.svelte';
 	import RoleLink, { RoleItem } from '$lib/RoleLink.svelte';
-	import { type PersonRow } from '$database/Organization';
 	import TeamLink from '$lib/TeamLink.svelte';
 	import validEmail, { validNameAndEmail } from '../../../validEmail';
 	import Notice from '$lib/Notice.svelte';
@@ -34,7 +33,6 @@
 	let isAdmin = $derived(orgContext().admin);
 
 	let newPersonEmail: string = $state('');
-	let match: PersonRow | undefined | null = undefined;
 	let existing = $derived(Organization.getProfileWithEmail(profiles, newPersonEmail));
 
 	let filter = $state('');
@@ -51,13 +49,10 @@
 			email = parts[1].replace('>', '').trim();
 		}
 
-		match = undefined;
-		match = await db.getPersonWithEmail(email);
-		await (match === null
-			? queryOrError(db.addPersonByEmail(organization.id, email, name), "Couldn't add person.")
-			: match !== null && match !== undefined
-				? queryOrError(db.addPersonByID(organization.id, match.id), "Couldn't add person.")
-				: undefined);
+		// If this email already has an account, the on_profile_create trigger links the profile to
+		// that person on insert, so there's no need to look the person up first.
+		await mutate(db.addPersonByEmail(organization.id, email, name), "Couldn't add person.");
+
 		newPersonEmail = '';
 
 		return true;
@@ -166,10 +161,12 @@
 									newRole = undefined;
 									if (roleID !== undefined)
 										return (
-											(await queryOrError(
-												db.assignPerson(organization.id, profile.id, roleID),
-												'Could not assign role.'
-											)) === null
+											(
+												await mutate(
+													db.assignPerson(organization.id, profile.id, roleID),
+													'Could not assign role.'
+												)
+											).error === null
 										);
 									return true;
 								}}
@@ -184,7 +181,7 @@
 											tip="Unassign this role from this person"
 											chromeless
 											action={async () => {
-												const error = await queryOrError(
+												const { error } = await mutate(
 													db.unassignPerson(organization.id, profile.id, role.id),
 													'Could not unassign role.'
 												);
@@ -226,10 +223,12 @@
 							view={{ snippet: ProfileItem, data: profiles }}
 							selection={profile.supervisor ?? undefined}
 							change={async (profileID) =>
-								(await queryOrError(
-									db.updateProfileSupervisor(organization.id, profile.id, profileID ?? null),
-									"Couldn't update supervisor."
-								)) === null}
+								(
+									await mutate(
+										db.updateProfileSupervisor(organization.id, profile.id, profileID ?? null),
+										"Couldn't update supervisor."
+									)
+								).error === null}
 						/>
 					{:else if profile.supervisor}<PersonLink
 							profile={Organization.getProfileWithID(profiles, profile.supervisor) ?? undefined}
@@ -244,7 +243,7 @@
 								(Organization.getAdminCount(profiles) > 1 ||
 									!Organization.hasAdminProfile(profiles, profile.id))}
 							change={(on) =>
-								queryOrError(
+								mutate(
 									db.updateAdmin(organization.id, profile.id, on),
 									"Couldn't update admin status."
 								)}
@@ -256,7 +255,7 @@
 					<td>
 						<Button
 							tip="Remove this person from the organization."
-							action={() => queryOrError(db.removeProfile(profile.id), "Couldn't remove person.")}
+							action={() => mutate(db.removeProfile(profile.id), "Couldn't remove person.")}
 							active={!Organization.hasAdminProfile(profiles, profile.id)}>{Delete}</Button
 						>
 					</td>

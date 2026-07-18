@@ -6,7 +6,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { addError, queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Field from '$lib/Field.svelte';
 	import Button from '$lib/Button.svelte';
 	import Labeled from '$lib/Labeled.svelte';
@@ -43,17 +43,20 @@
 	async function createChange() {
 		if ($user === null) return;
 		try {
-			const { data: change, error } = await db.createChange(
-				$user.id,
-				org.id,
-				newRequestTitle,
-				newRequestProblem,
-				org.visibility,
-				process ? [process] : [],
-				role ? [role] : []
+			const { data: change, error } = await mutate(
+				db.createChange(
+					$user.id,
+					org.id,
+					newRequestTitle,
+					newRequestProblem,
+					org.visibility,
+					process ? [process] : [],
+					role ? [role] : []
+				),
+				"Couldn't create the change.",
+				{ refresh: false }
 			);
-			if (error) addError("Couldn't create the change.", error);
-			else if (change) {
+			if (!error && change) {
 				goto(`/org/${Organization.getPath(org)}/change/${change.id}`, { invalidateAll: true });
 			}
 		} catch (_) {
@@ -145,7 +148,7 @@
 		markup={org.prompt}
 		placeholder={'No custom prompt set'}
 		edit={$user
-			? (text) => queryOrError(db.updateOrgPrompt(org, text, $user.id), "Couldn't update prompt")
+			? (text) => mutate(db.updateOrgPrompt(org, text, $user.id), "Couldn't update prompt")
 			: undefined}
 	/>
 {/if}

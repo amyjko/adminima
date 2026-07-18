@@ -25,6 +25,7 @@
 	import { type OrganizationRow } from '$database/Organization';
 	import { navigating } from '$app/state';
 	import Loading from '$lib/Loading.svelte';
+	import { addError } from '$routes/errors.svelte';
 
 	let { data, children } = $props();
 
@@ -59,7 +60,9 @@
 		const orgid = data.org.id;
 
 		// Listen to realitime changes on the organization.
-		db.listen(context.org, updateOrg);
+		db.listen(context.org, updateOrg, (status) =>
+			addError(`Lost live updates for this organization (${status}). Reload to see changes.`)
+		);
 
 		// When this layout unmounts, unsubscribe from the organization realitime updates.
 		return () => {

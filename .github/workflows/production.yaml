@@ -1,4 +1,4 @@
-name: Deploy Migrations to Production
+name: Deploy to production
 
 on:
   push:
@@ -6,8 +6,41 @@ on:
       - main
   workflow_dispatch:
 
+# Never run two deploys at once, and never cancel one partway: a cancelled run could leave
+# migrations applied with the matching app never deployed.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  # The same suite the pull request had to pass.
+  test:
+    uses: ./.github/workflows/test.yaml
+
+  # Check the Vercel credentials resolve before anything touches the production database. Without
+  # this, a bad or expired token fails at `vercel pull` in the deploy job -- after migrations have
+  # already been applied, and `supabase db push` cannot be rolled back.
+  verify-deploy-credentials:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - run: npm install --global vercel@latest
+      - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+  # Migrations go first. The app deploy calls database functions that migrations create, so
+  # deploying the app first would break it until this catches up.
+  #
+  # Because of that ordering the old app runs briefly against the new schema, so migrations need to
+  # stay backward compatible with the currently deployed app: add in one release, remove in a later
+  # one. `supabase db push` cannot be rolled back.
+  migrate:
+    needs: [test, verify-deploy-credentials]
     runs-on: ubuntu-latest
     environment: production
 
@@ -19,9 +52,47 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: supabase/setup-cli@v1
+      - uses: actions/setup-node@v4
         with:
-          version: latest
+          node-version: 22
+          cache: npm
 
-      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: supabase db push
+      # The CLI from devDependencies, so migrations are applied by the same version the tests ran
+      # against rather than whatever is newest that day.
+      - run: npm ci
+
+      - run: npx supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: npx supabase db push
+
+  # Vercel's own Git integration must be turned off for production, or this gate is bypassed and
+  # the app ships without waiting for either the tests or the migrations.
+  deploy:
+    needs: migrate
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm install --global vercel@latest
+
+      # `vercel pull` brings down the project's production environment variables, so the PUBLIC_*
+      # values the build inlines come from Vercel's project settings rather than being duplicated
+      # into GitHub secrets.
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

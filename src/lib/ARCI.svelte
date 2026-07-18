@@ -6,6 +6,7 @@
 	import RoleLink, { RoleItem } from './RoleLink.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 	import Options from './Options.svelte';
+	import { mutate } from '$routes/errors.svelte';
 
 	interface Props {
 		how: HowRow;
@@ -67,7 +68,10 @@
 					bind:selection={responsible}
 					change={async (value) => {
 						if (value) {
-							const error = await db.addHowRCI(how, value, 'responsible');
+							const { error } = await mutate(
+								db.addHowRCI(how, value, 'responsible'),
+								"Couldn't add role."
+							);
 							if (error) return false;
 							responsible = undefined;
 						}
@@ -83,7 +87,9 @@
 						<Button
 							chromeless
 							tip="Remove this role from the responsible list."
-							action={() => db.removeHowRCI(how, responsible, 'responsible')}>{Delete}</Button
+							action={() =>
+								mutate(db.removeHowRCI(how, responsible, 'responsible'), "Couldn't remove role.")}
+							>{Delete}</Button
 						>
 					{/if}</RoleLink
 				>
@@ -110,7 +116,10 @@
 					searchable={roleSearch}
 					change={async (value) => {
 						if (value) {
-							const error = await db.addHowRCI(how, value, 'consulted');
+							const { error } = await mutate(
+								db.addHowRCI(how, value, 'consulted'),
+								"Couldn't add role."
+							);
 							if (error) return false;
 							consulted = undefined;
 						}
@@ -126,7 +135,9 @@
 						<Button
 							chromeless
 							tip="Remove this role from the consulted list."
-							action={() => db.removeHowRCI(how, consulted, 'consulted')}>{Delete}</Button
+							action={() =>
+								mutate(db.removeHowRCI(how, consulted, 'consulted'), "Couldn't remove role.")}
+							>{Delete}</Button
 						>
 					{/if}</RoleLink
 				>
@@ -153,7 +164,10 @@
 					active={options.length >= 1}
 					change={async (value) => {
 						if (value) {
-							const error = await db.addHowRCI(how, value, 'informed');
+							const { error } = await mutate(
+								db.addHowRCI(how, value, 'informed'),
+								"Couldn't add role."
+							);
 							if (error) return false;
 							informed = undefined;
 						}
@@ -169,7 +183,9 @@
 						<Button
 							chromeless
 							tip="Remove this role from the informed list"
-							action={() => db.removeHowRCI(how, informed, 'informed')}>{Delete}</Button
+							action={() =>
+								mutate(db.removeHowRCI(how, informed, 'informed'), "Couldn't remove role.")}
+							>{Delete}</Button
 						>
 					{/if}</RoleLink
 				>

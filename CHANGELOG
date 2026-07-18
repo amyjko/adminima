@@ -3,6 +3,48 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.9.0 2026-07-18
+
+### Security
+
+- Fixed a row level security policy that let anyone, including unauthenticated callers, add
+  themselves as an administrator of any organization. The policy compared a profile's organization
+  id to its own primary key, which is never true, so the check it was meant to make always passed.
+- Stopped members from promoting themselves to administrator, or changing their own supervisor. The
+  policy restricted which rows a person could edit but not which columns, and editing your own name
+  and bio uses the same permission.
+- Restricted editing a comment to its author or an administrator, matching what deletion already
+  required. Previously any member could rewrite anyone else's comment.
+- Limited who can see an organization's roles to its members, unless the organization is public.
+
+### Fixed
+
+- Adding a person, or making any other change, no longer waits on a realtime notification to appear.
+  Realtime subscriptions were being torn down when revisiting an organization, after which nothing
+  refreshed until the page was reloaded by hand.
+- Comments left by a member on something they could not otherwise edit were silently discarded.
+- Deleting a comment you lacked permission to delete could still detach it from view.
+- Renaming a team recorded the change against the organization instead of the team, so it never
+  appeared in the team's history.
+- Unchecking all subtasks did not wait for the changes to save.
+- A paragraph following a block quote was dropped, and each line of a multi-line quote repeated the
+  first line.
+- Adding a subtask that failed to save still moved the cursor into it.
+
+### Added
+
+- An end-to-end test suite covering every database operation, including who is permitted to perform
+  each one.
+- Seed data for local development, so a fresh database has an organization to work with.
+- Continuous integration now runs the tests, and deploys wait for them to pass. Database migrations
+  are applied before the app that depends on them.
+
+## v0.8.11 2026-07-18
+
+### Changed
+
+- Updated minor dependencies; fixed migration to `write-excel-file` 4.0.
+
 ## v0.8.10 2026-04-02
 
 ### Changed

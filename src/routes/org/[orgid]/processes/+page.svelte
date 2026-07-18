@@ -5,7 +5,7 @@
 <script lang="ts">
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { addError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import ProcessLink from '$lib/ProcessLink.svelte';
 	import Title from '$lib/Title.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
@@ -163,9 +163,12 @@
 
 	let title = $state('');
 	async function newProcess() {
-		const { error, id } = await db.addProcess(org.id, title, org.visibility);
+		const { error, data: id } = await mutate(
+			db.addProcess(org.id, title, org.visibility),
+			"Couldn't add new process",
+			{ refresh: false }
+		);
 		if (error) {
-			addError("Couldn't add new process", error);
 			return false;
 		} else {
 			await goto(`/org/${Organization.getPath(org)}/process/${id}`);
@@ -291,7 +294,10 @@
 	<Header
 		><Concern
 			{concern}
-			edit={isAdmin ? (newConcern) => db.renameConcern(org.id, concern, newConcern) : undefined}
+			edit={isAdmin
+				? (newConcern) =>
+						mutate(db.renameConcern(org.id, concern, newConcern), "Couldn't rename concern.")
+				: undefined}
 		/></Header
 	>
 {/snippet}

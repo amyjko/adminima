@@ -1,18 +1,20 @@
 {
 	"name": "adminima",
-	"version": "0.8.10",
+	"version": "0.9.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"test": "npm run test:integration && npm run test:unit",
+		"test": "npm run test:unit && npm run test:e2e",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --plugin-search-dir . --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest",
+		"test:unit": "vitest run",
+		"test:watch": "vitest",
+		"test:e2e": "vitest run --config vitest.e2e.config.ts",
 		"csv": "node csv2org.js",
-		"start": "cp .env.local .env; supabase start --exclude storage-api,imgproxy,logflare,supavisor,vector",
+		"start": "cp .env.local .env; supabase start -x storage,imgproxy,analytics,vector,edge-runtime,functions",
 		"stop": "cp .env.prod .env; supabase stop",
 		"reset": "supabase db reset; npm run types",
 		"diff": "supabase db diff --local --use-migra -f rename_me",
@@ -46,6 +48,6 @@
 		"date-fns": "^4",
 		"fast-csv": "^5",
 		"uuid": "^13",
-		"write-excel-file": "^3"
+		"write-excel-file": "^4"
 	}
 }

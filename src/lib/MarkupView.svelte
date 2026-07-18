@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { parse } from '../markup/parser';
 	import Button from './Button.svelte';
-	import type { PostgrestError } from '@supabase/supabase-js';
+	import type { MutationResult } from '$database/Organization';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
 	import { addError } from '$routes/errors.svelte';
@@ -14,7 +14,7 @@
 		/** Placeholder text */
 		placeholder: string;
 		/** If given, allows the markup to edited. Returns an error */
-		edit?: undefined | ((text: string) => Promise<PostgrestError | null> | null);
+		edit?: undefined | ((text: string) => Promise<MutationResult> | null);
 		/** Whether in editing state */
 		editing?: boolean;
 		/** An HTML id to apply to the text area, if desired */
@@ -62,14 +62,10 @@
 		if (edit) {
 			saving = true;
 			try {
-				// Request the edit from the database.
-				const error = await edit(revisedText);
-				// If there was an error, show the error.
-				if (error) {
-					addError('Unable to save markup.', error);
-				}
-				// Otherwise, on success, show the revised text on the front end.
-				else {
+				// Request the edit from the database, which reports any error itself.
+				const result = await edit(revisedText);
+				// On success, show the revised text on the front end.
+				if (result === null || result.error === null) {
 					markup = revisedText;
 				}
 			} catch (err) {

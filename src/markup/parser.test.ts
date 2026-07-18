@@ -31,6 +31,16 @@ test.each([
 	[
 		'I am a paragraph\n\n"I am a block quote"\n\nThen another paragraph.',
 		'Markup[Paragraph[Text[I am a paragraph]], Quote[Text[I am a block quote]], Paragraph[Text[Then another paragraph.]]]'
+	],
+	// Each line of a multi-line quote is its own line; the parser used to repeat the first one.
+	[
+		'"first quoted line"\n"second quoted line"',
+		'Markup[Quote[Text[first quoted line], Text[second quoted line]]]'
+	],
+	// A quote at the very end must not run past the end of the input.
+	[
+		'A paragraph.\n\n"A trailing quote"',
+		'Markup[Paragraph[Text[A paragraph.]], Quote[Text[A trailing quote]]]'
 	]
 ])('parse %s', (markup: string, debug: string) => {
 	expect(parse(markup).toString()).toBe(debug);

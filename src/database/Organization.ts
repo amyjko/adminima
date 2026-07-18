@@ -23,6 +23,24 @@ export type Completion = Database['public']['Enums']['completion'];
 export type Status = Database['public']['Enums']['status'];
 export type State = Database['public']['Enums']['state'];
 
+/**
+ * What every mutating method on Organization returns.
+ *
+ * One shape for all of them, so a single wrapper can report the error and refresh the page on
+ * success. When methods returned three different shapes, the wrapper only fit some of them, and the
+ * ones it didn't fit quietly went without a refresh — which is how mutations ended up depending on
+ * a realtime notification that might never arrive.
+ *
+ * `data` is null for mutations that don't produce anything; creating methods return the new row or
+ * its id.
+ */
+export type MutationResult<T = null> = { data: T | null; error: PostgrestError | null };
+
+/** A mutation that produced nothing. */
+export function ok<T = null>(error: PostgrestError | null = null): MutationResult<T> {
+	return { data: null, error };
+}
+
 export type OrganizationID = string;
 export type ProcessID = string;
 export type TeamID = string;
@@ -41,8 +59,8 @@ class Organization {
 	/** A list of listeners to notify of realtime updates. */
 	private listeners: { id: OrganizationID; listener: () => void }[] = [];
 
-	/** Organization specific Supabase realtime channels */
-	readonly channels = new Map<OrganizationID, RealtimeChannel>();
+	/** Organization specific Supabase realtime channels, keyed by channel topic. */
+	readonly channels = new Map<string, RealtimeChannel>();
 
 	constructor(supabase: SupabaseClient<Database>) {
 		this.supabase = supabase;
@@ -72,8 +90,11 @@ class Organization {
 		for (const listener of this.listeners) if (listener.id === orgid) listener.listener();
 	}
 
-	/** Subscribe to an organization-specific channel, listening to all modifications to organization-related tables  */
-	listen(org: OrganizationRow, listener: () => void) {
+	/**
+	 * Subscribe to an organization-specific channel, listening to all modifications to organization-related tables.
+	 * Pass onError to be told when the subscription fails, so the UI can say so instead of silently going stale.
+	 */
+	listen(org: OrganizationRow, listener: () => void, onError?: (status: string) => void) {
 		const orgid = org.id;
 
 		// Add the listener to the list of listeners.
@@ -215,15 +236,29 @@ class Organization {
 					this.notify(orgid);
 				}
 			)
-			.subscribe();
+			.subscribe((status) => {
+				// Surface subscription failures; otherwise the UI silently shows stale data.
+				if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')
+					onError?.(status);
+			});
+
+		// Remember the channel so we don't subscribe to the same topic twice, and so we can remove it later.
+		this.channels.set(this.getOrgChannel(orgid), channel);
 	}
 
-	/** Unsubscribe from the organization specific channel, if there is one. */
+	/** Unsubscribe from the organization specific channel, if no one else is still listening to it. */
 	ignore(orgid: OrganizationID, listener: () => void) {
-		const channel = this.channels.get(this.getOrgChannel(orgid));
-		if (channel) this.supabase.removeChannel(channel);
-
 		this.listeners = this.listeners.filter((l) => l.listener !== listener);
+
+		// Others still listening to this organization? Keep the channel.
+		if (this.listeners.some((l) => l.id === orgid)) return;
+
+		const topic = this.getOrgChannel(orgid);
+		const channel = this.channels.get(topic);
+		if (channel) {
+			this.supabase.removeChannel(channel);
+			this.channels.delete(topic);
+		}
 	}
 
 	// Organizations
@@ -233,86 +268,57 @@ class Organization {
 		org: OrganizationRow,
 		text: string,
 		who: PersonID
-	): Promise<PostgrestError | null> {
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('orgs')
 			.update({ description: text })
 			.eq('id', org.id);
-		if (error) return error;
-		const commentError = await this.addComment(
-			org.id,
-			who,
-			'Updated organization description',
-			'orgs',
-			org.id,
-			org.comments
-		);
-		return commentError;
+		if (error) return ok(error);
+		return await this.addComment(org.id, 'Updated organization description', 'orgs', org.id);
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
-	async addOrgPath(org: OrganizationRow, path: string): Promise<PostgrestError | null> {
+	async addOrgPath(org: OrganizationRow, path: string): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('orgs')
 			.update({ paths: [path, ...org.paths] })
 			.eq('id', org.id);
-		return error;
+		return ok(error);
 	}
 
 	async updateOrgPrompt(
 		org: OrganizationRow,
 		text: string,
 		who: PersonID
-	): Promise<PostgrestError | null> {
+	): Promise<MutationResult> {
 		const { error } = await this.supabase.from('orgs').update({ prompt: text }).eq('id', org.id);
-		if (error) return error;
-		const commentError = await this.addComment(
-			org.id,
-			who,
-			'Updated organization change prompt',
-			'orgs',
-			org.id,
-			org.comments
-		);
-		return commentError;
+		if (error) return ok(error);
+		return await this.addComment(org.id, 'Updated organization change prompt', 'orgs', org.id);
 	}
 
-	async updateOrgName(
-		org: OrganizationRow,
-		name: string,
-		who: PersonID
-	): Promise<PostgrestError | null> {
-		if (org.name === name) return null;
+	async updateOrgName(org: OrganizationRow, name: string, who: PersonID): Promise<MutationResult> {
+		if (org.name === name) return ok();
 		const { error } = await this.supabase.from('orgs').update({ name }).eq('id', org.id);
-		if (error) return error;
+		if (error) return ok(error);
 
-		this.addComment(
-			org.id,
-			who,
-			`Updated organization name to ${name}`,
-			'orgs',
-			org.id,
-			org.comments
-		);
+		await this.addComment(org.id, `Updated organization name to ${name}`, 'orgs', org.id);
 
-		return null;
+		return ok();
 	}
 
 	async updateOrgVisibility(
 		org: OrganizationRow,
 		visibility: Visibility,
 		who: PersonID
-	): Promise<PostgrestError | null> {
+	): Promise<MutationResult> {
 		const { error } = await this.supabase.from('orgs').update({ visibility }).eq('id', org.id);
-		if (error) return error;
+		if (error) return ok(error);
 
 		return await this.addComment(
 			org.id,
-			who,
 			`Updated organization visibility to ${visibility}`,
 			'orgs',
-			org.id,
-			org.comments
+			org.id
 		);
 	}
 
@@ -346,51 +352,52 @@ class Organization {
 		return supabase.from('profiles').select('*').eq('orgid', orgid).eq('id', profile).single();
 	}
 
-	async updateProfileName(profile: ProfileRow, name: string): Promise<PostgrestError | null> {
+	async updateProfileName(profile: ProfileRow, name: string): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('profiles')
 			.update({ name })
 			.eq('email', profile.email)
 			.eq('orgid', profile.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateProfileBio(profile: ProfileRow, text: string) {
+	async updateProfileBio(profile: ProfileRow, text: string): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('profiles')
 			.update({ bio: text })
 			.eq('email', profile.email)
 			.eq('orgid', profile.orgid);
-		return error;
+		return ok(error);
 	}
 
 	/** Update admin status of a person. Rely on realtime to refresh. */
-	async updateAdmin(orgid: OrganizationID, profileid: ProfileID, admin: boolean) {
+	async updateAdmin(
+		orgid: OrganizationID,
+		profileid: ProfileID,
+		admin: boolean
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('profiles')
 			.update({ admin })
 			.eq('orgid', orgid)
 			.eq('id', profileid);
-		return error;
+		return ok(error);
 	}
 
 	/** Add a person to the organization's profiles if not already added. Rely on Realtime notification for update. */
-	async addPersonByID(orgid: OrganizationID, person: PersonID | PersonRow) {
-		const { data, error } =
-			typeof person === 'string' ? await this.getPerson(person) : { data: person, error: null };
-		if (error) return error;
-		const { error: insertError } = await this.supabase
-			.from('profiles')
-			.insert({ orgid, personid: data.id, name: '', email: data.email, admin: false });
-		return insertError;
-	}
-
-	/** Add a person to the organization's profiles by email. Rely on Realtime notification for update. */
-	async addPersonByEmail(orgid: OrganizationID, email: string, name: string | undefined) {
+	/**
+	 * Add a person to the organization's profiles by email. If the email already has an account, the
+	 * on_profile_create trigger links the new profile to that person.
+	 */
+	async addPersonByEmail(
+		orgid: OrganizationID,
+		email: string,
+		name: string | undefined
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('profiles')
 			.insert({ orgid, personid: null, name: name ?? '', email, admin: false });
-		return error;
+		return ok(error);
 	}
 
 	async getPersonProfile(orgid: OrganizationID, personid: PersonID) {
@@ -425,12 +432,20 @@ class Organization {
 			: { data: [] };
 	}
 
-	async assignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
+	async assignPerson(
+		orgid: OrganizationID,
+		profileid: ProfileID,
+		roleid: RoleID
+	): Promise<MutationResult> {
 		const { error } = await this.supabase.from('assignments').insert({ orgid, profileid, roleid });
-		return error;
+		return ok(error);
 	}
 
-	async unassignPerson(orgid: OrganizationID, profileid: ProfileID, roleid: RoleID) {
+	async unassignPerson(
+		orgid: OrganizationID,
+		profileid: ProfileID,
+		roleid: RoleID
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('assignments')
 			.delete()
@@ -441,7 +456,7 @@ class Organization {
 		// No error? Update the organization on the front end.
 		if (error === null) this.notify(orgid);
 
-		return error;
+		return ok(error);
 	}
 
 	// Roles
@@ -513,11 +528,6 @@ class Organization {
 		return assignments.filter((ass) => ass.profileid === profile.id).map((ass) => ass.roleid);
 	}
 
-	async getPersonWithEmail(email: string) {
-		const { data } = await this.supabase.from('people').select().eq('email', email).single();
-		return data;
-	}
-
 	static getProfileWithEmail(profiles: ProfileRow[], email: string): ProfileRow | null {
 		return profiles.find((person) => person.email === email) ?? null;
 	}
@@ -554,23 +564,23 @@ class Organization {
 		orgid: OrganizationID,
 		profileid: ProfileID,
 		supervisor: ProfileID | null
-	) {
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('profiles')
 			.update({ supervisor })
 			.eq('orgid', orgid)
 			.eq('id', profileid);
-		return error;
+		return ok(error);
 	}
 
 	/** Remove a perosn from the organization's profiles if included. Rely on Realtime notification for update. */
-	async removeProfile(profileid: ProfileID) {
+	async removeProfile(profileid: ProfileID): Promise<MutationResult> {
 		const { error } = await this.supabase.from('profiles').delete().eq('id', profileid);
-		return error;
+		return ok(error);
 	}
 
-	async createRole(orgid: OrganizationID, title: string) {
-		return await this.supabase
+	async createRole(orgid: OrganizationID, title: string): Promise<MutationResult<RoleRow>> {
+		const { data, error } = await this.supabase
 			.from('roles')
 			.insert({
 				orgid: orgid,
@@ -578,37 +588,24 @@ class Organization {
 			})
 			.select()
 			.single();
+		return { data: error ? null : data, error };
 	}
 
-	async updateRoleTitle(
-		role: RoleRow,
-		title: string,
-		who: PersonID
-	): Promise<PostgrestError | null> {
+	async updateRoleTitle(role: RoleRow, title: string, who: PersonID): Promise<MutationResult> {
 		const { error } = await this.supabase.from('roles').update({ title: title }).eq('id', role.id);
-		if (error) return error;
+		if (error) return ok(error);
 
-		return this.addComment(
-			role.orgid,
-			who,
-			`Updated role title to ${title}`,
-			'roles',
-			role.id,
-			role.comments
-		);
+		return await this.addComment(role.orgid, `Updated role title to ${title}`, 'roles', role.id);
 	}
 
-	async updateRoleDescription(role: RoleRow, description: string, who: PersonID) {
+	async updateRoleDescription(
+		role: RoleRow,
+		description: string,
+		who: PersonID
+	): Promise<MutationResult> {
 		const { error } = await this.supabase.from('roles').update({ description }).eq('id', role.id);
-		if (error) return error;
-		return this.addComment(
-			role.orgid,
-			who,
-			'Updated role description',
-			'roles',
-			role.id,
-			role.comments
-		);
+		if (error) return ok(error);
+		return await this.addComment(role.orgid, 'Updated role description', 'roles', role.id);
 	}
 
 	async updateRoleTeam(
@@ -616,68 +613,60 @@ class Organization {
 		team: TeamID | null,
 		name: string | undefined,
 		who: PersonID
-	) {
+	): Promise<MutationResult> {
 		const { error } = await this.supabase.from('roles').update({ team }).eq('id', role.id);
-		if (error) return error;
+		if (error) return ok(error);
 
-		return this.addComment(
+		return await this.addComment(
 			role.orgid,
-			who,
 			name ? `Updated role team to ${name}` : `Removed role from team`,
 			'roles',
-			role.id,
-			role.comments
+			role.id
 		);
 	}
 
-	async updateRoleShortName(role: RoleRow, short: string) {
+	async updateRoleShortName(role: RoleRow, short: string): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('roles')
 			.update({ short: Array.from(new Set([short, ...role.short].filter((s) => s !== ''))) })
 			.eq('id', role.id);
-		return error;
+		return ok(error);
 	}
 
 	// Comments
 
+	/**
+	 * Add a comment to an organization, role, team, process, or change.
+	 *
+	 * This goes through the add_comment function rather than inserting and then linking, because
+	 * linking is an UPDATE on the parent row and most parents only allow admins (or the author) to
+	 * update them. Doing it here would silently orphan any comment left by an ordinary member, since
+	 * an update that matches no rows is not an error. The function also appends atomically, so
+	 * concurrent comments can't overwrite each other.
+	 */
 	async addComment(
 		orgid: OrganizationID,
-		who: PersonID,
 		what: string,
 		table: 'orgs' | 'roles' | 'teams' | 'processes' | 'suggestions',
-		id: string,
-		comments: CommentID[]
-	) {
-		// Insert the new comment.
-		const { data: comment, error: insertError } = await this.supabase
-			.from('comments')
-			.insert({ orgid, what, who })
-			.select()
-			.single();
-		if (insertError) return insertError;
+		id: string
+	): Promise<MutationResult> {
+		const { error } = await this.supabase.rpc('add_comment', {
+			_orgid: orgid,
+			_what: what,
+			_table: table,
+			_id: id
+		});
+		if (error) return ok(error);
 
-		const commentID = comment?.id ?? null;
-
-		// If we succeeded, update the list of comments for the table.
-		if (commentID) {
-			const newComments = [...comments, commentID];
-			const { error: updateError } = await this.supabase
-				.from(table)
-				.update({ comments: newComments })
-				.eq('id', id);
-			if (updateError) return updateError;
-
-			// If we succeeded, notify the organization of the change, since it's
-			this.notify(orgid);
-		}
-		return null;
+		this.notify(orgid);
+		return ok();
 	}
 
-	async deleteRole(orgid: OrganizationID, id: RoleID): Promise<PostgrestError | null> {
+	async deleteRole(orgid: OrganizationID, id: RoleID): Promise<MutationResult> {
 		// Remove role from any hows that reference them in responsible, consulted, or informed lists.
 
 		const { data, error: howError } = await this.supabase.from('hows').select().eq('orgid', orgid);
-		if (howError) return howError;
+		if (howError) return ok(howError);
 
 		for (const how of data) {
 			if (how.responsible.includes(id)) {
@@ -685,26 +674,26 @@ class Organization {
 					.from('hows')
 					.update({ responsible: how.responsible.filter((r: string) => r !== id) })
 					.eq('id', how.id);
-				if (updateError) return updateError;
+				if (updateError) return ok(updateError);
 			}
 			if (how.consulted.includes(id)) {
 				const { error: updateError } = await this.supabase
 					.from('hows')
 					.update({ consulted: how.consulted.filter((r: string) => r !== id) })
 					.eq('id', how.id);
-				if (updateError) return updateError;
+				if (updateError) return ok(updateError);
 			}
 			if (how.informed.includes(id)) {
 				const { error: updateError } = await this.supabase
 					.from('hows')
 					.update({ informed: how.informed.filter((r: string) => r !== id) })
 					.eq('id', how.id);
-				if (updateError) return updateError;
+				if (updateError) return ok(updateError);
 			}
 		}
 
 		const { error } = await this.supabase.from('roles').delete().eq('id', id);
-		return error;
+		return ok(error);
 	}
 
 	// Teams
@@ -729,8 +718,8 @@ class Organization {
 		return supabase.from('roles').select('*').eq('orgid', orgid).eq('team', teamid);
 	}
 
-	async createTeam(orgid: OrganizationID, name: string) {
-		return await this.supabase
+	async createTeam(orgid: OrganizationID, name: string): Promise<MutationResult<TeamRow>> {
+		const { data, error } = await this.supabase
 			.from('teams')
 			.insert({
 				orgid: orgid,
@@ -738,51 +727,39 @@ class Organization {
 			})
 			.select()
 			.single();
+		return { data: error ? null : data, error };
 	}
 
 	/** Update an organization's description. Rely on Realtime to refresh. */
-	async updateTeamDescription(
-		team: TeamRow,
-		text: string,
-		who: PersonID
-	): Promise<PostgrestError | null> {
+	async updateTeamDescription(team: TeamRow, text: string, who: PersonID): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('teams')
 			.update({ description: text })
 			.eq('id', team.id);
-		if (error) return error;
-		return this.addComment(
-			team.orgid,
-			who,
-			'Updated team description',
-			'teams',
-			team.id,
-			team.comments
-		);
+		if (error) return ok(error);
+		return await this.addComment(team.orgid, 'Updated team description', 'teams', team.id);
 	}
 
-	async updateTeamName(team: TeamRow, name: string, who: PersonID): Promise<PostgrestError | null> {
+	async updateTeamName(team: TeamRow, name: string, who: PersonID): Promise<MutationResult> {
 		const { error } = await this.supabase.from('teams').update({ name }).eq('id', team.id);
-		if (error) return error;
+		if (error) return ok(error);
 
 		const comment = await this.addComment(
 			team.orgid,
-			who,
 			`Updated team name to ${name}`,
-			'orgs',
-			team.id,
-			team.comments
+			'teams',
+			team.id
 		);
 
-		if (!comment) this.notify(team.orgid);
+		if (!comment.error) this.notify(team.orgid);
 
 		return comment;
 	}
 
-	async deleteTeam(id: TeamID): Promise<PostgrestError | null> {
+	async deleteTeam(id: TeamID): Promise<MutationResult> {
 		const { error } = await this.supabase.from('teams').delete().eq('id', id);
 		if (!error) this.notify(id);
-		return error;
+		return ok(error);
 	}
 
 	async getPerson(id: PersonID) {
@@ -795,7 +772,7 @@ class Organization {
 		invite: string,
 		uid: string,
 		email: string
-	) {
+	): Promise<MutationResult<OrganizationID>> {
 		const { data, error } = await this.supabase.rpc('create_org', {
 			adminname: adminName,
 			orgname: orgName,
@@ -803,8 +780,7 @@ class Organization {
 			uid,
 			email
 		});
-		if (data) return data;
-		else return error;
+		return { data: data ?? null, error };
 	}
 
 	async pathIsAvailable(path: string): Promise<boolean> {
@@ -867,14 +843,18 @@ class Organization {
 	}
 
 	/** Create a new process, relying on Realtime for refresh */
-	async addProcess(orgid: OrganizationID, title: string, visibility: Visibility) {
+	async addProcess(
+		orgid: OrganizationID,
+		title: string,
+		visibility: Visibility
+	): Promise<MutationResult<ProcessID>> {
 		const { data: processData, error } = await this.supabase
 			.from('processes')
 			.insert({ title, orgid, repeat: [] })
 			.select()
 			.single();
 
-		if (error) return { error, id: null };
+		if (error) return { data: null, error };
 
 		const { data: newHow, error: howError } = await this.supabase
 			.from('hows')
@@ -882,67 +862,71 @@ class Organization {
 			.select()
 			.single();
 
-		if (howError) return { error: howError, id: null };
+		if (howError) return { data: null, error: howError };
 
 		const { error: updateError } = await this.supabase
 			.from('processes')
 			.update({ howid: newHow.id })
 			.eq('id', processData.id);
-		if (updateError) return { error: updateError, id: null };
+		if (updateError) return { data: null, error: updateError };
 
 		this.notify(orgid);
 
-		return { error, id: processData.id };
+		return { data: processData.id, error };
 	}
 
 	static getProcessHows(hows: HowRow[], id: ProcessID) {
 		return hows.filter((how) => how.processid === id);
 	}
 
-	async updateProcessTitle(process: ProcessRow, title: string, who: PersonID) {
+	async updateProcessTitle(
+		process: ProcessRow,
+		title: string,
+		who: PersonID
+	): Promise<MutationResult> {
 		const { error } = await this.supabase.from('processes').update({ title }).eq('id', process.id);
-		if (error) return error;
+		if (error) return ok(error);
 
 		const comment = await this.addComment(
 			process.orgid,
-			who,
 			`Updated process title to ${title}`,
 			'processes',
-			process.id,
-			process.comments
+			process.id
 		);
 
 		this.notify(process.orgid);
 		return comment;
 	}
 
-	async updateProcessShortName(process: ProcessRow, short: string) {
+	async updateProcessShortName(process: ProcessRow, short: string): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('processes')
 			.update({ short: Array.from(new Set([short, ...process.short].filter((s) => s !== ''))) })
 			.eq('id', process.id);
 		this.notify(process.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateProcessState(process: ProcessRow, state: State, who: PersonID) {
+	async updateProcessState(
+		process: ProcessRow,
+		state: State,
+		who: PersonID
+	): Promise<MutationResult> {
 		const { error } = await this.supabase.from('processes').update({ state }).eq('id', process.id);
-		if (error) return error;
+		if (error) return ok(error);
 
 		const comment = await this.addComment(
 			process.orgid,
-			who,
 			`Updated state to ${state}`,
 			'processes',
-			process.id,
-			process.comments
+			process.id
 		);
 
 		this.notify(process.orgid);
 		return comment;
 	}
 
-	async addProcessPeriod(process: ProcessRow, period: Period) {
+	async addProcessPeriod(process: ProcessRow, period: Period): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('processes')
 			.update({ repeat: [...(process.repeat ? process.repeat : []), period] })
@@ -950,12 +934,16 @@ class Organization {
 
 		this.notify(process.orgid);
 
-		return error;
+		return ok(error);
 	}
 
-	async updateProcessPeriod(process: ProcessRow, period: Period, index: number) {
+	async updateProcessPeriod(
+		process: ProcessRow,
+		period: Period,
+		index: number
+	): Promise<MutationResult> {
 		const repeat = process.repeat;
-		if (process.repeat === null || repeat.length <= index) return null;
+		if (process.repeat === null || repeat.length <= index) return ok();
 		const { error } = await this.supabase
 			.from('processes')
 			.update({
@@ -965,12 +953,12 @@ class Organization {
 
 		this.notify(process.orgid);
 
-		return error;
+		return ok(error);
 	}
 
-	async removeProcessPeriod(process: ProcessRow, index: number) {
+	async removeProcessPeriod(process: ProcessRow, index: number): Promise<MutationResult> {
 		const repeat = process.repeat;
-		if (process.repeat === null || repeat.length <= index || index < 0) return null;
+		if (process.repeat === null || repeat.length <= index || index < 0) return ok();
 		const { error } = await this.supabase
 			.from('processes')
 			.update({ repeat: repeat.filter((_, i) => i !== index) })
@@ -978,91 +966,104 @@ class Organization {
 
 		this.notify(process.orgid);
 
-		return error;
+		return ok(error);
 	}
 
-	async updateProcessConcern(process: ProcessRow, concern: string, who: PersonID) {
+	async updateProcessConcern(
+		process: ProcessRow,
+		concern: string,
+		who: PersonID
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('processes')
 			.update({ concern })
 			.eq('id', process.id);
-		if (error) return error;
+		if (error) return ok(error);
 
-		const comment = this.addComment(
+		const comment = await this.addComment(
 			process.orgid,
-			who,
 			`Updated concern to ${concern}`,
 			'processes',
-			process.id,
-			process.comments
+			process.id
 		);
 
 		this.notify(process.orgid);
 		return comment;
 	}
 
-	async renameConcern(orgid: OrganizationID, oldConcern: string, newConcern: string) {
+	async renameConcern(
+		orgid: OrganizationID,
+		oldConcern: string,
+		newConcern: string
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('processes')
 			.update({ concern: newConcern })
 			.eq('orgid', orgid)
 			.eq('concern', oldConcern);
-		if (error) return error;
+		if (error) return ok(error);
 		this.notify(orgid);
-		return null;
+		return ok();
 	}
 
 	static getHowParent(hows: HowRow[], id: HowID) {
 		return hows.find((how) => how.how.includes(id));
 	}
 
-	async createHow(process: ProcessRow, visibility: Visibility) {
-		const how = await this.supabase
+	async createHow(process: ProcessRow, visibility: Visibility): Promise<MutationResult<HowRow>> {
+		const { data, error } = await this.supabase
 			.from('hows')
 			.insert({ orgid: process.orgid, processid: process.id, what: '', visibility })
 			.select()
 			.single();
 
 		this.notify(process.orgid);
-		return how;
+		return { data: error ? null : data, error };
 	}
 
 	static getHow(hows: HowRow[], id: HowID) {
 		return hows.find((how) => how.id === id);
 	}
 
-	async updateHowText(how: HowRow, text: Markup) {
+	async updateHowText(how: HowRow, text: Markup): Promise<MutationResult> {
 		const { error } = await this.supabase.from('hows').update({ what: text }).eq('id', how.id);
 		this.notify(how.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateHowVisibility(how: HowRow, vis: Visibility) {
+	async updateHowVisibility(how: HowRow, vis: Visibility): Promise<MutationResult> {
 		const { error } = await this.supabase.from('hows').update({ visibility: vis }).eq('id', how.id);
 		this.notify(how.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateHowDone(how: HowRow, completion: Completion) {
+	async updateHowDone(how: HowRow, completion: Completion): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('hows')
 			.update({ done: completion })
 			.eq('id', how.id);
 		this.notify(how.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateProcessAccountable(process: ProcessRow, role: RoleID | null) {
+	async updateProcessAccountable(
+		process: ProcessRow,
+		role: RoleID | null
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('processes')
 			.update({ accountable: role })
 			.eq('id', process.id);
-		if (error) return error;
+		if (error) return ok(error);
 		this.notify(process.orgid);
-		return null;
+		return ok();
 	}
 
-	async addHowRCI(how: HowRow, role: RoleID, rci: 'responsible' | 'consulted' | 'informed') {
+	async addHowRCI(
+		how: HowRow,
+		role: RoleID,
+		rci: 'responsible' | 'consulted' | 'informed'
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('hows')
 			.update(
@@ -1074,10 +1075,14 @@ class Organization {
 			)
 			.eq('id', how.id);
 		this.notify(how.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async removeHowRCI(how: HowRow, role: RoleID, rci: 'responsible' | 'consulted' | 'informed') {
+	async removeHowRCI(
+		how: HowRow,
+		role: RoleID,
+		rci: 'responsible' | 'consulted' | 'informed'
+	): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('hows')
 			.update(
@@ -1089,27 +1094,37 @@ class Organization {
 			)
 			.eq('id', how.id);
 		this.notify(how.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async insertHow(process: ProcessRow, visibility: Visibility, how: HowRow, index: number) {
+	async insertHow(
+		process: ProcessRow,
+		visibility: Visibility,
+		how: HowRow,
+		index: number
+	): Promise<MutationResult<HowID>> {
 		const { data: newHow, error: howError } = await this.createHow(process, visibility);
-		if (howError) return { error: howError, id: null };
+		if (howError || newHow === null) return { data: null, error: howError };
 		const { error } = await this.supabase
 			.from('hows')
 			.update({ how: [...how.how.slice(0, index), newHow.id, ...how.how.slice(index)] })
 			.eq('id', how.id);
 		this.notify(process.orgid);
-		return { error, id: newHow.id };
+		return { data: newHow.id, error };
 	}
 
-	async reparentHow(how: HowRow, oldParent: HowRow, newParent: HowRow, index: number) {
+	async reparentHow(
+		how: HowRow,
+		oldParent: HowRow,
+		newParent: HowRow,
+		index: number
+	): Promise<MutationResult> {
 		// Remove from the current parent
 		const { error: oldError } = await this.supabase
 			.from('hows')
 			.update({ how: oldParent.how.filter((h) => h !== how.id) })
 			.eq('id', oldParent.id);
-		if (oldError) return oldError;
+		if (oldError) return ok(oldError);
 		// Insert in the new parent
 		const { error: newError } = await this.supabase
 			.from('hows')
@@ -1118,10 +1133,10 @@ class Organization {
 
 		if (!newError) this.notify(how.orgid);
 
-		return newError;
+		return ok(newError);
 	}
 
-	async moveHow(how: HowRow, parent: HowRow, index: number) {
+	async moveHow(how: HowRow, parent: HowRow, index: number): Promise<MutationResult> {
 		const hows = parent.how.filter((h) => h !== how.id);
 
 		// Insert in the new parent
@@ -1132,26 +1147,27 @@ class Organization {
 
 		if (!newError) this.notify(how.orgid);
 
-		return newError;
+		return ok(newError);
 	}
 
-	async deleteHow(parent: HowRow, how: HowRow) {
+	async deleteHow(parent: HowRow, how: HowRow): Promise<MutationResult> {
 		// Remove the how from it's parent
 		const { error: parentError } = await this.supabase
 			.from('hows')
 			.update({ how: parent.how.filter((howid) => howid !== how.id) })
 			.eq('id', parent.id);
-		if (parentError) return parentError;
+		if (parentError) return ok(parentError);
 		// Remove the how
 		const { error: deleteError } = await this.supabase.from('hows').delete().eq('id', how.id);
 
 		if (!deleteError) this.notify(how.orgid);
-		return deleteError;
+		return ok(deleteError);
 	}
 
 	/** Delete this process, relying on Realtime for refresh. */
-	async deleteProcess(id: ProcessID) {
-		return await this.supabase.from('processes').delete().eq('id', id);
+	async deleteProcess(id: ProcessID): Promise<MutationResult> {
+		const { error } = await this.supabase.from('processes').delete().eq('id', id);
+		return ok(error);
 	}
 
 	// Changes
@@ -1183,9 +1199,9 @@ class Organization {
 		visibility: Visibility,
 		processes: ProcessID[],
 		roles: RoleID[]
-	) {
+	): Promise<MutationResult<ChangeRow>> {
 		// Insert
-		return await this.supabase
+		const { data, error } = await this.supabase
 			.from('suggestions')
 			.insert({
 				who,
@@ -1199,130 +1215,139 @@ class Organization {
 			})
 			.select()
 			.single();
+		return { data: error ? null : data, error };
 	}
 
-	async updateChangeVisibility(change: ChangeRow, vis: string) {
+	async updateChangeVisibility(change: ChangeRow, vis: string): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ visibility: vis as Visibility })
 			.eq('id', change.id);
 
 		if (!error) this.notify(change.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateChangeLead(how: ChangeRow, lead: string | null) {
+	async updateChangeLead(how: ChangeRow, lead: string | null): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ lead: lead })
 			.eq('id', how.id);
 		if (!error) this.notify(how.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateChangeReview(change: ChangeRow, review: string | null) {
+	async updateChangeReview(change: ChangeRow, review: string | null): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ review: review })
 			.eq('id', change.id);
 		if (!error) this.notify(change.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async udpateChangeWhat(change: ChangeRow, what: string) {
-		if (change.what === what) return null;
+	async udpateChangeWhat(change: ChangeRow, what: string): Promise<MutationResult> {
+		if (change.what === what) return ok();
 		const { error } = await this.supabase.from('suggestions').update({ what }).eq('id', change.id);
 		if (!error) this.notify(change.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateChangeDescription(change: ChangeRow, description: string) {
-		if (change.description === description) return null;
+	async updateChangeDescription(change: ChangeRow, description: string): Promise<MutationResult> {
+		if (change.description === description) return ok();
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ description })
 			.eq('id', change.id);
 		if (!error) this.notify(change.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateChangeProposal(change: ChangeRow, proposal: string) {
-		if (change.proposal === proposal) return null;
+	async updateChangeProposal(change: ChangeRow, proposal: string): Promise<MutationResult> {
+		if (change.proposal === proposal) return ok();
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ proposal })
 			.eq('id', change.id);
 		if (!error) this.notify(change.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateChangeStatus(change: ChangeRow, status: Status, who: PersonID) {
-		if (change.status === status) return null;
+	async updateChangeStatus(
+		change: ChangeRow,
+		status: Status,
+		who: PersonID
+	): Promise<MutationResult> {
+		if (change.status === status) return ok();
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ status })
 			.eq('id', change.id);
-		if (error) return error;
+		if (error) return ok(error);
 
-		const comment = this.addComment(
+		const comment = await this.addComment(
 			change.orgid,
-			who,
 			`Updated status to ${status}`,
 			'suggestions',
-			change.id,
-			change.comments
+			change.id
 		);
 
 		if (!error) this.notify(change.orgid);
 		return comment;
 	}
 
-	async updateChangeRoles(change: ChangeRow, roles: RoleID[]) {
+	async updateChangeRoles(change: ChangeRow, roles: RoleID[]): Promise<MutationResult> {
 		const { error } = await this.supabase.from('suggestions').update({ roles }).eq('id', change.id);
 		if (!error) this.notify(change.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async updateChangeProcesses(change: ChangeRow, processes: ProcessID[]) {
+	async updateChangeProcesses(change: ChangeRow, processes: ProcessID[]): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('suggestions')
 			.update({ processes })
 			.eq('id', change.id);
 		if (!error) this.notify(change.orgid);
-		return error;
+		return ok(error);
 	}
 
-	async deleteChange(id: ChangeID) {
-		return await this.supabase.from('suggestions').delete().eq('id', id);
+	async deleteChange(id: ChangeID): Promise<MutationResult> {
+		const { error } = await this.supabase.from('suggestions').delete().eq('id', id);
+		return ok(error);
 	}
 
 	async getComments(ids: CommentID[]) {
 		return await this.supabase.from('comments').select().in('id', ids);
 	}
 
-	async updateComment(comment: CommentRow, text: string) {
+	async updateComment(comment: CommentRow, text: string): Promise<MutationResult> {
 		const { error } = await this.supabase
 			.from('comments')
 			.update({ what: text })
 			.eq('id', comment.id);
 		if (!error) this.notify(comment.orgid);
-		return error;
+		return ok(error);
 	}
 
 	async deleteComment(
 		process: ChangeRow | ProcessRow | RoleRow | OrganizationRow,
 		table: 'processes' | 'suggestions' | 'roles' | 'orgs',
 		comment: CommentID
-	) {
-		// Remove the comment from the process's comment list.
-		const { error } = await this.supabase
-			.from(table)
-			.update({ comments: process.comments.filter((c) => c !== comment) })
-			.eq('id', process.id);
-		if (error) return error;
-		const { error: deleteError } = await this.supabase.from('comments').delete().eq('id', comment);
-		if (!deleteError) this.notify('orgid' in process ? process.orgid : process.id);
-		return deleteError;
+	): Promise<MutationResult> {
+		// Unlinking and deleting go together in delete_comment: done separately under the caller's own
+		// permissions, a caller allowed to update the parent but not delete the comment would unlink it
+		// and then fail, hiding someone else's comment while leaving the row behind.
+		const orgid = 'orgid' in process ? process.orgid : process.id;
+		const { error } = await this.supabase.rpc('delete_comment', {
+			_orgid: orgid,
+			_table: table,
+			_id: process.id,
+			_commentid: comment
+		});
+		if (error) return ok(error);
+
+		this.notify(orgid);
+		return ok();
 	}
 }
 
