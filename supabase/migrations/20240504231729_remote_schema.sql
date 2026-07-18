@@ -10,7 +10,17 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-CREATE EXTENSION IF NOT EXISTS "pgsodium" WITH SCHEMA "pgsodium";
+-- pgsodium came from the original schema dump and is not used anywhere in this project. Supabase
+-- has since removed it from their Postgres images, so replaying this migration on a current image
+-- failed with 'schema "pgsodium" does not exist' -- which broke both CI and any fresh local setup.
+-- Only create it where it is actually available, so old and new images both work.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'pgsodium') THEN
+    CREATE EXTENSION IF NOT EXISTS "pgsodium" WITH SCHEMA "pgsodium";
+  END IF;
+END
+$$;
 
 COMMENT ON SCHEMA "public" IS 'standard public schema';
 
