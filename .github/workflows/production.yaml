@@ -17,6 +17,22 @@ jobs:
   test:
     uses: ./.github/workflows/test.yaml
 
+  # Check the Vercel credentials resolve before anything touches the production database. Without
+  # this, a bad or expired token fails at `vercel pull` in the deploy job -- after migrations have
+  # already been applied, and `supabase db push` cannot be rolled back.
+  verify-deploy-credentials:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - run: npm install --global vercel@latest
+      - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
   # Migrations go first. The app deploy calls database functions that migrations create, so
   # deploying the app first would break it until this catches up.
   #
@@ -24,7 +40,7 @@ jobs:
   # stay backward compatible with the currently deployed app: add in one release, remove in a later
   # one. `supabase db push` cannot be rolled back.
   migrate:
-    needs: test
+    needs: [test, verify-deploy-credentials]
     runs-on: ubuntu-latest
     environment: production
 
