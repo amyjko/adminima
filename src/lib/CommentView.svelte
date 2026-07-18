@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CommentRow, ProfileRow } from '$database/Organization';
 	import timestampToDate from '$database/timestampToDate';
-	import type { PostgrestError } from '@supabase/supabase-js';
+	import type { MutationResult } from '$database/Organization';
 	import Button, { Delete } from './Button.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import PersonLink from './ProfileLink.svelte';
@@ -9,14 +9,14 @@
 	import TimeView from './TimeView.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Organization from '$database/Organization';
 	import { type CommentID } from '$database/Organization';
 
 	interface Props {
 		comment: CommentRow;
 		profiles: ProfileRow[];
-		remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
+		remove: ((id: CommentID) => Promise<MutationResult>) | undefined;
 	}
 
 	let { comment, profiles, remove }: Props = $props();
@@ -51,7 +51,7 @@
 						markup={comment.what}
 						placeholder="—"
 						edit={async (text) =>
-							queryOrError(db.updateComment(comment, text), 'Unable to save comment.')}
+							mutate(db.updateComment(comment, text), 'Unable to save comment.')}
 					/>
 				{:else}
 					{comment.what}
@@ -65,7 +65,7 @@
 					warning
 					action={() => {
 						deleting = true;
-						queryOrError(remove(comment.id), 'Unable to delete comment.');
+						mutate(remove(comment.id), 'Unable to delete comment.');
 						deleting = false;
 					}}>{Delete}</Button
 				>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type CommentID } from '$database/Organization';
-	import type { PostgrestError } from '@supabase/supabase-js';
+	import type { MutationResult } from '$database/Organization';
 	import Button from './Button.svelte';
 	import CommentView from './CommentView.svelte';
 	import Dialog from './Dialog.svelte';
@@ -13,7 +13,7 @@
 	interface Props {
 		comments: CommentID[];
 		profiles: ProfileRow[];
-		remove: ((id: CommentID) => Promise<PostgrestError | null>) | undefined;
+		remove: ((id: CommentID) => Promise<MutationResult>) | undefined;
 	}
 
 	let { comments, profiles, remove }: Props = $props();

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { PostgrestError } from '@supabase/supabase-js';
+	import type { MutationResult } from '$database/Organization';
 	import Button from './Button.svelte';
 	import Loading from './Loading.svelte';
 	import { tick } from 'svelte';
 
 	interface Props {
 		text: string;
-		edit?: undefined | ((text: string) => Promise<PostgrestError | null>);
+		edit?: undefined | ((text: string) => Promise<MutationResult>);
 		transform?: undefined | ((text: string) => string);
 	}
 
@@ -21,7 +21,7 @@
 		if (editing) {
 			if (edit) {
 				saving = true;
-				const error = await edit(revision);
+				const { error } = await edit(revision);
 				saving = false;
 				if (error) return;
 				else {

@@ -4,7 +4,7 @@
 	import Field from '$lib/Field.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { addError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Title from '$lib/Title.svelte';
 	import Flow from '$lib/Flow.svelte';
 	import Header from '$lib/Header.svelte';
@@ -42,22 +42,26 @@
 	);
 
 	async function createRole() {
-		const { data, error } = await db.createRole(org.id, newRole);
+		const { data } = await mutate(
+			db.createRole(org.id, newRole),
+			"We couldn't create the new role.",
+			{ refresh: false }
+		);
 		if (data) {
 			goto(`/org/${path}/role/${data.id}`);
 			return true;
-		} else if (error) {
-			addError("We couldn't create the new role.", error);
-			return false;
 		} else return false;
 	}
 
 	let newTeam = $state('');
 
 	async function createTeam() {
-		const { data, error } = await db.createTeam(org.id, newTeam);
+		const { data, error } = await mutate(
+			db.createTeam(org.id, newTeam),
+			"We couldn't create the new team.",
+			{ refresh: false }
+		);
 		if (error) {
-			addError("We couldn't create the new team.", error);
 			return false;
 		} else if (data) {
 			await goto(`/org/${path}/team/${data.id}`);

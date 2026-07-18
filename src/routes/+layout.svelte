@@ -38,7 +38,10 @@
 
 	let { data, children }: Props = $props();
 
-	let db = $derived(new Organization(data.supabase));
+	// Create this once and keep it stable: it owns the realtime channels and listeners, which would
+	// be lost if a new instance were derived on every invalidation.
+	// svelte-ignore state_referenced_locally
+	const db = new Organization(data.supabase);
 	setContext(DBSymbol, () => db);
 
 	// Update client when data updates.

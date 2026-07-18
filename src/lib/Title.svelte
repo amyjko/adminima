@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PostgrestError } from '@supabase/supabase-js';
+	import type { MutationResult } from '$database/Organization';
 	import EditableText from './EditableText.svelte';
 	import OrgNav from './OrgNav.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
@@ -21,7 +21,7 @@
 			| 'error'
 			| undefined;
 		label?: boolean;
-		edit?: undefined | ((text: string) => Promise<PostgrestError | null>);
+		edit?: undefined | ((text: string) => Promise<MutationResult>);
 		children?: import('svelte').Snippet;
 	}
 

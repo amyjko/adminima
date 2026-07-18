@@ -7,7 +7,7 @@
 	import { goto } from '$app/navigation';
 	import Title from '$lib/Title.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { addError, queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Header from '$lib/Header.svelte';
 	import TeamLink, { TeamItem } from '$lib/TeamLink.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
@@ -18,7 +18,7 @@
 	import PathEditor from '$lib/PathEditor.svelte';
 	import RoleProcesses from '$lib/RoleProcesses.svelte';
 	import Options from '$lib/Options.svelte';
-	import Organization from '$database/Organization';
+	import Organization, { ok } from '$database/Organization';
 
 	const { data } = $props();
 	const role = $derived(data.role);
@@ -49,7 +49,7 @@
 	title={role.title}
 	kind="role"
 	edit={isAdmin && $user
-		? (text) => queryOrError(db.updateRoleTitle(role, text, $user.id), "Couldn't update role title")
+		? (text) => mutate(db.updateRoleTitle(role, text, $user.id), "Couldn't update role title")
 		: undefined}
 >
 	{#if isAdmin}
@@ -69,10 +69,12 @@
 			change={async (team) => {
 				if (isAdmin && $user) {
 					return (
-						(await queryOrError(
-							db.updateRoleTeam(role, team ?? null, teams.find((t) => t.id)?.name, $user.id),
-							"Couldn't update role team"
-						)) === null
+						(
+							await mutate(
+								db.updateRoleTeam(role, team ?? null, teams.find((t) => t.id)?.name, $user.id),
+								"Couldn't update role team"
+							)
+						).error === null
 					);
 				}
 				return true;
@@ -84,11 +86,14 @@
 			short={role.short[0] ?? ''}
 			path={'...role/'}
 			update={async (text) => {
-				await queryOrError(db.updateRoleShortName(role, text), "Couldn't update role short name");
+				// The goto below reloads; refreshing here would fetch the old path.
+				await mutate(db.updateRoleShortName(role, text), "Couldn't update role short name", {
+					refresh: false
+				});
 				goto(`/org/${Organization.getPath(org)}/role/${text.length > 0 ? text : role.id}`, {
 					replaceState: true
 				});
-				return null;
+				return ok();
 			}}
 		/>{/if}
 </Title>
@@ -103,10 +108,7 @@
 	placeholder="No description yet."
 	edit={$user
 		? (text) =>
-				queryOrError(
-					db.updateRoleDescription(role, text, $user.id),
-					"Couldn't update role description."
-				)
+				mutate(db.updateRoleDescription(role, text, $user.id), "Couldn't update role description.")
 		: undefined}
 />
 
@@ -157,10 +159,14 @@
 	<Button
 		tip="Permanently delete this role. All processes will remain, but without a role."
 		action={async () => {
-			const error = await db.deleteRole(role.orgid, role.id);
-			if (error) {
-				addError("We couldn't delete this role.", error);
-			} else goto(`/org/${Organization.getPath(org)}/roles`);
+			const { error } = await mutate(
+				db.deleteRole(role.orgid, role.id),
+				"We couldn't delete this role.",
+				{
+					refresh: false
+				}
+			);
+			if (!error) goto(`/org/${Organization.getPath(org)}/roles`);
 		}}
 		warning>{Delete} Delete this role</Button
 	>

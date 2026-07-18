@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { PostgrestError } from '@supabase/supabase-js';
+	import type { MutationResult } from '$database/Organization';
 	import EditableText from './EditableText.svelte';
 
 	interface Props {
 		concern: string;
-		edit?: ((concern: string) => Promise<PostgrestError | null>) | undefined;
+		edit?: ((concern: string) => Promise<MutationResult>) | undefined;
 	}
 
 	let { concern, edit = undefined }: Props = $props();

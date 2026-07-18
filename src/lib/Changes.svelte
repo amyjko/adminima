@@ -27,7 +27,7 @@
 	import NewComment from './NewComment.svelte';
 	import Button from './Button.svelte';
 	import Options from './Options.svelte';
-	import { queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Checkbox from './Checkbox.svelte';
 	import { type Snippet } from 'svelte';
 
@@ -222,7 +222,7 @@
 								none={false}
 								change={async (status: string | undefined) => {
 									if ($user && status !== undefined && isStatus(status))
-										return await queryOrError(
+										return await mutate(
 											db.updateChangeStatus(change, status, $user.id),
 											"Couldn't update the change's status."
 										);

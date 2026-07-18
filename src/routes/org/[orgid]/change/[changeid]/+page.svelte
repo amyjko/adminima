@@ -13,7 +13,7 @@
 	import Status from '$lib/Status.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { addError, queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import timestampToDate from '$database/timestampToDate';
 	import Tip from '$lib/Tip.svelte';
 	import Loading from '$lib/Loading.svelte';
@@ -82,8 +82,7 @@
 	title={change.what}
 	kind="change"
 	edit={editable
-		? (text) =>
-				queryOrError(db.udpateChangeWhat(change, text), "Couldn't update the change's title")
+		? (text) => mutate(db.udpateChangeWhat(change, text), "Couldn't update the change's title")
 		: undefined}
 >
 	{#if editable}
@@ -93,7 +92,7 @@
 			none={false}
 			change={async (status: string | undefined) => {
 				if ($user && status !== undefined && isStatus(status))
-					return await queryOrError(
+					return await mutate(
 						db.updateChangeStatus(change, status, $user.id),
 						"Couldn't update the change's status."
 					);
@@ -108,7 +107,8 @@
 		<Visibility
 			level={change.visibility}
 			tip="Edit this change's visibility"
-			edit={(vis) => db.updateChangeVisibility(change, vis)}
+			edit={(vis) =>
+				mutate(db.updateChangeVisibility(change, vis), "Couldn't update change visibility.")}
 		/>
 	{/if}
 </Title>
@@ -145,10 +145,12 @@
 						.includes(query.toLowerCase())
 			}}
 			change={async (person) =>
-				(await queryOrError(
-					db.updateChangeLead(change, person ?? null),
-					"Couldn't update change processes."
-				)) === null}
+				(
+					await mutate(
+						db.updateChangeLead(change, person ?? null),
+						"Couldn't update change processes."
+					)
+				).error === null}
 		/>
 	{:else if change.lead}
 		<PersonLink profile={Organization.getProfileWithID(profiles, change.lead) ?? undefined} />
@@ -166,7 +168,7 @@
 			return undefined;
 		}}
 		done={(text) => {
-			queryOrError(
+			mutate(
 				db.updateChangeReview(
 					change,
 					text.length === 0 ? null : new Date(Date.parse(text)).toISOString()
@@ -184,10 +186,7 @@
 	placeholder="No description"
 	edit={editable
 		? (text) =>
-				queryOrError(
-					db.updateChangeDescription(change, text),
-					"Couldn't update change description."
-				)
+				mutate(db.updateChangeDescription(change, text), "Couldn't update change description.")
 		: undefined}
 />
 
@@ -197,8 +196,7 @@
 	markup={change.proposal}
 	placeholder="No proposal"
 	edit={editable
-		? (text) =>
-				queryOrError(db.updateChangeProposal(change, text), "Couldn't update change description.")
+		? (text) => mutate(db.updateChangeProposal(change, text), "Couldn't update change description.")
 		: undefined}
 />
 
@@ -210,7 +208,7 @@
 				chromeless
 				tip="Remove this role from the affected roles."
 				action={() =>
-					queryOrError(
+					mutate(
 						db.updateChangeRoles(
 							change,
 							change.roles.filter((r) => r !== role)
@@ -242,7 +240,7 @@
 			}}
 			change={async (r) => {
 				if (r !== undefined) {
-					const error = await queryOrError(
+					const { error } = await mutate(
 						db.updateChangeRoles(change, Array.from(new Set([...change.roles, r]))),
 						"Couldn't update change roles."
 					);
@@ -262,7 +260,7 @@
 			tip="Remove this process from the affected processes."
 			chromeless
 			action={async () =>
-				(await queryOrError(
+				(await mutate(
 					db.updateChangeProcesses(
 						change,
 						change.processes.filter((p) => p !== process)
@@ -295,7 +293,7 @@
 			}}
 			change={async (p) => {
 				if (p !== undefined) {
-					const error = await queryOrError(
+					const { error } = await mutate(
 						db.updateChangeProcesses(change, Array.from(new Set([...change.processes, p]))),
 						"Couldn't update change processes."
 					);
@@ -342,9 +340,10 @@
 	<Button
 		tip="Permanently delete this change."
 		action={async () => {
-			const { error } = await db.deleteChange(change.id);
-			if (error) addError("Couldn't delete this change.", error);
-			else {
+			const { error } = await mutate(db.deleteChange(change.id), "Couldn't delete this change.", {
+				refresh: false
+			});
+			if (!error) {
 				goto(`/org/${Organization.getPath(organization)}/changes`);
 			}
 		}}

@@ -3,7 +3,7 @@
 	import Title from '$lib/Title.svelte';
 	import { getDB } from '$routes/+layout.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { addError, queryOrError } from '$routes/errors.svelte';
+	import { addError, mutate } from '$routes/errors.svelte';
 	import Visibility from '$lib/VisibilityChooser.svelte';
 	import CommentsView from '$lib/CommentsView.svelte';
 	import Note from '$lib/Note.svelte';
@@ -11,7 +11,7 @@
 	import PathEditor from '$lib/PathEditor.svelte';
 	import { getUser } from '$routes/+layout.svelte';
 	import Link from '$lib/Link.svelte';
-	import Organization from '$database/Organization';
+	import Organization, { ok } from '$database/Organization';
 	import Row from '$lib/Row.svelte';
 
 	let { data } = $props();
@@ -36,8 +36,7 @@
 	title={org.name}
 	kind="organization"
 	edit={$user && admin
-		? (text) =>
-				queryOrError(db.updateOrgName(org, text, $user.id), "Couldn't update organization name.")
+		? (text) => mutate(db.updateOrgName(org, text, $user.id), "Couldn't update organization name.")
 		: undefined}
 >
 	<div class="meta">
@@ -48,7 +47,7 @@
 				edit={$user && editable
 					? (vis) =>
 							vis === 'org' || vis === 'admin' || vis === 'public'
-								? queryOrError(
+								? mutate(
 										db.updateOrgVisibility(org, vis, $user.id),
 										"Couldn't update organization visibility."
 									)
@@ -68,15 +67,18 @@
 					short={org.paths[0] ?? ''}
 					path={'https://adminima.app/org/'}
 					update={async (text) => {
-						if (text === '') return null;
+						if (text === '') return ok();
 						const available = await db.pathIsAvailable(text);
 
 						if (available) {
-							await queryOrError(db.addOrgPath(org, text), "Couldn't update path.");
+							// The goto below reloads; refreshing here would fetch the old path.
+							await mutate(db.addOrgPath(org, text), "Couldn't update path.", {
+								refresh: false
+							});
 							goto(`/org/${text}`, { replaceState: true });
 						} else addError('This path is not available');
 
-						return null;
+						return ok();
 					}}
 				/>
 			</Row>
@@ -87,7 +89,13 @@
 <MarkupView
 	markup={org.description}
 	placeholder="No description"
-	edit={editable && $user ? (text) => db.updateOrgDescription(org, text, $user.id) : undefined}
+	edit={editable && $user
+		? (text) =>
+				mutate(
+					db.updateOrgDescription(org, text, $user.id),
+					"Couldn't update organization description."
+				)
+		: undefined}
 />
 
 <CommentsView

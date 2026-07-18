@@ -2,7 +2,7 @@
 	import Oops from '$lib/Oops.svelte';
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Title from '$lib/Title.svelte';
 	import MarkupView from '$lib/MarkupView.svelte';
 	import RoleLink from '$lib/RoleLink.svelte';
@@ -33,10 +33,7 @@
 		kind="team"
 		edit={$user && isAdmin
 			? (text) =>
-					queryOrError(
-						db.updateTeamName(team, text, $user.id),
-						"We couldn't update the team's name."
-					)
+					mutate(db.updateTeamName(team, text, $user.id), "We couldn't update the team's name.")
 			: undefined}
 	/>
 
@@ -50,7 +47,7 @@
 		placeholder="No description"
 		edit={isAdmin && $user
 			? (text) =>
-					queryOrError(
+					mutate(
 						db.updateTeamDescription(team, text, $user.id),
 						"We couldn't update the team's description."
 					)
@@ -72,7 +69,10 @@
 	<Button
 		tip="Delete this team from the organization. Any roles on the team will remain, but be teamless."
 		action={async () => {
-			const error = await queryOrError(db.deleteTeam(team.id), "Couldn't delete the team.");
+			// Navigating away on success; refreshing here would reload a deleted team.
+			const { error } = await mutate(db.deleteTeam(team.id), "Couldn't delete the team.", {
+				refresh: false
+			});
 			if (error === null) await goto(`/org/${Organization.getPath(org)}/roles`);
 		}}
 		warning>{Delete} Delete this team</Button

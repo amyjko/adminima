@@ -1,13 +1,12 @@
 <script lang="ts">
-	import type { PostgrestError } from '@supabase/supabase-js';
-	import { type Visibility } from '../database/Organization';
+	import { type MutationResult, type Visibility } from '../database/Organization';
 	import Options from './Options.svelte';
 	import Vis from './Visibility.svelte';
 
 	interface Props {
 		level: Visibility;
 		tip: string;
-		edit?: undefined | ((level: string) => Promise<PostgrestError | null> | undefined);
+		edit?: undefined | ((level: string) => Promise<MutationResult> | undefined);
 	}
 
 	let { level, tip, edit = undefined }: Props = $props();
@@ -30,7 +29,7 @@
 		{tip}
 		bind:selection={level}
 		options={opts.map((o) => o.value)}
-		change={async (value) => (value ? (await edit(value)) === null : true)}
+		change={async (value) => (value ? (await edit(value))?.error === null : true)}
 		id="visibility"
 		view={{ snippet: viz, data: opts }}
 	></Options>

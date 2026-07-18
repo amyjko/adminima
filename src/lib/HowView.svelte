@@ -4,7 +4,7 @@
 	import { getContext, tick } from 'svelte';
 	import Visibility from './VisibilityChooser.svelte';
 	import { getDB } from '$routes/+layout.svelte';
-	import { addError, queryOrError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Button, { Delete } from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
@@ -39,30 +39,32 @@
 	let deleted = $state(false);
 
 	function save(newText: string) {
-		return queryOrError(db.updateHowText(how, newText), "Couldn't update step text.");
+		return mutate(db.updateHowText(how, newText), "Couldn't update step text.");
 	}
 
 	function toggleDone() {
-		db.updateHowDone(how, how.done === 'no' ? 'pending' : how.done === 'pending' ? 'yes' : 'no');
+		mutate(
+			db.updateHowDone(how, how.done === 'no' ? 'pending' : how.done === 'pending' ? 'yes' : 'no'),
+			"Couldn't update step completion."
+		);
 	}
 
 	async function insertHow() {
 		// See if this how has a parent, and if so, insert after this how.
 		if (parent) {
-			const { error, id } = await db.insertHow(
-				process,
-				parent.visibility,
-				parent,
-				parent.how.indexOf(how.id) + 1
+			const { error, data: id } = await mutate(
+				db.insertHow(process, parent.visibility, parent, parent.how.indexOf(how.id) + 1),
+				'Unable to insert how.'
 			);
-			if (error) addError('Unable to insert how.', error);
-			else if (id) focusID.set(id);
+			if (!error && id) focusID.set(id);
 		}
 		// Otherwise, insert at the first position of this how.
 		else {
-			const { error, id } = await db.insertHow(process, how.visibility, how, 0);
-			if (error) addError('Unable to insert how.', error);
-			if (id) focusID.set(id);
+			const { error, data: id } = await mutate(
+				db.insertHow(process, how.visibility, how, 0),
+				'Unable to insert how.'
+			);
+			if (!error && id) focusID.set(id);
 		}
 	}
 
@@ -81,7 +83,7 @@
 					? parent.id
 					: parent.how[parent.how.indexOf(how.id) - 1];
 
-			const error = await queryOrError(db.deleteHow(parent, how), "Couldn't delete how.");
+			const { error } = await mutate(db.deleteHow(parent, how), "Couldn't delete how.");
 			if (error) return;
 
 			focusID.set(newFocusID);
@@ -102,7 +104,7 @@
 		if (result) {
 			const [parent, previousHow] = result;
 			deleted = true;
-			const error = await queryOrError(
+			const { error } = await mutate(
 				db.reparentHow(how, parent, previousHow, previousHow.how.length),
 				"Couldn't indent how."
 			);
@@ -127,7 +129,7 @@
 		if (result) {
 			const [parent, grandparent] = result;
 			deleted = true;
-			const error = await queryOrError(
+			const { error } = await mutate(
 				db.reparentHow(how, parent, grandparent, grandparent.how.indexOf(parent.id) + 1),
 				"Couldn't unindent how."
 			);
@@ -165,10 +167,7 @@
 		const parent = Organization.getHowParent(hows, how.id);
 		if (parent) {
 			if (index >= 0 && index + dir < parent.how.length) {
-				const error = await queryOrError(
-					db.moveHow(how, parent, index + dir),
-					"Couldn't move how."
-				);
+				const { error } = await mutate(db.moveHow(how, parent, index + dir), "Couldn't move how.");
 				if (error) return;
 			}
 		}
@@ -263,7 +262,7 @@
 				level={how.visibility}
 				edit={(vis) =>
 					vis === 'public' || vis === 'org' || vis === 'admin'
-						? db.updateHowVisibility(how, vis)
+						? mutate(db.updateHowVisibility(how, vis), "Couldn't update step visibility.")
 						: undefined}
 			/>
 		{:else}

@@ -2,7 +2,7 @@
 	import { type ChangeRow } from '$database/Organization';
 	import { getDB, getUser } from '$routes/+layout.svelte';
 	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { addError } from '$routes/errors.svelte';
+	import { mutate } from '$routes/errors.svelte';
 	import Button from './Button.svelte';
 	import Form from './Form.svelte';
 	import Labeled from './Labeled.svelte';
@@ -27,17 +27,11 @@
 	async function submitComment() {
 		if (!$user) return null;
 		submitting = true;
-		const error = await db.addComment(
-			org.id,
-			$user.id,
-			newComment,
-			'suggestions',
-			change.id,
-			change.comments
+		const { error } = await mutate(
+			db.addComment(org.id, newComment, 'suggestions', change.id),
+			"Couldn't add comment."
 		);
-		if (error) {
-			addError(error.message);
-		} else {
+		if (!error) {
 			submitted?.(newComment);
 			newComment = '';
 		}
