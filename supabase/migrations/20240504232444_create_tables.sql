@@ -8,10 +8,10 @@ create type visibility as enum (
   'admin' -- Only admins can see it
 );
 
--- A convenience function for policies to get access to current user's email.
-create or replace function auth.email() returns text as $$
-  select nullif(current_setting('request.jwt.claim.email', true), '')::text;
-$$ language sql;
+-- Supabase provides auth.email() itself, and current Postgres images no longer let the migration
+-- role write to the auth schema, so redefining it here failed with 'permission denied for schema
+-- auth' when replaying the history on a fresh database. Nothing in this project referenced it --
+-- not even this migration -- so the redefinition is simply removed.
 
 -- A table to store people by email.
 create table "public"."people" (
