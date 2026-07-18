@@ -28,13 +28,15 @@ export function parse(markup: string): Markup {
 	while (index < lines.length) {
 		const line = lines[index];
 		if (line.startsWith('"')) {
-			let segmentList: Segment[][] = [];
+			const segmentList: Segment[][] = [];
 			do {
-				const segments = parseSegments(line.slice(1, -1));
-				segmentList.push(segments);
+				// Parse the current line, not the line the loop started on, or every line of a
+				// multi-line quote is a copy of the first.
+				segmentList.push(parseSegments(lines[index].slice(1, -1)));
 				index++;
 			} while (index < lines.length && lines[index].startsWith('"'));
-			index++;
+			// No extra index++ here: the loop above already advanced past the last quoted line, and
+			// skipping again would swallow whatever block follows the quote.
 			blocks.push(new Quote(segmentList));
 		} else if (isBullets(line)) {
 			const bulletLines = [];
