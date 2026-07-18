@@ -4,25 +4,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Don't let a stale run keep reporting on a branch that has already moved on.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Start Supabase local development setup
-        run: supabase db start --exclude storage-api,imgproxy,logflare,supavisor,vector
-
-      - name: Verify generated types are checked in
-        run: |
-          supabase gen types typescript --local > types.gen.ts
-          if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
-            echo "Detected uncommitted changes after build. See status below:"
-            git diff
-            exit 1
-          fi
+    uses: ./.github/workflows/test.yaml
