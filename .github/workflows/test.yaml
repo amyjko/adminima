@@ -39,8 +39,25 @@ jobs:
             exit 1
           fi
 
+      # svelte-kit sync generates the $env/static/public module from the environment it can see, so
+      # .env has to exist before it runs or PUBLIC_SUPABASE_* are missing from the generated types
+      # and every file importing them fails to check. Values come from the running stack rather than
+      # .env.example so a port change cannot make CI disagree with reality.
+      - name: Write .env from the running stack
+        run: |
+          eval "$(npx supabase status -o env | sed 's/^/export SUPABASE_/')"
+          {
+            echo "PUBLIC_SUPABASE_API_URL=$SUPABASE_API_URL"
+            echo "PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY"
+          } > .env
+
+      # sync also generates .svelte-kit/tsconfig.json and the ./$types for each route. A working
+      # copy usually has them from a previous dev or build run; a fresh checkout does not, and
+      # svelte-check cannot resolve anything without them.
       - name: Check types
-        run: npx svelte-check --tsconfig ./tsconfig.json
+        run: |
+          npx svelte-kit sync
+          npx svelte-check --tsconfig ./tsconfig.json
 
       - name: Unit tests
         run: npx vitest run
@@ -53,11 +70,6 @@ jobs:
           eval "$(npx supabase status -o env | sed 's/^/export SUPABASE_/')"
           SUPABASE_URL="$SUPABASE_API_URL" npm run test:e2e
 
-      # Build last: it inlines $env/static/public, so it fails without these, and a broken build
-      # should not be discovered during a deploy.
+      # Build last, so a broken build is not discovered during a deploy. It reads .env written above.
       - name: Build
-        run: |
-          eval "$(npx supabase status -o env | sed 's/^/export SUPABASE_/')"
-          PUBLIC_SUPABASE_API_URL="$SUPABASE_API_URL" \
-          PUBLIC_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
-          npm run build
+        run: npm run build
