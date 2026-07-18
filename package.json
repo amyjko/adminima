@@ -14,7 +14,7 @@
 		"test:watch": "vitest",
 		"test:e2e": "vitest run --config vitest.e2e.config.ts",
 		"csv": "node csv2org.js",
-		"start": "cp .env.local .env; supabase start --exclude storage-api,imgproxy,logflare,supavisor,vector",
+		"start": "cp .env.local .env; supabase start -x storage,imgproxy,analytics,vector,edge-runtime,functions",
 		"stop": "cp .env.prod .env; supabase stop",
 		"reset": "supabase db reset; npm run types",
 		"diff": "supabase db diff --local --use-migra -f rename_me",

@@ -25,9 +25,16 @@ jobs:
       #
       # `supabase start`, not `supabase db start`: the e2e harness creates accounts through
       # auth.admin.createUser and reads through PostgREST, so those services have to be running.
-      # The exclusions match the repo's own `npm run start` script.
+      #
+      # Everything the tests do not touch is excluded, which skips those image pulls -- worth doing
+      # because Docker Hub rate limits have failed runs here. The tests need the database, the API
+      # gateway, PostgREST and auth; nothing exercises realtime, email, storage or edge functions.
+      # Use the CLI's own service names (`supabase start --help`): unrecognised names, which this
+      # repo previously had, are silently ignored and exclude nothing.
       - name: Start Supabase
-        run: npx supabase start --exclude storage-api,imgproxy,logflare,supavisor,vector
+        run: >
+          npx supabase start
+          -x studio,inbucket,imgproxy,storage,analytics,vector,edge-runtime,functions,meta,realtime
 
       # Regenerate into the committed path and fail if it differs. Writing to any other filename
       # makes this check silently pass, because git diff ignores untracked files.
