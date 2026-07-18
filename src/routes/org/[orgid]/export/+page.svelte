@@ -118,20 +118,24 @@
 
 		const changeData: SheetData = [changeHeaders, ...changesRows];
 
-		await writeXlsxFile([processData, changeData], {
-			columns: [
-				[
+		await writeXlsxFile([
+			{
+				data: processData,
+				sheet: 'processes',
+				columns: [
 					{ width: 30 },
 					{ width: 60 },
 					...roles.map(() => {
 						return { width: 3 };
 					})
-				],
-				[{ width: 30 }, { width: 60 }, { width: 60 }, { width: 20 }]
-			],
-			sheets: ['processes', 'changes'],
-			fileName: 'export.xlsx'
-		});
+				]
+			},
+			{
+				data: changeData,
+				sheet: 'changes',
+				columns: [{ width: 30 }, { width: 60 }, { width: 60 }, { width: 20 }]
+			}
+		]).toFile('export.xlsx');
 	}
 </script>
 
