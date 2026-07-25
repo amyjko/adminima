@@ -15,3 +15,8 @@ test-results
 # ...except the template of local defaults. This negation has to come after the .env* rule above:
 # gitignore applies the last matching pattern, so putting it earlier silently has no effect.
 !.env.example
+
+# Database snapshots and generated restore scripts. These hold member names and email addresses,
+# and this repository is public. restore/ refuses to write anywhere `git check-ignore` does not
+# cover, so moving or removing this rule breaks the tooling rather than silently leaking.
+/backups/

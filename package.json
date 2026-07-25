@@ -1,6 +1,6 @@
 {
 	"name": "adminima",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -14,6 +14,8 @@
 		"test:watch": "vitest",
 		"test:e2e": "vitest run --config vitest.e2e.config.ts",
 		"csv": "node csv2org.js",
+		"snapshot": "node restore/snapshot.js",
+		"restore": "node restore/restore.js",
 		"start": "cp .env.local .env; supabase start -x storage,imgproxy,analytics,vector,edge-runtime,functions",
 		"stop": "cp .env.prod .env; supabase stop",
 		"reset": "supabase db reset; npm run types",
@@ -30,6 +32,7 @@
 		"@sveltejs/kit": "^2",
 		"@sveltejs/vite-plugin-svelte": "^7",
 		"@types/uuid": "^10",
+		"pg": "^8",
 		"prettier": "^3",
 		"prettier-plugin-svelte": "^3",
 		"supabase": "^2",
@@ -47,7 +50,7 @@
 		"@sveltejs/adapter-vercel": "^6",
 		"date-fns": "^4",
 		"fast-csv": "^5",
-		"uuid": "^13",
+		"uuid": "^14",
 		"write-excel-file": "^4"
 	}
 }

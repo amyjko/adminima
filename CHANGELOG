@@ -3,6 +3,26 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.9.1 2026-07-25
+
+### Added
+
+- Added a runbook and tooling for recovering lost data, in `restore/`. Production keeps seven daily
+  backups and no point-in-time recovery, and restoring one of those backups in place would roll the
+  whole database back and discard every legitimate write since it was taken. The tooling supports
+  the alternative: load the backup locally, diff it against production, and copy back only the rows
+  that are missing. It is a dry run unless asked otherwise, and it never updates an existing row or
+  deletes anything.
+- Added `npm run snapshot`, which dumps a database to a replayable script in seconds. Run it before
+  a risky migration or any hand-written SQL against production; it is the cheapest way to cover the
+  gap between daily backups.
+
+### Fixed
+
+### Changed
+
+- Updated minor dependencies.
+
 ## v0.9.0 2026-07-18
 
 ### Security
