@@ -52,18 +52,66 @@ export type ChangeID = string;
 export type CommentID = string;
 export type Markup = string;
 
+/**
+ * The state of an organization's realtime connection, for the UI to report.
+ *
+ * 'connecting' covers the first subscription and every retry after it, and isn't worth telling
+ * anyone about: mutations refresh explicitly, so a brief gap only delays other people's changes.
+ * 'disconnected' means we've stopped retrying, and only a reload will bring live updates back.
+ */
+export type RealtimeStatus = 'connected' | 'connecting' | 'disconnected';
+
+/** What we track about an organization's realtime connection, so we can retry when it drops. */
+type Connection = {
+	status: RealtimeStatus;
+	/** Failed subscription attempts since the last successful one. */
+	attempts: number;
+	/** Whether the connection has dropped since it last succeeded, and so may have missed changes. */
+	missed: boolean;
+	/** The pending retry, if any. */
+	timeout: ReturnType<typeof setTimeout> | null;
+};
+
+/** How a lost subscription is retried before we give up and let the UI say the page is stale. */
+export type RetrySchedule = {
+	/** How many retries to make before giving up. */
+	attempts: number;
+	/** How long to wait before the first retry; each subsequent one waits twice as long. */
+	delay: number;
+	/** The longest to wait between retries. */
+	maxDelay: number;
+};
+
+/**
+ * The schedule the app runs on. A failed attempt also spends the channel's join timeout, so five
+ * retries mean roughly a minute and a half of quiet retrying before anything is said — patient by
+ * design, since returning to the tab retries immediately anyway.
+ */
+const DefaultRetrySchedule: RetrySchedule = { attempts: 5, delay: 1000, maxDelay: 30000 };
+
 /** Encapsulates functionality related to querying the database and manipulating organization data. */
 class Organization {
 	private supabase: SupabaseClient<Database>;
 
-	/** A list of listeners to notify of realtime updates. */
-	private listeners: { id: OrganizationID; listener: () => void }[] = [];
+	/** A list of listeners to notify of realtime updates and connection status changes. */
+	private listeners: {
+		id: OrganizationID;
+		listener: () => void;
+		onStatus?: (status: RealtimeStatus) => void;
+	}[] = [];
 
 	/** Organization specific Supabase realtime channels, keyed by channel topic. */
 	readonly channels = new Map<string, RealtimeChannel>();
 
-	constructor(supabase: SupabaseClient<Database>) {
+	/** The state of each organization channel's connection, keyed by channel topic. */
+	private connections = new Map<string, Connection>();
+
+	/** How lost subscriptions are retried. Tests pass a faster schedule than the app's. */
+	private readonly retry: RetrySchedule;
+
+	constructor(supabase: SupabaseClient<Database>, retry: RetrySchedule = DefaultRetrySchedule) {
 		this.supabase = supabase;
+		this.retry = retry;
 	}
 
 	// Authentication
@@ -90,160 +138,252 @@ class Organization {
 		for (const listener of this.listeners) if (listener.id === orgid) listener.listener();
 	}
 
+	/** Tell everyone listening to this organization how its realtime connection is doing. */
+	private report(orgid: OrganizationID, status: RealtimeStatus) {
+		const connection = this.connections.get(this.getOrgChannel(orgid));
+		if (connection) connection.status = status;
+		for (const listener of this.listeners) if (listener.id === orgid) listener.onStatus?.(status);
+	}
+
 	/**
 	 * Subscribe to an organization-specific channel, listening to all modifications to organization-related tables.
-	 * Pass onError to be told when the subscription fails, so the UI can say so instead of silently going stale.
+	 * Pass onStatus to be told when the connection drops and when it comes back, so the UI can say
+	 * so instead of silently going stale.
 	 */
-	listen(org: OrganizationRow, listener: () => void, onError?: (status: string) => void) {
+	listen(org: OrganizationRow, listener: () => void, onStatus?: (status: RealtimeStatus) => void) {
 		const orgid = org.id;
+		const topic = this.getOrgChannel(orgid);
 
 		// Add the listener to the list of listeners.
-		this.listeners.push({ id: orgid, listener });
+		this.listeners.push({ id: orgid, listener, onStatus });
 
-		// See if there's a channel already.
-		let channel = this.channels.get(this.getOrgChannel(orgid));
+		// Already subscribed? No need to subscribe again; just say where things stand.
+		const connection = this.connections.get(topic);
+		if (connection) {
+			onStatus?.(connection.status);
+			return;
+		}
 
-		// Already have a channel? No need to subscribe again.
-		if (channel) return;
+		// Otherwise, subscribe, and remember the channel so we don't subscribe to the same topic
+		// twice, and so we can remove it later.
+		this.connections.set(topic, {
+			status: 'connecting',
+			attempts: 0,
+			missed: false,
+			timeout: null
+		});
+		onStatus?.('connecting');
+		this.channels.set(topic, this.createOrgChannel(orgid));
+	}
 
-		// Otherwise, create a channel for this organization and listen to changes on it, keeping client-side model in sync with database.
-		channel = this.supabase
-			.channel(this.getOrgChannel(orgid))
-			/** When an organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: 'UPDATE',
-					schema: 'public',
-					table: 'orgs',
-					/** Only listen to rows for this organization id */
-					filter: `id=eq.${orgid}`
-				},
-				(payload: RealtimePostgresChangesPayload<OrganizationRow>) => {
-					// Otherwise, update the organization.
-					if (payload.eventType === 'UPDATE') this.notify(orgid);
-				}
-			)
-			/** When a profile for this organization changes, refresh */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'profiles',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			/** When a role for this organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'roles',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			/** When an assignment for this organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'assignments',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			/** When a team for this organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'teams',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			/** When an process for this organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'processes',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			/** When a how for this organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'hows',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			/** When a how for this organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'suggestions',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			/** When a comment for this organization changes, update it's client-side store. */
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'comments',
-					/** Only listen to rows for this organization id */
-					filter: `orgid=eq.${orgid}`
-				},
-				() => {
-					this.notify(orgid);
-				}
-			)
-			.subscribe((status) => {
-				// Surface subscription failures; otherwise the UI silently shows stale data.
-				if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')
-					onError?.(status);
-			});
+	/**
+	 * Create and subscribe to an organization's channel, listening to changes on every
+	 * organization-related table and keeping the client-side model in sync with the database.
+	 */
+	private createOrgChannel(orgid: OrganizationID): RealtimeChannel {
+		return (
+			this.supabase
+				.channel(this.getOrgChannel(orgid))
+				/** When an organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: 'UPDATE',
+						schema: 'public',
+						table: 'orgs',
+						/** Only listen to rows for this organization id */
+						filter: `id=eq.${orgid}`
+					},
+					(payload: RealtimePostgresChangesPayload<OrganizationRow>) => {
+						// Otherwise, update the organization.
+						if (payload.eventType === 'UPDATE') this.notify(orgid);
+					}
+				)
+				/** When a profile for this organization changes, refresh */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'profiles',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				/** When a role for this organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'roles',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				/** When an assignment for this organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'assignments',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				/** When a team for this organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'teams',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				/** When an process for this organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'processes',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				/** When a how for this organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'hows',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				/** When a how for this organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'suggestions',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				/** When a comment for this organization changes, update it's client-side store. */
+				.on(
+					'postgres_changes',
+					{
+						event: '*',
+						schema: 'public',
+						table: 'comments',
+						/** Only listen to rows for this organization id */
+						filter: `orgid=eq.${orgid}`
+					},
+					() => {
+						this.notify(orgid);
+					}
+				)
+				.subscribe((status) => {
+					if (status === 'SUBSCRIBED') this.connected(orgid);
+					else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') this.failed(orgid);
+					// CLOSED is what removeChannel() produces when we tear a channel down or replace it,
+					// so it isn't a failure.
+				})
+		);
+	}
 
-		// Remember the channel so we don't subscribe to the same topic twice, and so we can remove it later.
-		this.channels.set(this.getOrgChannel(orgid), channel);
+	/** A subscription succeeded. If it was a retry, catch up on what changed while we were away. */
+	private connected(orgid: OrganizationID) {
+		const connection = this.connections.get(this.getOrgChannel(orgid));
+		if (connection === undefined) return;
+
+		// Was there a gap to catch up on? Tracked separately from the retry count, which reconnect()
+		// can reset — the longest gaps end in exactly that kind of reconnection.
+		const missed = connection.missed;
+
+		if (connection.timeout) clearTimeout(connection.timeout);
+		connection.timeout = null;
+		connection.attempts = 0;
+		connection.missed = false;
+
+		this.report(orgid, 'connected');
+		if (missed) this.notify(orgid);
+	}
+
+	/** A subscription failed. Retry with backoff, and give up after enough tries so the UI can say so. */
+	private failed(orgid: OrganizationID) {
+		const connection = this.connections.get(this.getOrgChannel(orgid));
+		if (connection === undefined) return;
+
+		connection.attempts++;
+		connection.missed = true;
+
+		if (connection.timeout) clearTimeout(connection.timeout);
+		connection.timeout = null;
+
+		// Out of tries? Stop, and let the UI say the page is out of date.
+		if (connection.attempts > this.retry.attempts) {
+			this.report(orgid, 'disconnected');
+			return;
+		}
+
+		this.report(orgid, 'connecting');
+		connection.timeout = setTimeout(
+			() => this.reconnect(orgid),
+			Math.min(this.retry.delay * 2 ** (connection.attempts - 1), this.retry.maxDelay)
+		);
+	}
+
+	/**
+	 * Replace an organization's channel with a fresh one. A channel that errored can't be revived —
+	 * subscribe() only rejoins a channel that's closed — so recovering means removing it and starting
+	 * over. Pass reset to start the retry count over, as when someone returns to a long-idle tab.
+	 */
+	reconnect(orgid: OrganizationID, options?: { reset?: boolean }) {
+		const topic = this.getOrgChannel(orgid);
+		const connection = this.connections.get(topic);
+
+		// Nobody listening, or nothing wrong? Nothing to do.
+		if (connection === undefined || connection.status === 'connected') return;
+
+		if (options?.reset) connection.attempts = 0;
+
+		if (connection.timeout) clearTimeout(connection.timeout);
+		connection.timeout = null;
+
+		const channel = this.channels.get(topic);
+		if (channel) this.supabase.removeChannel(channel);
+
+		this.report(orgid, 'connecting');
+		this.channels.set(topic, this.createOrgChannel(orgid));
 	}
 
 	/** Unsubscribe from the organization specific channel, if no one else is still listening to it. */
@@ -254,6 +394,12 @@ class Organization {
 		if (this.listeners.some((l) => l.id === orgid)) return;
 
 		const topic = this.getOrgChannel(orgid);
+
+		// Stop any retry in flight; nobody's around to care anymore.
+		const connection = this.connections.get(topic);
+		if (connection?.timeout) clearTimeout(connection.timeout);
+		this.connections.delete(topic);
+
 		const channel = this.channels.get(topic);
 		if (channel) {
 			this.supabase.removeChannel(channel);

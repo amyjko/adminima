@@ -22,14 +22,17 @@
 	import { getDB } from '$routes/+layout.svelte';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
-	import { type OrganizationRow } from '$database/Organization';
+	import { type OrganizationRow, type RealtimeStatus } from '$database/Organization';
 	import { navigating } from '$app/state';
 	import Loading from '$lib/Loading.svelte';
-	import { addError } from '$routes/errors.svelte';
+	import Button from '$lib/Button.svelte';
 
 	let { data, children } = $props();
 
 	let loading = $state(false);
+
+	/** How live updates for this organization are doing. Only 'disconnected' is worth showing. */
+	let realtime = $state<RealtimeStatus>('connecting');
 
 	const dbContext = getDB();
 	const db = $derived(dbContext());
@@ -59,22 +62,42 @@
 		// When this layout mounts, listen to realtime changes on the organization payload.
 		const orgid = data.org.id;
 
-		// Listen to realitime changes on the organization.
-		db.listen(context.org, updateOrg, (status) =>
-			addError(`Lost live updates for this organization (${status}). Reload to see changes.`)
-		);
+		// Listen to realitime changes on the organization, tracking the connection so we can say
+		// when it's gone for good.
+		db.listen(context.org, updateOrg, (status) => (realtime = status));
+
+		/**
+		 * Connections often die while a tab sits in the background. Rather than wait out the retry
+		 * schedule when someone comes back to it, try again immediately.
+		 */
+		function retry() {
+			if (document.visibilityState === 'visible') db.reconnect(orgid, { reset: true });
+		}
+
+		document.addEventListener('visibilitychange', retry);
+		window.addEventListener('online', retry);
 
 		// When this layout unmounts, unsubscribe from the organization realitime updates.
 		return () => {
+			document.removeEventListener('visibilitychange', retry);
+			window.removeEventListener('online', retry);
 			if (orgid) db.ignore(orgid, updateOrg);
 		};
 	});
 </script>
 
 {@render children()}
-{#if loading}
+{#if loading || realtime === 'disconnected'}
 	<div class="banner">
-		<Loading />
+		{#if loading}<Loading />{/if}
+		{#if realtime === 'disconnected'}
+			<div class="stale">
+				<span>This page is out of date.</span>
+				<Button tip="Reload this page to see the latest changes" action={() => location.reload()}
+					>Reload</Button
+				>
+			</div>
+		{/if}
 	</div>
 {/if}
 
@@ -88,5 +111,18 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
+		gap: var(--spacing);
+	}
+
+	.stale {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: var(--spacing);
+		background: var(--error);
+		color: var(--background);
+		padding: calc(2 * var(--padding));
+		border-radius: var(--radius);
+		border: 1px solid var(--border);
 	}
 </style>

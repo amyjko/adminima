@@ -21,6 +21,7 @@ const NON_DATABASE = new Set([
 	'notify',
 	'listen',
 	'ignore',
+	'reconnect',
 	'signOut',
 	'getPath',
 	'getAdmins',
