@@ -27,14 +27,20 @@ jobs:
       # auth.admin.createUser and reads through PostgREST, so those services have to be running.
       #
       # Everything the tests do not touch is excluded, which skips those image pulls -- worth doing
-      # because Docker Hub rate limits have failed runs here. The tests need the database, the API
-      # gateway, PostgREST and auth; nothing exercises realtime, email, storage or edge functions.
-      # Use the CLI's own service names (`supabase start --help`): unrecognised names, which this
-      # repo previously had, are silently ignored and exclude nothing.
+      # because Docker Hub rate limits have failed runs here. What's left is everything the suite
+      # actually needs: Postgres (never excludable), kong as the API gateway, postgrest for reads,
+      # gotrue because the harness creates accounts through auth.admin.createUser, and realtime
+      # because e2e/realtime.test.ts subscribes to a channel and waits for live updates.
+      #
+      # These are image names, not the service names `supabase start --help` prints -- the help text
+      # is built before config load and is wrong. Anything unrecognised is silently ignored and
+      # excludes nothing, which is how `storage`, `analytics`, `functions`, `meta` and `inbucket`
+      # sat here doing nothing. The CLI prints the real list only when you pass it a bad name, so
+      # check any change to this line against that warning rather than against --help.
       - name: Start Supabase
         run: >
           npx supabase start
-          -x studio,inbucket,imgproxy,storage,analytics,vector,edge-runtime,functions,meta,realtime
+          -x edge-runtime,imgproxy,logflare,mailpit,postgres-meta,storage-api,studio,supavisor,vector
 
       # Regenerate into the committed path and fail if it differs. Writing to any other filename
       # makes this check silently pass, because git diff ignores untracked files.

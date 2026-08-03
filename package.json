@@ -16,7 +16,7 @@
 		"csv": "node csv2org.js",
 		"snapshot": "node restore/snapshot.js",
 		"restore": "node restore/restore.js",
-		"start": "cp .env.local .env; supabase start -x storage,imgproxy,analytics,vector,edge-runtime,functions",
+		"start": "cp .env.local .env; supabase start -x storage-api,imgproxy,logflare,vector,edge-runtime",
 		"stop": "cp .env.prod .env; supabase stop",
 		"reset": "supabase db reset; npm run types",
 		"diff": "supabase db diff --local --use-migra -f rename_me",
