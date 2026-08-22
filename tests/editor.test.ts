@@ -25,7 +25,7 @@ async function open(page: import('@playwright/test').Page, source: string) {
 		document.body.prepend(root);
 		const host = new Host(root, initial, {
 			onChange: (source: string) => ((window as never as Record<string, unknown>).source = source),
-			onState: () => {},
+			onState: (next: unknown) => ((window as never as Record<string, unknown>).editorState = next),
 			onToggleSource: () =>
 				((window as never as Record<string, unknown>).toggled =
 					(((window as never as Record<string, unknown>).toggled as number) ?? 0) + 1)
@@ -381,4 +381,179 @@ test('enter twice at the end of a quote leaves it', async ({ page }) => {
 	await page.keyboard.press('Enter');
 	await page.keyboard.type('after');
 	expect(await source(page)).toBe('"one"\n\nafter');
+});
+
+function status(page: import('@playwright/test').Page) {
+	return page.evaluate(
+		() =>
+			(window as never as Record<string, unknown>).editorState as {
+				bold: boolean;
+				italic: boolean;
+				kind: string;
+				selected: boolean;
+			}
+	);
+}
+
+test('the toolbar state follows a selection over formatted text', async ({ page }) => {
+	await open(page, 'a *bold* word');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 2 },
+		{ selector: '#editor p', offset: 6 }
+	);
+	expect((await status(page)).bold).toBe(true);
+
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 8 },
+		{ selector: '#editor p', offset: 12 }
+	);
+	expect((await status(page)).bold).toBe(false);
+});
+
+test('the toolbar state follows the caret into formatted text', async ({ page }) => {
+	// Putting the cursor inside a bold word, with nothing selected, is how someone checks what they
+	// are about to type into. Every word processor shows bold as on there.
+	// "a " is 0 to 2, the bold "bold" is 2 to 6, and " word" is 6 to 11.
+	await open(page, 'a *bold* word');
+
+	// Inside the bold word.
+	await caret(page, '#editor p', 4);
+	expect((await status(page)).bold).toBe(true);
+
+	// Just after it, which is where typing would continue it.
+	await caret(page, '#editor p', 6);
+	expect((await status(page)).bold).toBe(true);
+
+	// Just before it, which is not.
+	await caret(page, '#editor p', 2);
+	expect((await status(page)).bold).toBe(false);
+
+	// Well clear of it.
+	await caret(page, '#editor p', 11);
+	expect((await status(page)).bold).toBe(false);
+});
+
+test('the toolbar state reads formatting at the very start of a line', async ({ page }) => {
+	// Nothing precedes the caret, so the character after it is what it is sitting in.
+	await open(page, '*bold* start');
+	await caret(page, '#editor p', 0);
+	expect((await status(page)).bold).toBe(true);
+});
+
+test('italic and bold are tracked apart', async ({ page }) => {
+	await open(page, '*bold* and _italic_');
+	await caret(page, '#editor p', 2);
+	expect(await status(page)).toMatchObject({ bold: true, italic: false });
+	await caret(page, '#editor p', 15);
+	expect(await status(page)).toMatchObject({ bold: false, italic: true });
+});
+
+test('the toolbar state follows the caret between blocks', async ({ page }) => {
+	await open(page, '# Title\n\nplain\n\n- item');
+	await caret(page, '#editor h3', 2);
+	expect((await status(page)).kind).toBe('heading1');
+	await caret(page, '#editor p', 2);
+	expect((await status(page)).kind).toBe('paragraph');
+	await caret(page, '#editor li', 2);
+	expect((await status(page)).kind).toBe('bullets');
+});
+
+/** Mount the real toolbar with a given state, and report what it rendered. */
+async function toolbar(page: import('@playwright/test').Page, status: Record<string, unknown>) {
+	await page.goto('/');
+	await page.evaluate(async (status) => {
+		const path = '/src/lib/editor/mount.ts';
+		const mod = await import(path);
+		const target = document.createElement('div');
+		target.id = 'toolbar';
+		document.body.prepend(target);
+		mod.mountToolbar(target, {
+			status,
+			controls: 'editor',
+			source: false,
+			mark: () => {},
+			kind: () => {},
+			undo: () => {},
+			redo: () => {},
+			toggleSource: () => {}
+		});
+	}, status);
+	return page.locator('#toolbar');
+}
+
+const Off = {
+	bold: false,
+	italic: false,
+	kind: 'paragraph',
+	undoable: false,
+	redoable: false,
+	selected: false
+};
+
+test('the toolbar renders the pressed state it is given', async ({ page }) => {
+	await toolbar(page, { ...Off, bold: true, kind: 'bullets' });
+	await expect(page.getByRole('button', { name: 'Bold' })).toHaveAttribute('aria-pressed', 'true');
+	await expect(page.getByRole('button', { name: 'Italic' })).toHaveAttribute(
+		'aria-pressed',
+		'false'
+	);
+	await expect(page.getByRole('button', { name: 'Bulleted list' })).toHaveAttribute(
+		'aria-pressed',
+		'true'
+	);
+	await expect(page.getByRole('button', { name: 'Heading', exact: true })).toHaveAttribute(
+		'aria-pressed',
+		'false'
+	);
+});
+
+test('undo and redo are not toggles, so they carry no pressed state', async ({ page }) => {
+	await toolbar(page, { ...Off, undoable: true });
+	await expect(page.getByRole('button', { name: 'Undo' })).not.toHaveAttribute('aria-pressed');
+	// Unavailable rather than removed from the page, so it can still be found and read.
+	await expect(page.getByRole('button', { name: 'Redo' })).toHaveAttribute('aria-disabled', 'true');
+	await expect(page.getByRole('button', { name: 'Undo' })).toHaveAttribute(
+		'aria-disabled',
+		'false'
+	);
+});
+
+test('the whole toolbar is one stop in the tab order', async ({ page }) => {
+	const row = await toolbar(page, Off);
+	const stops = await row
+		.locator('button')
+		.evaluateAll((buttons) => buttons.filter((b) => b.getAttribute('tabindex') === '0').length);
+	expect(stops).toBe(1);
+	// And it really is ten buttons sharing that one stop.
+	expect(await row.locator('button').count()).toBe(10);
+});
+
+test('the arrow keys move along the toolbar', async ({ page }) => {
+	const row = await toolbar(page, Off);
+	await row.locator('button').first().focus();
+	await page.keyboard.press('ArrowRight');
+	expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))).toBe(
+		'Italic'
+	);
+	await page.keyboard.press('ArrowLeft');
+	expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))).toBe(
+		'Bold'
+	);
+	// And wraps rather than stopping.
+	await page.keyboard.press('ArrowLeft');
+	expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))).toBe(
+		'Markup source'
+	);
+	await page.keyboard.press('Home');
+	expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))).toBe(
+		'Bold'
+	);
+});
+
+test('the toolbar says what it controls', async ({ page }) => {
+	const row = await toolbar(page, Off);
+	await expect(row.getByRole('toolbar')).toHaveAttribute('aria-label', 'Formatting');
+	await expect(row.getByRole('toolbar')).toHaveAttribute('aria-controls', 'editor');
 });

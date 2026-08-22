@@ -295,12 +295,26 @@ export default class Host {
 
 	private markedNow(format: '*' | '_'): boolean {
 		const span = this.span();
-		if (span === undefined || span.collapsed) return false;
+		if (span === undefined) return false;
+		// Formatting cannot cross a block or a line, so a selection that does carries none of it.
 		if (span.start.block !== span.end.block || span.start.line !== span.end.line) return false;
 		const block = this.markup.blocks[indexOf(span.start)];
 		if (block === undefined) return false;
 		const line = linesOf(block)[span.start.line];
-		return line === undefined ? false : hasMark(line, span.start.offset, span.end.offset, format);
+		if (line === undefined) return false;
+
+		if (!span.collapsed) return hasMark(line, span.start.offset, span.end.offset, format);
+
+		/*
+		 * With nothing selected, report the formatting the caret is sitting in, which is what
+		 * someone is checking when they put it there. The character before it is the convention, and
+		 * the one after it at the start of a line: otherwise the toolbar says a word is not bold
+		 * while the cursor is in the middle of it, which is worse than useless to anyone who cannot
+		 * see that it is.
+		 */
+		const offset = span.start.offset;
+		if (offset > 0) return hasMark(line, offset - 1, offset, format);
+		return hasMark(line, 0, 1, format);
 	}
 
 	state(): State {
