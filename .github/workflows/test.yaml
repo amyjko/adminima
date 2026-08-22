@@ -83,6 +83,19 @@ jobs:
           eval "$(npx supabase status -o env | sed 's/^/export SUPABASE_/')"
           SUPABASE_URL="$SUPABASE_API_URL" npm run test:e2e
 
-      # Build last, so a broken build is not discovered during a deploy. It reads .env written above.
+      # Before the browser tests, so a broken build fails here with a build error rather than as a
+      # web server that never came up. It reads .env written above, and the preview server the
+      # browser tests run against reuses this output rather than building a second time.
       - name: Build
         run: npm run build
+
+      # Only the browser the tests actually use. --with-deps because a bare runner is missing the
+      # system libraries chromium needs.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # The suite that needs a real browser: the editor's caret, keystroke and clipboard behavior,
+      # and the accessibility checks. Playwright starts both servers itself here, because
+      # reuseExistingServer is off under CI.
+      - name: Browser tests
+        run: npm run test:integration
