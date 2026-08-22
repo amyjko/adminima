@@ -487,6 +487,14 @@ export default class Host {
 	// -- Events ---------------------------------------------------------------
 
 	private onCompositionStart = () => {
+		/*
+		 * Remember the state now, because nothing else will. Composition is never intercepted and
+		 * the input events it raises are all skipped, so without this a whole composed word could
+		 * not be undone -- which is most of what typing is for anyone using an input method, and
+		 * everything typed on Android.
+		 */
+		this.history.record({ source: this.source, point: savePoint(this.root) }, { typing: true });
+
 		// Composition cannot be intercepted, so formatting chosen for what comes next cannot be
 		// applied to it. Dropping it is honest; pretending otherwise would produce plain text under
 		// a toolbar insisting it is bold.

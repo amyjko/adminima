@@ -11,9 +11,15 @@
  */
 import { mount, type ComponentProps } from 'svelte';
 import MarkupToolbar from '../MarkupToolbar.svelte';
+import MarkupEditor from '../MarkupEditor.svelte';
 
 type ToolbarProps = ComponentProps<typeof MarkupToolbar>;
+type EditorProps = ComponentProps<typeof MarkupEditor>;
 
 export function mountToolbar(target: HTMLElement, props: ToolbarProps) {
 	return mount(MarkupToolbar, { target, props });
+}
+
+export function mountEditor(target: HTMLElement, props: EditorProps) {
+	return mount(MarkupEditor, { target, props });
 }

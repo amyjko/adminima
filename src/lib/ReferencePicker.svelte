@@ -26,11 +26,17 @@
 
 	let { context, insert, close }: Props = $props();
 
+	/*
+	 * Outside an organization there is nothing to refer to, but a web address is still a link worth
+	 * making. Reading the context defensively keeps the editor usable anywhere rather than throwing
+	 * the moment someone presses the shortcut.
+	 */
 	const org = getOrg();
+	let organization = $derived(typeof org === 'function' ? org() : undefined);
 
 	/** Roles and processes in one list, since `<name@target>` says both the same way. */
-	let roles = $derived(org().shortRoles);
-	let processes = $derived(org().shortProcesses);
+	let roles = $derived(organization?.shortRoles ?? []);
+	let processes = $derived(organization?.shortProcesses ?? []);
 
 	/** Values are prefixed so that one list can hold both without confusing an id for another. */
 	let choices = $derived([
@@ -101,30 +107,32 @@
 <Dialog {close}>
 	<h2>{context.target === undefined ? 'Insert a link' : 'Edit this link'}</h2>
 
-	<Labeled label="Role or process" id="reference-target">
-		<Options
-			id="reference-target"
-			tip="Choose a role or process to refer to"
-			bind:selection={choice}
-			options={choices}
-			empty
-			searchable={{
-				placeholder: 'Find a role or process',
-				include: (item, query) =>
-					titleOf(item).toLocaleLowerCase().includes(query.toLocaleLowerCase())
-			}}
-			view={{ snippet: Choice, data: [] }}
-			change={(value) => {
-				choice = value;
-				// Choosing something means it is not a web address, and an empty label takes its name.
-				if (value !== undefined) address = '';
-				if (label.trim().length === 0) label = titleOf(value);
-				return true;
-			}}
-		/>
-	</Labeled>
+	{#if roles.length > 0 || processes.length > 0}
+		<Labeled label="Role or process" id="reference-target">
+			<Options
+				id="reference-target"
+				tip="Choose a role or process to refer to"
+				bind:selection={choice}
+				options={choices}
+				empty
+				searchable={{
+					placeholder: 'Find a role or process',
+					include: (item, query) =>
+						titleOf(item).toLocaleLowerCase().includes(query.toLocaleLowerCase())
+				}}
+				view={{ snippet: Choice, data: [] }}
+				change={(value) => {
+					choice = value;
+					// Choosing something means it is not a web address, and an empty label takes its name.
+					if (value !== undefined) address = '';
+					if (label.trim().length === 0) label = titleOf(value);
+					return true;
+				}}
+			/>
+		</Labeled>
+	{/if}
 
-	<Labeled label="Or a web address">
+	<Labeled label={roles.length > 0 || processes.length > 0 ? 'Or a web address' : 'Web address'}>
 		<Field fill label="" bind:text={address} placeholder="https://" active={choice === undefined} />
 	</Labeled>
 

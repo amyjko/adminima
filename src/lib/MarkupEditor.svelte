@@ -52,8 +52,10 @@
 	});
 
 	$effect(() => {
+		// Svelte clears a bound element to null rather than undefined, so switching to the source
+		// view was building an editor around nothing and throwing on the way in.
 		const root = element;
-		if (root === undefined) return;
+		if (root === undefined || root === null) return;
 		const created = new Host(
 			root,
 			untrack(() => markup),
@@ -137,7 +139,6 @@
 			class="rich"
 			contenteditable="true"
 			spellcheck="true"
-			aria-multiline="true"
 			aria-labelledby={labelled ? `${id}-label` : undefined}
 			aria-describedby="{id}-help"
 			bind:this={element}
@@ -151,8 +152,8 @@
 		></div>
 		<Note>
 			<span id="{id}-help">
-				Bold is {modifier}+B, italic +I, heading +option+1, list +shift+8, markup source +shift+M.
-				Shift+tab reaches the toolbar.
+				Bold is {modifier}+B, italic +I, link or reference +K, heading +option+1, list +shift+8,
+				markup source +shift+M. Shift+tab reaches the toolbar.
 			</span>
 		</Note>
 	{/if}

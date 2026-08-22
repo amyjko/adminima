@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 // Reading the clipboard back is how the tests below check what a paste elsewhere would get.
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
@@ -784,3 +785,188 @@ test('emptying a document leaves somewhere to carry on', async ({ page }) => {
 	await page.keyboard.type('again');
 	expect(await source(page)).toBe('again');
 });
+
+/**
+ * Type through an input method, the way Japanese, Chinese or Korean text is entered — and the way
+ * Android enters everything, including swipes and autocorrect.
+ *
+ * This is the part of an editor that cannot be reasoned about safely: composition events cannot be
+ * cancelled, and anything that touches the DOM while one is running desynchronizes the keyboard's
+ * own buffer. Driving it through the devtools protocol is the only automated coverage there is.
+ * Chromium only, which is a real limit -- Safari and Android are still hand testing.
+ */
+async function compose(
+	context: import('@playwright/test').BrowserContext,
+	page: import('@playwright/test').Page,
+	stages: string[],
+	commit: string
+) {
+	const cdp = await context.newCDPSession(page);
+	for (const [index, text] of stages.entries())
+		await cdp.send('Input.imeSetComposition', {
+			text,
+			selectionStart: index + 1,
+			selectionEnd: index + 1
+		});
+	await cdp.send('Input.insertText', { text: commit });
+	// The read back waits a frame, since a trailing input event follows composition in Chrome.
+	await page.waitForTimeout(100);
+}
+
+test('composed text goes in where the caret is', async ({ page, context }) => {
+	await open(page, 'ab');
+	await caret(page, '#editor p', 1);
+	await compose(context, page, ['に', 'にほ'], '日本');
+	expect(await source(page)).toBe('a日本b');
+});
+
+test('composing beside a reference leaves it whole', async ({ page, context }) => {
+	// Nothing may rebuild the DOM while a composition is running, and a pill sitting next to one is
+	// where that would show up first.
+	const editor = await open(page, 'see <Amy@registrar> now');
+	// Just before the reference, then one step of travel over it, which is the real way past one.
+	await caret(page, '#editor p', 4);
+	await page.keyboard.press('ArrowRight');
+	await compose(context, page, ['に'], '日本');
+	expect(await source(page)).toBe('see <Amy@registrar>日本 now');
+	await expect(editor.locator('[data-pill]')).toHaveCount(1);
+});
+
+test('composed text can be undone', async ({ page, context }) => {
+	await open(page, 'ab');
+	await caret(page, '#editor p', 1);
+	await compose(context, page, ['に'], '日本');
+	expect(await source(page)).toBe('a日本b');
+	await page.keyboard.press('ControlOrMeta+z');
+	expect(await source(page)).toBe('ab');
+});
+
+test('composing into an empty document works', async ({ page, context }) => {
+	const editor = await open(page, '');
+	await editor.click();
+	await compose(context, page, ['に'], '日本');
+	expect(await source(page)).toBe('日本');
+});
+
+test('composing inside formatted text stays formatted', async ({ page, context }) => {
+	await open(page, 'a *bold* word');
+	await caret(page, '#editor p', 4);
+	await compose(context, page, ['に'], '日本');
+	expect(await source(page)).toBe('a *bo日本ld* word');
+});
+
+test('formatting chosen for what comes next is dropped rather than lied about', async ({
+	page,
+	context
+}) => {
+	// Composition cannot be intercepted, so the choice cannot be honoured. Saying so beats a
+	// toolbar insisting the plain text that arrives is bold.
+	await open(page, 'ab');
+	await caret(page, '#editor p', 1);
+	await page.keyboard.press('ControlOrMeta+b');
+	await compose(context, page, ['に'], '日本');
+	expect(await source(page)).toBe('a日本b');
+	await expectStatus(page, { bold: false });
+});
+
+/** Mount the whole editor, label and all, the way a page uses it. */
+async function field(page: import('@playwright/test').Page, markup: string, labelled = true) {
+	await page.goto('/');
+	await page.evaluate(
+		async ({ markup, labelled }) => {
+			const path = '/src/lib/editor/mount.ts';
+			const mod = await import(path);
+			const wrap = document.createElement('div');
+			wrap.id = 'wrap';
+			wrap.style.position = 'relative';
+			wrap.style.zIndex = '9999';
+			wrap.style.background = 'white';
+			// What Labeled renders when it is given an id to name something with.
+			if (labelled) {
+				const label = document.createElement('span');
+				label.id = 'field-label';
+				label.textContent = 'Describe this role';
+				wrap.appendChild(label);
+			}
+			const target = document.createElement('div');
+			wrap.appendChild(target);
+			document.body.prepend(wrap);
+			mod.mountEditor(target, { markup, id: 'field', labelled });
+		},
+		{ markup, labelled }
+	);
+	return page.locator('#wrap');
+}
+
+test('the editor is named by the label beside it', async ({ page }) => {
+	// A label only names a labelable element, and an editable region is not one, so this is the
+	// only thing standing between the field and having no accessible name at all.
+	await field(page, 'some text');
+	await expect(page.locator('#field')).toHaveAttribute('aria-labelledby', 'field-label');
+	await expect(page.locator('#field')).toHaveAttribute('aria-describedby', 'field-help');
+	// No role at all: a textbox role is a leaf, and would hide the headings and lists inside it.
+	await expect(page.locator('#field')).not.toHaveAttribute('role');
+});
+
+test('the editor has no accessibility violations', async ({ page }) => {
+	await field(
+		page,
+		'# Heading\n\nSome *bold* text and a <Amy@registrar> reference.\n\n- one\n- two'
+	);
+	const results = await new AxeBuilder({ page }).include('#wrap').analyze();
+	expect(results.violations.map((v) => `${v.id}: ${v.description}`)).toEqual([]);
+});
+
+test('the source view has no accessibility violations either', async ({ page }) => {
+	await field(page, '# Heading\n\n- one\n- two');
+	await page.getByRole('button', { name: 'Markup source' }).click();
+	await expect(page.locator('textarea#field')).toBeVisible();
+	const results = await new AxeBuilder({ page }).include('#wrap').analyze();
+	expect(results.violations.map((v) => `${v.id}: ${v.description}`)).toEqual([]);
+});
+
+/**
+ * Every shortcut the help text names, and what it should do.
+ *
+ * The help text is read out through aria-describedby, so someone who cannot see the toolbar is
+ * taking it as fact. Three shortcuts were once named there that had never been written.
+ */
+const Shortcuts = [
+	{ token: '+B', press: 'ControlOrMeta+b', from: 'word', to: '*word*' },
+	{ token: '+I', press: 'ControlOrMeta+i', from: 'word', to: '_word_' },
+	{ token: '+K', press: 'ControlOrMeta+k', from: 'word', to: 'word' },
+	{ token: '+1', press: 'ControlOrMeta+Alt+1', from: 'word', to: '# word' },
+	{ token: '+8', press: 'ControlOrMeta+Shift+8', from: 'word', to: '- word' },
+	{ token: '+M', press: 'ControlOrMeta+Shift+m', from: 'word', to: 'word' }
+];
+
+test('the help text names every shortcut and no others', async ({ page }) => {
+	await field(page, 'word');
+	const help = (await page.locator('#field-help').textContent()) ?? '';
+	// A single character after a plus is the key; anything longer is a modifier being named.
+	const named = new Set((help.match(/\+[A-Za-z0-9](?![A-Za-z])/g) ?? []).map((t) => t.toUpperCase()));
+	expect([...named].sort()).toEqual([...Shortcuts.map((s) => s.token)].sort());
+});
+
+for (const shortcut of Shortcuts) {
+	test(`the shortcut ${shortcut.token} does what the help text says`, async ({ page }) => {
+		await field(page, shortcut.from);
+		await page.locator('#field').click();
+		await page.keyboard.press('End');
+		// Bold and italic need something to apply to; the rest act on where the caret is.
+		if (shortcut.token === '+B' || shortcut.token === '+I')
+			for (let index = 0; index < 4; index++) await page.keyboard.press('Shift+ArrowLeft');
+		await page.keyboard.press(shortcut.press);
+
+		if (shortcut.token === '+K') {
+			// It opens the picker rather than changing anything.
+			await expect(page.getByRole('dialog')).toBeVisible();
+		} else if (shortcut.token === '+M') {
+			await expect(page.locator('textarea#field')).toBeVisible();
+		} else {
+			await expect
+				.poll(() => page.locator('#field').innerText())
+				.toContain(shortcut.to.replace(/[*_#-]/g, '').trim());
+		}
+	});
+}
