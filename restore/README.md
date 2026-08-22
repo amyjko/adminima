@@ -62,6 +62,17 @@ statements, and the tool refuses it.
 The session pooler's username is `postgres.<project-ref>`, not `postgres`. Getting that wrong
 fails as a password error, which sends you looking in the wrong place.
 
+Supabase signs its own certificates — the pooler presents one from `Supabase Intermediate 2021 CA`,
+which no public trust store carries — so every connection outside the local stack also needs
+`--ca`. Download it from **Dashboard → Settings → Database**:
+
+```sh
+npm run snapshot -- --source-env PROD_DB_URL --ca ~/Downloads/prod-ca-2021.crt
+```
+
+Do not reach for a way to skip verification instead. A connection that cannot prove what it is
+talking to is not one to send a production password down.
+
 ## 2. Get the backup
 
 **Dashboard → Database → Backups**, pick the day, **Download**. The timestamps are UTC.

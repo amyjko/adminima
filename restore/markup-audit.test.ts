@@ -26,6 +26,15 @@ import { connect } from './lib/db.js';
  *
  *   AUDIT_DB_URL=postgresql://... npm run audit:markup
  *
+ * Supabase presents a certificate from its own authority rather than a public one, so a connection
+ * to anything but the local stack also needs its CA:
+ *
+ *   AUDIT_DB_CA=~/Downloads/prod-ca-2021.crt
+ *
+ * Download it from Dashboard -> Settings -> Database. Verification is never turned off to get
+ * around this: a connection that cannot prove who it is talking to is not one to send a password
+ * down.
+ *
  * A url on the command line shows up in ps output and shell history, so it is read from the
  * environment only. Reading .env is deliberately not an option: `npm run stop` copies .env.prod
  * over .env, so .env points at production whenever the local stack is down.
@@ -111,6 +120,9 @@ const BlockCheck: [markup: string, rewritten: number, blocks: number][] = [
 
 const url = process.env.AUDIT_DB_URL;
 
+/** Supabase signs its own certificates, so anything but the local stack needs its authority. */
+const ca = process.env.AUDIT_DB_CA?.replace(/^~(?=\/)/, process.env.HOME ?? '~');
+
 test.skipIf(!url)(
 	'report what the editor would do to stored markup',
 	async () => {
@@ -130,7 +142,8 @@ test.skipIf(!url)(
 			new Markup([new Paragraph([new Characters('', 'a ')])]).toString()
 		);
 
-		const client = await connect(url, { label: 'audit' });
+		// connect() checks the file itself; what it does not do is expand a leading ~.
+		const client = await connect(url, { label: 'audit', ca });
 		const counts = new Map<string, number>();
 		const losses: string[] = [];
 		const lines: string[] = [];
