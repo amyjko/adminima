@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { slide } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 	import Button from './Button.svelte';
 	import type { State } from './editor/host';
 	import type { Kind } from './editor/commands';
@@ -27,6 +28,10 @@
 	 * Making room for the toolbar shoves everything below it down. Sliding it in shows where the
 	 * space came from, rather than the text appearing to jump on its own -- but only for people who
 	 * have not asked for less of that.
+	 *
+	 * On the way in only. An outro would hold the whole editor on the page while it played, and
+	 * saving puts the rendered version up at the same moment -- so both were briefly visible, one
+	 * above the other.
 	 */
 	let still = $derived(browser && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -93,7 +98,7 @@
 	bind:this={toolbar}
 	onkeydown={navigate}
 	onmousedowncapture={(event) => event.preventDefault()}
-	transition:slide={{ duration: still ? 0 : 140 }}
+	in:slide={{ duration: still ? 0 : 160, easing: cubicOut }}
 >
 	<Button
 		tip="Bold"
