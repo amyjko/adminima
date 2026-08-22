@@ -41,7 +41,28 @@ test.each([
 	[
 		'A paragraph.\n\n"A trailing quote"',
 		'Markup[Paragraph[Text[A paragraph.]], Quote[Text[A trailing quote]]]'
-	]
+	],
+	// Headings drop the space after the hashes rather than keeping it in the text.
+	['# Hello', 'Markup[Header[# Text[Hello]]]'],
+	['## Hello', 'Markup[Header[## Text[Hello]]]'],
+	// A backslash escapes a character that would otherwise start something.
+	['\\*not bold\\*', 'Markup[Paragraph[Text[*not bold*]]]'],
+	['a \\< b', 'Markup[Paragraph[Text[a < b]]]'],
+	['\\- not a list', 'Markup[Paragraph[Text[- not a list]]]'],
+	['1\\. not a list', 'Markup[Paragraph[Text[1. not a list]]]'],
+	['\\# not a heading', 'Markup[Paragraph[Text[# not a heading]]]'],
+	// A backslash before anything else stays a literal backslash, so paths and regexes survive.
+	['C:\\shared', 'Markup[Paragraph[Text[C:\\shared]]]'],
+	['match \\d+ digits', 'Markup[Paragraph[Text[match \\d+ digits]]]'],
+	// A target that isn't a web address is a reference to a role or process.
+	['<Amy@registrar>', 'Markup[Paragraph[Reference[Amy@registrar]]]'],
+	['<Amy@Chief of Staff>', 'Markup[Paragraph[Reference[Amy@Chief of Staff]]]'],
+	['<home@adminima.app>', 'Markup[Paragraph[Link[home@adminima.app]]]'],
+	['<docs@/org/1/role/2>', 'Markup[Paragraph[Link[docs@/org/1/role/2]]]'],
+	// A URL containing the separator used to lose everything after the second one.
+	['<mail@mailto:a@b.com>', 'Markup[Paragraph[Link[mail@mailto:a@b.com]]]'],
+	// A quote that was never closed used to lose its last character.
+	['"unclosed', 'Markup[Quote[Text[unclosed]]]']
 ])('parse %s', (markup: string, debug: string) => {
 	expect(parse(markup).toString()).toBe(debug);
 });

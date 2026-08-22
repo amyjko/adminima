@@ -128,7 +128,7 @@
 					expanded = true;
 				}}
 				onkeydown={(event) => handleKey(event, undefined)}
-				aria-controls={id}
+				aria-controls="{id}-list"
 				aria-autocomplete="list"
 				aria-expanded={expanded ? 'true' : 'false'}
 				data-active-option="{id}-{options.findIndex((s) => s === selection)}"

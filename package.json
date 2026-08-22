@@ -15,6 +15,7 @@
 		"test:e2e": "vitest run --config vitest.e2e.config.ts",
 		"csv": "node csv2org.js",
 		"snapshot": "node restore/snapshot.js",
+		"audit:markup": "vitest run restore/markup-audit.test.ts",
 		"restore": "node restore/restore.js",
 		"start": "cp .env.local .env; supabase start -x storage-api,imgproxy,logflare,vector,edge-runtime",
 		"stop": "cp .env.prod .env; supabase stop",
