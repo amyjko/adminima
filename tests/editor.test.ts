@@ -156,3 +156,106 @@ test('tab is left alone, so the toolbar stays one key away', async ({ page }) =>
 	expect(await source(page)).toBe('hello');
 	expect(await page.evaluate(() => document.activeElement?.id)).not.toBe('editor');
 });
+
+/** Select from one offset in one line to another offset in another, the way dragging would. */
+async function selectAcross(
+	page: import('@playwright/test').Page,
+	from: { selector: string; offset: number },
+	to: { selector: string; offset: number }
+) {
+	await page.evaluate(
+		({ from, to }) => {
+			const find = (selector: string, offset: number) => {
+				const line = document.querySelector(selector)!;
+				const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+				let seen = 0;
+				let node = walker.nextNode();
+				while (node !== null) {
+					const length = (node as Text).data.length;
+					if (seen + length >= offset) return { node, offset: offset - seen };
+					seen += length;
+					node = walker.nextNode();
+				}
+				return { node: line as Node, offset: 0 };
+			};
+			const start = find(from.selector, from.offset);
+			const end = find(to.selector, to.offset);
+			const range = document.createRange();
+			range.setStart(start.node, start.offset);
+			range.setEnd(end.node, end.offset);
+			const selection = getSelection()!;
+			selection.removeAllRanges();
+			selection.addRange(range);
+		},
+		{ from, to }
+	);
+}
+
+test('what the browser does with a cut across paragraphs', async ({ page }) => {
+	await open(page, 'first line\n\nsecond line');
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 6 },
+		{ selector: '#editor p:nth-child(2)', offset: 7 }
+	);
+	await page.keyboard.press('ControlOrMeta+x');
+	expect(await source(page)).toBe('first line');
+});
+
+test('what the browser does with a copy and paste across paragraphs', async ({ page }) => {
+	await open(page, 'first line\n\nsecond line');
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 0 },
+		{ selector: '#editor p:nth-child(2)', offset: 6 }
+	);
+	await page.keyboard.press('ControlOrMeta+c');
+	await caret(page, '#editor p:nth-child(2)', 11);
+	await page.keyboard.press('ControlOrMeta+v');
+	expect(await source(page)).toBe('first line\n\nsecond line\n\nfirst line\n\nsecond');
+});
+
+test('a copied reference is still a reference when pasted back', async ({ page }) => {
+	await open(page, 'see <Amy@registrar> now');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 4 },
+		{ selector: '#editor p', offset: 5 }
+	);
+	await page.keyboard.press('ControlOrMeta+c');
+	// The helper counts raw text, where the pill contributes its whole label.
+	await caret(page, '#editor p', 11);
+	await page.keyboard.press('ControlOrMeta+v');
+	expect(await source(page)).toBe('see <Amy@registrar> now<Amy@registrar>');
+});
+
+test('formatting survives a copy across paragraphs', async ({ page }) => {
+	await open(page, 'a *bold* word\n\nsecond');
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 0 },
+		{ selector: '#editor p:nth-child(2)', offset: 6 }
+	);
+	await page.keyboard.press('ControlOrMeta+c');
+	await caret(page, '#editor p:nth-child(2)', 6);
+	await page.keyboard.press('ControlOrMeta+v');
+	expect(await source(page)).toBe('a *bold* word\n\nsecond\n\na *bold* word\n\nsecond');
+});
+
+test('a reference survives a copy across paragraphs', async ({ page }) => {
+	// Across blocks the clipboard is the browser's to write, so what comes back is the editor's own
+	// HTML rather than markup. A reference must survive that too, or copying a paragraph quietly
+	// turns every reference in it into plain words.
+	await open(page, 'see <Amy@registrar> now\n\nsecond');
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 0 },
+		{ selector: '#editor p:nth-child(2)', offset: 6 }
+	);
+	await page.keyboard.press('ControlOrMeta+c');
+	await caret(page, '#editor p:nth-child(2)', 6);
+	await page.keyboard.press('ControlOrMeta+v');
+	expect(await source(page)).toBe(
+		'see <Amy@registrar> now\n\nsecond\n\nsee <Amy@registrar> now\n\nsecond'
+	);
+});

@@ -11,6 +11,7 @@ import type Block from '../../markup/Block';
 import type Segment from '../../markup/Segment';
 import { coalesce } from './segments';
 import { parse } from '../../markup/parser';
+import { PillAttribute } from './render';
 
 /**
  * Turning what is on the clipboard into markup.
@@ -60,6 +61,18 @@ function inlineFrom(
 
 	if (tag === 'br') return;
 	if (Ignored.has(tag)) return;
+
+	// Content copied out of the editor arrives as the editor's own HTML, since across blocks the
+	// clipboard is the browser's to write. Without this, copying a paragraph turns every reference
+	// in it into plain words.
+	const pill = element.getAttribute(PillAttribute);
+	if (pill !== null) {
+		const text = (element.textContent ?? '').replace(/\s+/g, ' ').trim();
+		const target = element.getAttribute('data-target') ?? '';
+		if (text !== '')
+			into.push(pill === 'reference' ? new Reference(text, target) : new Link(text, target));
+		return;
+	}
 	// A nested list is collected as items in its own right, so it must not also be read as part of
 	// the text of the item containing it.
 	if (tag === 'ul' || tag === 'ol') return;

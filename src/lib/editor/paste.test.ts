@@ -87,3 +87,17 @@ test('plain text is read as markup, so a pasted list is a list', () => {
 	expect(serialize(markupFromText('- one\n- two'))).toBe('- one\n- two');
 	expect(serialize(markupFromText('# Heading'))).toBe('# Heading');
 });
+
+test('content copied out of the editor keeps its references and links', () => {
+	// Across blocks the browser writes the clipboard, so what comes back is the editor's own HTML.
+	expect(
+		paste(
+			'<p>see <span data-pill="reference" data-target="registrar" contenteditable="false">Amy</span> now</p>'
+		)
+	).toBe('see <Amy@registrar> now');
+	expect(
+		paste(
+			'<p><span data-pill="link" data-target="https://example.com" contenteditable="false">docs</span></p>'
+		)
+	).toBe('<docs@https://example.com>');
+});
