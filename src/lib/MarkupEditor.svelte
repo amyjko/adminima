@@ -140,7 +140,6 @@
 			contenteditable="true"
 			spellcheck="true"
 			aria-labelledby={labelled ? `${id}-label` : undefined}
-			aria-describedby="{id}-help"
 			bind:this={element}
 			onkeydown={(event) => {
 				if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
@@ -150,11 +149,6 @@
 				}
 			}}
 		></div>
-		<Note>
-			<span id="{id}-help">
-				Rich text. Each button names its own keystroke; shift+tab reaches them.
-			</span>
-		</Note>
 	{/if}
 </div>
 

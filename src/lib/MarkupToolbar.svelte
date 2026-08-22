@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { slide } from 'svelte/transition';
 	import Button from './Button.svelte';
 	import type { State } from './editor/host';
 	import type { Kind } from './editor/commands';
@@ -21,6 +22,13 @@
 
 	/** Apple keyboards write these as symbols; everywhere else spells them out. */
 	let apple = $derived(browser && /Mac|iPhone|iPad/.test(navigator.userAgent));
+
+	/**
+	 * Making room for the toolbar shoves everything below it down. Sliding it in shows where the
+	 * space came from, rather than the text appearing to jump on its own -- but only for people who
+	 * have not asked for less of that.
+	 */
+	let still = $derived(browser && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 	/** How a keystroke is written in a tooltip, for the keyboard in front of the person reading it. */
 	function shortcut(key: string, { alt = false, shift = false } = {}) {
@@ -85,6 +93,7 @@
 	bind:this={toolbar}
 	onkeydown={navigate}
 	onmousedowncapture={(event) => event.preventDefault()}
+	transition:slide={{ duration: still ? 0 : 140 }}
 >
 	<Button
 		tip="Bold"
@@ -111,7 +120,7 @@
 		shortcut={shortcut('K')}
 		keys={keys('K')}
 		tabindex={stop(2)}
-		action={link}>🔗</Button
+		action={link}>@</Button
 	>
 	<Button
 		tip="Heading"
@@ -181,6 +190,7 @@
 
 <style>
 	.toolbar {
+		/* Every glyph here comes from the page's own font, so the buttons are all the same height. */
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;

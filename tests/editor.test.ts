@@ -905,9 +905,20 @@ test('the editor is named by the label beside it', async ({ page }) => {
 	// only thing standing between the field and having no accessible name at all.
 	await field(page, 'some text');
 	await expect(page.locator('#field')).toHaveAttribute('aria-labelledby', 'field-label');
-	await expect(page.locator('#field')).toHaveAttribute('aria-describedby', 'field-help');
 	// No role at all: a textbox role is a leaf, and would hide the headings and lists inside it.
 	await expect(page.locator('#field')).not.toHaveAttribute('role');
+	// Nothing describes it either. The buttons carry their own keystrokes, so a footer repeating
+	// them would only be read out ahead of every visit to the field.
+	await expect(page.locator('#field')).not.toHaveAttribute('aria-describedby');
+});
+
+test('the source view still explains the syntax, which nothing else can', async ({ page }) => {
+	await field(page, 'some text');
+	await page.getByRole('button', { name: 'Markup source' }).click();
+	const area = page.locator('textarea#field');
+	await expect(area).toHaveAttribute('aria-labelledby', 'field-label');
+	await expect(area).toHaveAttribute('aria-describedby', 'field-help');
+	await expect(page.locator('#field-help')).toContainText('*bold*');
 });
 
 test('the editor has no accessibility violations', async ({ page }) => {
