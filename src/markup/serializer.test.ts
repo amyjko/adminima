@@ -25,6 +25,14 @@ test.each([
 	['#### Deep', '## Deep'],
 	// Unterminated formatting is closed, which is the one place reserializing rewrites what was typed.
 	['I am *bold', 'I am *bold*'],
+	// A space just inside the end of a formatting run stays put. Moving it out would put it at the
+	// end of a line, where parsing trims it away and somebody's space is gone.
+	['_Overview _', '_Overview _'],
+	['*Heading *', '*Heading *'],
+	['a *bold * word', 'a *bold * word'],
+	// A space just inside the start stays too, unless it would open a line as a bullet.
+	['_ Rationale_', '_ Rationale_'],
+	['a _ spaced_ word', 'a _ spaced_ word'],
 	// Characters that would otherwise start something are escaped.
 	['\\*not bold\\*', '\\*not bold\\*'],
 	['a \\< b', 'a \\< b'],

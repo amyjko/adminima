@@ -30,17 +30,26 @@ function escapeLink(text: string): string {
 	return text.replace(/[\\>@]/g, (character) => `\\${character}`);
 }
 
-function serializeSegment(segment: Segment): string {
+function serializeSegment(segment: Segment, first = false): string {
 	if (segment instanceof Characters) {
 		if (segment.format === '') return escapeText(segment.text);
-		// Move any surrounding whitespace outside the formatting, so that a bold run never begins
-		// with a space — `* bold*` at the start of a line is indistinguishable from a bullet.
-		const trimmed = segment.text.trim();
-		if (trimmed === '')
+		/*
+		 * Whitespace just inside a formatting run stays exactly where it was written, with one
+		 * exception: a bold run that opens a line with a space reads as a bullet, since `* ` is one.
+		 * That space is moved outside, where the line trim takes it — but it was a leading space at
+		 * the start of a line, which the trim would have taken either way.
+		 *
+		 * Everything else is left alone. Moving trailing whitespace out put it at the end of a
+		 * line, where the trim ate it: `_Overview _` became `_Overview_ ` became `_Overview_`, and
+		 * a space somebody typed was gone. Real documents are full of that shape.
+		 */
+		if (segment.text.trim() === '')
 			return segment.text === '' ? `${segment.format}${segment.format}` : segment.text;
-		const before = segment.text.slice(0, segment.text.indexOf(trimmed[0]));
-		const after = segment.text.slice(before.length + trimmed.length);
-		return `${before}${segment.format}${escapeText(trimmed)}${segment.format}${after}`;
+		const ambiguous = first && segment.format === '*' && /^\s/.test(segment.text);
+		if (!ambiguous) return `${segment.format}${escapeText(segment.text)}${segment.format}`;
+		const trimmed = segment.text.replace(/^\s+/, '');
+		const before = segment.text.slice(0, segment.text.length - trimmed.length);
+		return `${before}${segment.format}${escapeText(trimmed)}${segment.format}`;
 	} else if (segment instanceof Link) {
 		return `<${escapeLink(segment.text)}@${escapeLink(segment.url)}>`;
 	} else if (segment instanceof Reference) {
@@ -61,8 +70,8 @@ const EmailDomainStart = /^[a-zA-Z0-9.-]/;
 function serializeSegments(segments: Segment[]): string {
 	// Serialize everything once, writing auto-linked emails bare, so that each one can see what
 	// its neighbors look like before deciding whether writing it bare is safe.
-	const parts = segments.map((segment) =>
-		isAutoLink(segment) ? segment.text : serializeSegment(segment)
+	const parts = segments.map((segment, index) =>
+		isAutoLink(segment) ? segment.text : serializeSegment(segment, index === 0)
 	);
 
 	let result = '';

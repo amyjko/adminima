@@ -6,6 +6,13 @@ import { serialize, serializeBlock } from '../src/markup/serializer';
 import Markup from '../src/markup/Markup';
 import Paragraph from '../src/markup/Paragraph';
 import Characters from '../src/markup/Text';
+import Heading from '../src/markup/Heading';
+import Bullets from '../src/markup/Bullets';
+import Numbered from '../src/markup/Numbered';
+import Quote from '../src/markup/Quote';
+import Link from '../src/markup/Link';
+import Reference from '../src/markup/Reference';
+import type Block from '../src/markup/Block';
 // @ts-expect-error -- restore/ is plain JavaScript with JSDoc types.
 import { connect } from './lib/db.js';
 
@@ -69,14 +76,61 @@ function classify(before: string, after: string): string {
 	return 'other';
 }
 
+function linesOf(block: Block) {
+	if (block instanceof Heading) return [block.text];
+	if (block instanceof Bullets || block instanceof Numbered) return block.items;
+	if (block instanceof Quote) return block.blocks;
+	if (block instanceof Paragraph) return [block.segments];
+	return [];
+}
+
+/**
+ * Every character a reader would see, with none of the structure.
+ *
+ * This is what must not change. The tree around it may: a space moves out of a bold run, a bullet
+ * marker becomes a dash, blank lines collapse. None of that is anybody's words going missing, and
+ * counting it as loss buries the thing worth being frightened of.
+ */
+function textOf(markup: Markup): string {
+	return markup.blocks
+		.map((block) =>
+			linesOf(block)
+				.map((line) =>
+					line
+						.map((segment) =>
+							segment instanceof Characters
+								? segment.text
+								: segment instanceof Link
+									? `${segment.text}${segment.url}`
+									: segment instanceof Reference
+										? `${segment.text}${segment.target}`
+										: ''
+						)
+						.join('')
+				)
+				.join('\n')
+		)
+		.join('\n');
+}
+
 /** What the round trip does to one stored value. */
 function examine(before: string) {
 	// One parse, so that the spans are keyed by the very blocks being looked up. Parsing twice
 	// gives two sets of blocks that are equal and not identical, and every lookup misses.
 	const { markup: tree, spans } = parseWithSpans(before);
 	const after = serialize(tree);
-	// Meaning is lost if reading back what we would write gives a different document.
-	const lost = parse(after).toString() !== tree.toString();
+	const once = parse(after);
+
+	// Words going missing. Nothing else counts, and this must be nothing.
+	const dropped = textOf(once) !== textOf(tree);
+
+	// Settling. The first pass normalizes -- a space leaves a bold run, a bullet becomes a dash --
+	// and that is fine as long as it is the end of it. A document that keeps changing on every save
+	// is being worn away rather than tidied.
+	const unstable = parse(serialize(once)).toString() !== once.toString();
+
+	// Same words, different tree: the normalization, which is untidy rather than dangerous.
+	const reshaped = !dropped && once.toString() !== tree.toString();
 	let blocks = 0;
 	let rewritten = 0;
 	for (const block of tree.blocks) {
@@ -86,7 +140,7 @@ function examine(before: string) {
 		if (before.slice(span[0], span[1]) !== serializeBlock(block)) rewritten++;
 	}
 
-	return { after, lost, changed: after !== before, blocks, rewritten };
+	return { after, dropped, unstable, reshaped, changed: after !== before, blocks, rewritten };
 }
 
 /**
@@ -118,6 +172,25 @@ const BlockCheck: [markup: string, rewritten: number, blocks: number][] = [
 	['#### deep\n\n- fine\n- fine', 1, 2]
 ];
 
+/**
+ * Shapes real documents turn out to be full of, and what each should be called.
+ *
+ * The first pass at this reported all of these as meaning lost, which buried the question worth
+ * asking under four false alarms.
+ */
+const MeaningCheck: [markup: string, dropped: boolean, unstable: boolean, reshaped: boolean][] = [
+	// A space just inside the end of a formatting run stays exactly where it was written.
+	['_Overview _', false, false, false],
+	['*Undergraduate Research *', false, false, false],
+	['_ Rationale_', false, false, false],
+	// A stray asterisk opens a run that never closes, which the parser has always read this way.
+	// Only the closing marker is added, which the parser was already supplying for itself.
+	['(PM)* owns the delivery.', false, false, false],
+	// Ordinary prose is not reshaped at all.
+	['Nothing remarkable here.', false, false, false],
+	['- one\n- two', false, false, false]
+];
+
 const url = process.env.AUDIT_DB_URL;
 
 /** Supabase signs its own certificates, so anything but the local stack needs its authority. */
@@ -129,6 +202,13 @@ test.skipIf(!url)(
 		// Prove the detectors before trusting anything they say about the corpus.
 		for (const [markup, changes] of SelfCheck)
 			expect(examine(markup).changed, `self check: ${JSON.stringify(markup)}`).toBe(changes);
+		for (const [markup, dropped, unstable, reshaped] of MeaningCheck) {
+			const result = examine(markup);
+			expect(
+				[result.dropped, result.unstable, result.reshaped],
+				`meaning: ${JSON.stringify(markup)}`
+			).toEqual([dropped, unstable, reshaped]);
+		}
 		for (const [markup, rewritten, blocks] of BlockCheck) {
 			const result = examine(markup);
 			expect([result.rewritten, result.blocks], `blocks: ${JSON.stringify(markup)}`).toEqual([
@@ -146,6 +226,8 @@ test.skipIf(!url)(
 		const client = await connect(url, { label: 'audit', ca });
 		const counts = new Map<string, number>();
 		const losses: string[] = [];
+		const unsettled: string[] = [];
+		let reshaped = 0;
 		const lines: string[] = [];
 		let total = 0;
 		let exposed = 0;
@@ -166,8 +248,14 @@ test.skipIf(!url)(
 					blocks += result.blocks;
 					rewritten += result.rewritten;
 
-					if (result.lost)
+					if (result.reshaped) reshaped++;
+					if (result.dropped)
 						losses.push(
+							`--- ${table}.${column} ${row.id}\nbefore: ${JSON.stringify(before)}\n` +
+								`after:  ${JSON.stringify(result.after)}`
+						);
+					if (result.unstable)
+						unsettled.push(
 							`--- ${table}.${column} ${row.id}\nbefore: ${JSON.stringify(before)}\n` +
 								`after:  ${JSON.stringify(result.after)}`
 						);
@@ -192,7 +280,9 @@ test.skipIf(!url)(
 		const summary = [
 			`Audited ${total} values across ${Columns.length} columns, ${blocks} blocks in all.`,
 			'',
-			`Meaning lost:      ${losses.length}  <- has to be zero`,
+			`Words dropped:     ${losses.length}  <- has to be zero`,
+			`Never settles:     ${unsettled.length}  <- has to be zero`,
+			`Reshaped:          ${reshaped} of ${total} values (${percent(reshaped, total)}); same words, tidier tree`,
 			`Bytes changed:     ${changed} of ${total} values (${percent(changed, total)}) if reserialized whole`,
 			`Blocks rewritten:  ${rewritten} of ${blocks} (${percent(rewritten, blocks)}) <- the odds for any one edit`,
 			`In scope at all:   ${exposed} of ${total} (${percent(exposed, total)}); the rest is plain prose`,
@@ -206,7 +296,8 @@ test.skipIf(!url)(
 		fs.mkdirSync('backups', { recursive: true });
 		fs.writeFileSync(
 			out,
-			`${summary}\n\n${losses.length > 0 ? `MEANING LOST\n\n${losses.join('\n\n')}\n\n` : ''}` +
+			`${summary}\n\n${losses.length > 0 ? `WORDS DROPPED\n\n${losses.join('\n\n')}\n\n` : ''}` +
+				`${unsettled.length > 0 ? `NEVER SETTLES\n\n${unsettled.join('\n\n')}\n\n` : ''}` +
 				`NORMALIZED\n\n${lines.join('\n\n')}\n`,
 			'utf8'
 		);
@@ -214,8 +305,14 @@ test.skipIf(!url)(
 		// Written straight out rather than through console, which the test runner swallows.
 		process.stdout.write(`\n${summary}\n\nFull report: ${out}\n\n`);
 
-		// Normalization is expected and is for a person to look at. Losing meaning is not.
-		expect(losses.slice(0, 5).join('\n\n')).toBe('');
+		// Normalization is expected and is for a person to look at. Words going missing is not, and
+		// neither is a document that never stops changing. The detail is in the file rather than
+		// here: five whole documents in a terminal is not a report anybody can read.
+		expect({ dropped: losses.length, unsettled: unsettled.length, report: out }).toEqual({
+			dropped: 0,
+			unsettled: 0,
+			report: out
+		});
 	},
 	120000
 );
