@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import Button from './Button.svelte';
 	import type { State } from './editor/host';
 	import type { Kind } from './editor/commands';
@@ -10,19 +11,35 @@
 		source: boolean;
 		mark: (format: '*' | '_') => void;
 		kind: (kind: Kind) => void;
+		link: () => void;
 		undo: () => void;
 		redo: () => void;
 		toggleSource: () => void;
 	}
 
-	let { status, controls, source, mark, kind, undo, redo, toggleSource }: Props = $props();
+	let { status, controls, source, mark, kind, link, undo, redo, toggleSource }: Props = $props();
+
+	/** Apple keyboards write these as symbols; everywhere else spells them out. */
+	let apple = $derived(browser && /Mac|iPhone|iPad/.test(navigator.userAgent));
+
+	/** How a keystroke is written in a tooltip, for the keyboard in front of the person reading it. */
+	function shortcut(key: string, { alt = false, shift = false } = {}) {
+		return apple
+			? `⌘${alt ? '⌥' : ''}${shift ? '⇧' : ''}${key}`
+			: `Ctrl+${alt ? 'Alt+' : ''}${shift ? 'Shift+' : ''}${key}`;
+	}
+
+	/** The same keystroke in the form aria-keyshortcuts takes, which names modifiers rather than drawing them. */
+	function keys(key: string, { alt = false, shift = false } = {}) {
+		return `${apple ? 'Meta' : 'Control'}+${alt ? 'Alt+' : ''}${shift ? 'Shift+' : ''}${key}`;
+	}
 
 	/**
 	 * A toolbar is one stop in the tab order, not one per button. On a page that renders a dozen
-	 * editable descriptions, the difference is a dozen tab presses against a hundred and twenty.
+	 * editable descriptions, the difference is a dozen tab presses against a hundred and forty.
 	 */
 	let focused = $state(0);
-	let toolbar: HTMLDivElement | undefined = $state();
+	let toolbar: HTMLDivElement | undefined | null = $state();
 
 	function buttons(): HTMLButtonElement[] {
 		return toolbar ? Array.from(toolbar.querySelectorAll('button')) : [];
@@ -48,6 +65,11 @@
 	function stop(index: number): number {
 		return index === focused ? 0 : -1;
 	}
+
+	/** Pressing a block button again puts the block back to being an ordinary paragraph. */
+	function toggle(to: Kind) {
+		kind(status.kind === to ? 'paragraph' : to);
+	}
 </script>
 
 <!--
@@ -64,46 +86,96 @@
 	onkeydown={navigate}
 	onmousedowncapture={(event) => event.preventDefault()}
 >
-	<Button tip="Bold" pressed={status.bold} tabindex={stop(0)} action={() => mark('*')}>
+	<Button
+		tip="Bold"
+		shortcut={shortcut('B')}
+		keys={keys('B')}
+		pressed={status.bold}
+		tabindex={stop(0)}
+		action={() => mark('*')}
+	>
 		<strong>B</strong>
 	</Button>
-	<Button tip="Italic" pressed={status.italic} tabindex={stop(1)} action={() => mark('_')}>
+	<Button
+		tip="Italic"
+		shortcut={shortcut('I')}
+		keys={keys('I')}
+		pressed={status.italic}
+		tabindex={stop(1)}
+		action={() => mark('_')}
+	>
 		<em>I</em>
 	</Button>
 	<Button
-		tip="Heading"
-		pressed={status.kind === 'heading1'}
+		tip="Link or reference"
+		shortcut={shortcut('K')}
+		keys={keys('K')}
 		tabindex={stop(2)}
-		action={() => kind(status.kind === 'heading1' ? 'paragraph' : 'heading1')}>H1</Button
+		action={link}>🔗</Button
+	>
+	<Button
+		tip="Heading"
+		shortcut={shortcut('1', { alt: true })}
+		keys={keys('1', { alt: true })}
+		pressed={status.kind === 'heading1'}
+		tabindex={stop(3)}
+		action={() => toggle('heading1')}>h1</Button
 	>
 	<Button
 		tip="Subheading"
+		shortcut={shortcut('2', { alt: true })}
+		keys={keys('2', { alt: true })}
 		pressed={status.kind === 'heading2'}
-		tabindex={stop(3)}
-		action={() => kind(status.kind === 'heading2' ? 'paragraph' : 'heading2')}>H2</Button
+		tabindex={stop(4)}
+		action={() => toggle('heading2')}>h2</Button
 	>
 	<Button
 		tip="Bulleted list"
+		shortcut={shortcut('8', { shift: true })}
+		keys={keys('8', { shift: true })}
 		pressed={status.kind === 'bullets'}
-		tabindex={stop(4)}
-		action={() => kind(status.kind === 'bullets' ? 'paragraph' : 'bullets')}>•</Button
+		tabindex={stop(5)}
+		action={() => toggle('bullets')}>•</Button
 	>
 	<Button
 		tip="Numbered list"
+		shortcut={shortcut('7', { shift: true })}
+		keys={keys('7', { shift: true })}
 		pressed={status.kind === 'numbered'}
-		tabindex={stop(5)}
-		action={() => kind(status.kind === 'numbered' ? 'paragraph' : 'numbered')}>1.</Button
+		tabindex={stop(6)}
+		action={() => toggle('numbered')}>1.</Button
 	>
 	<Button
 		tip="Block quote"
+		shortcut={shortcut('9', { shift: true })}
+		keys={keys('9', { shift: true })}
 		pressed={status.kind === 'quote'}
-		tabindex={stop(6)}
-		action={() => kind(status.kind === 'quote' ? 'paragraph' : 'quote')}>&rdquo;</Button
+		tabindex={stop(7)}
+		action={() => toggle('quote')}>&rdquo;</Button
 	>
-	<Button tip="Undo" active={status.undoable} tabindex={stop(7)} action={undo}>&#8630;</Button>
-	<Button tip="Redo" active={status.redoable} tabindex={stop(8)} action={redo}>&#8631;</Button>
-	<Button tip="Markup source" pressed={source} tabindex={stop(9)} action={toggleSource}
-		>&lt;/&gt;</Button
+	<Button
+		tip="Undo"
+		shortcut={shortcut('Z')}
+		keys={keys('Z')}
+		active={status.undoable}
+		tabindex={stop(8)}
+		action={undo}>↺</Button
+	>
+	<Button
+		tip="Redo"
+		shortcut={shortcut('Z', { shift: true })}
+		keys={keys('Z', { shift: true })}
+		active={status.redoable}
+		tabindex={stop(9)}
+		action={redo}>↻</Button
+	>
+	<Button
+		tip="Markup source"
+		shortcut={shortcut('M', { shift: true })}
+		keys={keys('M', { shift: true })}
+		pressed={source}
+		tabindex={stop(10)}
+		action={toggleSource}>&lt;/&gt;</Button
 	>
 </div>
 

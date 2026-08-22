@@ -8,7 +8,6 @@
 	import Note from './Note.svelte';
 	import { mode, setMode } from './editor/mode.svelte';
 	import { announce } from './editor/announce.svelte';
-	import { browser } from '$app/environment';
 
 	interface Props {
 		/** The markup being edited. */
@@ -23,16 +22,16 @@
 
 	let { markup = $bindable(''), id, labelled = false, save }: Props = $props();
 
-	// Which modifier to name in the help text. Apple keyboards say command where others say control.
-	let modifier = $derived(
-		browser && /Mac|iPhone|iPad/.test(navigator.userAgent) ? 'command' : 'control'
-	);
-
-	let area: HTMLTextAreaElement | undefined = $state();
+	/*
+	 * Bound elements are typed as possibly null as well as undefined, because that is what Svelte
+	 * actually puts in one when the element goes away. Checking only for undefined let a null
+	 * through, and the effect below threw on it -- taking the content with it.
+	 */
+	let area: HTMLTextAreaElement | undefined | null = $state();
 	$effect(() => {
 		// Read markup so this runs as the text changes, not only when the element appears.
 		markup;
-		if (area === undefined) return;
+		if (!area) return;
 		area.style.height = 'auto';
 		area.style.height = `${area.scrollHeight}px`;
 	});
@@ -40,7 +39,7 @@
 	/** The picker is open when there is something for it to work on. */
 	let picking = $state<LinkContext | undefined>(undefined);
 
-	let element: HTMLDivElement | undefined = $state();
+	let element: HTMLDivElement | undefined | null = $state();
 	let host: Host | undefined = $state();
 	let status = $state<State>({
 		bold: false,
@@ -55,7 +54,7 @@
 		// Svelte clears a bound element to null rather than undefined, so switching to the source
 		// view was building an editor around nothing and throwing on the way in.
 		const root = element;
-		if (root === undefined || root === null) return;
+		if (!root) return;
 		const created = new Host(
 			root,
 			untrack(() => markup),
@@ -94,6 +93,7 @@
 		source={mode() === 'source'}
 		mark={(format) => host?.toggleMark(format)}
 		kind={(kind: Kind) => host?.setKind(kind)}
+		link={() => host?.link()}
 		undo={() => host?.undo()}
 		redo={() => host?.redo()}
 		{toggleSource}
@@ -152,8 +152,7 @@
 		></div>
 		<Note>
 			<span id="{id}-help">
-				Bold is {modifier}+B, italic +I, link or reference +K, heading +option+1, list +shift+8,
-				markup source +shift+M. Shift+tab reaches the toolbar.
+				Rich text. Each button names its own keystroke; shift+tab reaches them.
 			</span>
 		</Note>
 	{/if}

@@ -129,7 +129,7 @@ export function lengthOf(line: Element): number {
 }
 
 /** A selection, in the same terms, with its ends in document order. */
-export type Span = { start: Point; end: Point; collapsed: boolean };
+export type Span = { start: Point; end: Point; collapsed: boolean; backward: boolean };
 
 function pointOf(root: Element, node: Node, offset: number): Point | undefined {
 	const block = blockAt(root, node);
@@ -164,11 +164,13 @@ export function saveSpan(root: Element): Span | undefined {
 	if (anchor === undefined || focus === undefined) return undefined;
 	// A selection made right to left has its anchor after its focus, which nothing downstream
 	// should have to think about.
-	const [start, end] = before(focus, anchor) ? [focus, anchor] : [anchor, focus];
+	const backward = before(focus, anchor);
+	const [start, end] = backward ? [focus, anchor] : [anchor, focus];
 	return {
 		start,
 		end,
-		collapsed: start.block === end.block && start.line === end.line && start.offset === end.offset
+		collapsed: start.block === end.block && start.line === end.line && start.offset === end.offset,
+		backward
 	};
 }
 
@@ -185,6 +187,34 @@ export function savePoint(root: Element): Point | undefined {
 		line: found.index,
 		offset: offsetOf(found.line, selection.focusNode, selection.focusOffset)
 	};
+}
+
+/** Where in the document a point lands, for building a range. */
+function placeOf(root: Element, point: Point): { node: Node; offset: number } | undefined {
+	const block = root.querySelector(`[${BlockAttribute}="${point.block}"]`);
+	if (block === null) return undefined;
+	const candidates = lines(block);
+	const line = candidates[Math.min(point.line, candidates.length - 1)];
+	if (line === undefined) return undefined;
+	return nodeAt(line, Math.min(point.offset, lengthOf(line)));
+}
+
+/**
+ * Put a selection back, keeping which end of it the caret was at. Collapsing to the start instead
+ * moves the caret backwards past the words somebody just formatted, which is not where they left it.
+ */
+export function restoreSpan(root: Element, span: Span): boolean {
+	const selection = root.ownerDocument.defaultView?.getSelection();
+	if (!selection) return false;
+	const from = placeOf(root, span.start);
+	const to = placeOf(root, span.end);
+	if (from === undefined || to === undefined) return false;
+
+	selection.removeAllRanges();
+	// setBaseAndExtent keeps the direction, which collapsing and extending would not.
+	const [anchor, focus] = span.backward ? [to, from] : [from, to];
+	selection.setBaseAndExtent(anchor.node, anchor.offset, focus.node, focus.offset);
+	return true;
 }
 
 /** Put the caret back where it was, as nearly as the text still allows. */

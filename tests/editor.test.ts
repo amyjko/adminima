@@ -550,8 +550,8 @@ test('the whole toolbar is one stop in the tab order', async ({ page }) => {
 		.locator('button')
 		.evaluateAll((buttons) => buttons.filter((b) => b.getAttribute('tabindex') === '0').length);
 	expect(stops).toBe(1);
-	// And it really is ten buttons sharing that one stop.
-	expect(await row.locator('button').count()).toBe(10);
+	// And it really is eleven buttons sharing that one stop.
+	expect(await row.locator('button').count()).toBe(11);
 });
 
 test('the arrow keys move along the toolbar', async ({ page }) => {
@@ -942,14 +942,38 @@ const Shortcuts = [
 	{ token: '+M', press: 'ControlOrMeta+Shift+m', from: 'word', to: 'word' }
 ];
 
-test('the help text names every shortcut and no others', async ({ page }) => {
+test('every button names its keystroke, in both the forms it is read from', async ({ page }) => {
+	// The tooltip is what a sighted person sees; aria-keyshortcuts is where a screen reader looks.
+	// Putting it in the accessible name instead would read it out every time the button is passed.
 	await field(page, 'word');
-	const help = (await page.locator('#field-help').textContent()) ?? '';
-	// A single character after a plus is the key; anything longer is a modifier being named.
-	const named = new Set(
-		(help.match(/\+[A-Za-z0-9](?![A-Za-z])/g) ?? []).map((t) => t.toUpperCase())
+	const buttons = page.getByRole('toolbar').getByRole('button');
+	const count = await buttons.count();
+	for (let index = 0; index < count; index++) {
+		const button = buttons.nth(index);
+		const name = await button.getAttribute('aria-label');
+		const title = await button.getAttribute('title');
+		const keys = await button.getAttribute('aria-keyshortcuts');
+		expect(title, `${name} tooltip`).toMatch(/\((⌘|Ctrl\+)/);
+		expect(keys, `${name} keyshortcuts`).toMatch(/^(Meta|Control)\+/);
+		// The name stays the name.
+		expect(name).not.toMatch(/[⌘⇧⌥]|Ctrl\+/);
+	}
+});
+
+test('the shortcuts the buttons name are the ones that work', async ({ page }) => {
+	await field(page, 'word');
+	const titles = await page
+		.getByRole('toolbar')
+		.getByRole('button')
+		.evaluateAll((buttons) => buttons.map((b) => b.getAttribute('title') ?? ''));
+	// Every key the toolbar advertises is one the Shortcuts table below drives and asserts.
+	const advertised = new Set(
+		titles.flatMap((t) =>
+			(t.match(/\((?:⌘|Ctrl\+)(?:⌥|Alt\+|⇧|Shift\+)*([A-Za-z0-9])\)/) ?? []).slice(1)
+		)
 	);
-	expect([...named].sort()).toEqual([...Shortcuts.map((s) => s.token)].sort());
+	const driven = new Set(Shortcuts.map((s) => s.token.replace('+', '')));
+	for (const key of driven) expect([...advertised], `${key} is advertised`).toContain(key);
 });
 
 for (const shortcut of Shortcuts) {
@@ -974,3 +998,25 @@ for (const shortcut of Shortcuts) {
 		}
 	});
 }
+
+test('bolding leaves the words selected, facing the way they were chosen', async ({ page }) => {
+	// Collapsing to the start would put the caret back before the words just formatted.
+	await open(page, 'hello world');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 0 },
+		{ selector: '#editor p', offset: 5 }
+	);
+	await page.keyboard.press('ControlOrMeta+b');
+	expect(await source(page)).toBe('*hello* world');
+
+	// Still selected, so a second command acts on the same words.
+	await page.keyboard.press('ControlOrMeta+i');
+	expect(await source(page)).toBe('_hello_ world');
+
+	// And the caret is at the far end of them rather than back at the start, so what is typed next
+	// carries on from the end of the run: `_hello!_`, not `!_hello_`.
+	await page.keyboard.press('ArrowRight');
+	await page.keyboard.type('!');
+	expect(await source(page)).toBe('_hello!_ world');
+});

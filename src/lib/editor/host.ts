@@ -12,7 +12,15 @@ import { spliceSource } from './splice';
 import { markupFromHTML, markupFromText } from './paste';
 import History from './undo';
 import { announce } from './announce.svelte';
-import { saveSpan, savePoint, restorePoint, indexOf, type Point, type Span } from './selection';
+import {
+	saveSpan,
+	savePoint,
+	restorePoint,
+	restoreSpan,
+	indexOf,
+	type Point,
+	type Span
+} from './selection';
 import {
 	kindOf,
 	linesOf,
@@ -269,9 +277,18 @@ export default class Host {
 	 * the rest of the word it begins.
 	 */
 	private apply(edit: Edit, spoken?: string, { typing = false } = {}) {
+		const was = this.span();
 		this.history.record({ source: this.source, point: savePoint(this.root) }, { typing });
 		this.markup = edit.markup;
 		this.render(this.pointAt(edit.position));
+		// A command that acted on a selection leaves it selected, facing the way it was made.
+		if (edit.to !== undefined)
+			restoreSpan(this.root, {
+				start: this.pointAt(edit.position),
+				end: this.pointAt(edit.to),
+				collapsed: false,
+				backward: was?.backward ?? false
+			});
 		this.emit();
 		if (spoken !== undefined) announce(spoken);
 	}

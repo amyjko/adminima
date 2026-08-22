@@ -21,7 +21,8 @@ export type Kind = 'paragraph' | 'heading1' | 'heading2' | 'bullets' | 'numbered
 /** Which block, which of its lines, and how many characters into that line. */
 export type Position = { block: number; line: number; offset: number };
 
-export type Edit = { markup: Markup; position: Position };
+/** Where to leave the caret, and where the other end of the selection goes if there was one. */
+export type Edit = { markup: Markup; position: Position; to?: Position };
 
 export function kindOf(block: Block): Kind {
 	if (block instanceof Heading) return block.level === 1 ? 'heading1' : 'heading2';
@@ -80,7 +81,12 @@ export function mark(markup: Markup, at: Position, to: number, format: '*' | '_'
 	const marked = lines.map((each, index) =>
 		index === at.line ? toggleMark(line, start, end, format) : each
 	);
-	return { markup: withLines(markup, at.block, marked), position: at };
+	// The words stay selected, so the next command applies to them too.
+	return {
+		markup: withLines(markup, at.block, marked),
+		position: { ...at, offset: start },
+		to: { ...at, offset: end }
+	};
 }
 
 /** Change what kind of block the caret is in. */
