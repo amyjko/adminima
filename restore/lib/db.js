@@ -65,6 +65,22 @@ export async function connect(url, { ca, label } = {}) {
 		);
 	}
 
+	/*
+	 * The session pooler's username is postgres.<project-ref>, which is easy to paste into the
+	 * database's place at the end of the string instead. Postgres then reports that a database of
+	 * that name does not exist, and the search goes looking for a missing database rather than for
+	 * a username in the wrong half of the connection string.
+	 */
+	const database = parsed.pathname.replace(/^\//, '');
+	if (/^postgres\.\w/.test(database)) {
+		throw new Error(
+			`${label ?? 'connection'} names a database of "${database}", which looks like the session ` +
+				`pooler's username in the database's place. The username goes before the @ and the ` +
+				`database after the host:\n` +
+				`  postgresql://${database}:PASSWORD@${parsed.hostname}:${parsed.port || '5432'}/postgres`
+		);
+	}
+
 	const local = isLocal(parsed.hostname);
 	/** @type {import('pg').ClientConfig} */
 	const config = { connectionString: url };
