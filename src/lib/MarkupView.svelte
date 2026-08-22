@@ -98,19 +98,27 @@
 </script>
 
 <div class="markup" class:editable={edit !== undefined} class:small>
-	{#if editing}
-		<MarkupEditor bind:markup={revisedText} id={editorID} {labelled} save={() => save()} />
-	{:else}
-		<!--
-			No height until the editor has finished leaving, so the two are never on screen at once.
-			Nothing is animated here; the wait is the whole point of it.
-		-->
-		<div class="blocks" in:slide={{ duration: 0, delay: after() }}>
-			{#if markup === '' || markup === undefined}<em>{placeholder}</em>{:else}<BlocksView
-					blocks={parse(markup).blocks}
-				/>{/if}
-		</div>
-	{/if}
+	<!--
+		Both states live in one column, because the row they sit in shares its width between its
+		children. While the editor was on its way out and the rendered version was already there,
+		they were two children of that row -- so the editor lost half its width and its text wrapped
+		on the way past.
+	-->
+	<div class="content">
+		{#if editing}
+			<MarkupEditor bind:markup={revisedText} id={editorID} {labelled} save={() => save()} />
+		{:else}
+			<!--
+				No height until the editor has finished leaving, so the two are never both taking up
+				room. Nothing is animated here; the wait is the whole point of it.
+			-->
+			<div class="blocks" in:slide={{ duration: 0, delay: after() }}>
+				{#if markup === '' || markup === undefined}<em>{placeholder}</em>{:else}<BlocksView
+						blocks={parse(markup).blocks}
+					/>{/if}
+			</div>
+		{/if}
+	</div>
 	{#if edit}<div class="control">
 			{#if saving}<Loading />
 			{:else}
@@ -143,6 +151,12 @@
 	}
 	.small {
 		font-size: var(--small-size);
+	}
+
+	.content {
+		/* One child of the row, whatever is inside it, so the width never has to be shared. */
+		flex: 1;
+		min-width: 0;
 	}
 
 	.control {
