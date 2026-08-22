@@ -5,8 +5,8 @@
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
 	import { addError } from '$routes/errors.svelte';
-	import Note from './Note.svelte';
 	import Loading from './Loading.svelte';
+	import MarkupEditor from './MarkupEditor.svelte';
 
 	interface Props {
 		/** The markup's text */
@@ -21,6 +21,8 @@
 		id?: string | undefined;
 		/** Whether to render the text smaller */
 		small?: boolean;
+		/** Whether something else on the page names this field, via Labeled's id. */
+		labelled?: boolean;
 	}
 
 	let {
@@ -29,14 +31,25 @@
 		edit = undefined,
 		editing = $bindable(false),
 		id = undefined,
-		small = false
+		small = false,
+		labelled = false
 	}: Props = $props();
 
-	let height = $state(0);
 	let revisedText = $state(markup);
-	let input: HTMLTextAreaElement | undefined = $state();
-	let scrollHeight = $derived(revisedText ? (input ? input.scrollHeight : height) : height);
 	let saving = $state(false);
+
+	/**
+	 * The editor needs an id to be named by a label and pointed at by a toolbar, and the process
+	 * page focuses steps by id, so one is made when the caller has not given one.
+	 */
+	let editorID = $derived(id ?? `markup-${Math.abs(hash(placeholder))}`);
+
+	function hash(text: string): number {
+		let value = 0;
+		for (let index = 0; index < text.length; index++)
+			value = (value * 31 + text.charCodeAt(index)) | 0;
+		return value;
+	}
 
 	// No edit function and revised text changes, update the markup.
 	$effect(() => {
@@ -54,7 +67,7 @@
 		revisedText = markup;
 		editing = true;
 		await tick();
-		input?.focus();
+		document.getElementById(editorID)?.focus();
 	}
 
 	async function save() {
@@ -84,29 +97,9 @@
 
 <div class="markup" class:editable={edit !== undefined} class:small>
 	{#if editing}
-		<div class="editor">
-			<textarea
-				bind:value={revisedText}
-				bind:this={input}
-				{id}
-				disabled={saving}
-				onkeydown={(e) => {
-					// Shortcut to submit without using button.
-					if (e.key === 'Enter' && e.metaKey) {
-						e.preventDefault();
-						e.stopPropagation();
-						save();
-					}
-				}}
-				style:height="{editing ? scrollHeight : height}px"></textarea>
-			<Note
-				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@https://url&gt;</code>,
-				<code>&lt;link@role/process&gt;</code>,
-				<code>*/-/• bullets</code>, <code>1. lists</code>, <code>"block quote"</code></Note
-			>
-		</div>
+		<MarkupEditor bind:markup={revisedText} id={editorID} {labelled} save={() => save()} />
 	{:else}
-		<div class="blocks" bind:clientHeight={height}>
+		<div class="blocks">
 			{#if markup === '' || markup === undefined}<em>{placeholder}</em>{:else}<BlocksView
 					blocks={parse(markup).blocks}
 				/>{/if}
@@ -146,11 +139,6 @@
 		font-size: var(--small-size);
 	}
 
-	.editor {
-		display: block;
-		width: 100%;
-	}
-
 	.control {
 		align-self: baseline;
 	}
@@ -158,27 +146,5 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-	}
-
-	textarea {
-		flex: 1;
-		font-family: inherit;
-		font-size: inherit;
-		line-height: inherit;
-		border: none;
-		padding: 0;
-		outline: var(--border) solid var(--thickness);
-		min-height: 2em;
-		border-radius: var(--radius);
-		width: 100%;
-	}
-
-	textarea:focus {
-		outline: var(--focus) solid var(--thickness);
-	}
-
-	code {
-		font-family: monospace;
-		font-size: 10pt;
 	}
 </style>

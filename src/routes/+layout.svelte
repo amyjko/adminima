@@ -30,6 +30,7 @@
 
 	import { type Snippet } from 'svelte';
 	import { errors } from './errors.svelte';
+	import Announcement from '$lib/Announcement.svelte';
 
 	interface Props {
 		data: LayoutData;
@@ -88,6 +89,7 @@
 	});
 </script>
 
+<Announcement />
 <div class="errors">
 	{#each errors as error}
 		<Error {error} />

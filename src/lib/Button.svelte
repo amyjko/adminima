@@ -14,6 +14,10 @@
 		chromeless?: boolean;
 		children?: import('svelte').Snippet;
 		onkeydown?: (event: KeyboardEvent) => void;
+		/** For a button that turns something on and off, such as bold in a toolbar. */
+		pressed?: boolean | undefined;
+		/** A toolbar is one tab stop, so all but one of its buttons are taken out of the order. */
+		tabindex?: number | undefined;
 	}
 
 	let {
@@ -25,7 +29,9 @@
 		end = false,
 		chromeless = false,
 		children,
-		onkeydown
+		onkeydown,
+		pressed = undefined,
+		tabindex = undefined
 	}: Props = $props();
 
 	let confirm = $state(false);
@@ -47,6 +53,8 @@
 		class:chromeless
 		type={submit ? 'submit' : 'button'}
 		aria-disabled={!active}
+		aria-pressed={pressed === undefined ? null : pressed}
+		{tabindex}
 		title={tip}
 		aria-label={tip}
 		{onkeydown}

@@ -33,7 +33,9 @@ function isElement(node: Node): node is Element {
 
 function readInline(node: Node, format: Format, into: Segment[]) {
 	if (node.nodeType === 3) {
-		const text = (node as globalThis.Text).data;
+		// Browsers substitute a non-breaking space wherever an ordinary one would collapse. Nobody
+		// typed those, and the grammar cannot tell them apart from the ones people do type.
+		const text = (node as globalThis.Text).data.replace(/\u00a0/g, ' ');
 		if (text !== '') into.push(new Characters(format, text));
 		return;
 	}

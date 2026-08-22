@@ -128,6 +128,50 @@ export function lengthOf(line: Element): number {
 	return count;
 }
 
+/** A selection, in the same terms, with its ends in document order. */
+export type Span = { start: Point; end: Point; collapsed: boolean };
+
+function pointOf(root: Element, node: Node, offset: number): Point | undefined {
+	const block = blockAt(root, node);
+	if (block === undefined) return undefined;
+	const found = lineAt(block, node);
+	if (found === undefined) return undefined;
+	return {
+		block: block.getAttribute(BlockAttribute) ?? '',
+		line: found.index,
+		offset: offsetOf(found.line, node, offset)
+	};
+}
+
+/** Which of two positions comes first, by block, then line, then character. */
+export function before(a: Point, b: Point): boolean {
+	if (a.block !== b.block) return indexOf(a) < indexOf(b);
+	if (a.line !== b.line) return a.line < b.line;
+	return a.offset < b.offset;
+}
+
+/** Blocks are numbered in order, so a block's id says where it sits. */
+export function indexOf(point: Point): number {
+	return Number(point.block.replace(/^b/, ''));
+}
+
+/** What is selected now, if anything in this editor is. */
+export function saveSpan(root: Element): Span | undefined {
+	const selection = root.ownerDocument.defaultView?.getSelection();
+	if (!selection || selection.anchorNode === null || selection.focusNode === null) return undefined;
+	const anchor = pointOf(root, selection.anchorNode, selection.anchorOffset);
+	const focus = pointOf(root, selection.focusNode, selection.focusOffset);
+	if (anchor === undefined || focus === undefined) return undefined;
+	// A selection made right to left has its anchor after its focus, which nothing downstream
+	// should have to think about.
+	const [start, end] = before(focus, anchor) ? [focus, anchor] : [anchor, focus];
+	return {
+		start,
+		end,
+		collapsed: start.block === end.block && start.line === end.line && start.offset === end.offset
+	};
+}
+
 /** Where the caret is now, if it is in this editor at all. */
 export function savePoint(root: Element): Point | undefined {
 	const selection = root.ownerDocument.defaultView?.getSelection();

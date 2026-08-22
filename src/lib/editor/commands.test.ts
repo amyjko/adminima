@@ -2,7 +2,16 @@ import { test, expect } from 'vitest';
 import Markup from '../../markup/Markup';
 import { parse } from '../../markup/parser';
 import { serialize } from '../../markup/serializer';
-import { split, mergeBackward, setKind, mark, insert, kindOf, type Position } from './commands';
+import {
+	split,
+	mergeBackward,
+	setKind,
+	mark,
+	insert,
+	insertMarkup,
+	kindOf,
+	type Position
+} from './commands';
 import Characters from '../../markup/Text';
 import Reference from '../../markup/Reference';
 import Bullets from '../../markup/Bullets';
@@ -138,4 +147,48 @@ test('inserting a reference puts the caret after it', () => {
 	expect(serialize(tree.markup)).toBe('see <Amy@registrar> now');
 	// One character of travel, however long the name is.
 	expect(tree.position).toEqual({ block: 0, line: 0, offset: 5 });
+});
+
+test('pasting a single paragraph joins the line it lands in', () => {
+	const tree = insertMarkup(parse('see  now'), { block: 0, line: 0, offset: 4 }, 4, parse('this'));
+	expect(serialize(tree.markup)).toBe('see this now');
+	expect(tree.position).toEqual({ block: 0, line: 0, offset: 8 });
+});
+
+test('pasting something with structure splits the block open', () => {
+	const tree = insertMarkup(
+		parse('beforeafter'),
+		{ block: 0, line: 0, offset: 6 },
+		6,
+		parse('- one\n- two')
+	);
+	expect(serialize(tree.markup)).toBe('before\n\n- one\n- two\n\nafter');
+	// At the end of the last thing pasted.
+	expect(tree.position).toEqual({ block: 1, line: 1, offset: 3 });
+});
+
+test('pasting over a selection replaces it', () => {
+	const tree = insertMarkup(
+		parse('keep remove keep'),
+		{ block: 0, line: 0, offset: 5 },
+		12,
+		parse('new')
+	);
+	expect(serialize(tree.markup)).toBe('keep newkeep');
+});
+
+test('pasting at the start of a block leaves nothing empty above it', () => {
+	const tree = insertMarkup(
+		parse('after'),
+		{ block: 0, line: 0, offset: 0 },
+		0,
+		parse('# Heading\n\nbody')
+	);
+	expect(serialize(tree.markup)).toBe('# Heading\n\nbody\n\nafter');
+});
+
+test('pasting nothing changes nothing', () => {
+	const before = parse('unchanged');
+	const tree = insertMarkup(before, { block: 0, line: 0, offset: 4 }, 4, parse(''));
+	expect(tree.markup).toBe(before);
 });

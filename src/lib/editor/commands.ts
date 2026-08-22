@@ -173,6 +173,52 @@ export function mergeBackward(markup: Markup, at: Position): Edit {
 	};
 }
 
+/**
+ * Put a whole pasted document in at the caret. A single pasted paragraph joins the line it lands
+ * in; anything with structure to it splits the block open and sits between the halves.
+ */
+export function insertMarkup(markup: Markup, at: Position, to: number, pasted: Markup): Edit {
+	if (pasted.blocks.length === 0) return { markup, position: at };
+
+	const only = pasted.blocks.length === 1 ? pasted.blocks[0] : undefined;
+	if (only instanceof Paragraph) return insert(markup, at, to, only.segments);
+
+	const block = markup.blocks[at.block];
+	if (block === undefined) return { markup, position: at };
+	const kind = kindOf(block);
+	const lines = linesOf(block);
+	const [start, end] = at.offset <= to ? [at.offset, to] : [to, at.offset];
+	const [head] = splitLine(lines[at.line] ?? [], start);
+	const [, tail] = splitLine(lines[at.line] ?? [], end);
+
+	const above = [...lines.slice(0, at.line), head].filter(
+		(line, index) => index < at.line || lineLength(line) > 0
+	);
+	const below = [tail, ...lines.slice(at.line + 1)].filter(
+		(line, index) => index > 0 || lineLength(line) > 0
+	);
+
+	const blocks: Block[] = [
+		...(above.length > 0 ? blocksOf(kind, above) : []),
+		...pasted.blocks,
+		...(below.length > 0 ? blocksOf(kind, below) : [])
+	];
+
+	// The caret ends up at the end of the last thing pasted.
+	const lastIndex =
+		(above.length > 0 ? blocksOf(kind, above).length : 0) + pasted.blocks.length - 1;
+	const last = blocks[lastIndex];
+	const lastLines = linesOf(last);
+	return {
+		markup: replace(markup, at.block, blocks),
+		position: {
+			block: at.block + lastIndex,
+			line: lastLines.length - 1,
+			offset: lineLength(lastLines[lastLines.length - 1])
+		}
+	};
+}
+
 /** Put segments in at the caret, replacing a selection if there is one. */
 export function insert(markup: Markup, at: Position, to: number, segments: Segment[]): Edit {
 	const lines = linesOf(markup.blocks[at.block]);

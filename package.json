@@ -6,7 +6,7 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"test": "npm run test:unit && npm run test:e2e",
+		"test": "npm run test:unit && npm run test:e2e && npm run test:integration",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
