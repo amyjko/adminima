@@ -236,7 +236,7 @@ fails. Creating the extensions by hand matters too — `pg_dump -n` does **not**
 EXTENSION`, so without them every `uuid_generate_v1()` default fails and no table gets created.
 
 The load prints exactly two errors, `schema "extensions" already exists` and `schema "public"
-already exists`. Both are expected — they are the schemas you just created by hand. Any *other*
+already exists`. Both are expected — they are the schemas you just created by hand. Any _other_
 error means the clone is incomplete, so check the row counts before trusting a rehearsal.
 
 Now damage `postgres`, using the seed's fixed UUIDs. Each deletion exercises a case the others do

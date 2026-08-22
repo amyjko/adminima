@@ -98,8 +98,7 @@
 						save();
 					}
 				}}
-				style:height="{editing ? scrollHeight : height}px"
-			></textarea>
+				style:height="{editing ? scrollHeight : height}px"></textarea>
 			<Note
 				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@https://url&gt;</code>,
 				<code>&lt;link@role/process&gt;</code>,

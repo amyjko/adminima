@@ -6,12 +6,7 @@
 		change?: undefined | ((on: boolean) => void);
 	}
 
-	let {
-		on = $bindable(),
-		tip,
-		enabled = true,
-		change = undefined
-	}: Props = $props();
+	let { on = $bindable(), tip, enabled = true, change = undefined }: Props = $props();
 </script>
 
 <input
