@@ -33,6 +33,7 @@
 		"@sveltejs/kit": "^2",
 		"@sveltejs/vite-plugin-svelte": "^7",
 		"@types/uuid": "^10",
+		"happy-dom": "^20.11.6",
 		"pg": "^8",
 		"prettier": "^3",
 		"prettier-plugin-svelte": "^4",
