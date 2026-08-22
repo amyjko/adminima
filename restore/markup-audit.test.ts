@@ -45,6 +45,16 @@ import { connect } from './lib/db.js';
  * A url on the command line shows up in ps output and shell history, so it is read from the
  * environment only. Reading .env is deliberately not an option: `npm run stop` copies .env.prod
  * over .env, so .env points at production whenever the local stack is down.
+ *
+ * Run against production on 22 August 2026, before the rich text editor was turned on, over 3332
+ * values and 5183 blocks, of which 42% held anything the round trip could touch:
+ *
+ *   Words dropped     0
+ *   Never settles     0
+ *   Reshaped          0
+ *   Blocks rewritten  398 of 5183 (7.7%), all of it cosmetic
+ *
+ * A later run that moves any of the first three off zero is a regression, whatever else changed.
  */
 
 /** Every column that holds markup, as of the call sites of MarkupView. */
