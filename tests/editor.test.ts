@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+// Reading the clipboard back is how the tests below check what a paste elsewhere would get.
+test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
 /**
  * The editor, driven by a real browser.
  *
@@ -216,17 +219,18 @@ test('what the browser does with a copy and paste across paragraphs', async ({ p
 });
 
 test('a copied reference is still a reference when pasted back', async ({ page }) => {
+	// Offsets here count raw text, where the pill contributes its whole label, so this covers the
+	// reference and the words on either side of it.
 	await open(page, 'see <Amy@registrar> now');
 	await selectAcross(
 		page,
-		{ selector: '#editor p', offset: 4 },
-		{ selector: '#editor p', offset: 5 }
+		{ selector: '#editor p', offset: 0 },
+		{ selector: '#editor p', offset: 11 }
 	);
 	await page.keyboard.press('ControlOrMeta+c');
-	// The helper counts raw text, where the pill contributes its whole label.
 	await caret(page, '#editor p', 11);
 	await page.keyboard.press('ControlOrMeta+v');
-	expect(await source(page)).toBe('see <Amy@registrar> now<Amy@registrar>');
+	expect(await source(page)).toBe('see <Amy@registrar> nowsee <Amy@registrar> now');
 });
 
 test('formatting survives a copy across paragraphs', async ({ page }) => {
@@ -258,4 +262,48 @@ test('a reference survives a copy across paragraphs', async ({ page }) => {
 	expect(await source(page)).toBe(
 		'see <Amy@registrar> now\n\nsecond\n\nsee <Amy@registrar> now\n\nsecond'
 	);
+});
+
+test('the clipboard carries rendered text, the same way everywhere', async ({ page }) => {
+	// Copy and cut are the browser's, in every case, so an external paste reads the same whether a
+	// phrase or three paragraphs were selected. This markup is not meant to travel.
+	await open(page, 'a *bold* word\n\nsecond line');
+
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 2 },
+		{ selector: '#editor p:nth-child(1)', offset: 6 }
+	);
+	await page.keyboard.press('ControlOrMeta+c');
+	expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('bold');
+
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 0 },
+		{ selector: '#editor p:nth-child(2)', offset: 6 }
+	);
+	await page.keyboard.press('ControlOrMeta+c');
+	expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('a bold word\n\nsecond');
+});
+
+test('cutting within a line takes out just what was selected', async ({ page }) => {
+	await open(page, 'keep remove keep');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 5 },
+		{ selector: '#editor p', offset: 12 }
+	);
+	await page.keyboard.press('ControlOrMeta+x');
+	expect(await source(page)).toBe('keep keep');
+});
+
+test('cutting formatted text leaves the formatting around it intact', async ({ page }) => {
+	await open(page, 'a *bold and more* word');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 7 },
+		{ selector: '#editor p', offset: 16 }
+	);
+	await page.keyboard.press('ControlOrMeta+x');
+	expect(await source(page)).toBe('a *bold* word');
 });

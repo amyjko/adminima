@@ -22,9 +22,7 @@ import {
 	type Kind,
 	type Position
 } from './commands';
-import { hasMark, sliceLine } from './segments';
-import { serializeBlock } from '../../markup/serializer';
-import Paragraph from '../../markup/Paragraph';
+import { hasMark } from './segments';
 
 /**
  * The editor, as the browser sees it.
@@ -132,8 +130,6 @@ export default class Host {
 		root.addEventListener('compositionend', this.onCompositionEnd);
 		root.addEventListener('keydown', this.onKeyDown);
 		root.addEventListener('paste', this.onPaste);
-		root.addEventListener('copy', this.onCopy);
-		root.addEventListener('cut', this.onCut);
 		root.addEventListener('dragstart', this.onDragStart);
 		root.addEventListener('blur', this.onBlur);
 		root.ownerDocument.addEventListener('selectionchange', this.onSelectionChange);
@@ -149,8 +145,6 @@ export default class Host {
 		root.removeEventListener('compositionend', this.onCompositionEnd);
 		root.removeEventListener('keydown', this.onKeyDown);
 		root.removeEventListener('paste', this.onPaste);
-		root.removeEventListener('copy', this.onCopy);
-		root.removeEventListener('cut', this.onCut);
 		root.removeEventListener('dragstart', this.onDragStart);
 		root.removeEventListener('blur', this.onBlur);
 		root.ownerDocument.removeEventListener('selectionchange', this.onSelectionChange);
@@ -476,6 +470,14 @@ export default class Host {
 
 	// -- Clipboard ------------------------------------------------------------
 
+	/*
+	 * Copy and cut are left entirely to the browser. It gets both right: cutting across paragraphs
+	 * joins the halves that remain, and what it puts on the clipboard as HTML carries formatting
+	 * and references through a paste back in. Writing markup to the clipboard instead would mean
+	 * cancelling the cut and reimplementing the deletion, to make an external paste say
+	 * `a \*bold\* word` rather than `a bold word` -- and this markup is not meant to travel.
+	 */
+
 	private onPaste = (event: Event) => {
 		const paste = event as ClipboardEvent;
 		const data = paste.clipboardData;
@@ -500,39 +502,4 @@ export default class Host {
 		if (span === undefined) return;
 		this.apply(insertMarkup(this.markup, this.positionAt(span.start), span.end.offset, pasted));
 	};
-
-	private onCopy = (event: Event) => {
-		this.writeClipboard(event as ClipboardEvent);
-	};
-
-	private onCut = (event: Event) => {
-		const span = this.span();
-		if (!this.writeClipboard(event as ClipboardEvent)) return;
-		if (span === undefined) return;
-		this.apply(insert(this.markup, this.positionAt(span.start), span.end.offset, []));
-	};
-
-	/**
-	 * Put markup on the clipboard, not the rendered text. Without this, copying a reference gives
-	 * whatever the browser makes of the pill — its label, or its label and its symbol — and pasting
-	 * it back somewhere else loses that it was a reference at all.
-	 */
-	private writeClipboard(event: ClipboardEvent): boolean {
-		const span = this.span();
-		if (span === undefined || span.collapsed) return false;
-		// A selection spanning blocks is left to the browser, which already copies something
-		// sensible. The case worth getting right is a phrase within one line.
-		if (span.start.block !== span.end.block || span.start.line !== span.end.line) return false;
-		const block = this.markup.blocks[indexOf(span.start)];
-		if (block === undefined) return false;
-		const line = linesOf(block)[span.start.line];
-		if (line === undefined) return false;
-
-		const selected = sliceLine(line, span.start.offset, span.end.offset);
-		if (selected.length === 0) return false;
-
-		event.clipboardData?.setData('text/plain', serializeBlock(new Paragraph(selected)));
-		event.preventDefault();
-		return true;
-	}
 }
