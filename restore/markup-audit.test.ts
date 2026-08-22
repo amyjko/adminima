@@ -198,7 +198,8 @@ test.skipIf(!url)(
 			'utf8'
 		);
 
-		console.log(`${summary}\n\nFull report: ${out}`);
+		// Written straight out rather than through console, which the test runner swallows.
+		process.stdout.write(`\n${summary}\n\nFull report: ${out}\n\n`);
 
 		// Normalization is expected and is for a person to look at. Losing meaning is not.
 		expect(losses.slice(0, 5).join('\n\n')).toBe('');
