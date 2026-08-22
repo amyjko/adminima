@@ -41,7 +41,7 @@ Take a snapshot of production **before** you change anything. It is your only re
 pre-restore state, and it makes the whole operation auditable.
 
 ```sh
-export PROD_DB_URL='postgresql://postgres:...@db.xxxx.supabase.co:5432/postgres'
+export PROD_DB_URL='postgresql://postgres.xxxx:...@aws-0-REGION.pooler.supabase.com:5432/postgres'
 npm run snapshot -- --source-env PROD_DB_URL
 ```
 
@@ -50,9 +50,17 @@ No downtime is needed and nothing is locked for long — the tool only reads her
 Then write down what was lost, roughly when, and who reported it. You will need it in step 4,
 because the diff cannot tell an accidental deletion from a deliberate one.
 
-Get the connection string from **Dashboard → Connect**. Use the **direct connection** or the
-**session pooler**. Not the transaction pooler on port 6543 — it does not hold session state across
+Get the connection string from **Dashboard → Connect**, and take the **session pooler**.
+
+Not the **direct connection**: `db.<ref>.supabase.co` resolves to IPv6 only unless the project has
+the IPv4 add-on, so on a network without IPv6 it fails at name resolution with `ENOTFOUND` before
+anything is even attempted. Check with `dig +short A db.<ref>.supabase.co` — no answer means no.
+
+Not the **transaction pooler** on port 6543 either: it does not hold session state across
 statements, and the tool refuses it.
+
+The session pooler's username is `postgres.<project-ref>`, not `postgres`. Getting that wrong
+fails as a password error, which sends you looking in the wrong place.
 
 ## 2. Get the backup
 
