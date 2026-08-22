@@ -7,6 +7,8 @@
 	import { addError } from '$routes/errors.svelte';
 	import Loading from './Loading.svelte';
 	import MarkupEditor from './MarkupEditor.svelte';
+	import { slide } from 'svelte/transition';
+	import { after } from './editor/motion.svelte';
 
 	interface Props {
 		/** The markup's text */
@@ -99,7 +101,11 @@
 	{#if editing}
 		<MarkupEditor bind:markup={revisedText} id={editorID} {labelled} save={() => save()} />
 	{:else}
-		<div class="blocks">
+		<!--
+			No height until the editor has finished leaving, so the two are never on screen at once.
+			Nothing is animated here; the wait is the whole point of it.
+		-->
+		<div class="blocks" in:slide={{ duration: 0, delay: after() }}>
 			{#if markup === '' || markup === undefined}<em>{placeholder}</em>{:else}<BlocksView
 					blocks={parse(markup).blocks}
 				/>{/if}

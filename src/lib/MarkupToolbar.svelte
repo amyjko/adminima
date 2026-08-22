@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { slide } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { still, Milliseconds } from './editor/motion.svelte';
 	import Button from './Button.svelte';
 	import type { State } from './editor/host';
 	import type { Kind } from './editor/commands';
@@ -25,15 +26,13 @@
 	let apple = $derived(browser && /Mac|iPhone|iPad/.test(navigator.userAgent));
 
 	/**
-	 * Making room for the toolbar shoves everything below it down. Sliding it in shows where the
-	 * space came from, rather than the text appearing to jump on its own -- but only for people who
-	 * have not asked for less of that.
+	 * Making room for the toolbar shoves everything below it down the page, and taking the room
+	 * back pulls it up again. Both ways, so that it is the same movement reversed.
 	 *
-	 * On the way in only. An outro would hold the whole editor on the page while it played, and
-	 * saving puts the rendered version up at the same moment -- so both were briefly visible, one
-	 * above the other.
+	 * Going out, the rendered version waits the same length of time before taking any space, or the
+	 * two of them are briefly on screen together saying the same thing.
 	 */
-	let still = $derived(browser && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+	let motionless = $derived(still());
 
 	/** How a keystroke is written in a tooltip, for the keyboard in front of the person reading it. */
 	function shortcut(key: string, { alt = false, shift = false } = {}) {
@@ -98,7 +97,7 @@
 	bind:this={toolbar}
 	onkeydown={navigate}
 	onmousedowncapture={(event) => event.preventDefault()}
-	in:slide={{ duration: still ? 0 : 160, easing: cubicOut }}
+	transition:slide={{ duration: motionless ? 0 : Milliseconds, easing: cubicOut }}
 >
 	<Button
 		tip="Bold"
