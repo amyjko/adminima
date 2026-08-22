@@ -356,8 +356,9 @@ export default class Host {
 			case 'insertParagraph':
 			case 'insertLineBreak': {
 				event.preventDefault();
-				const point = savePoint(this.root);
-				if (point !== undefined) this.apply(split(this.markup, this.positionAt(point)));
+				const span = this.span();
+				if (span !== undefined)
+					this.apply(split(this.markup, this.positionAt(span.start), this.positionAt(span.end)));
 				return;
 			}
 			case 'historyUndo':

@@ -307,3 +307,78 @@ test('cutting formatted text leaves the formatting around it intact', async ({ p
 	await page.keyboard.press('ControlOrMeta+x');
 	expect(await source(page)).toBe('a *bold* word');
 });
+
+test('enter with text selected replaces it', async ({ page }) => {
+	await open(page, 'keep remove keep');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 5 },
+		{ selector: '#editor p', offset: 12 }
+	);
+	await page.keyboard.press('Enter');
+	expect(await source(page)).toBe('keep \n\nkeep');
+});
+
+test('enter with a selection spanning blocks replaces all of it', async ({ page }) => {
+	await open(page, 'first line\n\nsecond line');
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 6 },
+		{ selector: '#editor p:nth-child(2)', offset: 7 }
+	);
+	await page.keyboard.press('Enter');
+	expect(await source(page)).toBe('first \n\nline');
+});
+
+test('backspace with text selected deletes just that', async ({ page }) => {
+	await open(page, 'keep remove keep');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 5 },
+		{ selector: '#editor p', offset: 12 }
+	);
+	await page.keyboard.press('Backspace');
+	expect(await source(page)).toBe('keep keep');
+});
+
+test('backspace with a selection spanning blocks joins what is left', async ({ page }) => {
+	await open(page, 'first line\n\nsecond line');
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 6 },
+		{ selector: '#editor p:nth-child(2)', offset: 7 }
+	);
+	await page.keyboard.press('Backspace');
+	expect(await source(page)).toBe('first line');
+});
+
+test('backspace at the start of a heading gives a paragraph', async ({ page }) => {
+	await open(page, '# Title');
+	await caret(page, '#editor h3', 0);
+	await page.keyboard.press('Backspace');
+	expect(await source(page)).toBe('Title');
+});
+
+test('backspace at the start of a quote gives a paragraph', async ({ page }) => {
+	await open(page, '"quoted"');
+	await caret(page, '#editor blockquote p', 0);
+	await page.keyboard.press('Backspace');
+	expect(await source(page)).toBe('quoted');
+});
+
+test('enter at the end of a quoted line makes another quoted line', async ({ page }) => {
+	await open(page, '"one"');
+	await caret(page, '#editor blockquote p', 3);
+	await page.keyboard.press('Enter');
+	await page.keyboard.type('two');
+	expect(await source(page)).toBe('"one"\n"two"');
+});
+
+test('enter twice at the end of a quote leaves it', async ({ page }) => {
+	await open(page, '"one"');
+	await caret(page, '#editor blockquote p', 3);
+	await page.keyboard.press('Enter');
+	await page.keyboard.press('Enter');
+	await page.keyboard.type('after');
+	expect(await source(page)).toBe('"one"\n\nafter');
+});

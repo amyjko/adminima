@@ -6,7 +6,7 @@ import Paragraph from '../../markup/Paragraph';
 import Quote from '../../markup/Quote';
 import type Block from '../../markup/Block';
 import type Segment from '../../markup/Segment';
-import { coalesce, lineLength, splitLine, spliceLine, toggleMark } from './segments';
+import { coalesce, lineLength, sliceLine, splitLine, spliceLine, toggleMark } from './segments';
 
 /**
  * What the toolbar and the keyboard actually do, as transforms on a document.
@@ -96,8 +96,59 @@ export function setKind(markup: Markup, at: Position, kind: Kind): Edit {
 	return { markup: replace(markup, at.block, blocks), position };
 }
 
-/** Enter. */
-export function split(markup: Markup, at: Position): Edit {
+/**
+ * Take out everything between two positions, joining what is left on either side. What follows the
+ * selection in its own block stays that kind of block; the line the two ends become belongs to the
+ * block the selection started in.
+ */
+export function deleteRange(markup: Markup, start: Position, end: Position): Edit {
+	if (start.block === end.block && start.line === end.line)
+		return insert(markup, start, end.offset, []);
+
+	const first = markup.blocks[start.block];
+	const last = markup.blocks[end.block];
+	if (first === undefined || last === undefined) return { markup, position: start };
+
+	const firstLines = linesOf(first);
+	const lastLines = linesOf(last);
+	const head = sliceLine(firstLines[start.line] ?? [], 0, start.offset);
+	const tailLine = lastLines[end.line] ?? [];
+	const tail = sliceLine(tailLine, end.offset, lineLength(tailLine));
+	const position = { block: start.block, line: start.line, offset: lineLength(head) };
+
+	// Within one block, the lines between the two ends simply go.
+	if (start.block === end.block) {
+		const joined = [
+			...firstLines.slice(0, start.line),
+			coalesce([...head, ...tail]),
+			...lastLines.slice(end.line + 1)
+		];
+		return { markup: withLines(markup, start.block, joined), position };
+	}
+
+	const merged = [...firstLines.slice(0, start.line), coalesce([...head, ...tail])];
+	const remaining = lastLines.slice(end.line + 1);
+	return {
+		markup: new Markup([
+			...markup.blocks.slice(0, start.block),
+			...blocksOf(kindOf(first), merged),
+			...(remaining.length > 0 ? blocksOf(kindOf(last), remaining) : []),
+			...markup.blocks.slice(end.block + 1)
+		]),
+		position
+	};
+}
+
+/** Enter. Anything selected is replaced by the break, rather than left behind beside it. */
+export function split(markup: Markup, at: Position, to?: Position): Edit {
+	if (
+		to !== undefined &&
+		(to.block !== at.block || to.line !== at.line || to.offset !== at.offset)
+	) {
+		const emptied = deleteRange(markup, at, to);
+		return split(emptied.markup, emptied.position);
+	}
+
 	const block = markup.blocks[at.block];
 	if (block === undefined) return { markup, position: at };
 	const kind = kindOf(block);
