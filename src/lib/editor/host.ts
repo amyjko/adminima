@@ -56,6 +56,8 @@ export type Options = {
 	onState: (state: State) => void;
 	/** The application's own origin, so a pasted link back into it becomes a reference. */
 	origin?: string;
+	/** Switching between rich text and source, which the component owns rather than the host. */
+	onToggleSource?: () => void;
 };
 
 /** Input types that arrive while an input method is composing and must be left entirely alone. */
@@ -450,6 +452,9 @@ export default class Host {
 			if (lower === 'z') {
 				event.preventDefault();
 				this.redo();
+			} else if (lower === 'm' && this.options.onToggleSource !== undefined) {
+				event.preventDefault();
+				this.options.onToggleSource();
 			}
 			return;
 		}

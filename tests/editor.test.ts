@@ -22,7 +22,10 @@ async function open(page: import('@playwright/test').Page, source: string) {
 		document.body.prepend(root);
 		const host = new Host(root, initial, {
 			onChange: (source: string) => ((window as never as Record<string, unknown>).source = source),
-			onState: () => {}
+			onState: () => {},
+			onToggleSource: () =>
+				((window as never as Record<string, unknown>).toggled =
+					(((window as never as Record<string, unknown>).toggled as number) ?? 0) + 1)
 		});
 		host.mount();
 		(window as never as Record<string, unknown>).host = host;
@@ -132,4 +135,24 @@ test('blocks nobody touched keep the bytes they were written with', async ({ pag
 	await caret(page, '#editor p', 9);
 	await page.keyboard.type('!');
 	expect(await source(page)).toBe('* a bullet\n\n\n\nchange me!\n\n#### deep heading');
+});
+
+test('the shortcut for markup source is the one the help text promises', async ({ page }) => {
+	await open(page, 'hello');
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('ControlOrMeta+Shift+m');
+	expect(await page.evaluate(() => (window as never as Record<string, unknown>).toggled)).toBe(1);
+	// And it did not also type an m.
+	expect(await source(page)).toBe('hello');
+});
+
+test('tab is left alone, so the toolbar stays one key away', async ({ page }) => {
+	// Editors that capture Tab for indentation are why Alt+F10 exists. This grammar has no nesting,
+	// so Tab keeps its ordinary meaning and the toolbar needs no shortcut of its own.
+	const editor = await open(page, 'hello');
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('Tab');
+	await expect(editor).toHaveText('hello');
+	expect(await source(page)).toBe('hello');
+	expect(await page.evaluate(() => document.activeElement?.id)).not.toBe('editor');
 });

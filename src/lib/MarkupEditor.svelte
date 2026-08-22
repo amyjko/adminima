@@ -58,7 +58,8 @@
 				// and rebuild the document under someone's cursor.
 				onChange: (source) => (markup = source),
 				onState: (next) => (status = next),
-				origin: page.url.origin
+				origin: page.url.origin,
+				onToggleSource: () => toggleSource()
 			}
 		);
 		created.mount();
@@ -146,7 +147,7 @@
 		<Note>
 			<span id="{id}-help">
 				Bold is {modifier}+B, italic +I, heading +option+1, list +shift+8, markup source +shift+M.
-				The toolbar is alt+F10.
+				Shift+tab reaches the toolbar.
 			</span>
 		</Note>
 	{/if}
