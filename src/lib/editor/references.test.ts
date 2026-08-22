@@ -38,6 +38,5 @@ test('an empty short name is not a name to refer to', () => {
 
 test('what the picker offers is what the view will resolve', () => {
 	// The two rules have to agree, or the picker offers references that render as unknown.
-	for (const item of [Registrar, Chief, Blank])
-		expect(matches(item, targetFor(item))).toBe(true);
+	for (const item of [Registrar, Chief, Blank]) expect(matches(item, targetFor(item))).toBe(true);
 });
