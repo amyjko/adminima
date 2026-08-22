@@ -32,7 +32,10 @@ export function blockAt(root: Element, node: Node | null): Element | undefined {
 }
 
 /** The line a node sits in, and which line of its block that is. */
-export function lineAt(block: Element, node: Node | null): { line: Element; index: number } | undefined {
+export function lineAt(
+	block: Element,
+	node: Node | null
+): { line: Element; index: number } | undefined {
 	const candidates = lines(block);
 	for (const [index, line] of candidates.entries()) {
 		if (line === node || line.contains(node)) return { line, index };
@@ -72,7 +75,8 @@ export function offsetOf(line: Element, node: Node, offset: number): number {
 			if (current === node) {
 				// A position expressed as an index among children, which is what browsers give for
 				// an empty line or a position between elements.
-				for (let index = 0; index < Math.min(offset, children.length); index++) walk(children[index]);
+				for (let index = 0; index < Math.min(offset, children.length); index++)
+					walk(children[index]);
 				found = count;
 				return;
 			}

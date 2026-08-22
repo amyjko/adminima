@@ -104,7 +104,11 @@ export function renderBlock(document: Document, block: Block, id: string): HTMLE
 }
 
 /** Render a whole document, numbering the blocks so that each one can be found again. */
-export function renderMarkup(document: Document, markup: Markup, next: () => string): DocumentFragment {
+export function renderMarkup(
+	document: Document,
+	markup: Markup,
+	next: () => string
+): DocumentFragment {
 	const fragment = document.createDocumentFragment();
 	for (const block of markup.blocks) fragment.appendChild(renderBlock(document, block, next()));
 	return fragment;

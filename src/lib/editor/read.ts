@@ -94,7 +94,8 @@ function readLine(element: Element): Segment[] {
 /** The elements holding each line of a block: list items, quoted lines, or the block itself. */
 export function lines(element: Element): Element[] {
 	const tag = element.tagName.toLowerCase();
-	if (tag === 'ul' || tag === 'ol') return Array.from(element.children).filter((c) => c.tagName.toLowerCase() === 'li');
+	if (tag === 'ul' || tag === 'ol')
+		return Array.from(element.children).filter((c) => c.tagName.toLowerCase() === 'li');
 	if (tag === 'blockquote') {
 		const children = Array.from(element.children);
 		return children.length > 0 ? children : [element];
