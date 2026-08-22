@@ -1,0 +1,738 @@
+import Markup from '../../markup/Markup';
+import Paragraph from '../../markup/Paragraph';
+import type Part from '../../markup/Part';
+import type Segment from '../../markup/Segment';
+import Reference from '../../markup/Reference';
+import Link from '../../markup/Link';
+import Characters from '../../markup/Text';
+import { parseWithSpans } from '../../markup/parser';
+import { renderMarkup } from './render';
+import { readDocument } from './read';
+import { spliceSource } from './splice';
+import { markupFromHTML, markupFromText } from './paste';
+import History from './undo';
+import { announce } from './announce.svelte';
+import {
+	saveSpan,
+	savePoint,
+	restorePoint,
+	restoreSpan,
+	indexOf,
+	type Point,
+	type Span
+} from './selection';
+import {
+	kindOf,
+	linesOf,
+	mark,
+	mergeBackward,
+	setKind,
+	split,
+	insert,
+	insertMarkup,
+	type Edit,
+	type Kind,
+	type Position
+} from './commands';
+import { hasMark, sliceLine, segmentAt } from './segments';
+
+/**
+ * The editor, as the browser sees it.
+ *
+ * The arrangement is: the browser owns the DOM while someone is typing, the DOM is read back into
+ * a document afterwards, and the source is derived from that. Typing is never intercepted and
+ * never causes a re-render, which is what keeps the caret, the screen reader's cursor, the braille
+ * cursor and the input method's own buffer where they were. Only deliberate commands — bold,
+ * Enter, a block type change — go the other way and rebuild the block they changed.
+ *
+ * What is deliberately not done here is cancel every input and re-render, the way a strictly
+ * controlled editor would. Composition cannot be cancelled at all, so that arrangement is a fiction
+ * during exactly the input it claims to control, and every avoidable rebuild near the caret costs
+ * a screen reader user their place.
+ */
+
+export type State = {
+	bold: boolean;
+	italic: boolean;
+	kind: Kind;
+	undoable: boolean;
+	redoable: boolean;
+	/** Whether anything is selected, since formatting needs something to apply to. */
+	selected: boolean;
+};
+
+/**
+ * What a link or reference is being made out of: the words selected, and the one already there if
+ * the caret is on it.
+ */
+export type LinkContext = {
+	text: string;
+	target?: string;
+	kind?: 'link' | 'reference';
+};
+
+export type Options = {
+	onChange: (source: string) => void;
+	onState: (state: State) => void;
+	/** The application's own origin, so a pasted link back into it becomes a reference. */
+	origin?: string;
+	/** Switching between rich text and source, which the component owns rather than the host. */
+	onToggleSource?: () => void;
+	/** Asking for the picker, which is a dialog the component owns. */
+	onLink?: (context: LinkContext) => void;
+};
+
+/** Input types that arrive while an input method is composing and must be left entirely alone. */
+function composed(type: string): boolean {
+	return (
+		type.startsWith('insertComposition') ||
+		type.startsWith('deleteComposition') ||
+		type === 'insertFromComposition' ||
+		type === 'deleteByComposition'
+	);
+}
+
+/** Formatting the grammar has no way to express. Dropped here rather than lost at save time. */
+const Unsupported = new Set([
+	'formatUnderline',
+	'formatStrikeThrough',
+	'formatSuperscript',
+	'formatSubscript',
+	'formatFontColor',
+	'formatFontName',
+	'formatBackColor',
+	'formatIndent',
+	'formatOutdent',
+	'formatJustifyLeft',
+	'formatJustifyCenter',
+	'formatJustifyRight'
+]);
+
+const Names: Record<Kind, string> = {
+	paragraph: 'Paragraph',
+	heading1: 'Heading level one',
+	heading2: 'Heading level two',
+	bullets: 'Bulleted list',
+	numbered: 'Numbered list',
+	quote: 'Block quote'
+};
+
+export default class Host {
+	readonly root: HTMLElement;
+	private options: Options;
+
+	/**
+	 * The source as it was opened, and its parse. Everything emitted is spliced against this, so
+	 * blocks nobody touched keep the bytes they were written with for the whole session.
+	 */
+	private baseline: { source: string; markup: Markup; spans: Map<Part, [number, number]> };
+
+	/** The live document, read back from the DOM after typing and replaced outright by commands. */
+	private markup: Markup;
+
+	private history = new History();
+
+	/**
+	 * What a pending link is replacing. Opening the picker moves focus into a dialog, which takes
+	 * the selection with it, so where to put the result has to be remembered beforehand.
+	 */
+	private pending: { start: Position; end: Position } | undefined;
+
+	/**
+	 * Formatting chosen for text that has not been typed yet.
+	 *
+	 * Pressing bold with nothing selected has to mean something, and what it means everywhere else
+	 * is that the next thing typed comes out bold. It is remembered against the position it was
+	 * chosen at, so that moving the caret abandons it rather than surprising someone later.
+	 */
+	private marks: { at: Point; formats: Partial<Record<'*' | '_', boolean>> } | undefined;
+	private composing = false;
+	private listening = false;
+
+	constructor(root: HTMLElement, source: string, options: Options) {
+		this.root = root;
+		this.options = options;
+		const parsed = parseWithSpans(source);
+		this.baseline = { source, markup: parsed.markup, spans: parsed.spans };
+		this.markup = parsed.markup;
+	}
+
+	// -- Lifecycle ------------------------------------------------------------
+
+	mount() {
+		this.render();
+		if (this.listening) return;
+		const root = this.root;
+		root.addEventListener('beforeinput', this.onBeforeInput);
+		root.addEventListener('input', this.onInput);
+		root.addEventListener('compositionstart', this.onCompositionStart);
+		root.addEventListener('compositionend', this.onCompositionEnd);
+		root.addEventListener('keydown', this.onKeyDown);
+		root.addEventListener('paste', this.onPaste);
+		root.addEventListener('dragstart', this.onDragStart);
+		root.addEventListener('blur', this.onBlur);
+		root.ownerDocument.addEventListener('selectionchange', this.onSelectionChange);
+		this.listening = true;
+	}
+
+	destroy() {
+		if (!this.listening) return;
+		const root = this.root;
+		root.removeEventListener('beforeinput', this.onBeforeInput);
+		root.removeEventListener('input', this.onInput);
+		root.removeEventListener('compositionstart', this.onCompositionStart);
+		root.removeEventListener('compositionend', this.onCompositionEnd);
+		root.removeEventListener('keydown', this.onKeyDown);
+		root.removeEventListener('paste', this.onPaste);
+		root.removeEventListener('dragstart', this.onDragStart);
+		root.removeEventListener('blur', this.onBlur);
+		root.ownerDocument.removeEventListener('selectionchange', this.onSelectionChange);
+		this.listening = false;
+	}
+
+	focus() {
+		this.root.focus();
+	}
+
+	// -- Source ---------------------------------------------------------------
+
+	/** The document as markup, with everything untouched left exactly as it was written. */
+	get source(): string {
+		return spliceSource(
+			this.baseline.source,
+			this.baseline.markup,
+			this.markup,
+			this.baseline.spans
+		);
+	}
+
+	/**
+	 * Take in content from outside. Only ever called deliberately — on opening, and on switching
+	 * between rich text and source — never in response to a property changing, which would rebuild
+	 * the document under someone's cursor the moment a colleague saved an edit of their own.
+	 */
+	adopt(source: string) {
+		const parsed = parseWithSpans(source);
+		this.baseline = { source, markup: parsed.markup, spans: parsed.spans };
+		this.markup = parsed.markup;
+		this.history = new History();
+		this.render();
+	}
+
+	private render(point?: Point) {
+		const document = this.root.ownerDocument;
+		let next = 0;
+		/*
+		 * A document with nothing in it still needs somewhere to put the cursor. Without a paragraph
+		 * to type into, the browser puts what is typed straight into the editable element, where
+		 * reading back does not look -- so a new comment would take text and then save none of it.
+		 */
+		const showing = this.markup.blocks.length > 0 ? this.markup : new Markup([new Paragraph([])]);
+		this.root.replaceChildren(renderMarkup(document, showing, () => `b${next++}`));
+		if (point !== undefined) restorePoint(this.root, point);
+		this.report();
+	}
+
+	private emit() {
+		this.options.onChange(this.source);
+	}
+
+	private report() {
+		this.options.onState(this.state());
+	}
+
+	// -- Reading the DOM back -------------------------------------------------
+
+	/**
+	 * What the browser has done since the last time we looked. The whole document is read rather
+	 * than the one block that changed: these are comments and descriptions, so it costs nothing,
+	 * and it means no bookkeeping can drift out of step with what is on screen.
+	 */
+	private readBack() {
+		if (this.composing) return;
+		this.markup = readDocument(this.root);
+		this.emit();
+		this.report();
+	}
+
+	// -- Positions ------------------------------------------------------------
+
+	private positionAt(point: Point): Position {
+		return { block: indexOf(point), line: point.line, offset: point.offset };
+	}
+
+	private pointAt(position: Position): Point {
+		return { block: `b${position.block}`, line: position.line, offset: position.offset };
+	}
+
+	private span(): Span | undefined {
+		return saveSpan(this.root);
+	}
+
+	/**
+	 * Apply a transform, rebuild, and put the caret where the transform said it should go.
+	 *
+	 * A command is its own step in the history. The one exception is the keystroke that starts a
+	 * run of formatted text, which is a keystroke like any other and belongs in the same step as
+	 * the rest of the word it begins.
+	 */
+	private apply(edit: Edit, spoken?: string, { typing = false } = {}) {
+		const was = this.span();
+		this.history.record({ source: this.source, point: savePoint(this.root) }, { typing });
+		this.markup = edit.markup;
+		this.render(this.pointAt(edit.position));
+		// A command that acted on a selection leaves it selected, facing the way it was made.
+		if (edit.to !== undefined)
+			restoreSpan(this.root, {
+				start: this.pointAt(edit.position),
+				end: this.pointAt(edit.to),
+				collapsed: false,
+				backward: was?.backward ?? false
+			});
+		this.emit();
+		if (spoken !== undefined) announce(spoken);
+	}
+
+	// -- Commands -------------------------------------------------------------
+
+	toggleMark(format: '*' | '_') {
+		const span = this.span();
+		const name = format === '*' ? 'Bold' : 'Italic';
+		if (span === undefined) return;
+
+		// Formatting cannot cross a line, and there is no sensible half of a selection to apply it to.
+		if (span.start.block !== span.end.block || span.start.line !== span.end.line) {
+			announce(`${name} cannot cross from one block to another`);
+			return;
+		}
+
+		if (!span.collapsed) {
+			const at = this.positionAt(span.start);
+			const was = this.markedNow(format);
+			this.apply(mark(this.markup, at, span.end.offset, format), `${name} ${was ? 'off' : 'on'}`);
+			return;
+		}
+
+		// Nothing selected, so this is a choice about what comes next rather than an edit.
+		const at = this.positionAt(span.start);
+		const current = this.marksAt(span.start)?.[format] ?? this.markedInDocument(at, format);
+		this.marks = {
+			at: span.start,
+			formats: { ...(this.marksAt(span.start) ?? {}), [format]: !current }
+		};
+		announce(`${name} ${current ? 'off' : 'on'} for what you type next`);
+		this.report();
+	}
+
+	setKind(kind: Kind) {
+		const point = savePoint(this.root);
+		if (point === undefined) return;
+		this.apply(setKind(this.markup, this.positionAt(point), kind), Names[kind]);
+	}
+
+	insertSegments(segments: Segment[]) {
+		const span = this.span();
+		if (span === undefined) return;
+		this.apply(insert(this.markup, this.positionAt(span.start), span.end.offset, segments));
+	}
+
+	undo() {
+		const restored = this.history.undo({ source: this.source, point: savePoint(this.root) });
+		if (restored === undefined) {
+			announce('Nothing to undo');
+			return;
+		}
+		this.restore(restored.source, restored.point, 'Undo');
+	}
+
+	redo() {
+		const restored = this.history.redo({ source: this.source, point: savePoint(this.root) });
+		if (restored === undefined) {
+			announce('Nothing to redo');
+			return;
+		}
+		this.restore(restored.source, restored.point, 'Redo');
+	}
+
+	private restore(source: string, point: Point | undefined, spoken: string) {
+		this.markup = parseWithSpans(source).markup;
+		this.render(point);
+		this.emit();
+		announce(spoken);
+	}
+
+	// -- Links and references -------------------------------------------------
+
+	/** The reference or link the caret is on, if it is on one. */
+	private linkAt(
+		at: Position
+	): { found: Reference | Link; start: number; end: number } | undefined {
+		const block = this.markup.blocks[at.block];
+		if (block === undefined) return undefined;
+		const line = linesOf(block)[at.line];
+		if (line === undefined) return undefined;
+		// A pill is one character wide, so the caret is on one when it sits at either edge.
+		for (const offset of [at.offset, at.offset - 1]) {
+			if (offset < 0) continue;
+			const found = segmentAt(line, offset);
+			if (found === undefined) continue;
+			if (found.segment instanceof Reference || found.segment instanceof Link)
+				return { found: found.segment, start: found.start, end: found.end };
+		}
+		return undefined;
+	}
+
+	/** Open the picker, remembering what it is going to replace. */
+	link() {
+		const span = this.span();
+		if (span === undefined || this.options.onLink === undefined) return;
+		const start = this.positionAt(span.start);
+		const end = this.positionAt(span.end);
+
+		// Editing the reference the caret is on takes precedence over an empty selection beside it.
+		const existing = span.collapsed ? this.linkAt(start) : undefined;
+		if (existing !== undefined) {
+			this.pending = {
+				start: { ...start, offset: existing.start },
+				end: { ...start, offset: existing.end }
+			};
+			this.options.onLink({
+				text: existing.found.text,
+				target: existing.found instanceof Link ? existing.found.url : existing.found.target,
+				kind: existing.found instanceof Link ? 'link' : 'reference'
+			});
+			return;
+		}
+
+		this.pending = { start, end };
+		const selected =
+			span.collapsed || start.block !== end.block || start.line !== end.line
+				? ''
+				: this.textBetween(start, end.offset);
+		this.options.onLink({ text: selected });
+	}
+
+	private textBetween(at: Position, to: number): string {
+		const block = this.markup.blocks[at.block];
+		if (block === undefined) return '';
+		const line = linesOf(block)[at.line];
+		if (line === undefined) return '';
+		return sliceLine(line, at.offset, to)
+			.map((segment) => (segment instanceof Characters ? segment.text : ''))
+			.join('');
+	}
+
+	/**
+	 * Put the result of the picker in. Nothing means take the reference out but keep its words,
+	 * which is the only way back from one otherwise.
+	 */
+	applyLink(replacement: Segment[]) {
+		const where = this.pending;
+		this.pending = undefined;
+		if (where === undefined) return;
+		this.apply(
+			insert(this.markup, where.start, where.end.offset, replacement),
+			replacement.length === 0 ? 'Reference removed' : 'Reference inserted'
+		);
+		this.focus();
+	}
+
+	// -- State ----------------------------------------------------------------
+
+	private markedNow(format: '*' | '_'): boolean {
+		const span = this.span();
+		if (span === undefined) return false;
+		// Formatting cannot cross a block or a line, so a selection that does carries none of it.
+		if (span.start.block !== span.end.block || span.start.line !== span.end.line) return false;
+		const block = this.markup.blocks[indexOf(span.start)];
+		if (block === undefined) return false;
+		const line = linesOf(block)[span.start.line];
+		if (line === undefined) return false;
+
+		if (!span.collapsed) return hasMark(line, span.start.offset, span.end.offset, format);
+
+		// Formatting chosen but not yet typed into is what the toolbar should be showing.
+		const chosen = this.marksAt(span.start)?.[format];
+		if (chosen !== undefined) return chosen;
+
+		/*
+		 * With nothing selected, report the formatting the caret is sitting in, which is what
+		 * someone is checking when they put it there. The character before it is the convention, and
+		 * the one after it at the start of a line: otherwise the toolbar says a word is not bold
+		 * while the cursor is in the middle of it, which is worse than useless to anyone who cannot
+		 * see that it is.
+		 */
+		const offset = span.start.offset;
+		if (offset > 0) return hasMark(line, offset - 1, offset, format);
+		return hasMark(line, 0, 1, format);
+	}
+
+	/** The pending formatting, if it belongs to where the caret is now. */
+	private marksAt(point: Point): Partial<Record<'*' | '_', boolean>> | undefined {
+		const marks = this.marks;
+		if (marks === undefined) return undefined;
+		return marks.at.block === point.block &&
+			marks.at.line === point.line &&
+			marks.at.offset === point.offset
+			? marks.formats
+			: undefined;
+	}
+
+	/** Whether the text at a position carries a format, ignoring anything pending. */
+	private markedInDocument(at: Position, format: '*' | '_'): boolean {
+		const block = this.markup.blocks[at.block];
+		if (block === undefined) return false;
+		const line = linesOf(block)[at.line];
+		if (line === undefined) return false;
+		if (at.offset > 0) return hasMark(line, at.offset - 1, at.offset, format);
+		return hasMark(line, 0, 1, format);
+	}
+
+	state(): State {
+		const span = this.span();
+		const block = span === undefined ? undefined : this.markup.blocks[indexOf(span.start)];
+		return {
+			bold: this.markedNow('*'),
+			italic: this.markedNow('_'),
+			kind: block === undefined ? 'paragraph' : kindOf(block),
+			undoable: this.history.undoable,
+			redoable: this.history.redoable,
+			selected: span !== undefined && !span.collapsed
+		};
+	}
+
+	// -- Events ---------------------------------------------------------------
+
+	private onCompositionStart = () => {
+		/*
+		 * Remember the state now, because nothing else will. Composition is never intercepted and
+		 * the input events it raises are all skipped, so without this a whole composed word could
+		 * not be undone -- which is most of what typing is for anyone using an input method, and
+		 * everything typed on Android.
+		 */
+		this.history.record({ source: this.source, point: savePoint(this.root) }, { typing: true });
+
+		// Composition cannot be intercepted, so formatting chosen for what comes next cannot be
+		// applied to it. Dropping it is honest; pretending otherwise would produce plain text under
+		// a toolbar insisting it is bold.
+		this.marks = undefined;
+		// Nothing may touch the DOM until this finishes. Anything that does desynchronizes the
+		// input method's own buffer, and on Android that shows up as duplicated text.
+		this.composing = true;
+	};
+
+	private onCompositionEnd = () => {
+		this.composing = false;
+		// Chrome fires a trailing input event after this, and some virtual keyboards mutate once
+		// more, so settle on the next frame rather than reading a half finished state.
+		const view = this.root.ownerDocument.defaultView;
+		if (view) view.requestAnimationFrame(() => this.readBack());
+		else this.readBack();
+	};
+
+	private onBeforeInput = (event: Event) => {
+		const input = event as InputEvent;
+		if (this.composing || composed(input.inputType)) return;
+
+		const type = input.inputType;
+
+		if (Unsupported.has(type)) {
+			event.preventDefault();
+			return;
+		}
+
+		switch (type) {
+			case 'formatBold':
+				event.preventDefault();
+				this.toggleMark('*');
+				return;
+			case 'formatItalic':
+				event.preventDefault();
+				this.toggleMark('_');
+				return;
+			case 'insertParagraph':
+			case 'insertLineBreak': {
+				event.preventDefault();
+				const span = this.span();
+				if (span !== undefined)
+					this.apply(split(this.markup, this.positionAt(span.start), this.positionAt(span.end)));
+				return;
+			}
+			case 'historyUndo':
+				event.preventDefault();
+				this.undo();
+				return;
+			case 'historyRedo':
+				event.preventDefault();
+				this.redo();
+				return;
+			case 'insertFromPaste':
+			case 'insertFromDrop':
+				// Handled on the clipboard events, which carry the data this one does not.
+				event.preventDefault();
+				return;
+			case 'insertText': {
+				const marks = this.marks;
+				if (marks === undefined) break;
+				const span = this.span();
+				// A selection being typed over is an edit the browser does perfectly well.
+				if (span === undefined || !span.collapsed || input.data === null || input.data === '')
+					break;
+				if (this.marksAt(span.start) === undefined) break;
+
+				event.preventDefault();
+				const at = this.positionAt(span.start);
+				const bold = marks.formats['*'] ?? this.markedInDocument(at, '*');
+				const italic = marks.formats['_'] ?? this.markedInDocument(at, '_');
+				// Bold and italic cannot combine, so one of them has to win.
+				const format = bold ? '*' : italic ? '_' : '';
+				this.marks = undefined;
+				// Part of the same undo step as the rest of the word it begins, not a step of its own.
+				this.apply(
+					insert(this.markup, at, span.end.offset, [new Characters(format, input.data)]),
+					undefined,
+					{ typing: true }
+				);
+				// Everything after this one keystroke lands inside what it made, so the browser can
+				// have the rest of the word back.
+				return;
+			}
+			case 'deleteContentBackward': {
+				const span = this.span();
+				// Only the start of a line needs deciding: what joins to what, and whether backspace
+				// backs out of a list rather than merging into the block above. Everywhere else the
+				// browser already does the right thing, including deleting a whole reference.
+				if (span === undefined || !span.collapsed || span.start.offset !== 0) break;
+				event.preventDefault();
+				this.apply(mergeBackward(this.markup, this.positionAt(span.start)));
+				return;
+			}
+			default:
+				break;
+		}
+
+		// Anything left is the browser's to do. Remember the state it is about to replace.
+		this.history.record(
+			{ source: this.source, point: savePoint(this.root) },
+			{ typing: type.startsWith('insert') || type.startsWith('delete') }
+		);
+	};
+
+	private onInput = () => {
+		if (this.composing) return;
+		this.readBack();
+	};
+
+	private onSelectionChange = () => {
+		// What the toolbar shows depends on where the caret is, but only while this editor has it.
+		if (this.root.ownerDocument.activeElement !== this.root) return;
+		// Formatting chosen for what comes next belongs to where it was chosen.
+		const point = savePoint(this.root);
+		if (this.marks !== undefined && (point === undefined || this.marksAt(point) === undefined))
+			this.marks = undefined;
+		this.report();
+	};
+
+	private onBlur = () => {
+		this.history.seal();
+		this.marks = undefined;
+	};
+
+	private onDragStart = (event: Event) => {
+		// Dragging a reference out of a line is more ways to go wrong than it is worth.
+		const target = event.target;
+		if (target instanceof Element && target.closest('[data-pill]') !== null) event.preventDefault();
+	};
+
+	private onKeyDown = (event: Event) => {
+		const key = event as KeyboardEvent;
+		const command = key.metaKey || key.ctrlKey;
+		if (!command) return;
+
+		// On many European layouts AltGr is Ctrl and Alt together, so Ctrl+Alt+2 is how someone
+		// types an @. Taking that keystroke would make the editor unusable for them.
+		if (key.getModifierState && key.getModifierState('AltGraph')) return;
+
+		const lower = key.key.toLowerCase();
+
+		if (key.altKey) {
+			const kinds: Record<string, Kind> = { '0': 'paragraph', '1': 'heading1', '2': 'heading2' };
+			const kind = kinds[key.key];
+			if (kind !== undefined) {
+				event.preventDefault();
+				this.setKind(kind);
+			}
+			return;
+		}
+
+		if (key.shiftKey) {
+			const kinds: Record<string, Kind> = { '7': 'numbered', '8': 'bullets', '9': 'quote' };
+			const kind = kinds[key.key];
+			if (kind !== undefined) {
+				event.preventDefault();
+				this.setKind(kind);
+				return;
+			}
+			if (lower === 'z') {
+				event.preventDefault();
+				this.redo();
+			} else if (lower === 'm' && this.options.onToggleSource !== undefined) {
+				event.preventDefault();
+				this.options.onToggleSource();
+			}
+			return;
+		}
+
+		if (lower === 'b') {
+			event.preventDefault();
+			this.toggleMark('*');
+		} else if (lower === 'i') {
+			event.preventDefault();
+			this.toggleMark('_');
+		} else if (lower === 'z') {
+			event.preventDefault();
+			this.undo();
+		} else if (lower === 'y') {
+			event.preventDefault();
+			this.redo();
+		} else if (lower === 'k') {
+			event.preventDefault();
+			this.link();
+		}
+	};
+
+	// -- Clipboard ------------------------------------------------------------
+
+	/*
+	 * Copy and cut are left entirely to the browser. It gets both right: cutting across paragraphs
+	 * joins the halves that remain, and what it puts on the clipboard as HTML carries formatting
+	 * and references through a paste back in. Writing markup to the clipboard instead would mean
+	 * cancelling the cut and reimplementing the deletion, to make an external paste say
+	 * `a \*bold\* word` rather than `a bold word` -- and this markup is not meant to travel.
+	 */
+
+	private onPaste = (event: Event) => {
+		const paste = event as ClipboardEvent;
+		const data = paste.clipboardData;
+		if (data === null) return;
+		event.preventDefault();
+
+		const html = data.getData('text/html');
+		const text = data.getData('text/plain');
+
+		// Something the size of a document is a mistake, not a paste.
+		if (html.length > 200000 || text.length > 200000) {
+			announce('That is too large to paste');
+			return;
+		}
+
+		const pasted =
+			html !== ''
+				? markupFromHTML(html, this.root.ownerDocument, this.options.origin)
+				: markupFromText(text);
+
+		const span = this.span();
+		if (span === undefined) return;
+		this.apply(insertMarkup(this.markup, this.positionAt(span.start), span.end.offset, pasted));
+	};
+}

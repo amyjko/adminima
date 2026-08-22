@@ -16,13 +16,3 @@
 		</p>
 	{/each}
 </blockquote>
-
-<style>
-	blockquote {
-		margin-inline-start: var(--spacing);
-		margin-inline-end: var(--spacing);
-		padding-inline-start: var(--spacing);
-		border-inline-start: solid var(--thickness) var(--chrome);
-		font-style: italic;
-	}
-</style>

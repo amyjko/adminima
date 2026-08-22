@@ -73,11 +73,13 @@
 
 <div class="form">
 	<Field label="Title" bind:text={newRequestTitle} />
-	<Labeled label={org.prompt.trim().length === 0 ? defaultPrompt : org.prompt}>
+	<Labeled label={org.prompt.trim().length === 0 ? defaultPrompt : org.prompt} id="new-change">
 		<MarkupView
 			bind:markup={newRequestProblem}
 			editing
 			placeholder="Detail your change suggestion"
+			id="new-change"
+			labelled
 		/>
 	</Labeled>
 

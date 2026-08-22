@@ -48,7 +48,7 @@
 	target={external ? '_blank' : ''}
 >
 	{#if icon || kind}
-		<span class="emoji">
+		<span class="emoji" aria-hidden="true">
 			{#if icon}
 				{icon}
 			{:else if kind === 'person'}

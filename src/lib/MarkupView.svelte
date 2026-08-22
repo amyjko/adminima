@@ -5,8 +5,10 @@
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
 	import { addError } from '$routes/errors.svelte';
-	import Note from './Note.svelte';
 	import Loading from './Loading.svelte';
+	import MarkupEditor from './MarkupEditor.svelte';
+	import { slide } from 'svelte/transition';
+	import { after } from './editor/motion.svelte';
 
 	interface Props {
 		/** The markup's text */
@@ -21,6 +23,8 @@
 		id?: string | undefined;
 		/** Whether to render the text smaller */
 		small?: boolean;
+		/** Whether something else on the page names this field, via Labeled's id. */
+		labelled?: boolean;
 	}
 
 	let {
@@ -29,14 +33,25 @@
 		edit = undefined,
 		editing = $bindable(false),
 		id = undefined,
-		small = false
+		small = false,
+		labelled = false
 	}: Props = $props();
 
-	let height = $state(0);
 	let revisedText = $state(markup);
-	let input: HTMLTextAreaElement | undefined = $state();
-	let scrollHeight = $derived(revisedText ? (input ? input.scrollHeight : height) : height);
 	let saving = $state(false);
+
+	/**
+	 * The editor needs an id to be named by a label and pointed at by a toolbar, and the process
+	 * page focuses steps by id, so one is made when the caller has not given one.
+	 */
+	let editorID = $derived(id ?? `markup-${Math.abs(hash(placeholder))}`);
+
+	function hash(text: string): number {
+		let value = 0;
+		for (let index = 0; index < text.length; index++)
+			value = (value * 31 + text.charCodeAt(index)) | 0;
+		return value;
+	}
 
 	// No edit function and revised text changes, update the markup.
 	$effect(() => {
@@ -54,7 +69,7 @@
 		revisedText = markup;
 		editing = true;
 		await tick();
-		input?.focus();
+		document.getElementById(editorID)?.focus();
 	}
 
 	async function save() {
@@ -83,35 +98,27 @@
 </script>
 
 <div class="markup" class:editable={edit !== undefined} class:small>
-	{#if editing}
-		<div class="editor">
-			<textarea
-				bind:value={revisedText}
-				bind:this={input}
-				{id}
-				disabled={saving}
-				onkeydown={(e) => {
-					// Shortcut to submit without using button.
-					if (e.key === 'Enter' && e.metaKey) {
-						e.preventDefault();
-						e.stopPropagation();
-						save();
-					}
-				}}
-				style:height="{editing ? scrollHeight : height}px"></textarea>
-			<Note
-				><code>*bold*</code>, <code>_italic_</code>, <code>&lt;link@https://url&gt;</code>,
-				<code>&lt;link@role/process&gt;</code>,
-				<code>*/-/• bullets</code>, <code>1. lists</code>, <code>"block quote"</code></Note
-			>
-		</div>
-	{:else}
-		<div class="blocks" bind:clientHeight={height}>
-			{#if markup === '' || markup === undefined}<em>{placeholder}</em>{:else}<BlocksView
-					blocks={parse(markup).blocks}
-				/>{/if}
-		</div>
-	{/if}
+	<!--
+		Both states live in one column, because the row they sit in shares its width between its
+		children. While the editor was on its way out and the rendered version was already there,
+		they were two children of that row -- so the editor lost half its width and its text wrapped
+		on the way past.
+	-->
+	<div class="content">
+		{#if editing}
+			<MarkupEditor bind:markup={revisedText} id={editorID} {labelled} save={() => save()} />
+		{:else}
+			<!--
+				No height until the editor has finished leaving, so the two are never both taking up
+				room. Nothing is animated here; the wait is the whole point of it.
+			-->
+			<div class="blocks" in:slide={{ duration: 0, delay: after() }}>
+				{#if markup === '' || markup === undefined}<em>{placeholder}</em>{:else}<BlocksView
+						blocks={parse(markup).blocks}
+					/>{/if}
+			</div>
+		{/if}
+	</div>
 	{#if edit}<div class="control">
 			{#if saving}<Loading />
 			{:else}
@@ -146,9 +153,10 @@
 		font-size: var(--small-size);
 	}
 
-	.editor {
-		display: block;
-		width: 100%;
+	.content {
+		/* One child of the row, whatever is inside it, so the width never has to be shared. */
+		flex: 1;
+		min-width: 0;
 	}
 
 	.control {
@@ -158,27 +166,5 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-	}
-
-	textarea {
-		flex: 1;
-		font-family: inherit;
-		font-size: inherit;
-		line-height: inherit;
-		border: none;
-		padding: 0;
-		outline: var(--border) solid var(--thickness);
-		min-height: 2em;
-		border-radius: var(--radius);
-		width: 100%;
-	}
-
-	textarea:focus {
-		outline: var(--focus) solid var(--thickness);
-	}
-
-	code {
-		font-family: monospace;
-		font-size: 10pt;
 	}
 </style>

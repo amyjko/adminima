@@ -14,6 +14,18 @@
 		chromeless?: boolean;
 		children?: import('svelte').Snippet;
 		onkeydown?: (event: KeyboardEvent) => void;
+		/** For a button that turns something on and off, such as bold in a toolbar. */
+		pressed?: boolean | undefined;
+		/** A toolbar is one tab stop, so all but one of its buttons are taken out of the order. */
+		tabindex?: number | undefined;
+		/**
+		 * The keystroke for this command, written the way the platform writes it. It goes in the
+		 * tooltip, where it can be seen, and in aria-keyshortcuts, which is where a screen reader
+		 * expects to find it -- rather than in the accessible name, which is read out every time.
+		 */
+		shortcut?: string | undefined;
+		/** The same keystroke in the form aria-keyshortcuts takes, such as "Control+B". */
+		keys?: string | undefined;
 	}
 
 	let {
@@ -25,7 +37,11 @@
 		end = false,
 		chromeless = false,
 		children,
-		onkeydown
+		onkeydown,
+		pressed = undefined,
+		tabindex = undefined,
+		shortcut = undefined,
+		keys = undefined
 	}: Props = $props();
 
 	let confirm = $state(false);
@@ -47,8 +63,11 @@
 		class:chromeless
 		type={submit ? 'submit' : 'button'}
 		aria-disabled={!active}
-		title={tip}
+		aria-pressed={pressed === undefined ? null : pressed}
+		{tabindex}
+		title={shortcut ? `${tip} (${shortcut})` : tip}
 		aria-label={tip}
+		aria-keyshortcuts={keys}
 		{onkeydown}
 		onclick={(event) => {
 			if (warning) confirm = true;

@@ -65,6 +65,22 @@ export async function connect(url, { ca, label } = {}) {
 		);
 	}
 
+	/*
+	 * The session pooler's username is postgres.<project-ref>, which is easy to paste into the
+	 * database's place at the end of the string instead. Postgres then reports that a database of
+	 * that name does not exist, and the search goes looking for a missing database rather than for
+	 * a username in the wrong half of the connection string.
+	 */
+	const database = parsed.pathname.replace(/^\//, '');
+	if (/^postgres\.\w/.test(database)) {
+		throw new Error(
+			`${label ?? 'connection'} names a database of "${database}", which looks like the session ` +
+				`pooler's username in the database's place. The username goes before the @ and the ` +
+				`database after the host:\n` +
+				`  postgresql://${database}:PASSWORD@${parsed.hostname}:${parsed.port || '5432'}/postgres`
+		);
+	}
+
 	const local = isLocal(parsed.hostname);
 	/** @type {import('pg').ClientConfig} */
 	const config = { connectionString: url };
@@ -86,6 +102,18 @@ export async function connect(url, { ca, label } = {}) {
 				`${label ?? 'connection'} (${describe(url)}): TLS verification failed -- ${message}\n` +
 					`Download the project's CA certificate from Dashboard -> Settings -> Database and ` +
 					`pass it with --ca <path>. Do not disable certificate verification.`
+			);
+		}
+		// A direct connection host resolves to IPv6 only unless the project has the IPv4 add-on, so
+		// on a network without IPv6 it fails here rather than anywhere informative. Saying so is
+		// worth more than the raw resolver error, since this is read during an emergency.
+		if (/ENOTFOUND|EAI_AGAIN/i.test(message) && /^db\./.test(parsed.hostname)) {
+			throw new Error(
+				`${label ?? 'connection'} (${describe(url)}): ${message}\n` +
+					`${parsed.hostname} is a direct connection host, which resolves to IPv6 only unless ` +
+					`the project has the IPv4 add-on. Use the session pooler instead: Dashboard -> ` +
+					`Connect -> Session pooler, on port 5432. Note its username is postgres.<project-ref> ` +
+					`rather than postgres.`
 			);
 		}
 		throw new Error(`${label ?? 'connection'} (${describe(url)}): ${message}`);

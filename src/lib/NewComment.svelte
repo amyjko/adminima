@@ -42,8 +42,14 @@
 
 {#if $user && orgContext().member}
 	<Form active={!submitting} inactiveMessage={undefined} action={() => submitComment()}>
-		<Labeled label="Have a comment?">
-			<MarkupView bind:markup={newComment} placeholder="Add a comment" editing />
+		<Labeled label="Have a comment?" id="new-comment">
+			<MarkupView
+				bind:markup={newComment}
+				placeholder="Add a comment"
+				editing
+				id="new-comment"
+				labelled
+			/>
 		</Labeled>
 		<Button
 			end
