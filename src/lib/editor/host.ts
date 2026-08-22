@@ -1,6 +1,9 @@
 import type Markup from '../../markup/Markup';
 import type Part from '../../markup/Part';
 import type Segment from '../../markup/Segment';
+import Reference from '../../markup/Reference';
+import Link from '../../markup/Link';
+import Characters from '../../markup/Text';
 import { parseWithSpans } from '../../markup/parser';
 import { renderMarkup } from './render';
 import { readDocument } from './read';
@@ -22,7 +25,7 @@ import {
 	type Kind,
 	type Position
 } from './commands';
-import { hasMark } from './segments';
+import { hasMark, sliceLine, segmentAt } from './segments';
 
 /**
  * The editor, as the browser sees it.
@@ -49,6 +52,16 @@ export type State = {
 	selected: boolean;
 };
 
+/**
+ * What a link or reference is being made out of: the words selected, and the one already there if
+ * the caret is on it.
+ */
+export type LinkContext = {
+	text: string;
+	target?: string;
+	kind?: 'link' | 'reference';
+};
+
 export type Options = {
 	onChange: (source: string) => void;
 	onState: (state: State) => void;
@@ -56,6 +69,8 @@ export type Options = {
 	origin?: string;
 	/** Switching between rich text and source, which the component owns rather than the host. */
 	onToggleSource?: () => void;
+	/** Asking for the picker, which is a dialog the component owns. */
+	onLink?: (context: LinkContext) => void;
 };
 
 /** Input types that arrive while an input method is composing and must be left entirely alone. */
@@ -107,6 +122,12 @@ export default class Host {
 	private markup: Markup;
 
 	private history = new History();
+
+	/**
+	 * What a pending link is replacing. Opening the picker moves focus into a dialog, which takes
+	 * the selection with it, so where to put the result has to be remembered beforehand.
+	 */
+	private pending: { start: Position; end: Position } | undefined;
 	private composing = false;
 	private listening = false;
 
@@ -289,6 +310,82 @@ export default class Host {
 		this.render(point);
 		this.emit();
 		announce(spoken);
+	}
+
+	// -- Links and references -------------------------------------------------
+
+	/** The reference or link the caret is on, if it is on one. */
+	private linkAt(
+		at: Position
+	): { found: Reference | Link; start: number; end: number } | undefined {
+		const block = this.markup.blocks[at.block];
+		if (block === undefined) return undefined;
+		const line = linesOf(block)[at.line];
+		if (line === undefined) return undefined;
+		// A pill is one character wide, so the caret is on one when it sits at either edge.
+		for (const offset of [at.offset, at.offset - 1]) {
+			if (offset < 0) continue;
+			const found = segmentAt(line, offset);
+			if (found === undefined) continue;
+			if (found.segment instanceof Reference || found.segment instanceof Link)
+				return { found: found.segment, start: found.start, end: found.end };
+		}
+		return undefined;
+	}
+
+	/** Open the picker, remembering what it is going to replace. */
+	link() {
+		const span = this.span();
+		if (span === undefined || this.options.onLink === undefined) return;
+		const start = this.positionAt(span.start);
+		const end = this.positionAt(span.end);
+
+		// Editing the reference the caret is on takes precedence over an empty selection beside it.
+		const existing = span.collapsed ? this.linkAt(start) : undefined;
+		if (existing !== undefined) {
+			this.pending = {
+				start: { ...start, offset: existing.start },
+				end: { ...start, offset: existing.end }
+			};
+			this.options.onLink({
+				text: existing.found.text,
+				target: existing.found instanceof Link ? existing.found.url : existing.found.target,
+				kind: existing.found instanceof Link ? 'link' : 'reference'
+			});
+			return;
+		}
+
+		this.pending = { start, end };
+		const selected =
+			span.collapsed || start.block !== end.block || start.line !== end.line
+				? ''
+				: this.textBetween(start, end.offset);
+		this.options.onLink({ text: selected });
+	}
+
+	private textBetween(at: Position, to: number): string {
+		const block = this.markup.blocks[at.block];
+		if (block === undefined) return '';
+		const line = linesOf(block)[at.line];
+		if (line === undefined) return '';
+		return sliceLine(line, at.offset, to)
+			.map((segment) => (segment instanceof Characters ? segment.text : ''))
+			.join('');
+	}
+
+	/**
+	 * Put the result of the picker in. Nothing means take the reference out but keep its words,
+	 * which is the only way back from one otherwise.
+	 */
+	applyLink(replacement: Segment[]) {
+		const where = this.pending;
+		this.pending = undefined;
+		if (where === undefined) return;
+		this.apply(
+			insert(this.markup, where.start, where.end.offset, replacement),
+			replacement.length === 0 ? 'Reference removed' : 'Reference inserted'
+		);
+		this.focus();
 	}
 
 	// -- State ----------------------------------------------------------------
@@ -480,6 +577,9 @@ export default class Host {
 		} else if (lower === 'y') {
 			event.preventDefault();
 			this.redo();
+		} else if (lower === 'k') {
+			event.preventDefault();
+			this.link();
 		}
 	};
 

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { page } from '$app/state';
-	import Host, { type State } from './editor/host';
+	import Host, { type State, type LinkContext } from './editor/host';
 	import type { Kind } from './editor/commands';
 	import MarkupToolbar from './MarkupToolbar.svelte';
+	import ReferencePicker from './ReferencePicker.svelte';
 	import Note from './Note.svelte';
 	import { mode, setMode } from './editor/mode.svelte';
 	import { announce } from './editor/announce.svelte';
@@ -36,6 +37,9 @@
 		area.style.height = `${area.scrollHeight}px`;
 	});
 
+	/** The picker is open when there is something for it to work on. */
+	let picking = $state<LinkContext | undefined>(undefined);
+
 	let element: HTMLDivElement | undefined = $state();
 	let host: Host | undefined = $state();
 	let status = $state<State>({
@@ -59,7 +63,8 @@
 				onChange: (source) => (markup = source),
 				onState: (next) => (status = next),
 				origin: page.url.origin,
-				onToggleSource: () => toggleSource()
+				onToggleSource: () => toggleSource(),
+				onLink: (context) => (picking = context)
 			}
 		);
 		created.mount();
@@ -152,6 +157,18 @@
 		</Note>
 	{/if}
 </div>
+
+{#if picking !== undefined}
+	<ReferencePicker
+		context={picking}
+		insert={(segments) => host?.applyLink(segments)}
+		close={() => {
+			picking = undefined;
+			// The dialog took the focus; the editor knows where the caret was.
+			host?.focus();
+		}}
+	/>
+{/if}
 
 <style>
 	.editor {

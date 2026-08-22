@@ -112,3 +112,17 @@ export function toggleMark(
 ): Segment[] {
 	return markLine(segments, start, end, hasMark(segments, start, end, format) ? '' : format);
 }
+
+/** The segment covering an offset, and where it sits, for finding the pill beside a caret. */
+export function segmentAt(
+	segments: Segment[],
+	offset: number
+): { segment: Segment; start: number; end: number } | undefined {
+	let at = 0;
+	for (const segment of segments) {
+		const length = segmentLength(segment);
+		if (offset >= at && offset < at + length) return { segment, start: at, end: at + length };
+		at += length;
+	}
+	return undefined;
+}

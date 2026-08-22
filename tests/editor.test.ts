@@ -22,10 +22,15 @@ async function open(page: import('@playwright/test').Page, source: string) {
 		root.setAttribute('contenteditable', 'true');
 		// The same whitespace handling the component gives it, which the behavior depends on.
 		root.style.whiteSpace = 'pre-wrap';
+		// Above the page it is borrowing, so that clicks reach it rather than the layout on top.
+		root.style.position = 'relative';
+		root.style.zIndex = '9999';
+		root.style.background = 'white';
 		document.body.prepend(root);
 		const host = new Host(root, initial, {
 			onChange: (source: string) => ((window as never as Record<string, unknown>).source = source),
 			onState: (next: unknown) => ((window as never as Record<string, unknown>).editorState = next),
+			onLink: (context: unknown) => ((window as never as Record<string, unknown>).link = context),
 			onToggleSource: () =>
 				((window as never as Record<string, unknown>).toggled =
 					(((window as never as Record<string, unknown>).toggled as number) ?? 0) + 1)
@@ -45,6 +50,7 @@ function source(page: import('@playwright/test').Page) {
 async function caret(page: import('@playwright/test').Page, selector: string, offset: number) {
 	await page.evaluate(
 		({ selector, offset }) => {
+			(document.getElementById('editor') as HTMLElement).focus();
 			const line = document.querySelector(selector)!;
 			const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
 			let seen = 0;
@@ -168,6 +174,7 @@ async function selectAcross(
 ) {
 	await page.evaluate(
 		({ from, to }) => {
+			(document.getElementById('editor') as HTMLElement).focus();
 			const find = (selector: string, offset: number) => {
 				const line = document.querySelector(selector)!;
 				const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
@@ -556,4 +563,109 @@ test('the toolbar says what it controls', async ({ page }) => {
 	const row = await toolbar(page, Off);
 	await expect(row.getByRole('toolbar')).toHaveAttribute('aria-label', 'Formatting');
 	await expect(row.getByRole('toolbar')).toHaveAttribute('aria-controls', 'editor');
+});
+
+function link(page: import('@playwright/test').Page) {
+	return page.evaluate(
+		() =>
+			(window as never as Record<string, unknown>).link as {
+				text: string;
+				target?: string;
+				kind?: string;
+			}
+	);
+}
+
+/** Apply a picker result through the host, the way the dialog does. */
+async function applyReference(
+	page: import('@playwright/test').Page,
+	value: { text: string; target: string } | undefined
+) {
+	await page.evaluate(async (value) => {
+		const path = '/src/markup/Reference.ts';
+		const { default: Reference } = await import(path);
+		const host = (window as never as Record<string, unknown>).host as {
+			applyLink: (segments: unknown[]) => void;
+		};
+		host.applyLink(value === undefined ? [] : [new Reference(value.text, value.target)]);
+	}, value);
+}
+
+test('the picker is told what is selected', async ({ page }) => {
+	await open(page, 'ask someone about it');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 4 },
+		{ selector: '#editor p', offset: 11 }
+	);
+	await page.keyboard.press('ControlOrMeta+k');
+	expect(await link(page)).toMatchObject({ text: 'someone' });
+});
+
+test('the picker is told nothing when nothing is selected', async ({ page }) => {
+	await open(page, 'plain words');
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('ControlOrMeta+k');
+	expect(await link(page)).toMatchObject({ text: '' });
+});
+
+test('the picker is told which reference the caret is on', async ({ page }) => {
+	await open(page, 'see <Amy@registrar> now');
+	// The pill is one character of the line, at offset 4.
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('ControlOrMeta+k');
+	expect(await link(page)).toMatchObject({
+		text: 'Amy',
+		target: 'registrar',
+		kind: 'reference'
+	});
+});
+
+test('a reference goes in where the selection was', async ({ page }) => {
+	await open(page, 'ask someone about it');
+	await selectAcross(
+		page,
+		{ selector: '#editor p', offset: 4 },
+		{ selector: '#editor p', offset: 11 }
+	);
+	await page.keyboard.press('ControlOrMeta+k');
+	await applyReference(page, { text: 'Amy', target: 'registrar' });
+	expect(await source(page)).toBe('ask <Amy@registrar> about it');
+});
+
+test('editing a reference replaces it rather than adding another', async ({ page }) => {
+	await open(page, 'see <Amy@registrar> now');
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('ControlOrMeta+k');
+	await applyReference(page, { text: 'Amy', target: 'treasurer' });
+	expect(await source(page)).toBe('see <Amy@treasurer> now');
+});
+
+test('the caret lands after a reference, ready to keep typing', async ({ page }) => {
+	await open(page, 'ask  about it');
+	await caret(page, '#editor p', 4);
+	await page.keyboard.press('ControlOrMeta+k');
+	await applyReference(page, { text: 'Amy', target: 'registrar' });
+	await page.keyboard.type('!');
+	expect(await source(page)).toBe('ask <Amy@registrar>! about it');
+});
+
+test('a reference can be undone in one step', async ({ page }) => {
+	await open(page, 'ask  about it');
+	await caret(page, '#editor p', 4);
+	await page.keyboard.press('ControlOrMeta+k');
+	await applyReference(page, { text: 'Amy', target: 'registrar' });
+	await page.keyboard.press('ControlOrMeta+z');
+	expect(await source(page)).toBe('ask  about it');
+});
+
+test('clicking a reference focuses the editor and selects it for editing', async ({ page }) => {
+	// The helpers above focus the editor themselves. A real click has to do it on its own, and a
+	// reference is not editable content, so it is worth knowing that it does.
+	const editor = await open(page, 'see <Amy@registrar> now');
+	await editor.locator('[data-pill]').click();
+	expect(await page.evaluate(() => document.activeElement?.id)).toBe('editor');
+
+	await page.keyboard.press('ControlOrMeta+k');
+	expect(await link(page)).toMatchObject({ target: 'registrar', kind: 'reference' });
 });

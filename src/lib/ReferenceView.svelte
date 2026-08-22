@@ -4,6 +4,7 @@
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import Oops from './Oops.svelte';
+	import { find } from './editor/references';
 
 	interface Props {
 		segment: Reference;
@@ -13,24 +14,9 @@
 
 	const context = getOrg();
 
-	let target = $derived(segment.target.toLocaleLowerCase());
-
-	// Does the reference correspond to a role short name?
-	let role = $derived(
-		context().shortRoles.find(
-			(role) =>
-				role.short.some((name) => name.toLocaleLowerCase() === target) ||
-				role.title.toLocaleLowerCase() === target
-		)
-	);
-	// Does the reference correspond to a process short name?
-	let process = $derived(
-		context().shortProcesses.find(
-			(process) =>
-				process.short.some((name) => name.toLocaleLowerCase() === target) ||
-				process.title.toLocaleLowerCase() === target
-		)
-	);
+	// The same rule the picker offers by, so that what it offers is what this resolves.
+	let role = $derived(find(context().shortRoles, segment.target));
+	let process = $derived(find(context().shortProcesses, segment.target));
 </script>
 
 {#if role}
