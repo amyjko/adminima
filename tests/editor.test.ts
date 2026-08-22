@@ -390,6 +390,20 @@ test('enter twice at the end of a quote leaves it', async ({ page }) => {
 	expect(await source(page)).toBe('"one"\n\nafter');
 });
 
+/**
+ * Assert on the state the toolbar is given.
+ *
+ * A selection change reaches the host through an event, so reading the state straight after moving
+ * the caret races it. Polling is not papering over anything -- for a person the toolbar updates
+ * within a frame -- but a test reading across processes has to wait for it.
+ */
+async function expectStatus(
+	page: import('@playwright/test').Page,
+	expected: Record<string, unknown>
+) {
+	await expect.poll(() => status(page)).toMatchObject(expected);
+}
+
 function status(page: import('@playwright/test').Page) {
 	return page.evaluate(
 		() =>
@@ -409,14 +423,14 @@ test('the toolbar state follows a selection over formatted text', async ({ page 
 		{ selector: '#editor p', offset: 2 },
 		{ selector: '#editor p', offset: 6 }
 	);
-	expect((await status(page)).bold).toBe(true);
+	await expectStatus(page, { bold: true });
 
 	await selectAcross(
 		page,
 		{ selector: '#editor p', offset: 8 },
 		{ selector: '#editor p', offset: 12 }
 	);
-	expect((await status(page)).bold).toBe(false);
+	await expectStatus(page, { bold: false });
 });
 
 test('the toolbar state follows the caret into formatted text', async ({ page }) => {
@@ -427,44 +441,44 @@ test('the toolbar state follows the caret into formatted text', async ({ page })
 
 	// Inside the bold word.
 	await caret(page, '#editor p', 4);
-	expect((await status(page)).bold).toBe(true);
+	await expectStatus(page, { bold: true });
 
 	// Just after it, which is where typing would continue it.
 	await caret(page, '#editor p', 6);
-	expect((await status(page)).bold).toBe(true);
+	await expectStatus(page, { bold: true });
 
 	// Just before it, which is not.
 	await caret(page, '#editor p', 2);
-	expect((await status(page)).bold).toBe(false);
+	await expectStatus(page, { bold: false });
 
 	// Well clear of it.
 	await caret(page, '#editor p', 11);
-	expect((await status(page)).bold).toBe(false);
+	await expectStatus(page, { bold: false });
 });
 
 test('the toolbar state reads formatting at the very start of a line', async ({ page }) => {
 	// Nothing precedes the caret, so the character after it is what it is sitting in.
 	await open(page, '*bold* start');
 	await caret(page, '#editor p', 0);
-	expect((await status(page)).bold).toBe(true);
+	await expectStatus(page, { bold: true });
 });
 
 test('italic and bold are tracked apart', async ({ page }) => {
 	await open(page, '*bold* and _italic_');
 	await caret(page, '#editor p', 2);
-	expect(await status(page)).toMatchObject({ bold: true, italic: false });
+	await expectStatus(page, { bold: true, italic: false });
 	await caret(page, '#editor p', 15);
-	expect(await status(page)).toMatchObject({ bold: false, italic: true });
+	await expectStatus(page, { bold: false, italic: true });
 });
 
 test('the toolbar state follows the caret between blocks', async ({ page }) => {
 	await open(page, '# Title\n\nplain\n\n- item');
 	await caret(page, '#editor h3', 2);
-	expect((await status(page)).kind).toBe('heading1');
+	await expectStatus(page, { kind: 'heading1' });
 	await caret(page, '#editor p', 2);
-	expect((await status(page)).kind).toBe('paragraph');
+	await expectStatus(page, { kind: 'paragraph' });
 	await caret(page, '#editor li', 2);
-	expect((await status(page)).kind).toBe('bullets');
+	await expectStatus(page, { kind: 'bullets' });
 });
 
 /** Mount the real toolbar with a given state, and report what it rendered. */
@@ -668,4 +682,105 @@ test('clicking a reference focuses the editor and selects it for editing', async
 
 	await page.keyboard.press('ControlOrMeta+k');
 	expect(await link(page)).toMatchObject({ target: 'registrar', kind: 'reference' });
+});
+
+test('bold with nothing selected applies to what is typed next', async ({ page }) => {
+	await open(page, 'plain');
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('ControlOrMeta+b');
+	// The toolbar says so before there is anything to see.
+	await expectStatus(page, { bold: true });
+
+	await page.keyboard.type('bold');
+	expect(await source(page)).toBe('plain*bold*');
+});
+
+test('the rest of the word carries on without being intercepted', async ({ page }) => {
+	// Only the first keystroke is taken; after it the caret is inside what it made.
+	await open(page, '');
+	await caret(page, '#editor p', 0);
+	await page.keyboard.press('ControlOrMeta+b');
+	await page.keyboard.type('several words here');
+	expect(await source(page)).toBe('*several words here*');
+});
+
+test('bold twice with nothing selected leaves it off again', async ({ page }) => {
+	await open(page, 'plain');
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('ControlOrMeta+b');
+	await page.keyboard.press('ControlOrMeta+b');
+	await expectStatus(page, { bold: false });
+	await page.keyboard.type('text');
+	expect(await source(page)).toBe('plaintext');
+});
+
+test('turning bold off inside a bold word applies from there on', async ({ page }) => {
+	// "a " is 0 to 2 and the bold "bold" is 2 to 6, so this is the end of the bold run.
+	await open(page, 'a *bold*');
+	await caret(page, '#editor p', 6);
+	await expectStatus(page, { bold: true });
+	await page.keyboard.press('ControlOrMeta+b');
+	await expectStatus(page, { bold: false });
+	await page.keyboard.type(' plain');
+	expect(await source(page)).toBe('a *bold* plain');
+});
+
+test('moving the caret abandons formatting that was chosen but not used', async ({ page }) => {
+	await open(page, 'one two');
+	await caret(page, '#editor p', 7);
+	await page.keyboard.press('ControlOrMeta+b');
+	await expectStatus(page, { bold: true });
+
+	await caret(page, '#editor p', 3);
+	await expectStatus(page, { bold: false });
+	await page.keyboard.type('X');
+	expect(await source(page)).toBe('oneX two');
+});
+
+test('italic with nothing selected works the same way', async ({ page }) => {
+	await open(page, '');
+	await caret(page, '#editor p', 0);
+	await page.keyboard.press('ControlOrMeta+i');
+	await page.keyboard.type('quiet');
+	expect(await source(page)).toBe('_quiet_');
+});
+
+test('formatting chosen for what comes next can be undone in one step', async ({ page }) => {
+	await open(page, 'plain');
+	await caret(page, '#editor p', 5);
+	await page.keyboard.press('ControlOrMeta+b');
+	await page.keyboard.type('bold');
+	await page.keyboard.press('ControlOrMeta+z');
+	expect(await source(page)).toBe('plain');
+});
+
+test('bold across a block boundary says why it cannot', async ({ page }) => {
+	await open(page, 'first\n\nsecond');
+	await selectAcross(
+		page,
+		{ selector: '#editor p:nth-child(1)', offset: 1 },
+		{ selector: '#editor p:nth-child(2)', offset: 3 }
+	);
+	await page.keyboard.press('ControlOrMeta+b');
+	expect(await source(page)).toBe('first\n\nsecond');
+});
+
+test('an empty document still has somewhere to type', async ({ page }) => {
+	// A new comment starts empty. Without a paragraph in it the browser puts what is typed straight
+	// into the editable element, where reading back does not look, and none of it would be saved.
+	const editor = await open(page, '');
+	await expect(editor.locator('p')).toHaveCount(1);
+	await editor.click();
+	await page.keyboard.type('a first comment');
+	expect(await source(page)).toBe('a first comment');
+});
+
+test('emptying a document leaves somewhere to carry on', async ({ page }) => {
+	const editor = await open(page, 'x');
+	await editor.click();
+	await page.keyboard.press('End');
+	await page.keyboard.press('Backspace');
+	expect(await source(page)).toBe('');
+	await page.keyboard.type('again');
+	expect(await source(page)).toBe('again');
 });

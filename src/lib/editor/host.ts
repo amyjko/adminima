@@ -1,4 +1,5 @@
-import type Markup from '../../markup/Markup';
+import Markup from '../../markup/Markup';
+import Paragraph from '../../markup/Paragraph';
 import type Part from '../../markup/Part';
 import type Segment from '../../markup/Segment';
 import Reference from '../../markup/Reference';
@@ -128,6 +129,15 @@ export default class Host {
 	 * the selection with it, so where to put the result has to be remembered beforehand.
 	 */
 	private pending: { start: Position; end: Position } | undefined;
+
+	/**
+	 * Formatting chosen for text that has not been typed yet.
+	 *
+	 * Pressing bold with nothing selected has to mean something, and what it means everywhere else
+	 * is that the next thing typed comes out bold. It is remembered against the position it was
+	 * chosen at, so that moving the caret abandons it rather than surprising someone later.
+	 */
+	private marks: { at: Point; formats: Partial<Record<'*' | '_', boolean>> } | undefined;
 	private composing = false;
 	private listening = false;
 
@@ -204,7 +214,13 @@ export default class Host {
 	private render(point?: Point) {
 		const document = this.root.ownerDocument;
 		let next = 0;
-		this.root.replaceChildren(renderMarkup(document, this.markup, () => `b${next++}`));
+		/*
+		 * A document with nothing in it still needs somewhere to put the cursor. Without a paragraph
+		 * to type into, the browser puts what is typed straight into the editable element, where
+		 * reading back does not look -- so a new comment would take text and then save none of it.
+		 */
+		const showing = this.markup.blocks.length > 0 ? this.markup : new Markup([new Paragraph([])]);
+		this.root.replaceChildren(renderMarkup(document, showing, () => `b${next++}`));
 		if (point !== undefined) restorePoint(this.root, point);
 		this.report();
 	}
@@ -245,9 +261,15 @@ export default class Host {
 		return saveSpan(this.root);
 	}
 
-	/** Apply a transform, rebuild, and put the caret where the transform said it should go. */
-	private apply(edit: Edit, spoken?: string) {
-		this.history.record({ source: this.source, point: savePoint(this.root) });
+	/**
+	 * Apply a transform, rebuild, and put the caret where the transform said it should go.
+	 *
+	 * A command is its own step in the history. The one exception is the keystroke that starts a
+	 * run of formatted text, which is a keystroke like any other and belongs in the same step as
+	 * the rest of the word it begins.
+	 */
+	private apply(edit: Edit, spoken?: string, { typing = false } = {}) {
+		this.history.record({ source: this.source, point: savePoint(this.root) }, { typing });
 		this.markup = edit.markup;
 		this.render(this.pointAt(edit.position));
 		this.emit();
@@ -260,19 +282,29 @@ export default class Host {
 		const span = this.span();
 		const name = format === '*' ? 'Bold' : 'Italic';
 		if (span === undefined) return;
-		if (
-			span.collapsed ||
-			span.start.line !== span.end.line ||
-			span.start.block !== span.end.block
-		) {
-			// Formatting needs something to apply to, and the grammar cannot carry a mark across a
-			// block boundary. Say so rather than doing nothing silently.
-			announce(`Select text on one line to make it ${name.toLowerCase()}`);
+
+		// Formatting cannot cross a line, and there is no sensible half of a selection to apply it to.
+		if (span.start.block !== span.end.block || span.start.line !== span.end.line) {
+			announce(`${name} cannot cross from one block to another`);
 			return;
 		}
+
+		if (!span.collapsed) {
+			const at = this.positionAt(span.start);
+			const was = this.markedNow(format);
+			this.apply(mark(this.markup, at, span.end.offset, format), `${name} ${was ? 'off' : 'on'}`);
+			return;
+		}
+
+		// Nothing selected, so this is a choice about what comes next rather than an edit.
 		const at = this.positionAt(span.start);
-		const was = this.markedNow(format);
-		this.apply(mark(this.markup, at, span.end.offset, format), `${name} ${was ? 'off' : 'on'}`);
+		const current = this.marksAt(span.start)?.[format] ?? this.markedInDocument(at, format);
+		this.marks = {
+			at: span.start,
+			formats: { ...(this.marksAt(span.start) ?? {}), [format]: !current }
+		};
+		announce(`${name} ${current ? 'off' : 'on'} for what you type next`);
+		this.report();
 	}
 
 	setKind(kind: Kind) {
@@ -402,6 +434,10 @@ export default class Host {
 
 		if (!span.collapsed) return hasMark(line, span.start.offset, span.end.offset, format);
 
+		// Formatting chosen but not yet typed into is what the toolbar should be showing.
+		const chosen = this.marksAt(span.start)?.[format];
+		if (chosen !== undefined) return chosen;
+
 		/*
 		 * With nothing selected, report the formatting the caret is sitting in, which is what
 		 * someone is checking when they put it there. The character before it is the convention, and
@@ -411,6 +447,27 @@ export default class Host {
 		 */
 		const offset = span.start.offset;
 		if (offset > 0) return hasMark(line, offset - 1, offset, format);
+		return hasMark(line, 0, 1, format);
+	}
+
+	/** The pending formatting, if it belongs to where the caret is now. */
+	private marksAt(point: Point): Partial<Record<'*' | '_', boolean>> | undefined {
+		const marks = this.marks;
+		if (marks === undefined) return undefined;
+		return marks.at.block === point.block &&
+			marks.at.line === point.line &&
+			marks.at.offset === point.offset
+			? marks.formats
+			: undefined;
+	}
+
+	/** Whether the text at a position carries a format, ignoring anything pending. */
+	private markedInDocument(at: Position, format: '*' | '_'): boolean {
+		const block = this.markup.blocks[at.block];
+		if (block === undefined) return false;
+		const line = linesOf(block)[at.line];
+		if (line === undefined) return false;
+		if (at.offset > 0) return hasMark(line, at.offset - 1, at.offset, format);
 		return hasMark(line, 0, 1, format);
 	}
 
@@ -430,6 +487,10 @@ export default class Host {
 	// -- Events ---------------------------------------------------------------
 
 	private onCompositionStart = () => {
+		// Composition cannot be intercepted, so formatting chosen for what comes next cannot be
+		// applied to it. Dropping it is honest; pretending otherwise would produce plain text under
+		// a toolbar insisting it is bold.
+		this.marks = undefined;
 		// Nothing may touch the DOM until this finishes. Anything that does desynchronizes the
 		// input method's own buffer, and on Android that shows up as duplicated text.
 		this.composing = true;
@@ -485,6 +546,32 @@ export default class Host {
 				// Handled on the clipboard events, which carry the data this one does not.
 				event.preventDefault();
 				return;
+			case 'insertText': {
+				const marks = this.marks;
+				if (marks === undefined) break;
+				const span = this.span();
+				// A selection being typed over is an edit the browser does perfectly well.
+				if (span === undefined || !span.collapsed || input.data === null || input.data === '')
+					break;
+				if (this.marksAt(span.start) === undefined) break;
+
+				event.preventDefault();
+				const at = this.positionAt(span.start);
+				const bold = marks.formats['*'] ?? this.markedInDocument(at, '*');
+				const italic = marks.formats['_'] ?? this.markedInDocument(at, '_');
+				// Bold and italic cannot combine, so one of them has to win.
+				const format = bold ? '*' : italic ? '_' : '';
+				this.marks = undefined;
+				// Part of the same undo step as the rest of the word it begins, not a step of its own.
+				this.apply(
+					insert(this.markup, at, span.end.offset, [new Characters(format, input.data)]),
+					undefined,
+					{ typing: true }
+				);
+				// Everything after this one keystroke lands inside what it made, so the browser can
+				// have the rest of the word back.
+				return;
+			}
 			case 'deleteContentBackward': {
 				const span = this.span();
 				// Only the start of a line needs deciding: what joins to what, and whether backspace
@@ -513,11 +600,17 @@ export default class Host {
 
 	private onSelectionChange = () => {
 		// What the toolbar shows depends on where the caret is, but only while this editor has it.
-		if (this.root.ownerDocument.activeElement === this.root) this.report();
+		if (this.root.ownerDocument.activeElement !== this.root) return;
+		// Formatting chosen for what comes next belongs to where it was chosen.
+		const point = savePoint(this.root);
+		if (this.marks !== undefined && (point === undefined || this.marksAt(point) === undefined))
+			this.marks = undefined;
+		this.report();
 	};
 
 	private onBlur = () => {
 		this.history.seal();
+		this.marks = undefined;
 	};
 
 	private onDragStart = (event: Event) => {
