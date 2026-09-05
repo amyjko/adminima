@@ -3,13 +3,17 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.10.1 2026-09-05
+
+### Fixed
+
+- Removed the arrow on processes on the processes page if there were no roles to show.
+
 ## v0.10.0 2026-08-22
 
 ### Added
 
 - We now support rich text editing! No more having to learn the markup syntax.
-
-### Fixed
 
 ### Changed
 

@@ -399,25 +399,29 @@
 												)
 												.flat() ?? [])
 										: []}
-								<div class="process-people">
-									<div class="arrow">↳</div>
-									<div class="people">
-										{#if accountable.length < 3}
-											{#each accountable as profile}
-												<ProfileLink short {profile} />
-											{/each}
-										{:else}
-											<span><strong>{accountable.length}</strong> accountable</span>
-										{/if}
-										{#if responsible.length <= 3}
-											{#each responsible as profile}
-												<ProfileLink short {profile} />
-											{/each}
-										{:else}
-											<span>and <strong>{responsible.length}</strong> responsible</span>
-										{/if}
+								<!-- Only show the arrow if there's someone for it to point at; roles and
+									 assignments are invisible to non-members of private organizations. -->
+								{#if accountable.length > 0 || responsible.length > 0}
+									<div class="process-people">
+										<div class="arrow">↳</div>
+										<div class="people">
+											{#if accountable.length < 3}
+												{#each accountable as profile}
+													<ProfileLink short {profile} />
+												{/each}
+											{:else}
+												<span><strong>{accountable.length}</strong> accountable</span>
+											{/if}
+											{#if responsible.length <= 3}
+												{#each responsible as profile}
+													<ProfileLink short {profile} />
+												{/each}
+											{:else}
+												<span>and <strong>{responsible.length}</strong> responsible</span>
+											{/if}
+										</div>
 									</div>
-								</div>
+								{/if}
 							{/if}
 						</div>
 					{/each}
