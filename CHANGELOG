@@ -3,6 +3,30 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.10.2 2026-09-20
+
+### Changed
+
+- Updated minor dependencies: `@playwright/test` 1.63.0, `@supabase/ssr` 0.12.7,
+  `@supabase/supabase-js` 2.116.0, `happy-dom` 20.14.5, `prettier` 3.9.8, `supabase` 2.117.0,
+  `svelte` 5.57.1, `type-fest` 5.10.0, and `vite` 8.3.0.
+- Updated `vitest` to 5. Nothing in the suite had to change. Its breaking changes land on things we
+  do not do: `vi.mock` must now be top level rather than merely warned about, and our two calls in
+  `refresh.test.ts` already are; `clearMocks` now defaults to on, and we have no `vi.fn` or
+  `vi.spyOn` for it to clear; the rest concern benchmarks, browser mode, coverage, and the `-t` flag,
+  none of which we use. Per-file `@vitest-environment` docblocks still work, so the two configs stay
+  as they are.
+- `engines.node` is now `>=22.12`, up from `>=22`, because that is Vitest 5's floor. `.npmrc` sets
+  `engine-strict=true`, so the old range would have advertised node versions on which `npm ci` fails
+  outright. CI already runs node 22.
+- Regenerated `src/database/database.types.ts`. The newer Supabase CLI parenthesizes the conditional
+  types it uses as constraints in `Tables`, `TablesInsert`, `TablesUpdate`, `Enums`, and
+  `CompositeTypes`. The meaning is identical, but CI regenerates the file and fails on any byte
+  difference, so it has to be committed.
+- Held `typescript` at 6. TypeScript 7 is out, but `svelte-check` and `@sveltejs/kit` both still
+  declare `typescript "^5 || ^6"`, and `svelte-check` is what CI checks types with. Worth revisiting
+  once the Svelte toolchain says it supports 7.
+
 ## v0.10.1 2026-09-05
 
 ### Fixed
