@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SegmentView from '$lib/SegmentView.svelte';
+	import SegmentView from '#lib/SegmentView.svelte';
 	import type Heading from '../markup/Heading';
 
 	interface Props {

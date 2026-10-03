@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { MutationResult } from '$database/Organization';
+	import type { MutationResult } from '#database/Organization.ts';
 	import EditableText from './EditableText.svelte';
 	import Flow from './Flow.svelte';
 

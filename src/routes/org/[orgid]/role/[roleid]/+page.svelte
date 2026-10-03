@@ -1,24 +1,24 @@
 <script lang="ts">
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import MarkupView from '$lib/MarkupView.svelte';
-	import PersonLink from '$lib/ProfileLink.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
-	import Button, { Delete } from '$lib/Button.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import MarkupView from '#lib/MarkupView.svelte';
+	import PersonLink from '#lib/ProfileLink.svelte';
+	import Paragraph from '#lib/Paragraph.svelte';
+	import Button, { Delete } from '#lib/Button.svelte';
 	import { goto } from '$app/navigation';
-	import Title from '$lib/Title.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import Header from '$lib/Header.svelte';
-	import TeamLink, { TeamItem } from '$lib/TeamLink.svelte';
-	import CommentsView from '$lib/CommentsView.svelte';
-	import Notice from '$lib/Notice.svelte';
-	import Changes from '$lib/Changes.svelte';
-	import ChangeLink from '$lib/ChangeLink.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import PathEditor from '$lib/PathEditor.svelte';
-	import RoleProcesses from '$lib/RoleProcesses.svelte';
-	import Options from '$lib/Options.svelte';
-	import Organization, { ok } from '$database/Organization';
+	import Title from '#lib/Title.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import Header from '#lib/Header.svelte';
+	import TeamLink, { TeamItem } from '#lib/TeamLink.svelte';
+	import CommentsView from '#lib/CommentsView.svelte';
+	import Notice from '#lib/Notice.svelte';
+	import Changes from '#lib/Changes.svelte';
+	import ChangeLink from '#lib/ChangeLink.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import PathEditor from '#lib/PathEditor.svelte';
+	import RoleProcesses from '#lib/RoleProcesses.svelte';
+	import Options from '#lib/Options.svelte';
+	import Organization, { ok } from '#database/Organization.ts';
 
 	const { data } = $props();
 	const role = $derived(data.role);
@@ -91,7 +91,7 @@
 					refresh: false
 				});
 				goto(`/org/${Organization.getPath(org)}/role/${text.length > 0 ? text : role.id}`, {
-					replaceState: true
+					replace: true
 				});
 				return ok();
 			}}

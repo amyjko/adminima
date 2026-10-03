@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Button from '$lib/Button.svelte';
-	import Notice from '$lib/Notice.svelte';
-	import Oops from '$lib/Oops.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
-	import Title from '$lib/Title.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { addError } from '$routes/errors.svelte';
-	import OrganizationLink from '$lib/OrganizationLink.svelte';
-	import ProfileLink from '$lib/ProfileLink.svelte';
-	import NewOrganization from '$lib/NewOrganization.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import Link from '$lib/Link.svelte';
-	import Table from '$lib/Table.svelte';
-	import { page } from '$app/stores';
-	import Header from '$lib/Header.svelte';
+	import Button from '#lib/Button.svelte';
+	import Notice from '#lib/Notice.svelte';
+	import Oops from '#lib/Oops.svelte';
+	import Paragraph from '#lib/Paragraph.svelte';
+	import Title from '#lib/Title.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { addError } from '#routes/errors.svelte.ts';
+	import OrganizationLink from '#lib/OrganizationLink.svelte';
+	import ProfileLink from '#lib/ProfileLink.svelte';
+	import NewOrganization from '#lib/NewOrganization.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import Link from '#lib/Link.svelte';
+	import Table from '#lib/Table.svelte';
+	import { page } from '$app/state';
+	import Header from '#lib/Header.svelte';
 
 	let { data } = $props();
 
@@ -24,7 +24,7 @@
 	const db = $derived(dbContext());
 
 	let orgs = $derived(data.orgs);
-	let isSelf = $derived($user && $user.id === $page.params.personid);
+	let isSelf = $derived($user && $user.id === page.params.personid);
 
 	async function logout() {
 		const { error } = await db.signOut();
@@ -55,16 +55,18 @@
 			>Here are the organizations {#if isSelf}you are{:else}this person is{/if} part of:</Paragraph
 		>
 		<Table full={false}>
-			{#each orgs as org}
-				<tr>
-					<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
-					<td
-						>{#if org.profiles.length > 0 && org.profiles[0].personid !== null}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
-								<ProfileLink profile={profile ?? undefined} />
-							{/await}{/if}
-					</td>
-				</tr>
-			{/each}
+			<tbody>
+				{#each orgs as org}
+					<tr>
+						<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
+						<td
+							>{#if org.profiles.length > 0 && org.profiles[0].personid !== null}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
+									<ProfileLink profile={profile ?? undefined} />
+								{/await}{/if}
+						</td>
+					</tr>
+				{/each}
+			</tbody>
 		</Table>
 	{:else}
 		<Notice

@@ -4,9 +4,9 @@
 	import FormDialog from './FormDialog.svelte';
 	import Link from './Link.svelte';
 	import Paragraph from './Paragraph.svelte';
-	import { getUser } from '$routes/+layout.svelte';
-	import { addError, mutate } from '$routes/errors.svelte';
-	import { getDB } from '$routes/+layout.svelte';
+	import { getUser } from '#routes/+layout.svelte';
+	import { addError, mutate } from '#routes/errors.svelte.ts';
+	import { getDB } from '#routes/+layout.svelte';
 
 	const dbContext = getDB();
 	const db = $derived(dbContext());

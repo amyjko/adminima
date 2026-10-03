@@ -1,12 +1,12 @@
 <!-- Represents ARCI for a processes's how to -->
 <script lang="ts">
-	import type { HowRow, RoleRow } from '$database/Organization';
+	import type { HowRow, RoleRow } from '#database/Organization.ts';
 	import Button, { Delete } from './Button.svelte';
 	import Level from './Level.svelte';
 	import RoleLink, { RoleItem } from './RoleLink.svelte';
-	import { getDB } from '$routes/+layout.svelte';
+	import { getDB } from '#routes/+layout.svelte';
 	import Options from './Options.svelte';
-	import { mutate } from '$routes/errors.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
 
 	interface Props {
 		how: HowRow;

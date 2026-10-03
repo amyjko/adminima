@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Changes from '$lib/Changes.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
-	import Title from '$lib/Title.svelte';
-	import Link from '$lib/Link.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import Organization from '$database/Organization';
+	import Changes from '#lib/Changes.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import Paragraph from '#lib/Paragraph.svelte';
+	import Title from '#lib/Title.svelte';
+	import Link from '#lib/Link.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import Organization from '#database/Organization.ts';
 
 	const { data } = $props();
 

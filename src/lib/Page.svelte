@@ -4,7 +4,7 @@
 	import Link from './Link.svelte';
 	import Loading from './Loading.svelte';
 	import Logo from './Logo';
-	import { getUser } from '$routes/+layout.svelte';
+	import { getUser } from '#routes/+layout.svelte';
 
 	/** @type {{children?: import('svelte').Snippet}} */
 	let { children } = $props();
@@ -23,7 +23,7 @@
 			>{/if}</span
 	>
 </div>
-<main class="page" data-sveltekit-reload={updated.current ? '' : 'off'}>
+<main class="page" data-sveltekit-reload={updated.current ? '' : 'false'}>
 	{@render children?.()}
 </main>
 

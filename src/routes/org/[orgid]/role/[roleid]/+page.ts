@@ -1,5 +1,5 @@
-import Organization from '$database/Organization';
-import { noAccess } from '$types/Locales.js';
+import Organization from '#database/Organization.ts';
+import { noAccess } from '#types/Locales.ts';
 import { error } from '@sveltejs/kit';
 import { validate as isValidUUID } from 'uuid';
 
@@ -35,9 +35,7 @@ export async function load({ parent, params }) {
 		changes === null ||
 		hows === null
 	)
-		error(404, {
-			message: noAccess('role')
-		});
+		error(404, noAccess('role'));
 
 	return {
 		role,

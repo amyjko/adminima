@@ -1,5 +1,5 @@
-import Organization from '$database/Organization';
-import { noAccess } from '$types/Locales';
+import Organization from '#database/Organization.ts';
+import { noAccess } from '#types/Locales.ts';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent }) {
@@ -14,9 +14,7 @@ export async function load({ parent }) {
 		]);
 
 	if (roles === null || profiles === null || assignments === null || teams === null)
-		error(404, {
-			message: noAccess('person list')
-		});
+		error(404, noAccess('person list'));
 
 	return {
 		roles,

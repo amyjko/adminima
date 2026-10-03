@@ -5,10 +5,10 @@
 <script lang="ts">
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import type { OrganizationRow, ProfileRow } from '$database/Organization';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import type { OrganizationRow, ProfileRow } from '#database/Organization.ts';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import Self from './ProfileLink.svelte';
-	import Organization from '$database/Organization';
+	import Organization from '#database/Organization.ts';
 
 	interface Props {
 		profile: ProfileRow | undefined;
@@ -17,8 +17,9 @@
 
 	let { profile, short = false }: Props = $props();
 
+	// There is no organization context outside of an organization's pages, such as a person's own page.
 	const context = getOrg();
-	let org: OrganizationRow | undefined = $derived(context().org ?? undefined);
+	let org: OrganizationRow | undefined = $derived(context ? context().org : undefined);
 </script>
 
 {#snippet ProfileItem(profile: string | undefined, profiles: ProfileRow[])}

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { RoleID } from '$database/Organization';
-	import type { ProcessID } from '$database/Organization';
+	import type { RoleID } from '#database/Organization.ts';
+	import type { ProcessID } from '#database/Organization.ts';
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import type { ChangeRow } from '$database/Organization';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import Organization from '$database/Organization';
+	import type { ChangeRow } from '#database/Organization.ts';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import Organization from '#database/Organization.ts';
 
 	interface Props {
 		change: ChangeRow | null | undefined;

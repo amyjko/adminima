@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { getUser } from '$routes/+layout.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getUser } from '#routes/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import Link from './Link.svelte';
 	import OrganizationLink from './OrganizationLink.svelte';
-	import Organization from '$database/Organization';
+	import Organization from '#database/Organization.ts';
 
 	const user = getUser();
 

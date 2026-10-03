@@ -1,4 +1,4 @@
-import Organization from '$database/Organization';
+import Organization from '#database/Organization.ts';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
@@ -10,9 +10,7 @@ export async function load({ parent, params }) {
 	]);
 
 	if (roles === null || processes === null)
-		error(404, {
-			message: 'Unable to retrieve roles and processes for new change.'
-		});
+		error(404, 'Unable to retrieve roles and processes for new change.');
 
 	return {
 		roles,

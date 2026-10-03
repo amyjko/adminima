@@ -9,9 +9,9 @@
 	import Oops from './Oops.svelte';
 	import { DraftSymbol } from './Symbols';
 	import Self from './ProcessLink.svelte';
-	import type { ProcessRow } from '$database/Organization';
-	import Organization, { type ProcessID } from '$database/Organization';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import type { ProcessRow } from '#database/Organization.ts';
+	import Organization, { type ProcessID } from '#database/Organization.ts';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 
 	interface Props {
 		process: { id: ProcessID; title: string; short: string[]; state: string } | null | undefined;

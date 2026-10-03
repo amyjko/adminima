@@ -1,10 +1,10 @@
 <script lang="ts">
 	import writeXlsxFile, { type SheetData } from 'write-excel-file/browser';
-	import Button from '$lib/Button.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import type { HowRow } from '$database/Organization';
-	import Organization from '$database/Organization';
-	import Title from '$lib/Title.svelte';
+	import Button from '#lib/Button.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import type { HowRow } from '#database/Organization.ts';
+	import Organization from '#database/Organization.ts';
+	import Title from '#lib/Title.svelte';
 
 	const { data } = $props();
 

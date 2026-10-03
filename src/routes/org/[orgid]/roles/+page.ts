@@ -1,4 +1,4 @@
-import Organization from '$database/Organization';
+import Organization from '#database/Organization.ts';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent }) {
@@ -13,9 +13,7 @@ export async function load({ parent }) {
 		]);
 
 	if (roles === null || teams === null || assignments === null || profiles === null)
-		error(404, {
-			message: 'Unable to retrieve roles for this organization.'
-		});
+		error(404, 'Unable to retrieve roles for this organization.');
 
 	return {
 		roles,

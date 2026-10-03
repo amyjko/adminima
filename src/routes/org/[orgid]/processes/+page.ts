@@ -1,4 +1,4 @@
-import Organization from '$database/Organization';
+import Organization from '#database/Organization.ts';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent }) {
@@ -25,9 +25,7 @@ export async function load({ parent }) {
 		assignments === null ||
 		profiles === null
 	)
-		error(404, {
-			message: 'Unable to retrieve processes for this organization.'
-		});
+		error(404, 'Unable to retrieve processes for this organization.');
 
 	return {
 		processes,

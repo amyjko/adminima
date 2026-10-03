@@ -19,13 +19,13 @@
 </script>
 
 <script lang="ts">
-	import { getDB } from '$routes/+layout.svelte';
+	import { getDB } from '#routes/+layout.svelte';
 	import { getContext, onMount, setContext } from 'svelte';
-	import { invalidateAll } from '$app/navigation';
-	import { type OrganizationRow, type RealtimeStatus } from '$database/Organization';
+	import { refreshAll } from '$app/navigation';
+	import { type OrganizationRow, type RealtimeStatus } from '#database/Organization.ts';
 	import { navigating } from '$app/state';
-	import Loading from '$lib/Loading.svelte';
-	import Button from '$lib/Button.svelte';
+	import Loading from '#lib/Loading.svelte';
+	import Button from '#lib/Button.svelte';
 
 	let { data, children } = $props();
 
@@ -54,7 +54,7 @@
 	function updateOrg() {
 		if (navigating.to === null) {
 			loading = true;
-			invalidateAll().then(() => (loading = false));
+			refreshAll().then(() => (loading = false));
 		}
 	}
 
