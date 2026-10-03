@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { ProcessRow } from '$database/Organization';
-	import { formatNextDate, getNextProcessDate } from '$database/Period';
+	import type { ProcessRow } from '#database/Organization.ts';
+	import { formatNextDate, getNextProcessDate } from '#database/Period.ts';
 	import Note from './Note.svelte';
 
 	interface Props {

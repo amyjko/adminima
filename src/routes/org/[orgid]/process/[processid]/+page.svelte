@@ -1,42 +1,42 @@
 <script lang="ts">
 	import { run } from 'svelte/legacy';
 
-	import MarkupView from '$lib/MarkupView.svelte';
-	import Header from '$lib/Header.svelte';
-	import HowView from '$lib/HowView.svelte';
-	import Oops from '$lib/Oops.svelte';
-	import Button, { Delete } from '$lib/Button.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
+	import MarkupView from '#lib/MarkupView.svelte';
+	import Header from '#lib/Header.svelte';
+	import HowView from '#lib/HowView.svelte';
+	import Oops from '#lib/Oops.svelte';
+	import Button, { Delete } from '#lib/Button.svelte';
+	import Paragraph from '#lib/Paragraph.svelte';
 	import { goto } from '$app/navigation';
-	import Title from '$lib/Title.svelte';
-	import Level from '$lib/Level.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import CommentsView from '$lib/CommentsView.svelte';
-	import Concern from '$lib/Concern.svelte';
-	import Field from '$lib/Field.svelte';
-	import FormDialog from '$lib/FormDialog.svelte';
+	import Title from '#lib/Title.svelte';
+	import Level from '#lib/Level.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import CommentsView from '#lib/CommentsView.svelte';
+	import Concern from '#lib/Concern.svelte';
+	import Field from '#lib/Field.svelte';
+	import FormDialog from '#lib/FormDialog.svelte';
 	import { setContext, tick } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { browser } from '$app/environment';
-	import Changes from '$lib/Changes.svelte';
-	import RoleLink, { RoleItem } from '$lib/RoleLink.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import ChangeLink from '$lib/ChangeLink.svelte';
-	import Visibility from '$lib/VisibilityChooser.svelte';
-	import Note from '$lib/Note.svelte';
-	import ARCI from '$lib/ARCI.svelte';
-	import type { HowRow } from '$database/Organization';
-	import type { HowID } from '$database/Organization.js';
-	import Flow from '$lib/Flow.svelte';
-	import PathEditor from '$lib/PathEditor.svelte';
-	import Status from '$lib/Status.svelte';
-	import Period from '$lib/Period.svelte';
-	import type { default as PeriodType } from '$database/Period';
-	import Options from '$lib/Options.svelte';
-	import Organization, { ok } from '$database/Organization';
-	import Row from '$lib/Row.svelte';
+	import { browser } from '$app/env';
+	import Changes from '#lib/Changes.svelte';
+	import RoleLink, { RoleItem } from '#lib/RoleLink.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import ChangeLink from '#lib/ChangeLink.svelte';
+	import Visibility from '#lib/VisibilityChooser.svelte';
+	import Note from '#lib/Note.svelte';
+	import ARCI from '#lib/ARCI.svelte';
+	import type { HowRow } from '#database/Organization.ts';
+	import type { HowID } from '#database/Organization.ts';
+	import Flow from '#lib/Flow.svelte';
+	import PathEditor from '#lib/PathEditor.svelte';
+	import Status from '#lib/Status.svelte';
+	import Period from '#lib/Period.svelte';
+	import type { default as PeriodType } from '#database/Period.ts';
+	import Options from '#lib/Options.svelte';
+	import Organization, { ok } from '#database/Organization.ts';
+	import Row from '#lib/Row.svelte';
 
 	const { data } = $props();
 
@@ -299,7 +299,7 @@
 							await goto(
 								`/org/${Organization.getPath(org)}/process/${text.length > 0 ? text : process.id}`,
 								{
-									replaceState: true
+									replace: true
 								}
 							);
 							return ok();

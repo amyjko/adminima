@@ -1,8 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
-import { type Handle } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
+import { sequence, type Handle } from '@sveltejs/kit/hooks';
 
-import { PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import { PUBLIC_SUPABASE_API_URL, PUBLIC_SUPABASE_ANON_KEY } from '$app/env/public';
 
 const supabase: Handle = async ({ event, resolve }) => {
 	/**

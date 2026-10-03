@@ -52,9 +52,8 @@ jobs:
             exit 1
           fi
 
-      # svelte-kit sync generates the $env/static/public module from the environment it can see, so
-      # .env has to exist before it runs or PUBLIC_SUPABASE_* are missing from the generated types
-      # and every file importing them fails to check. Values come from the running stack rather than
+      # src/env.ts declares PUBLIC_SUPABASE_* as static, so the build inlines their values and has
+      # nothing to inline unless .env exists first. Values come from the running stack rather than
       # .env.example so a port change cannot make CI disagree with reality.
       - name: Write .env from the running stack
         run: |
@@ -64,9 +63,9 @@ jobs:
             echo "PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY"
           } > .env
 
-      # sync also generates .svelte-kit/tsconfig.json and the ./$types for each route. A working
-      # copy usually has them from a previous dev or build run; a fresh checkout does not, and
-      # svelte-check cannot resolve anything without them.
+      # sync generates the $app/tsconfig that tsconfig.json extends and the ./$types for each route.
+      # A working copy usually has them from a previous dev or build run; a fresh checkout does not,
+      # and svelte-check cannot resolve anything without them.
       - name: Check types
         run: |
           npx svelte-kit sync

@@ -1,16 +1,16 @@
 <script lang="ts">
 	import HowView from './HowView.svelte';
-	import type { HowRow, ProcessRow, RoleRow } from '$database/Organization';
+	import type { HowRow, ProcessRow, RoleRow } from '#database/Organization.ts';
 	import { getContext, tick } from 'svelte';
 	import Visibility from './VisibilityChooser.svelte';
-	import { getDB } from '$routes/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
+	import { getDB } from '#routes/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
 	import Button, { Delete } from './Button.svelte';
 	import type { Writable } from 'svelte/store';
 	import ARCI from './ARCI.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import Status from './Status.svelte';
-	import Organization from '$database/Organization';
+	import Organization from '#database/Organization.ts';
 
 	interface Props {
 		how: HowRow;

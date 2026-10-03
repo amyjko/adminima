@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { type ChangeRow } from '$database/Organization';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
+	import { type ChangeRow } from '#database/Organization.ts';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
 	import Button from './Button.svelte';
 	import Form from './Form.svelte';
 	import Labeled from './Labeled.svelte';

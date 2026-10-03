@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { MutationResult } from '$database/Organization';
+	import type { MutationResult } from '#database/Organization.ts';
 	import EditableText from './EditableText.svelte';
 	import OrgNav from './OrgNav.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 
 	// The title to show in the header
 	// The kind of page this is, to determine background

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getNextPeriodDate, formatNextDate, type default as Period } from '$database/Period';
+	import { getNextPeriodDate, formatNextDate, type default as Period } from '#database/Period.ts';
 	import Button, { Delete } from './Button.svelte';
 	import MonthChooser from './MonthChooser.svelte';
 	import Weekdays from '../database/Weekdays';

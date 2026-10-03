@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { default as MarkupLink } from '../markup/Link';
-	import Link from '$lib/Link.svelte';
+	import Link from '#lib/Link.svelte';
 
 	interface Props {
 		segment: MarkupLink;

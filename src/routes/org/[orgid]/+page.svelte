@@ -1,18 +1,18 @@
 <script lang="ts">
-	import MarkupView from '$lib/MarkupView.svelte';
-	import Title from '$lib/Title.svelte';
-	import { getDB } from '$routes/+layout.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { addError, mutate } from '$routes/errors.svelte';
-	import Visibility from '$lib/VisibilityChooser.svelte';
-	import CommentsView from '$lib/CommentsView.svelte';
-	import Note from '$lib/Note.svelte';
+	import MarkupView from '#lib/MarkupView.svelte';
+	import Title from '#lib/Title.svelte';
+	import { getDB } from '#routes/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { addError, mutate } from '#routes/errors.svelte.ts';
+	import Visibility from '#lib/VisibilityChooser.svelte';
+	import CommentsView from '#lib/CommentsView.svelte';
+	import Note from '#lib/Note.svelte';
 	import { goto } from '$app/navigation';
-	import PathEditor from '$lib/PathEditor.svelte';
-	import { getUser } from '$routes/+layout.svelte';
-	import Link from '$lib/Link.svelte';
-	import Organization, { ok } from '$database/Organization';
-	import Row from '$lib/Row.svelte';
+	import PathEditor from '#lib/PathEditor.svelte';
+	import { getUser } from '#routes/+layout.svelte';
+	import Link from '#lib/Link.svelte';
+	import Organization, { ok } from '#database/Organization.ts';
+	import Row from '#lib/Row.svelte';
 
 	let { data } = $props();
 
@@ -75,7 +75,7 @@
 							await mutate(db.addOrgPath(org, text), "Couldn't update path.", {
 								refresh: false
 							});
-							goto(`/org/${text}`, { replaceState: true });
+							goto(`/org/${text}`, { replace: true });
 						} else addError('This path is not available');
 
 						return ok();

@@ -1,17 +1,17 @@
 <script lang="ts">
-	import type { CommentRow, ProfileRow } from '$database/Organization';
-	import timestampToDate from '$database/timestampToDate';
-	import type { MutationResult } from '$database/Organization';
+	import type { CommentRow, ProfileRow } from '#database/Organization.ts';
+	import timestampToDate from '#database/timestampToDate.ts';
+	import type { MutationResult } from '#database/Organization.ts';
 	import Button, { Delete } from './Button.svelte';
 	import MarkupView from './MarkupView.svelte';
 	import PersonLink from './ProfileLink.svelte';
 	import Quote from './Quote.svelte';
 	import TimeView from './TimeView.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import Organization from '$database/Organization';
-	import { type CommentID } from '$database/Organization';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import Organization from '#database/Organization.ts';
+	import { type CommentID } from '#database/Organization.ts';
 
 	interface Props {
 		comment: CommentRow;

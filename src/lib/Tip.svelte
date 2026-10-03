@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {

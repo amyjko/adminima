@@ -5,11 +5,11 @@
 <script lang="ts">
 	import Link from './Link.svelte';
 	import Oops from './Oops.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import { type Snippet } from 'svelte';
 	import Self from './RoleLink.svelte';
-	import type { RoleRow } from '$database/Organization';
-	import Organization, { type RoleID } from '$database/Organization';
+	import type { RoleRow } from '#database/Organization.ts';
+	import Organization, { type RoleID } from '#database/Organization.ts';
 	interface Props {
 		/** Undefined means not found, null means link to all roles */
 		role: { id: RoleID; title: string; short: string[] } | null | undefined;

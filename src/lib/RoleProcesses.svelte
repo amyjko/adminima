@@ -2,10 +2,10 @@
 	import Subheader from './Subheader.svelte';
 	import Flow from './Flow.svelte';
 	import ProcessLink from './ProcessLink.svelte';
-	import type { HowRow, ProcessRow, RoleRow } from '$database/Organization';
-	import { sortProcessesByNextDate } from '$database/Period';
+	import type { HowRow, ProcessRow, RoleRow } from '#database/Organization.ts';
+	import { sortProcessesByNextDate } from '#database/Period.ts';
 	import ProcessDate from './ProcessDate.svelte';
-	import Organization from '$database/Organization';
+	import Organization from '#database/Organization.ts';
 
 	interface Props {
 		role: RoleRow;

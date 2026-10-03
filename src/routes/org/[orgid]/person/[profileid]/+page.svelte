@@ -1,17 +1,17 @@
 <script lang="ts">
-	import Title from '$lib/Title.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import Header from '$lib/Header.svelte';
-	import RoleLink from '$lib/RoleLink.svelte';
-	import RoleProcesses from '$lib/RoleProcesses.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import MarkupView from '$lib/MarkupView.svelte';
-	import Notice from '$lib/Notice.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import Paragraph from '$lib/Paragraph.svelte';
-	import ChangeLink from '$lib/ChangeLink.svelte';
-	import Organization from '$database/Organization';
+	import Title from '#lib/Title.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import Header from '#lib/Header.svelte';
+	import RoleLink from '#lib/RoleLink.svelte';
+	import RoleProcesses from '#lib/RoleProcesses.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import MarkupView from '#lib/MarkupView.svelte';
+	import Notice from '#lib/Notice.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import Paragraph from '#lib/Paragraph.svelte';
+	import ChangeLink from '#lib/ChangeLink.svelte';
+	import Organization from '#database/Organization.ts';
 
 	let { data } = $props();
 	const profile = $derived(data.profile);

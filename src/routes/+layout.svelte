@@ -17,20 +17,20 @@
 </script>
 
 <script lang="ts">
-	import Page from '$lib/Page.svelte';
+	import Page from '#lib/Page.svelte';
 	import { getContext, onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import Organization from '$database/Organization';
-	import Error from '$lib/Error.svelte';
+	import Organization from '#database/Organization.ts';
+	import Error from '#lib/Error.svelte';
 	import { goto, invalidate } from '$app/navigation';
-	import Note from '$lib/Note.svelte';
-	import Link from '$lib/Link.svelte';
+	import Note from '#lib/Note.svelte';
+	import Link from '#lib/Link.svelte';
 	import type { User } from '@supabase/supabase-js';
 	import type { LayoutData } from './$types';
 
 	import { type Snippet } from 'svelte';
 	import { errors } from './errors.svelte';
-	import Announcement from '$lib/Announcement.svelte';
+	import Announcement from '#lib/Announcement.svelte';
 
 	interface Props {
 		data: LayoutData;

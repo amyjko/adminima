@@ -4,11 +4,11 @@
 
 <script lang="ts">
 	import Link from './Link.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import Oops from './Oops.svelte';
 	import Self from './TeamLink.svelte';
-	import type { TeamRow } from '$database/Organization';
-	import Organization from '$database/Organization';
+	import type { TeamRow } from '#database/Organization.ts';
+	import Organization from '#database/Organization.ts';
 
 	interface Props {
 		team: TeamRow | undefined;

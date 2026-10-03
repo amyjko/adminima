@@ -1,5 +1,5 @@
-import Organization from '$database/Organization';
-import { noAccess } from '$types/Locales.js';
+import Organization from '#database/Organization.ts';
+import { noAccess } from '#types/Locales.ts';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
@@ -29,9 +29,7 @@ export async function load({ parent, params }) {
 		hows === null ||
 		changes === null
 	)
-		error(404, {
-			message: noAccess('profile')
-		});
+		error(404, noAccess('profile'));
 
 	return {
 		profile,

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type Quote from '../markup/Quote';
-	import SegmentsView from '$lib/SegmentsView.svelte';
+	import SegmentsView from '#lib/SegmentsView.svelte';
 
 	interface Props {
 		block: Quote;

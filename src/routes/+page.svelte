@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Paragraph from '$lib/Paragraph.svelte';
-	import Lead from '$lib/Lead.svelte';
-	import Title from '$lib/Title.svelte';
-	import Link from '$lib/Link.svelte';
-	import OrganizationLink from '$lib/OrganizationLink.svelte';
-	import Notice from '$lib/Notice.svelte';
-	import Flow from '$lib/Flow.svelte';
-	import Tip from '$lib/Tip.svelte';
+	import Paragraph from '#lib/Paragraph.svelte';
+	import Lead from '#lib/Lead.svelte';
+	import Title from '#lib/Title.svelte';
+	import Link from '#lib/Link.svelte';
+	import OrganizationLink from '#lib/OrganizationLink.svelte';
+	import Notice from '#lib/Notice.svelte';
+	import Flow from '#lib/Flow.svelte';
+	import Tip from '#lib/Tip.svelte';
 
 	let { data } = $props();
 </script>

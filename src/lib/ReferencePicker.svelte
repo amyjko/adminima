@@ -7,7 +7,7 @@
 	import Note from './Note.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import Reference from '../markup/Reference';
 	import MarkupLink from '../markup/Link';
 	import Characters from '../markup/Text';

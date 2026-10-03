@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { type CommentID } from '$database/Organization';
-	import type { MutationResult } from '$database/Organization';
+	import { type CommentID } from '#database/Organization.ts';
+	import type { MutationResult } from '#database/Organization.ts';
 	import Button from './Button.svelte';
 	import CommentView from './CommentView.svelte';
 	import Dialog from './Dialog.svelte';
 	import Header from './Header.svelte';
 	import Loading from './Loading.svelte';
-	import { getDB } from '$routes/+layout.svelte';
+	import { getDB } from '#routes/+layout.svelte';
 	import Table from './Table.svelte';
-	import type { ProfileRow } from '$database/Organization';
+	import type { ProfileRow } from '#database/Organization.ts';
 
 	interface Props {
 		comments: CommentID[];

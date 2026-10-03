@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { ProcessRow } from '$database/Organization';
-	import Organization from '$database/Organization';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import type { ProcessRow } from '#database/Organization.ts';
+	import Organization from '#database/Organization.ts';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import Link from './Link.svelte';
 
 	interface Props {
