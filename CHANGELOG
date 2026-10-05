@@ -9,6 +9,7 @@ Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](
 
 - Process pages no longer show "Internal Error" to people who aren't logged in.
 - Process pages now list the changes suggested for that process.
+- People outside an organization no longer see edit controls on its processes.
 
 ## v0.10.2 2026-09-20
 

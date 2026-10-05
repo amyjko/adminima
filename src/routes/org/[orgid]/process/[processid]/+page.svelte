@@ -67,10 +67,12 @@
 
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
 	let isAdmin = $derived(orgContext().admin);
+	let isMember = $derived(orgContext().member);
 	let accountable = $derived(
 		$user !== null &&
 			process !== null &&
-			(process.accountable === null || personRoles.includes(process.accountable))
+			// If no one is accountable, anyone in the org can edit it, not anyone logged in.
+			(process.accountable === null ? isMember : personRoles.includes(process.accountable))
 	);
 	let responsible = $derived(
 		$user !== null &&
