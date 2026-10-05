@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { MutationResult } from '$database/Organization';
+	import type { MutationResult } from '#database/Organization.ts';
 	import Button from './Button.svelte';
 	import Loading from './Loading.svelte';
 	import { tick } from 'svelte';

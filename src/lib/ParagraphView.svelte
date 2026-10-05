@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { default as ParagraphMarkup } from '../markup/Paragraph';
 	import Paragraph from './Paragraph.svelte';
-	import SegmentsView from '$lib/SegmentsView.svelte';
+	import SegmentsView from '#lib/SegmentsView.svelte';
 
 	interface Props {
 		block: ParagraphMarkup;

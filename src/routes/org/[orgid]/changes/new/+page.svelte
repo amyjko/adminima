@@ -1,21 +1,21 @@
 <script lang="ts">
-	import Header from '$lib/Header.svelte';
-	import Title from '$lib/Title.svelte';
+	import Header from '#lib/Header.svelte';
+	import Title from '#lib/Title.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import Oops from '$lib/Oops.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import Field from '$lib/Field.svelte';
-	import Button from '$lib/Button.svelte';
-	import Labeled from '$lib/Labeled.svelte';
-	import MarkupView from '$lib/MarkupView.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import Options from '$lib/Options.svelte';
-	import { RoleItem } from '$lib/RoleLink.svelte';
-	import { ProcessItem } from '$lib/ProcessLink.svelte';
-	import Organization from '$database/Organization';
+	import Oops from '#lib/Oops.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import Field from '#lib/Field.svelte';
+	import Button from '#lib/Button.svelte';
+	import Labeled from '#lib/Labeled.svelte';
+	import MarkupView from '#lib/MarkupView.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import Options from '#lib/Options.svelte';
+	import { RoleItem } from '#lib/RoleLink.svelte';
+	import { ProcessItem } from '#lib/ProcessLink.svelte';
+	import Organization from '#database/Organization.ts';
 
 	const { data } = $props();
 
@@ -57,7 +57,7 @@
 				{ refresh: false }
 			);
 			if (!error && change) {
-				goto(`/org/${Organization.getPath(org)}/change/${change.id}`, { invalidateAll: true });
+				goto(`/org/${Organization.getPath(org)}/change/${change.id}`, { refreshAll: true });
 			}
 		} catch (_) {
 			newRequestError = "We couldn't create the request.";

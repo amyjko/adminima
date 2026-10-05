@@ -3,7 +3,7 @@
 	import Link from '../markup/Link';
 	import Reference from '../markup/Reference';
 	import type Segment from '../markup/Segment';
-	import TextView from '$lib/TextView.svelte';
+	import TextView from '#lib/TextView.svelte';
 	import LinkView from './LinkView.svelte';
 	import ReferenceView from './ReferenceView.svelte';
 

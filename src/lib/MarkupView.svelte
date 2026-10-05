@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { parse } from '../markup/parser';
 	import Button from './Button.svelte';
-	import type { MutationResult } from '$database/Organization';
+	import type { MutationResult } from '#database/Organization.ts';
 	import BlocksView from './BlocksView.svelte';
 	import { tick } from 'svelte';
-	import { addError } from '$routes/errors.svelte';
+	import { addError } from '#routes/errors.svelte.ts';
 	import Loading from './Loading.svelte';
 	import MarkupEditor from './MarkupEditor.svelte';
 	import { slide } from 'svelte/transition';

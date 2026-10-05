@@ -1,5 +1,5 @@
-import Organization from '$database/Organization';
-import { noAccess } from '$types/Locales.js';
+import Organization from '#database/Organization.ts';
+import { noAccess } from '#types/Locales.ts';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
@@ -10,10 +10,7 @@ export async function load({ parent, params }) {
 		Organization.queryTeamRoles(supabase, org.id, params.teamid)
 	]);
 
-	if (team === null || roles === null)
-		error(404, {
-			message: noAccess('team')
-		});
+	if (team === null || roles === null) error(404, noAccess('team'));
 
 	return {
 		team,

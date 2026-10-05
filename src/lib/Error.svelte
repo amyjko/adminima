@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button, { Delete } from './Button.svelte';
-	import { errors, type DBError } from '$routes/errors.svelte';
+	import { errors, type DBError } from '#routes/errors.svelte.ts';
 
 	interface Props {
 		error: DBError;

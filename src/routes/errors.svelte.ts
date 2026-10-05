@@ -1,7 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js';
-import type { MutationResult } from '$database/Organization';
-import { browser } from '$app/environment';
-import { invalidateAll } from '$app/navigation';
+import type { MutationResult } from '#database/Organization.ts';
+import { browser } from '$app/env';
+import { refreshAll } from '$app/navigation';
 
 export type DBError = { message: string; error: PostgrestError | undefined };
 export let errors = $state<DBError[]>([]);
@@ -34,7 +34,7 @@ export function refresh(): Promise<void> {
 		try {
 			do {
 				refreshAgain = false;
-				await invalidateAll();
+				await refreshAll();
 			} while (refreshAgain);
 		} finally {
 			refreshing = null;

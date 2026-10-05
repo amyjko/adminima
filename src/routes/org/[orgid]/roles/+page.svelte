@@ -1,21 +1,21 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import RoleLink from '$lib/RoleLink.svelte';
-	import Field from '$lib/Field.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import Title from '$lib/Title.svelte';
-	import Flow from '$lib/Flow.svelte';
-	import Header from '$lib/Header.svelte';
-	import TeamLink from '$lib/TeamLink.svelte';
-	import Notice from '$lib/Notice.svelte';
-	import FormDialog from '$lib/FormDialog.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import ProfileLink from '$lib/ProfileLink.svelte';
-	import Oops from '$lib/Oops.svelte';
-	import type { RoleRow, TeamRow } from '$database/Organization';
-	import Organization from '$database/Organization';
+	import RoleLink from '#lib/RoleLink.svelte';
+	import Field from '#lib/Field.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import Title from '#lib/Title.svelte';
+	import Flow from '#lib/Flow.svelte';
+	import Header from '#lib/Header.svelte';
+	import TeamLink from '#lib/TeamLink.svelte';
+	import Notice from '#lib/Notice.svelte';
+	import FormDialog from '#lib/FormDialog.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import ProfileLink from '#lib/ProfileLink.svelte';
+	import Oops from '#lib/Oops.svelte';
+	import type { RoleRow, TeamRow } from '#database/Organization.ts';
+	import Organization from '#database/Organization.ts';
 
 	const { data } = $props();
 	const roles = $derived(data.roles);

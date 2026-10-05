@@ -3,14 +3,14 @@
 		type ChangeRow,
 		type CommentRow,
 		type ProfileRow
-	} from '$database/Organization';
-	import timestampToDate from '$database/timestampToDate';
+	} from '#database/Organization.ts';
+	import timestampToDate from '#database/timestampToDate.ts';
 	import ChangeLink from './ChangeLink.svelte';
 	import ProfileLink, { ProfileItem } from './ProfileLink.svelte';
 	import Status from './Status.svelte';
-	import { getDB } from '$routes/+layout.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { getUser } from '$routes/+layout.svelte';
+	import { getDB } from '#routes/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { getUser } from '#routes/+layout.svelte';
 	import Table from './Table.svelte';
 	import Field from './Field.svelte';
 	import Oops from './Oops.svelte';
@@ -19,7 +19,7 @@
 	import Labeled from './Labeled.svelte';
 	import { isStatus, Statuses, type StatusType } from './status';
 	import Notice from './Notice.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import MarkupView from './MarkupView.svelte';
 	import TimeView from './TimeView.svelte';
@@ -27,7 +27,7 @@
 	import NewComment from './NewComment.svelte';
 	import Button from './Button.svelte';
 	import Options from './Options.svelte';
-	import { mutate } from '$routes/errors.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
 	import Checkbox from './Checkbox.svelte';
 	import { type Snippet } from 'svelte';
 
@@ -97,24 +97,24 @@
 	}
 
 	function getInitialTextFilter() {
-		return decodeURI($page.url.searchParams.get('words') || '');
+		return decodeURI(page.url.searchParams.get('words') || '');
 	}
 
 	function getInitialStatusFilter() {
-		const params = $page.url.searchParams;
+		const params = page.url.searchParams;
 		const status = params.get('status');
 		return status !== null && status in Statuses ? (status as StatusType) : undefined;
 	}
 
 	function getInitialLeadFilter() {
-		const params = $page.url.searchParams;
+		const params = page.url.searchParams;
 		const lead = params.get('lead');
 		return lead !== null ? lead : undefined;
 	}
 
 	// When the filters change, update the URL to match
 	$effect(() => {
-		const params = new URLSearchParams($page.url.searchParams.toString());
+		const params = new URLSearchParams(page.url.searchParams.toString());
 		const start = params.toString();
 		if (filterText === '') params.delete('words');
 		else params.set('words', encodeURI(filterText));
@@ -123,8 +123,7 @@
 		if (filterLead === undefined) params.delete('lead');
 		else params.set('lead', filterLead);
 		// Did the params change? Navigate.
-		if (start !== params.toString())
-			goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
+		if (start !== params.toString()) goto(`?${params.toString()}`, { replace: true, reset: false });
 	});
 
 	// The filtered list of comment IDs that we need to asynchronously load.

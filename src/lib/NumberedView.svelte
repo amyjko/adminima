@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { default as Bullets } from '../markup/Bullets';
-	import SegmentView from '$lib/SegmentView.svelte';
+	import SegmentView from '#lib/SegmentView.svelte';
 
 	interface Props {
 		block: Bullets;

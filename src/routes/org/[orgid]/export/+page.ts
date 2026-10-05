@@ -1,4 +1,4 @@
-import Organization from '$database/Organization';
+import Organization from '#database/Organization.ts';
 import { error } from '@sveltejs/kit';
 
 export async function load({ parent }) {
@@ -28,9 +28,7 @@ export async function load({ parent }) {
 		profiles === null ||
 		changes === null
 	)
-		error(404, {
-			message: 'Unable to retrieve data to export this organization.'
-		});
+		error(404, 'Unable to retrieve data to export this organization.');
 
 	return {
 		roles,

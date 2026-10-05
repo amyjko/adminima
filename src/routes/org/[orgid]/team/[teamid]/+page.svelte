@@ -1,17 +1,17 @@
 <script lang="ts">
-	import Oops from '$lib/Oops.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import Title from '$lib/Title.svelte';
-	import MarkupView from '$lib/MarkupView.svelte';
-	import RoleLink from '$lib/RoleLink.svelte';
-	import Button, { Delete } from '$lib/Button.svelte';
+	import Oops from '#lib/Oops.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import Title from '#lib/Title.svelte';
+	import MarkupView from '#lib/MarkupView.svelte';
+	import RoleLink from '#lib/RoleLink.svelte';
+	import Button, { Delete } from '#lib/Button.svelte';
 	import { goto } from '$app/navigation';
-	import Notice from '$lib/Notice.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import Header from '$lib/Header.svelte';
-	import Organization from '$database/Organization';
+	import Notice from '#lib/Notice.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import Header from '#lib/Header.svelte';
+	import Organization from '#database/Organization.ts';
 
 	const { data } = $props();
 	const team = $derived(data.team);

@@ -3,32 +3,32 @@
 </script>
 
 <script lang="ts">
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
-	import { getDB, getUser } from '$routes/+layout.svelte';
-	import { mutate } from '$routes/errors.svelte';
-	import ProcessLink from '$lib/ProcessLink.svelte';
-	import Title from '$lib/Title.svelte';
-	import RoleLink from '$lib/RoleLink.svelte';
-	import Level from '$lib/Level.svelte';
-	import type { ProcessRow, RoleRow } from '$database/Organization';
-	import type { RoleID } from '$database/Organization.js';
-	import FormDialog from '$lib/FormDialog.svelte';
-	import Field from '$lib/Field.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
+	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { mutate } from '#routes/errors.svelte.ts';
+	import ProcessLink from '#lib/ProcessLink.svelte';
+	import Title from '#lib/Title.svelte';
+	import RoleLink from '#lib/RoleLink.svelte';
+	import Level from '#lib/Level.svelte';
+	import type { ProcessRow, RoleRow } from '#database/Organization.ts';
+	import type { RoleID } from '#database/Organization.ts';
+	import FormDialog from '#lib/FormDialog.svelte';
+	import Field from '#lib/Field.svelte';
 	import { goto } from '$app/navigation';
-	import Notice from '$lib/Notice.svelte';
-	import Oops from '$lib/Oops.svelte';
-	import Concern from '$lib/Concern.svelte';
-	import Tip from '$lib/Tip.svelte';
-	import Header from '$lib/Header.svelte';
-	import Table from '$lib/Table.svelte';
-	import Status from '$lib/Status.svelte';
-	import { getNextProcessDate, sortProcessesByNextDate } from '$database/Period';
-	import ProcessDate from '$lib/ProcessDate.svelte';
-	import Visibility from '$lib/VisibilityChooser.svelte';
+	import Notice from '#lib/Notice.svelte';
+	import Oops from '#lib/Oops.svelte';
+	import Concern from '#lib/Concern.svelte';
+	import Tip from '#lib/Tip.svelte';
+	import Header from '#lib/Header.svelte';
+	import Table from '#lib/Table.svelte';
+	import Status from '#lib/Status.svelte';
+	import { getNextProcessDate, sortProcessesByNextDate } from '#database/Period.ts';
+	import ProcessDate from '#lib/ProcessDate.svelte';
+	import Visibility from '#lib/VisibilityChooser.svelte';
 	import { page } from '$app/state';
-	import ProfileLink from '$lib/ProfileLink.svelte';
-	import Organization from '$database/Organization';
-	import getProcessDuplicates from '$database/possibleProcessOverlap.js';
+	import ProfileLink from '#lib/ProfileLink.svelte';
+	import Organization from '#database/Organization.ts';
+	import getProcessDuplicates from '#database/possibleProcessOverlap.ts';
 
 	const { data } = $props();
 
@@ -191,8 +191,7 @@
 		params.set('view', view);
 
 		// If the query string changed, change the URL.
-		if (start !== params.toString())
-			goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
+		if (start !== params.toString()) goto(`?${params.toString()}`, { replace: true, reset: false });
 	});
 </script>
 

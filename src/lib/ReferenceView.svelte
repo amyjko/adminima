@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type Reference from '../markup/Reference';
-	import { getOrg } from '$routes/org/[orgid]/+layout.svelte';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import RoleLink from './RoleLink.svelte';
 	import ProcessLink from './ProcessLink.svelte';
 	import Oops from './Oops.svelte';

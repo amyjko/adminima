@@ -10,9 +10,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 let invalidateCalls = 0;
 let resolveInvalidate: (() => void) | null = null;
 
-vi.mock('$app/environment', () => ({ browser: true }));
+vi.mock('$app/env', () => ({ browser: true }));
 vi.mock('$app/navigation', () => ({
-	invalidateAll: () => {
+	refreshAll: () => {
 		invalidateCalls++;
 		return new Promise<void>((resolve) => {
 			resolveInvalidate = resolve;

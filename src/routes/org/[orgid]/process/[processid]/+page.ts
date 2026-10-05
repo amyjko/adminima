@@ -1,5 +1,5 @@
-import Organization from '$database/Organization';
-import { noAccess } from '$types/Locales.js';
+import Organization from '#database/Organization.ts';
+import { noAccess } from '#types/Locales.ts';
 import { error } from '@sveltejs/kit';
 import { validate as isValidUUID } from 'uuid';
 
@@ -10,10 +10,7 @@ export async function load({ parent, params }) {
 		? await Organization.queryProcess(supabase, params.processid)
 		: await Organization.queryProcessByShortName(supabase, org.id, params.processid);
 
-	if (process === null)
-		error(404, {
-			message: noAccess('process')
-		});
+	if (process === null) error(404, noAccess('process'));
 
 	const [
 		{ data: hows },
@@ -39,9 +36,7 @@ export async function load({ parent, params }) {
 		personRoles === null ||
 		profiles === null
 	)
-		error(404, {
-			message: noAccess('process')
-		});
+		error(404, noAccess('process'));
 
 	return {
 		process,

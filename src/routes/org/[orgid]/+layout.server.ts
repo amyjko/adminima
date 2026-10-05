@@ -1,4 +1,4 @@
-import type Database from '$database/Database';
+import type Database from '#database/Database.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { error } from '@sveltejs/kit';
 import { validate as isValidUUID } from 'uuid';
@@ -15,9 +15,7 @@ export async function load({ params, locals }) {
 
 	// No org? Error out.
 	if (org === null) {
-		error(404, {
-			message: 'Unable to show organization. It may not exist or may not be visible to you.'
-		});
+		error(404, 'Unable to show organization. It may not exist or may not be visible to you.');
 	}
 
 	const profileQuery = supabase

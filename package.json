@@ -1,6 +1,6 @@
 {
 	"name": "adminima",
-	"version": "0.10.3",
+	"version": "0.10.4",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -25,13 +25,13 @@
 		"outdated": "npx check-outdated --ignore-pre-releases --columns name,type,current,latest,changes"
 	},
 	"engines": {
-		"node": ">=22.12"
+		"node": ">=22.17"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.13.0",
 		"@playwright/test": "^1",
 		"@supabase/supabase-js": "^2",
-		"@sveltejs/kit": "^2",
+		"@sveltejs/kit": "^3",
 		"@sveltejs/vite-plugin-svelte": "^7",
 		"@types/uuid": "^10",
 		"happy-dom": "^20.11.6",
@@ -50,10 +50,16 @@
 	"type": "module",
 	"dependencies": {
 		"@supabase/ssr": "^0",
-		"@sveltejs/adapter-vercel": "^6",
+		"@sveltejs/adapter-vercel": "^7",
 		"date-fns": "^4",
 		"fast-csv": "^5",
 		"uuid": "^14",
 		"write-excel-file": "^4"
+	},
+	"imports": {
+		"#lib/*": "./src/lib/*",
+		"#types/*": "./src/types/*",
+		"#database/*": "./src/database/*",
+		"#routes/*": "./src/routes/*"
 	}
 }

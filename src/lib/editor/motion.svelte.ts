@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 
 /**
  * The one duration the editor animates over, shared because two components have to agree on it.
