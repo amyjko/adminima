@@ -3,6 +3,13 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.10.3 2026-10-05
+
+### Fixed
+
+- Process pages no longer show "Internal Error" to people who aren't logged in.
+- Process pages now list the changes suggested for that process.
+
 ## v0.10.2 2026-09-20
 
 ### Changed

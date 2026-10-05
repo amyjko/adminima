@@ -8,13 +8,14 @@
 	let { text = undefined, inline = false, children }: Props = $props();
 </script>
 
-<div class:inline>
+<!-- A span when inline, since a div inside a paragraph is invalid HTML and breaks hydration. -->
+<svelte:element this={inline ? 'span' : 'div'} class="oops" class:inline>
 	{#if text}<span>{typeof text === 'string' ? text : 'Error'}</span>{/if}
 	<span class="sub">{@render children?.()}</span>
-</div>
+</svelte:element>
 
 <style>
-	div {
+	.oops {
 		display: flex;
 		flex-direction: column;
 		background: var(--error);
