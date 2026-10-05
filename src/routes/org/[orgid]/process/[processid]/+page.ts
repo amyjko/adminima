@@ -22,7 +22,7 @@ export async function load({ parent, params }) {
 	] = await Promise.all([
 		Organization.queryProcessHows(supabase, process.id),
 		Organization.queryRoles(supabase, org.id),
-		Organization.queryProcessChanges(supabase, org.id),
+		Organization.queryProcessChanges(supabase, process.id),
 		Organization.queryConcerns(supabase, org.id),
 		Organization.queryPersonRoles(supabase, org.id, uid),
 		Organization.queryProfiles(supabase, org.id)
