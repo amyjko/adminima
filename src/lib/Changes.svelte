@@ -40,7 +40,6 @@
 	let { changes, profiles, children }: Props = $props();
 
 	const context = getOrg();
-	let org = $derived(context().org);
 
 	const dbContext = getDB();
 	const db = $derived(dbContext());
@@ -48,9 +47,9 @@
 	const user = getUser();
 	const Levels = { triage: 0, active: 1, blocked: 2, done: 4, backlog: 3, declined: 5 };
 
-	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && context().member)
-	);
+	let visible = $derived(context().visible);
+	// Only members can change a change's status; everyone else sees it read-only.
+	let canEditStatus = $derived($user !== null && context().member);
 
 	let filterText = $state(getInitialTextFilter());
 	let filterStatus = $state<undefined | StatusType>(getInitialStatusFilter());
@@ -214,7 +213,7 @@
 				{@const comment = latestComments.find((c) => c.id === change.comments.at(-1))}
 				<tr>
 					<td
-						>{#if visible}
+						>{#if canEditStatus}
 							<StatusChooser
 								tip="Change the status of this change"
 								value={change.status}

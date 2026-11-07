@@ -68,8 +68,7 @@
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
 	let isAdmin = $derived(orgContext().admin);
 	let isMember = $derived(orgContext().member);
-	// Mirrors the roles RLS policy; without roles, assignments would all render as "Unknown role".
-	let canSeeRoles = $derived(isMember || orgContext().org.visibility === 'public');
+	let canSeeRoles = $derived(orgContext().visible);
 	let accountable = $derived(
 		$user !== null &&
 			process !== null &&

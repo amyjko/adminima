@@ -3,6 +3,12 @@
 We'll document all notable changes in this file, including bug fixes, enhancements, and dependency updates.
 Dates should be in`YYYY-MM-DD` format and versions are in [semantic versioning](http://semver.org/) format.
 
+## v0.10.7 2026-11-07
+
+### Fixed
+
+- People who aren't members of a public organization can now see its roles and who holds them.
+
 ## v0.10.6 2026-11-07
 
 ### Fixed

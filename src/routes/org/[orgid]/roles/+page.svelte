@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import RoleLink from '#lib/RoleLink.svelte';
 	import Field from '#lib/Field.svelte';
-	import { getDB, getUser } from '#routes/+layout.svelte';
+	import { getDB } from '#routes/+layout.svelte';
 	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 	import { mutate } from '#routes/errors.svelte.ts';
 	import Title from '#lib/Title.svelte';
@@ -29,17 +29,12 @@
 	const dbContext = getDB();
 	const db = $derived(dbContext());
 
-	const user = getUser();
-
 	let newRole: string = $state('');
 	let filter: string = $state('');
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
 	let path = $derived(Organization.getPath(org));
 
-	/** Roles are visible if the org is public or the authenticated user is in the org. */
-	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && orgContext().member)
-	);
+	let visible = $derived(orgContext().visible);
 
 	async function createRole() {
 		const { data } = await mutate(

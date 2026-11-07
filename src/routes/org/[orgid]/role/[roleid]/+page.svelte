@@ -40,9 +40,7 @@
 	let profiles = $derived(Organization.getRoleProfiles(role.id, assignments, allProfiles));
 	let isAdmin = $derived($user && orgContext().admin);
 
-	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && orgContext().member)
-	);
+	let visible = $derived(orgContext().visible);
 </script>
 
 <Title

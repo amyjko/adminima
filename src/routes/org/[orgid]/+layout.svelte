@@ -4,6 +4,12 @@
 		org: OrganizationRow;
 		admin: boolean;
 		member: boolean;
+		/**
+		 * Whether the viewer can see the whole organization, not just its public items: its roles,
+		 * who holds them, and all of its processes and changes. Mirrors the SELECT policies on
+		 * roles, assignments and processes: members, or anyone if the organization is public.
+		 */
+		visible: boolean;
 		counts: {
 			roles: number;
 			profiles: number;
@@ -42,6 +48,7 @@
 		org: data.org,
 		admin: data.admin,
 		member: data.member,
+		visible: data.member || data.org.visibility === 'public',
 		counts: data.counts,
 		shortRoles: data.shortRoles,
 		shortProcesses: data.shortProcesses

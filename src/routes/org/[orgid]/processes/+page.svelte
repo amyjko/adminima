@@ -59,9 +59,7 @@
 
 	let isAdmin = $derived($user && orgContext().admin);
 
-	let visible = $derived(
-		($user === null && org.visibility === 'public') || ($user !== null && orgContext().member)
-	);
+	let visible = $derived(orgContext().visible);
 
 	let filter = $state(getInitialTextFilter());
 	let lowerFilter = $derived(filter.toLocaleLowerCase().trim());
