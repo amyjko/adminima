@@ -61,8 +61,11 @@ jobs:
       # against rather than whatever is newest that day.
       - run: npm ci
 
+      # CLI 3 targets the local stack unless told otherwise, and refuses to change a hosted
+      # project unattended. Without --remote this push would succeed against nothing; without
+      # --yes it would fail with HostedMutationConsentRequiredError.
       - run: npx supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: npx supabase db push
+      - run: npx supabase db push --remote --yes
 
   # Vercel's own Git integration must be turned off for production, or this gate is bypassed and
   # the app ships without waiting for either the tests or the migrations.
