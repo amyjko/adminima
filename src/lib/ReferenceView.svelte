@@ -24,8 +24,9 @@
 {:else if process}
 	<ProcessLink {process} />
 {:else if !context().member}
-	<!-- Non-members may not be able to see the org's roles, so just show the text the author wrote. -->
-	{segment.text}
+	<!-- Non-members may not be able to see the org's roles, so just show the text the author wrote,
+	 or the target if they didn't write any, as in <@AOM>. -->
+	{segment.text.length > 0 ? segment.text : segment.target}
 {:else}
 	<!-- Say so, rather than rendering a link that silently goes nowhere. -->
 	<Oops inline text="Unknown role or process: {segment.target}" />
