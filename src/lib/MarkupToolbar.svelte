@@ -127,7 +127,7 @@
 		action={link}>@</Button
 	>
 	<Button
-		tip="Heading"
+		tip="h1 Heading"
 		shortcut={shortcut('1', { alt: true })}
 		keys={keys('1', { alt: true })}
 		pressed={status.kind === 'heading1'}
@@ -135,7 +135,7 @@
 		action={() => toggle('heading1')}>h1</Button
 	>
 	<Button
-		tip="Subheading"
+		tip="h2 Subheading"
 		shortcut={shortcut('2', { alt: true })}
 		keys={keys('2', { alt: true })}
 		pressed={status.kind === 'heading2'}
@@ -151,7 +151,7 @@
 		action={() => toggle('bullets')}>•</Button
 	>
 	<Button
-		tip="Numbered list"
+		tip="1. Numbered list"
 		shortcut={shortcut('7', { shift: true })}
 		keys={keys('7', { shift: true })}
 		pressed={status.kind === 'numbered'}

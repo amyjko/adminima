@@ -27,6 +27,7 @@ export type Database = {
                   Row: {
                     "orgid": string,"profileid": string,"roleid": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "orgid": string,"profileid": string,"roleid": string
                   }
@@ -58,6 +59,7 @@ isOneToOne: false
                   Row: {
                     "id": string,"orgid": string,"what": string,"when": string,"who": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "id"?: string,"orgid": string,"what": string,"when"?: string,"who": string
                   }
@@ -83,6 +85,7 @@ isOneToOne: false
                   Row: {
                     "authorized": (string)[],"consulted": (string)[],"done": Database["public"]['Enums']["completion"],"how": (string)[],"id": string,"informed": (string)[],"orgid": string,"processid": string,"responsible": (string)[],"visibility": Database["public"]['Enums']["visibility"],"what": string,"when": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "authorized"?: (string)[],"consulted"?: (string)[],"done"?: Database["public"]['Enums']["completion"],"how"?: (string)[],"id"?: string,"informed"?: (string)[],"orgid": string,"processid": string,"responsible"?: (string)[],"visibility"?: Database["public"]['Enums']["visibility"],"what"?: string,"when"?: string
                   }
@@ -120,6 +123,7 @@ isOneToOne: false
                   Row: {
                     "id": string,"used": boolean,"when": string,"who": string | null
                   }
+                  ComputedFields: never
                   Insert: {
                     "id"?: string,"used"?: boolean,"when"?: string,"who"?: string | null
                   }
@@ -133,6 +137,7 @@ isOneToOne: false
                   Row: {
                     "authorized": (string)[],"comments": (string)[],"description": string,"id": string,"name": string,"paths": (string)[],"prompt": string,"visibility": Database["public"]['Enums']["visibility"],"when": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "authorized"?: (string)[],"comments"?: (string)[],"description"?: string,"id"?: string,"name"?: string,"paths"?: (string)[],"prompt"?: string,"visibility"?: Database["public"]['Enums']["visibility"],"when"?: string
                   }
@@ -146,6 +151,7 @@ isOneToOne: false
                   Row: {
                     "email": string,"id": string,"when": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "email": string,"id": string,"when"?: string
                   }
@@ -159,6 +165,7 @@ isOneToOne: false
                   Row: {
                     "accountable": string | null,"comments": (string)[],"concern": string,"howid": string | null,"icon": string,"id": string,"orgid": string,"repeat": NonNullable<Json>,"short": (string)[],"state": Database["public"]['Enums']["state"],"title": string,"when": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "accountable"?: string | null,"comments"?: (string)[],"concern"?: string,"howid"?: string | null,"icon"?: string,"id"?: string,"orgid": string,"repeat"?: NonNullable<Json>,"short"?: (string)[],"state"?: Database["public"]['Enums']["state"],"title"?: string,"when"?: string
                   }
@@ -196,6 +203,7 @@ isOneToOne: false
                   Row: {
                     "admin": boolean,"bio": string,"email": string,"id": string,"name": string,"orgid": string,"personid": string | null,"supervisor": string | null
                   }
+                  ComputedFields: never
                   Insert: {
                     "admin": boolean,"bio"?: string,"email"?: string,"id"?: string,"name"?: string,"orgid": string,"personid"?: string | null,"supervisor"?: string | null
                   }
@@ -227,6 +235,7 @@ isOneToOne: false
                   Row: {
                     "comments": (string)[],"description": string,"id": string,"orgid": string,"short": (string)[],"team": string | null,"title": string,"when": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "comments"?: (string)[],"description"?: string,"id"?: string,"orgid": string,"short"?: (string)[],"team"?: string | null,"title": string,"when"?: string
                   }
@@ -258,6 +267,7 @@ isOneToOne: false
                   Row: {
                     "authorized": (string)[],"comments": (string)[],"description": string,"id": string,"lead": string | null,"orgid": string,"processes": (string)[],"proposal": string,"review": string | null,"roles": (string)[],"status": Database["public"]['Enums']["status"],"visibility": Database["public"]['Enums']["visibility"],"watchers": (string)[],"what": string,"when": string,"who": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "authorized"?: (string)[],"comments"?: (string)[],"description"?: string,"id"?: string,"lead"?: string | null,"orgid": string,"processes"?: (string)[],"proposal"?: string,"review"?: string | null,"roles"?: (string)[],"status"?: Database["public"]['Enums']["status"],"visibility"?: Database["public"]['Enums']["visibility"],"watchers"?: (string)[],"what"?: string,"when"?: string,"who": string
                   }
@@ -289,6 +299,7 @@ isOneToOne: false
                   Row: {
                     "comments": (string)[],"description": string,"id": string,"name": string,"orgid": string,"when": string
                   }
+                  ComputedFields: never
                   Insert: {
                     "comments"?: (string)[],"description"?: string,"id"?: string,"name"?: string,"orgid": string,"when"?: string
                   }

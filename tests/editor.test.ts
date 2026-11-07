@@ -527,7 +527,7 @@ test('the toolbar renders the pressed state it is given', async ({ page }) => {
 		'aria-pressed',
 		'true'
 	);
-	await expect(page.getByRole('button', { name: 'Heading', exact: true })).toHaveAttribute(
+	await expect(page.getByRole('button', { name: 'h1 Heading', exact: true })).toHaveAttribute(
 		'aria-pressed',
 		'false'
 	);

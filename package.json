@@ -1,6 +1,6 @@
 {
 	"name": "adminima",
-	"version": "0.10.7",
+	"version": "0.10.8",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -20,8 +20,8 @@
 		"start": "cp .env.local .env; supabase start -x storage-api,imgproxy,logflare,vector,edge-runtime",
 		"stop": "cp .env.prod .env; supabase stop",
 		"reset": "supabase db reset; npm run types",
-		"diff": "supabase db diff --local --use-migra -f rename_me",
-		"types": "supabase gen types typescript --local > src/database/database.types.ts",
+		"diff": "supabase db diff --use-migra -f rename_me",
+		"types": "supabase gen types typescript > src/database/database.types.ts",
 		"outdated": "npx check-outdated --ignore-pre-releases --columns name,type,current,latest,changes"
 	},
 	"engines": {
@@ -34,11 +34,11 @@
 		"@sveltejs/kit": "^3",
 		"@sveltejs/vite-plugin-svelte": "^7",
 		"@types/uuid": "^10",
-		"happy-dom": "^20.11.6",
+		"happy-dom": "^21",
 		"pg": "^8",
 		"prettier": "^3",
 		"prettier-plugin-svelte": "^4",
-		"supabase": "^2",
+		"supabase": "^3",
 		"svelte": "^5",
 		"svelte-check": "^4",
 		"tslib": "^2",
