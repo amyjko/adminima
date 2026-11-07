@@ -20,9 +20,8 @@
 
 	const orgContext = getOrg();
 
-	// Mirrors the roles RLS policy: only members, or anyone if the org is public, can see its roles.
-	// Without them, every assignment would render as "Unknown role", so show nothing instead.
-	let canSeeRoles = $derived(orgContext().member || orgContext().org.visibility === 'public');
+	// Without the org's roles, every assignment would render as "Unknown role", so show nothing.
+	let canSeeRoles = $derived(orgContext().visible);
 
 	const dbContext = getDB();
 	const db = $derived(dbContext());
