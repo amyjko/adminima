@@ -7,6 +7,7 @@
 	import { getDB } from '#routes/+layout.svelte';
 	import Options from './Options.svelte';
 	import { mutate } from '#routes/errors.svelte.ts';
+	import { getOrg } from '#routes/org/[orgid]/+layout.svelte';
 
 	interface Props {
 		how: HowRow;
@@ -16,6 +17,12 @@
 	}
 
 	let { roles, how, verbose, editable }: Props = $props();
+
+	const orgContext = getOrg();
+
+	// Mirrors the roles RLS policy: only members, or anyone if the org is public, can see its roles.
+	// Without them, every assignment would render as "Unknown role", so show nothing instead.
+	let canSeeRoles = $derived(orgContext().member || orgContext().org.visibility === 'public');
 
 	const dbContext = getDB();
 	const db = $derived(dbContext());
@@ -50,152 +57,154 @@
 	};
 </script>
 
-<div class="arci" class:verbose>
-	<div class="slot">
-		<div class="control">
-			{#if !verbose}
-				<Level level="responsible" />
-			{/if}
-			{#if editable}
-				<Options
-					id="responsible-chooser"
-					tip="Add a role to be responsible for completing this step."
-					{options}
-					view={{ snippet: RoleItem, data: roles }}
-					empty={false}
-					searchable={roleSearch}
-					active={options.length >= 1}
-					bind:selection={responsible}
-					change={async (value) => {
-						if (value) {
-							const { error } = await mutate(
-								db.addHowRCI(how, value, 'responsible'),
-								"Couldn't add role."
-							);
-							if (error) return false;
-							responsible = undefined;
-						}
-						return true;
-					}}
-				/>
-			{/if}
+{#if canSeeRoles}
+	<div class="arci" class:verbose>
+		<div class="slot">
+			<div class="control">
+				{#if !verbose}
+					<Level level="responsible" />
+				{/if}
+				{#if editable}
+					<Options
+						id="responsible-chooser"
+						tip="Add a role to be responsible for completing this step."
+						{options}
+						view={{ snippet: RoleItem, data: roles }}
+						empty={false}
+						searchable={roleSearch}
+						active={options.length >= 1}
+						bind:selection={responsible}
+						change={async (value) => {
+							if (value) {
+								const { error } = await mutate(
+									db.addHowRCI(how, value, 'responsible'),
+									"Couldn't add role."
+								);
+								if (error) return false;
+								responsible = undefined;
+							}
+							return true;
+						}}
+					/>
+				{/if}
+			</div>
+			<div class="roles">
+				{#each how.responsible as responsible}
+					<RoleLink role={roles.find((r) => r.id === responsible)}
+						>{#if editable}
+							<Button
+								chromeless
+								tip="Remove this role from the responsible list."
+								action={() =>
+									mutate(db.removeHowRCI(how, responsible, 'responsible'), "Couldn't remove role.")}
+								>{Delete}</Button
+							>
+						{/if}</RoleLink
+					>
+				{/each}
+				{#if verbose}
+					is <Level level="responsible" verbose /> for completing this process.
+				{/if}
+			</div>
 		</div>
-		<div class="roles">
-			{#each how.responsible as responsible}
-				<RoleLink role={roles.find((r) => r.id === responsible)}
-					>{#if editable}
-						<Button
-							chromeless
-							tip="Remove this role from the responsible list."
-							action={() =>
-								mutate(db.removeHowRCI(how, responsible, 'responsible'), "Couldn't remove role.")}
-							>{Delete}</Button
-						>
-					{/if}</RoleLink
-				>
-			{/each}
-			{#if verbose}
-				is <Level level="responsible" verbose /> for completing this process.
-			{/if}
+		<div class="slot">
+			<div class="control">
+				{#if !verbose}
+					<Level level="consulted" />
+				{/if}
+				{#if editable}
+					<Options
+						id="consulted-chooser"
+						tip="Add a role to be consulted in this step."
+						{options}
+						view={{ snippet: RoleItem, data: roles }}
+						empty={false}
+						active={options.length >= 1}
+						bind:selection={consulted}
+						searchable={roleSearch}
+						change={async (value) => {
+							if (value) {
+								const { error } = await mutate(
+									db.addHowRCI(how, value, 'consulted'),
+									"Couldn't add role."
+								);
+								if (error) return false;
+								consulted = undefined;
+							}
+							return true;
+						}}
+					/>
+				{/if}
+			</div>
+			<div class="roles">
+				{#each how.consulted as consulted}
+					<RoleLink role={roles.find((r) => r.id === consulted)}
+						>{#if editable}
+							<Button
+								chromeless
+								tip="Remove this role from the consulted list."
+								action={() =>
+									mutate(db.removeHowRCI(how, consulted, 'consulted'), "Couldn't remove role.")}
+								>{Delete}</Button
+							>
+						{/if}</RoleLink
+					>
+				{/each}
+				{#if verbose}
+					is <Level level="consulted" verbose /> to complete this process.
+				{/if}
+			</div>
+		</div>
+		<div class="slot">
+			<div class="controls">
+				{#if !verbose}
+					<Level level="informed" />
+				{/if}
+				{#if editable}
+					<Options
+						id="informed-chooser"
+						tip="Add a role to be informed in this step."
+						{options}
+						view={{ snippet: RoleItem, data: roles }}
+						empty={false}
+						searchable={roleSearch}
+						bind:selection={informed}
+						active={options.length >= 1}
+						change={async (value) => {
+							if (value) {
+								const { error } = await mutate(
+									db.addHowRCI(how, value, 'informed'),
+									"Couldn't add role."
+								);
+								if (error) return false;
+								informed = undefined;
+							}
+							return true;
+						}}
+					/>
+				{/if}
+			</div>
+			<div class="roles">
+				{#each how.informed as informed}
+					<RoleLink role={roles.find((r) => r.id === informed)}
+						>{#if editable}
+							<Button
+								chromeless
+								tip="Remove this role from the informed list"
+								action={() =>
+									mutate(db.removeHowRCI(how, informed, 'informed'), "Couldn't remove role.")}
+								>{Delete}</Button
+							>
+						{/if}</RoleLink
+					>
+				{/each}
+				{#if verbose}
+					is <Level level="informed" verbose /> about this process and its outcomes.
+				{/if}
+			</div>
 		</div>
 	</div>
-	<div class="slot">
-		<div class="control">
-			{#if !verbose}
-				<Level level="consulted" />
-			{/if}
-			{#if editable}
-				<Options
-					id="consulted-chooser"
-					tip="Add a role to be consulted in this step."
-					{options}
-					view={{ snippet: RoleItem, data: roles }}
-					empty={false}
-					active={options.length >= 1}
-					bind:selection={consulted}
-					searchable={roleSearch}
-					change={async (value) => {
-						if (value) {
-							const { error } = await mutate(
-								db.addHowRCI(how, value, 'consulted'),
-								"Couldn't add role."
-							);
-							if (error) return false;
-							consulted = undefined;
-						}
-						return true;
-					}}
-				/>
-			{/if}
-		</div>
-		<div class="roles">
-			{#each how.consulted as consulted}
-				<RoleLink role={roles.find((r) => r.id === consulted)}
-					>{#if editable}
-						<Button
-							chromeless
-							tip="Remove this role from the consulted list."
-							action={() =>
-								mutate(db.removeHowRCI(how, consulted, 'consulted'), "Couldn't remove role.")}
-							>{Delete}</Button
-						>
-					{/if}</RoleLink
-				>
-			{/each}
-			{#if verbose}
-				is <Level level="consulted" verbose /> to complete this process.
-			{/if}
-		</div>
-	</div>
-	<div class="slot">
-		<div class="controls">
-			{#if !verbose}
-				<Level level="informed" />
-			{/if}
-			{#if editable}
-				<Options
-					id="informed-chooser"
-					tip="Add a role to be informed in this step."
-					{options}
-					view={{ snippet: RoleItem, data: roles }}
-					empty={false}
-					searchable={roleSearch}
-					bind:selection={informed}
-					active={options.length >= 1}
-					change={async (value) => {
-						if (value) {
-							const { error } = await mutate(
-								db.addHowRCI(how, value, 'informed'),
-								"Couldn't add role."
-							);
-							if (error) return false;
-							informed = undefined;
-						}
-						return true;
-					}}
-				/>
-			{/if}
-		</div>
-		<div class="roles">
-			{#each how.informed as informed}
-				<RoleLink role={roles.find((r) => r.id === informed)}
-					>{#if editable}
-						<Button
-							chromeless
-							tip="Remove this role from the informed list"
-							action={() =>
-								mutate(db.removeHowRCI(how, informed, 'informed'), "Couldn't remove role.")}
-							>{Delete}</Button
-						>
-					{/if}</RoleLink
-				>
-			{/each}
-			{#if verbose}
-				is <Level level="informed" verbose /> about this process and its outcomes.
-			{/if}
-		</div>
-	</div>
-</div>
+{/if}
 
 <style>
 	.arci {

@@ -68,6 +68,8 @@
 	// This mirrors the row-level security policy: only admins and people with an accountable or responsible role can edit this policy.
 	let isAdmin = $derived(orgContext().admin);
 	let isMember = $derived(orgContext().member);
+	// Mirrors the roles RLS policy; without roles, assignments would all render as "Unknown role".
+	let canSeeRoles = $derived(isMember || orgContext().org.visibility === 'public');
 	let accountable = $derived(
 		$user !== null &&
 			process !== null &&
@@ -327,48 +329,50 @@
 			: undefined}
 	/>
 
-	<Header>Who</Header>
+	{#if canSeeRoles}
+		<Header>Who</Header>
 
-	<div>
-		{#if editable}
-			{@const sortedRoles = roles.toSorted((a, b) => a.title.localeCompare(b.title))}
-			<Options
-				id="choose-accountable"
-				tip="Choose a role to be accountable for the processes outcomes."
-				options={[
-					undefined,
-					...sortedRoles.toSorted((a, b) => a.title.localeCompare(b.title)).map((role) => role.id)
-				]}
-				searchable={{
-					placeholder: 'role',
-					include: (item: string, query: string) =>
-						sortedRoles
-							.find((r) => r.id === item)
-							?.title.toLowerCase()
-							.includes(query.toLowerCase()) === true
-				}}
-				view={{ snippet: RoleItem, data: roles }}
-				selection={process.accountable ?? undefined}
-				change={async (value) =>
-					(
-						await mutate(
-							db.updateProcessAccountable(process, value ?? null),
-							"Couldn't update who's accountable."
-						)
-					).error === null}
-			/>
-		{:else if process.accountable}
-			<RoleLink role={roles.find((r) => r.id === process.accountable)} />
-		{:else}
-			No one
-		{/if}
-		is
-		<Level level="accountable" verbose /> for this processes outcomes
-		{#if how.responsible.length === 0}
-			&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible)
-		{/if}
-	</div>
-	<ARCI {how} {roles} verbose {editable} />
+		<div>
+			{#if editable}
+				{@const sortedRoles = roles.toSorted((a, b) => a.title.localeCompare(b.title))}
+				<Options
+					id="choose-accountable"
+					tip="Choose a role to be accountable for the processes outcomes."
+					options={[
+						undefined,
+						...sortedRoles.toSorted((a, b) => a.title.localeCompare(b.title)).map((role) => role.id)
+					]}
+					searchable={{
+						placeholder: 'role',
+						include: (item: string, query: string) =>
+							sortedRoles
+								.find((r) => r.id === item)
+								?.title.toLowerCase()
+								.includes(query.toLowerCase()) === true
+					}}
+					view={{ snippet: RoleItem, data: roles }}
+					selection={process.accountable ?? undefined}
+					change={async (value) =>
+						(
+							await mutate(
+								db.updateProcessAccountable(process, value ?? null),
+								"Couldn't update who's accountable."
+							)
+						).error === null}
+				/>
+			{:else if process.accountable}
+				<RoleLink role={roles.find((r) => r.id === process.accountable)} />
+			{:else}
+				No one
+			{/if}
+			is
+			<Level level="accountable" verbose /> for this processes outcomes
+			{#if how.responsible.length === 0}
+				&nbsp;(and <Level level="responsible" verbose /> for completing it, as no one else is responsible)
+			{/if}
+		</div>
+		<ARCI {how} {roles} verbose {editable} />
+	{/if}
 
 	<Header>When</Header>
 
