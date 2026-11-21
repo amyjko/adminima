@@ -9,6 +9,6 @@
 	let { segment }: Props = $props();
 </script>
 
-<Link to={segment.url.startsWith('http') || segment.url.startsWith('/') ? segment.url : ''}
-	>{segment.text.length === 0 ? '—' : segment.text}</Link
->
+<Link to={segment.url.startsWith('http') || segment.url.startsWith('/') ? segment.url : ''}>
+	{segment.text.length === 0 ? '—' : segment.text}
+</Link>

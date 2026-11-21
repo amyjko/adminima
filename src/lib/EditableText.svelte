@@ -52,12 +52,12 @@
 				onkeydown={(event) => (event.key === 'Enter' ? save() : undefined)}
 				oninput={() => (revision = transform ? transform(revision) : revision)}
 				autofocus
-			/>{:else}<span class="text"
-				>{#if text.length === 0}&mdash;{:else}{text}{/if}</span
-			>{/if}
-		{#if saving}<Loading />{:else}<Button tip="Save this edit" action={save}
-				>{#if editing}&checkmark;{:else}✎{/if}</Button
-			>{/if}
+			/>{:else}<span class="text">
+				{#if text.length === 0}&mdash;{:else}{text}{/if}
+			</span>{/if}
+		{#if saving}<Loading />{:else}<Button tip="Save this edit" action={save}>
+				{#if editing}&checkmark;{:else}✎{/if}
+			</Button>{/if}
 	</form>
 {:else}{text}{/if}
 

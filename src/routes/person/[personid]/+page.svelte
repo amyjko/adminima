@@ -43,24 +43,26 @@
 	<Oops text="Couldn't load this person's organizations" />
 {:else}
 	{#if isSelf}
-		<Tip
-			>Want to create an organization? Make sure you've got an invite code from <Link
-				to="mailto:ajko@uw.edu">Amy</Link
-			>.</Tip
-		>
+		<Tip>
+			Want to create an organization? Make sure you've got an invite code from <Link
+				to="mailto:ajko@uw.edu"
+			>
+				Amy
+			</Link>.
+		</Tip>
 		<NewOrganization />
 	{/if}
 	{#if orgs.length > 0}
-		<Paragraph
-			>Here are the organizations {#if isSelf}you are{:else}this person is{/if} part of:</Paragraph
-		>
+		<Paragraph>
+			Here are the organizations {#if isSelf}you are{:else}this person is{/if} part of:
+		</Paragraph>
 		<Table full={false}>
 			<tbody>
 				{#each orgs as org}
 					<tr>
 						<td> <OrganizationLink id={org.paths[0] ?? org.id} name={org.name} /></td>
-						<td
-							>{#if org.profiles.length > 0 && org.profiles[0].personid !== null}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
+						<td>
+							{#if org.profiles.length > 0 && org.profiles[0].personid !== null}{#await db.getPersonProfile(org.id, org.profiles[0].personid) then profile}
 									<ProfileLink profile={profile ?? undefined} />
 								{/await}{/if}
 						</td>
@@ -69,12 +71,12 @@
 			</tbody>
 		</Table>
 	{:else}
-		<Notice
-			>{#if isSelf}You are{:else}this person is{/if} not part of any organizations.
+		<Notice>
+			{#if isSelf}You are{:else}this person is{/if} not part of any organizations.
 			{#if isSelf}<ul>
 					<li>Join one by asking the person in charge.</li>
 					<li>Create one if you're in charge.</li>
-				</ul>{/if}</Notice
-		>
+				</ul>{/if}
+		</Notice>
 	{/if}
 {/if}

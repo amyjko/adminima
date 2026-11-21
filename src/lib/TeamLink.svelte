@@ -34,5 +34,7 @@
 
 {#if team === undefined}<Oops inline text="Unknown team" />{:else}<Link
 		to="/org/{Organization.getPath(org)}/team/{team.id}"
-		kind="team">{team.name}</Link
-	>{/if}
+		kind="team"
+	>
+		{team.name}
+	</Link>{/if}

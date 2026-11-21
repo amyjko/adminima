@@ -10,9 +10,9 @@
 </script>
 
 <div class="columns">
-	<Button tip="Dismiss this alert" action={() => errors.splice(errors.indexOf(error), 1)}
-		>{Delete}</Button
-	>
+	<Button tip="Dismiss this alert" action={() => errors.splice(errors.indexOf(error), 1)}>
+		{Delete}
+	</Button>
 	<div class="messages">
 		<span>{error.message}</span>
 		{#if error.error}<span class="sub">{error.error.message}</span>{/if}

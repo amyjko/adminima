@@ -53,8 +53,10 @@
 			type={submit ? 'submit' : null}
 			class:warning
 			{onkeydown}
-			onclick={action}>{Confirm}</button
+			onclick={action}
 		>
+			{Confirm}
+		</button>
 	</div>
 {:else}
 	<button
@@ -76,8 +78,10 @@
 				event.stopPropagation();
 				event.preventDefault();
 			}
-		}}>{@render children?.()}</button
+		}}
 	>
+		{@render children?.()}
+	</button>
 {/if}
 
 <style>

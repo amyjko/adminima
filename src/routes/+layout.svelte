@@ -101,10 +101,12 @@
 	<hr />
 
 	<div style="display: flex; flex-direction:row; justify-content: center; width: 100%">
-		<Note
-			><Link to="https://amyjko.phd">Amy</Link> made this. Have <Link
-				to="https://github.com/amyjko/adminima/issues/new/choose">feedback</Link
-			>?
+		<Note>
+			<Link to="https://amyjko.phd">Amy</Link> made this. Have <Link
+				to="https://github.com/amyjko/adminima/issues/new/choose"
+			>
+				feedback
+			</Link>?
 		</Note>
 	</div>
 </Page>

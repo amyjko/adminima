@@ -148,9 +148,9 @@
 
 <Title title={org.name} kind="organization"></Title>
 
-<Tip
-	>You can export your data at any time. The export will generate a <code>.xlsx</code> spreadsheet of
-	processes in rows, with a description column summarizing the steps and then columns for each role the
-	organization (with the names of who holds each), and ARCI in cells. Comment histories will not be exported.</Tip
->
+<Tip>
+	You can export your data at any time. The export will generate a <code>.xlsx</code> spreadsheet of processes
+	in rows, with a description column summarizing the steps and then columns for each role the organization
+	(with the names of who holds each), and ARCI in cells. Comment histories will not be exported.
+</Tip>
 <Button tip="Export the organization" action={exportOrg}>Export…</Button>

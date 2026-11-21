@@ -12,12 +12,12 @@
 	let { short = $bindable(), path, update }: Props = $props();
 </script>
 
-<code
-	><Flow spaced={false}
-		>{path}<EditableText
+<code>
+	<Flow spaced={false}>
+		{path}<EditableText
 			bind:text={short}
 			transform={(text) => text.trim().replaceAll(' ', '')}
 			edit={update}
-		/></Flow
-	></code
->
+		/>
+	</Flow>
+</code>

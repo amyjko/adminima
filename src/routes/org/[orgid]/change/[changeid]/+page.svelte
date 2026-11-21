@@ -117,8 +117,8 @@
 
 <Paragraph>
 	<PersonLink profile={Organization.getProfileWithPersonID(profiles, change.who) ?? undefined} />
-	reported this problem on <TimeView date={timestampToDate(change.when)} />.</Paragraph
->
+	reported this problem on <TimeView date={timestampToDate(change.when)} />.
+</Paragraph>
 
 <div>
 	{#if editable}
@@ -203,8 +203,8 @@
 <Header>Affected roles</Header>
 <div class="row">
 	{#each change.roles as role}
-		<RoleLink role={roles.find((r) => r.id === role)}
-			><Button
+		<RoleLink role={roles.find((r) => r.id === role)}>
+			<Button
 				chromeless
 				tip="Remove this role from the affected roles."
 				action={() =>
@@ -216,9 +216,9 @@
 						"Couldn't update change roles."
 					)}
 			>
-				{Delete}</Button
-			></RoleLink
-		>
+				{Delete}
+			</Button>
+		</RoleLink>
 	{/each}
 	{#if unselectedRoles.length > 0}
 		<Options
@@ -268,8 +268,8 @@
 					"Couldn't update change processes."
 				)) !== null}
 		>
-			{Delete}</Button
-		>
+			{Delete}
+		</Button>
 	{/each}
 	{#if unselectedProcesses.length > 0}
 		<Options
@@ -347,8 +347,10 @@
 				goto(`/org/${Organization.getPath(organization)}/changes`);
 			}
 		}}
-		warning>{Delete} Delete this change</Button
+		warning
 	>
+		{Delete} Delete this change
+	</Button>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 {/if}
 

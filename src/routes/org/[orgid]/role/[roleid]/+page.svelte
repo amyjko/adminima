@@ -96,10 +96,10 @@
 		/>{/if}
 </Title>
 
-<Tip admin
-	>This is a role in the organization. <strong>Admins</strong> can update it's description and team. Set
-	a short name to use in URLs and links.</Tip
->
+<Tip admin>
+	This is a role in the organization. <strong>Admins</strong> can update it's description and team. Set
+	a short name to use in URLs and links.
+</Tip>
 
 <MarkupView
 	markup={role.description}
@@ -114,15 +114,15 @@
 
 {#if profiles.length === 0}{#if visible}<Notice>No one holds this role.</Notice>{:else}Who holds
 		this role is private.{/if}{:else}
-	<Paragraph
-		>This role is held by
+	<Paragraph>
+		This role is held by
 		{#each profiles as profile, index}<PersonLink
 				{profile}
 			/>{#if profiles.length >= 2 && index < profiles.length - 1 && index !== profiles.length - 2},
 			{/if}{#if profiles.length >= 2 && index === profiles.length - 2}
 				&nbsp;and
-			{/if}{/each}.</Paragraph
-	>{/if}
+			{/if}{/each}.
+	</Paragraph>{/if}
 
 <Header>Processes</Header>
 
@@ -137,8 +137,9 @@
 <Changes
 	changes={changes.filter((change) => change.status === 'active' && change.roles.includes(role.id))}
 	profiles={allProfiles}
-	><Paragraph>There are no active changes suggested for this role.</Paragraph></Changes
 >
+	<Paragraph>There are no active changes suggested for this role.</Paragraph>
+</Changes>
 
 <Header>History</Header>
 
@@ -150,10 +151,10 @@
 
 <Header>Delete</Header>
 {#if isAdmin}
-	<Tip admin
-		>Is this role obsolete? You can delete it, but it is permanent. All of the processes for this
-		role will remain, in case you want to assign them to a different role.</Tip
-	>
+	<Tip admin>
+		Is this role obsolete? You can delete it, but it is permanent. All of the processes for this
+		role will remain, in case you want to assign them to a different role.
+	</Tip>
 	<Button
 		tip="Permanently delete this role. All processes will remain, but without a role."
 		action={async () => {
@@ -166,6 +167,8 @@
 			);
 			if (!error) goto(`/org/${Organization.getPath(org)}/roles`);
 		}}
-		warning>{Delete} Delete this role</Button
+		warning
 	>
+		{Delete} Delete this role
+	</Button>
 {/if}

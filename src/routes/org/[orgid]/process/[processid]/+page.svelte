@@ -206,11 +206,11 @@
 									: undefined
 						: undefined}
 				/>
-				<Note inline
-					>{#if how.visibility === 'public'}Everyone on the internet can see this process{:else if how.visibility === 'org'}Only
+				<Note inline>
+					{#if how.visibility === 'public'}Everyone on the internet can see this process{:else if how.visibility === 'org'}Only
 						members can see this process.{:else if how.visibility === 'admin'}Only admins can see
-						this process.{/if}</Note
-				>
+						this process.{/if}
+				</Note>
 			</Row>
 		</Flow>
 		<Flow>
@@ -288,8 +288,8 @@
 				</FormDialog>
 			{/if}
 			{#if isAdmin}
-				<Row name="Link"
-					><PathEditor
+				<Row name="Link">
+					<PathEditor
 						short={process.short[0] ?? ''}
 						path={'...process/'}
 						update={async (text) => {
@@ -313,12 +313,10 @@
 		</Flow>
 	</Title>
 
-	<Tip member
-		>Admins and anyone <Level level="accountable" verbose /> or <Level
-			level="responsible"
-			verbose
-		/> can edit a process. If no one is accountable, anyone in the organization can edit.</Tip
-	>
+	<Tip member>
+		Admins and anyone <Level level="accountable" verbose /> or <Level level="responsible" verbose /> can
+		edit a process. If no one is accountable, anyone in the organization can edit.
+	</Tip>
 
 	<MarkupView
 		markup={how.what}
@@ -376,10 +374,9 @@
 	<Header>When</Header>
 
 	{#if editable}
-		<Tip
-			>Setting one or more periods for when a process starts helps communicate when it should
-			happen.</Tip
-		>
+		<Tip>
+			Setting one or more periods for when a process starts helps communicate when it should happen.
+		</Tip>
 		{#snippet period(period: string | undefined)}
 			<div style:padding="var(--padding)">
 				{#if period === undefined}
@@ -436,30 +433,31 @@
 
 	<Header>How</Header>
 
-	<Tip member
-		>If you want to provide more detail about how to do this process, you can add a list of tasks
-		and subtasks, and specify for each, who is <Level level="responsible" verbose /> for doing it, and
-		who is <Level level="consulted" verbose /> and <Level level="informed" verbose /> about it. Adding
-		this level of detail will let you track progress and make sure everyone knows who is responsible for
-		what.
+	<Tip member>
+		If you want to provide more detail about how to do this process, you can add a list of tasks and
+		subtasks, and specify for each, who is <Level level="responsible" verbose /> for doing it, and who
+		is <Level level="consulted" verbose /> and <Level level="informed" verbose /> about it. Adding this
+		level of detail will let you track progress and make sure everyone knows who is responsible for what.
 	</Tip>
 
 	{#if how.how.length === 0}
-		<Button tip="Create a subtask for this process." action={() => createFirstSubtask(how)}
-			>Create a subtask...</Button
-		>
+		<Button tip="Create a subtask for this process." action={() => createFirstSubtask(how)}>
+			Create a subtask...
+		</Button>
 	{:else}
-		<Flow
-			><Button tip="Uncheck all steps" action={() => uncheckAll(true)}>Uncheck all</Button><Button
+		<Flow>
+			<Button tip="Uncheck all steps" action={() => uncheckAll(true)}>Uncheck all</Button><Button
 				tip="Check all steps"
-				action={() => uncheckAll(false)}>Check all</Button
-			></Flow
-		>
+				action={() => uncheckAll(false)}
+			>
+				Check all
+			</Button>
+		</Flow>
 		<div class="steps">
 			{#each how.how.map( (h) => Organization.getHow(hows, h) ) as subHow, index (subHow?.id ?? index)}
-				{#if subHow}<HowView how={subHow} {hows} {roles} {process} {editable} />{:else}<Note
-						>This step is not visible to you.</Note
-					>{/if}
+				{#if subHow}<HowView how={subHow} {hows} {roles} {process} {editable} />{:else}<Note>
+						This step is not visible to you.
+					</Note>{/if}
 			{/each}
 		</div>
 	{/if}
@@ -468,12 +466,12 @@
 
 	<ChangeLink change={null} process={process.id} />
 
-	<Tip member
-		>These are changes people have suggested that might affect this process that aren't yet done.</Tip
-	>
-	<Changes changes={changes.filter((change) => change.status !== 'done')} {profiles}
-		><Paragraph>There are no active changes suggested for this process.</Paragraph></Changes
-	>
+	<Tip member>
+		These are changes people have suggested that might affect this process that aren't yet done.
+	</Tip>
+	<Changes changes={changes.filter((change) => change.status !== 'done')} {profiles}>
+		<Paragraph>There are no active changes suggested for this process.</Paragraph>
+	</Changes>
 
 	<Header>History</Header>
 
@@ -486,8 +484,9 @@
 {#if isAdmin || accountable}
 	<Header>Delete</Header>
 	<Paragraph>Is this process obsolete? You can permanently delete it.</Paragraph>
-	<Tip admin>Only admins and those role <Level level="accountable" verbose /> roles can delete.</Tip
-	>
+	<Tip admin>
+		Only admins and those role <Level level="accountable" verbose /> roles can delete.
+	</Tip>
 	<Button
 		tip="Permantently delete this process and all of it's steps."
 		action={async () => {
@@ -500,8 +499,10 @@
 				deleteError = "We couldn't delete this";
 			}
 		}}
-		warning>{Delete} Delete this process</Button
+		warning
 	>
+		{Delete} Delete this process
+	</Button>
 	{#if deleteError}<Oops text={deleteError} />{/if}
 {/if}
 

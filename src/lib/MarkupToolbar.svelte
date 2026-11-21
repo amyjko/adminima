@@ -124,72 +124,90 @@
 		shortcut={shortcut('K')}
 		keys={keys('K')}
 		tabindex={stop(2)}
-		action={link}>@</Button
+		action={link}
 	>
+		@
+	</Button>
 	<Button
 		tip="h1 Heading"
 		shortcut={shortcut('1', { alt: true })}
 		keys={keys('1', { alt: true })}
 		pressed={status.kind === 'heading1'}
 		tabindex={stop(3)}
-		action={() => toggle('heading1')}>h1</Button
+		action={() => toggle('heading1')}
 	>
+		h1
+	</Button>
 	<Button
 		tip="h2 Subheading"
 		shortcut={shortcut('2', { alt: true })}
 		keys={keys('2', { alt: true })}
 		pressed={status.kind === 'heading2'}
 		tabindex={stop(4)}
-		action={() => toggle('heading2')}>h2</Button
+		action={() => toggle('heading2')}
 	>
+		h2
+	</Button>
 	<Button
 		tip="Bulleted list"
 		shortcut={shortcut('8', { shift: true })}
 		keys={keys('8', { shift: true })}
 		pressed={status.kind === 'bullets'}
 		tabindex={stop(5)}
-		action={() => toggle('bullets')}>•</Button
+		action={() => toggle('bullets')}
 	>
+		•
+	</Button>
 	<Button
 		tip="1. Numbered list"
 		shortcut={shortcut('7', { shift: true })}
 		keys={keys('7', { shift: true })}
 		pressed={status.kind === 'numbered'}
 		tabindex={stop(6)}
-		action={() => toggle('numbered')}>1.</Button
+		action={() => toggle('numbered')}
 	>
+		1.
+	</Button>
 	<Button
 		tip="Block quote"
 		shortcut={shortcut('9', { shift: true })}
 		keys={keys('9', { shift: true })}
 		pressed={status.kind === 'quote'}
 		tabindex={stop(7)}
-		action={() => toggle('quote')}>&rdquo;</Button
+		action={() => toggle('quote')}
 	>
+		&rdquo;
+	</Button>
 	<Button
 		tip="Undo"
 		shortcut={shortcut('Z')}
 		keys={keys('Z')}
 		active={status.undoable}
 		tabindex={stop(8)}
-		action={undo}>↺</Button
+		action={undo}
 	>
+		↺
+	</Button>
 	<Button
 		tip="Redo"
 		shortcut={shortcut('Z', { shift: true })}
 		keys={keys('Z', { shift: true })}
 		active={status.redoable}
 		tabindex={stop(9)}
-		action={redo}>↻</Button
+		action={redo}
 	>
+		↻
+	</Button>
 	<Button
 		tip="Markup source"
 		shortcut={shortcut('M', { shift: true })}
 		keys={keys('M', { shift: true })}
 		pressed={source}
 		tabindex={stop(10)}
-		action={toggleSource}>&lt;/&gt;</Button
+		action={toggleSource}
 	>
+		&lt;/&gt;
+	</Button>
 </div>
 
 <style>

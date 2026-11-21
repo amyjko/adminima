@@ -37,10 +37,10 @@
 			: undefined}
 	/>
 
-	<Tip admin
-		>Teams are helpful ways of organizing roles. <strong>Admins</strong> can update their names and which
-		roles are in them.</Tip
-	>
+	<Tip admin>
+		Teams are helpful ways of organizing roles. <strong>Admins</strong> can update their names and which
+		roles are in them.
+	</Tip>
 
 	<MarkupView
 		markup={team.description}
@@ -75,6 +75,8 @@
 			});
 			if (error === null) await goto(`/org/${Organization.getPath(org)}/roles`);
 		}}
-		warning>{Delete} Delete this team</Button
+		warning
 	>
+		{Delete} Delete this team
+	</Button>
 {/if}

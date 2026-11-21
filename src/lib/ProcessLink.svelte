@@ -46,9 +46,10 @@
 			: `/org/${Organization.getPath(org)}/processes`}
 		kind="process"
 		icon={process && process.state === 'draft' ? DraftSymbol : undefined}
-		>{#if process}
+	>
+		{#if process}
 			{process.title.substring(0, MaxLength) + (process.title.length > MaxLength ? '…' : '')}
 		{:else}
 			<em>unknown process</em>
-		{/if}</Link
-	>{/if}
+		{/if}
+	</Link>{/if}

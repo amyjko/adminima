@@ -42,5 +42,6 @@
 			? `/org/${Organization.getPath(org)}/role/${path}`
 			: `/org/${Organization.getPath(org)}/roles`}
 		kind="role"
-		>{role ? role.title : 'roles'}{#snippet action()}{@render children?.()}{/snippet}</Link
-	>{/if}
+	>
+		{role ? role.title : 'roles'}{#snippet action()}{@render children?.()}{/snippet}
+	</Link>{/if}

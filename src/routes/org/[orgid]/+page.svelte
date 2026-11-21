@@ -54,12 +54,12 @@
 								: undefined
 					: undefined}
 			/>
-			<Note inline
-				>{#if org.visibility === 'public'}Everyone on the internet can see this organization's
+			<Note inline>
+				{#if org.visibility === 'public'}Everyone on the internet can see this organization's
 					details.{:else if org.visibility === 'org'}Only members can see this organization's
 					private processes and changes.{:else if org.visibility === 'admin'}Only admins can see
-					this organization's details.{/if}</Note
-			>
+					this organization's details.{/if}
+			</Note>
 		</Row>
 		{#if admin}
 			<Row name="Link">
@@ -83,8 +83,8 @@
 				/>
 			</Row>
 		{/if}
-	</div></Title
->
+	</div>
+</Title>
 
 <MarkupView
 	markup={org.description}
