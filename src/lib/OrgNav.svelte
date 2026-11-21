@@ -28,28 +28,28 @@
 		<OrganizationLink id={path} name="" />
 	</span>
 	<span class="link">
-		<Link bland kind="role" to="/org/{path}/roles"
-			><strong>{counts.roles}</strong> Role{counts.roles === 1 ? '' : 's'}</Link
-		>
+		<Link bland kind="role" to="/org/{path}/roles">
+			<strong>{counts.roles}</strong> Role{counts.roles === 1 ? '' : 's'}
+		</Link>
 	</span>
 	{#if visible}
 		<span class="link">
-			<Link bland kind="person" to="/org/{Organization.getPath(organization)}/people"
-				><strong>{counts.profiles} </strong>
-				{counts.profiles !== 1 ? 'People' : 'Person'}</Link
-			>
+			<Link bland kind="person" to="/org/{Organization.getPath(organization)}/people">
+				<strong>{counts.profiles} </strong>
+				{counts.profiles !== 1 ? 'People' : 'Person'}
+			</Link>
 		</span>
 	{/if}
 	<span class="link">
-		<Link bland kind="process" to="/org/{path}/processes"
-			><strong>{counts.processes}</strong> Process{counts.processes !== 1 ? 'es' : ''}</Link
-		>
+		<Link bland kind="process" to="/org/{path}/processes">
+			<strong>{counts.processes}</strong> Process{counts.processes !== 1 ? 'es' : ''}
+		</Link>
 	</span>
 	<span class="link">
-		<Link bland kind="change" to="/org/{path}/changes"
-			><strong>{counts.changes}</strong>
-			Change{counts.changes !== 1 ? 's' : ''}</Link
-		>
+		<Link bland kind="change" to="/org/{path}/changes">
+			<strong>{counts.changes}</strong>
+			Change{counts.changes !== 1 ? 's' : ''}
+		</Link>
 	</span>
 </div>
 

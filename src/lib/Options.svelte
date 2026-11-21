@@ -159,8 +159,10 @@
 				action={() => {
 					searching = !searching;
 					tick().then(() => search?.focus());
-				}}>🔍</Button
+				}}
 			>
+				🔍
+			</Button>
 		{:else}
 			<Button
 				chromeless

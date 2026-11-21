@@ -26,9 +26,10 @@
 		to="/org/{Organization.getPath(org)}/{change ? 'change' : 'changes'}/{change
 			? change.id
 			: 'new'}{role ? `?role=${role}` : ''}{process ? `?process=${process}` : ''}"
-		>{change
+	>
+		{change
 			? change.what.length > 100
 				? `${change.what.substring(0, 100)}...`
 				: change.what
-			: 'Suggest a change...'}</Link
-	>{/if}
+			: 'Suggest a change...'}
+	</Link>{/if}

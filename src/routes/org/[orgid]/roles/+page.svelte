@@ -97,10 +97,10 @@
 </script>
 
 <Title title="Roles" kind="role" label={false} />
-<Tip
-	>These are the roles held in this organization. Each one is responsible for particular processes
-	in this organization.</Tip
->
+<Tip>
+	These are the roles held in this organization. Each one is responsible for particular processes in
+	this organization.
+</Tip>
 
 {#if !visible}
 	<Oops
@@ -168,9 +168,9 @@
 								{/if}
 							{/if}
 						{:else}
-							<Notice
-								>{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}</Notice
-							>
+							<Notice>
+								{#if filter.length > 0}No matching roles{:else}This team has no roles.{/if}
+							</Notice>
 						{/each}
 					</ul>
 				</ul>

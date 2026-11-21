@@ -89,17 +89,18 @@
 			</div>
 			<div class="roles">
 				{#each how.responsible as responsible}
-					<RoleLink role={roles.find((r) => r.id === responsible)}
-						>{#if editable}
+					<RoleLink role={roles.find((r) => r.id === responsible)}>
+						{#if editable}
 							<Button
 								chromeless
 								tip="Remove this role from the responsible list."
 								action={() =>
 									mutate(db.removeHowRCI(how, responsible, 'responsible'), "Couldn't remove role.")}
-								>{Delete}</Button
 							>
-						{/if}</RoleLink
-					>
+								{Delete}
+							</Button>
+						{/if}
+					</RoleLink>
 				{/each}
 				{#if verbose}
 					is <Level level="responsible" verbose /> for completing this process.
@@ -137,17 +138,18 @@
 			</div>
 			<div class="roles">
 				{#each how.consulted as consulted}
-					<RoleLink role={roles.find((r) => r.id === consulted)}
-						>{#if editable}
+					<RoleLink role={roles.find((r) => r.id === consulted)}>
+						{#if editable}
 							<Button
 								chromeless
 								tip="Remove this role from the consulted list."
 								action={() =>
 									mutate(db.removeHowRCI(how, consulted, 'consulted'), "Couldn't remove role.")}
-								>{Delete}</Button
 							>
-						{/if}</RoleLink
-					>
+								{Delete}
+							</Button>
+						{/if}
+					</RoleLink>
 				{/each}
 				{#if verbose}
 					is <Level level="consulted" verbose /> to complete this process.
@@ -185,17 +187,18 @@
 			</div>
 			<div class="roles">
 				{#each how.informed as informed}
-					<RoleLink role={roles.find((r) => r.id === informed)}
-						>{#if editable}
+					<RoleLink role={roles.find((r) => r.id === informed)}>
+						{#if editable}
 							<Button
 								chromeless
 								tip="Remove this role from the informed list"
 								action={() =>
 									mutate(db.removeHowRCI(how, informed, 'informed'), "Couldn't remove role.")}
-								>{Delete}</Button
 							>
-						{/if}</RoleLink
-					>
+								{Delete}
+							</Button>
+						{/if}
+					</RoleLink>
 				{/each}
 				{#if verbose}
 					is <Level level="informed" verbose /> about this process and its outcomes.

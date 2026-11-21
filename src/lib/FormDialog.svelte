@@ -56,14 +56,16 @@
 		<Paragraph>{explanation}</Paragraph>
 		<Form {active} inactiveMessage={inactive} action={doAction}>
 			{@render children?.()}
-			<Actions
-				><Button tip="Dismiss this dialog." end action={() => (show = false)}>Cancel</Button><Button
+			<Actions>
+				<Button tip="Dismiss this dialog." end action={() => (show = false)}>Cancel</Button><Button
 					tip={submitTip}
 					end
 					submit
 					{active}
-					action={doAction}>{submit}</Button
+					action={doAction}
 				>
+					{submit}
+				</Button>
 			</Actions>
 			{#if submitting}<Loading />{/if}
 		</Form>

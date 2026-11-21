@@ -44,8 +44,8 @@
 				<TimeView date={timestampToDate(comment.when)} />
 			</div>
 		</td>
-		<td
-			><Quote>
+		<td>
+			<Quote>
 				{#if admin || ($user && comment.who === $user.id)}
 					<MarkupView
 						markup={comment.what}
@@ -67,8 +67,10 @@
 						deleting = true;
 						mutate(remove(comment.id), 'Unable to delete comment.');
 						deleting = false;
-					}}>{Delete}</Button
+					}}
 				>
+					{Delete}
+				</Button>
 			</td>{/if}
 	</tr>
 {/if}

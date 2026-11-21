@@ -212,8 +212,8 @@
 				<!-- Get the most recent comment -->
 				{@const comment = latestComments.find((c) => c.id === change.comments.at(-1))}
 				<tr>
-					<td
-						>{#if canEditStatus}
+					<td>
+						{#if canEditStatus}
 							<StatusChooser
 								tip="Change the status of this change"
 								value={change.status}
@@ -231,32 +231,30 @@
 						{/if}
 					</td>
 					<!-- <td><Visibility level={change.visibility} tip="Visibility of the change" /></td> -->
-					<td
-						>{#if change.lead}<ProfileLink
+					<td>
+						{#if change.lead}<ProfileLink
 								short
 								profile={Organization.getProfileWithID(profiles, change.lead) ?? undefined}
-							/>{:else}&mdash;{/if}</td
-					>
-					<td
-						>{#if change.review}<TimeView
+							/>{:else}&mdash;{/if}
+					</td>
+					<td>
+						{#if change.review}<TimeView
 								time={false}
 								date={new Date(Date.parse(change.review))}
 								warning={change.review !== null &&
 									new Date(Date.parse(change.review)).getTime() < Date.now()}
-							/>{/if}</td
-					>
+							/>{/if}
+					</td>
 					<td class="info">
 						<ChangeLink {change} />
 						<div class="update">
-							<Button tip="Add comment to change" action={() => (submittingComment = change)}
-								>+</Button
-							>
+							<Button tip="Add comment to change" action={() => (submittingComment = change)}>
+								+
+							</Button>
 							{#if comment}
-								<em
-									>{(Organization.getPersonNameOrEmail(profiles, comment.who) ?? '—').split(
-										' '
-									)[0]}</em
-								>
+								<em>
+									{(Organization.getPersonNameOrEmail(profiles, comment.who) ?? '—').split(' ')[0]}
+								</em>
 								<TimeView time={false} date={timestampToDate(comment.when)} />
 								<MarkupView small markup={comment.what.split('\n')[0]} placeholder="status"
 								></MarkupView>

@@ -6,9 +6,9 @@
 	let { status }: Props = $props();
 </script>
 
-<span class="status {status}" title={status}
-	>{#if status.length === 0}<em>no status</em>{:else}{status}{/if}</span
->
+<span class="status {status}" title={status}>
+	{#if status.length === 0}<em>no status</em>{:else}{status}{/if}
+</span>
 
 <style>
 	.status {

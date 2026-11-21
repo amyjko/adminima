@@ -37,11 +37,12 @@
 	<Link
 		to="/org/{org ? Organization.getPath(org) : profile.orgid}/person/{profile.id}"
 		kind="person"
-		>{#if profile.name === ''}{profile.email}{:else if short}{profile.name.split(
+	>
+		{#if profile.name === ''}{profile.email}{:else if short}{profile.name.split(
 				' '
 			)[0]}{:else}{profile.name}
-			<sub>&lt;{profile.email}&gt;</sub>{/if}</Link
-	>
+			<sub>&lt;{profile.email}&gt;</sub>{/if}
+	</Link>
 {:else}
 	<Oops inline text="Unknown person" />
 {/if}

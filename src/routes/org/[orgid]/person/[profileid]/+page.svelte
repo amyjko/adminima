@@ -40,9 +40,9 @@
 <Tip admin>People have unique profiles for each organization they are in.</Tip>
 
 {#if profile.personid === null}
-	<Notice
-		>This person does not yet have an account on Adminima. If they create one, they can add a bio.</Notice
-	>
+	<Notice>
+		This person does not yet have an account on Adminima. If they create one, they can add a bio.
+	</Notice>
 {/if}
 
 <MarkupView
@@ -55,10 +55,10 @@
 
 <Header>Roles</Header>
 
-<Paragraph
-	>Roles and recurring processes this person is accountable or responsible for. Use this like a to
-	do list, to check for upcoming tasks.</Paragraph
->
+<Paragraph>
+	Roles and recurring processes this person is accountable or responsible for. Use this like a to do
+	list, to check for upcoming tasks.
+</Paragraph>
 {#if roles.length > 0}
 	{#each roles as role}
 		<RoleLink {role} />
@@ -75,9 +75,9 @@
 
 <Header>Changes</Header>
 
-<Paragraph
-	>These are the <strong>{data.changes.length}</strong> changes this person is leading.</Paragraph
->
+<Paragraph>
+	These are the <strong>{data.changes.length}</strong> changes this person is leading.
+</Paragraph>
 
 {#each data.changes as change}
 	<ChangeLink wrap {change} />

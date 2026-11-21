@@ -100,9 +100,9 @@
 		{#if realtime === 'disconnected'}
 			<div class="stale">
 				<span>This page is out of date.</span>
-				<Button tip="Reload this page to see the latest changes" action={() => location.reload()}
-					>Reload</Button
-				>
+				<Button tip="Reload this page to see the latest changes" action={() => location.reload()}>
+					Reload
+				</Button>
 			</div>
 		{/if}
 	</div>

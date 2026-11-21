@@ -132,8 +132,9 @@
 						}
 					}}
 					active={!saving}
-					>{#if editing}&checkmark;{:else}✎{/if}</Button
 				>
+					{#if editing}&checkmark;{:else}✎{/if}
+				</Button>
 			{/if}
 		</div>
 	{/if}

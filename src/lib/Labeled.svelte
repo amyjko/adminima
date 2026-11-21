@@ -17,19 +17,19 @@
 
 {#if label.length > 0 && id !== undefined}
 	<div class="labeled">
-		<span id="{id}-label"
-			>{label}
-			{#if message}<span class="invalid">{message}</span>{/if}</span
-		>
+		<span id="{id}-label">
+			{label}
+			{#if message}<span class="invalid">{message}</span>{/if}
+		</span>
 		{@render children?.()}
 	</div>{:else if label.length > 0}
-	<label
-		><span
-			>{label}
-			{#if message}<span class="invalid">{message}</span>{/if}</span
-		>
-		{@render children?.()}</label
-	>{:else}{@render children?.()} <span class="invalid">{message}</span>{/if}
+	<label>
+		<span>
+			{label}
+			{#if message}<span class="invalid">{message}</span>{/if}
+		</span>
+		{@render children?.()}
+	</label>{:else}{@render children?.()} <span class="invalid">{message}</span>{/if}
 
 <style>
 	label,

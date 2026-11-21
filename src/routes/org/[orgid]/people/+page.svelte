@@ -61,18 +61,20 @@
 
 <Title title="People" kind="person" label={false} />
 
-<Tip member
-	>This is the list of people in this organization. <strong>Admins</strong> have permission to add and
+<Tip member>
+	This is the list of people in this organization. <strong>Admins</strong> have permission to add and
 	remove people from the organization, promote or demote people from admin status, and create and delete
-	roles. Select a person to see the roles they have.</Tip
->
+	roles. Select a person to see the roles they have.
+</Tip>
 
 {#if isAdmin && orgContext().counts.roles === 0}
-	<Notice
-		>Want to give people roles? First you'll need to <Link
-			to="/org/{Organization.getPath(organization)}/roles">define some</Link
-		>.</Notice
-	>
+	<Notice>
+		Want to give people roles? First you'll need to <Link
+			to="/org/{Organization.getPath(organization)}/roles"
+		>
+			define some
+		</Link>.
+	</Notice>
 {/if}
 
 {#if isAdmin}
@@ -175,9 +177,9 @@
 					{/if}
 					<div class="role-list">
 						{#each roles as role}
-							<span class="role"
-								><RoleLink {role}
-									>{#if isAdmin}<Button
+							<span class="role">
+								<RoleLink {role}>
+									{#if isAdmin}<Button
 											tip="Unassign this role from this person"
 											chromeless
 											action={async () => {
@@ -186,10 +188,12 @@
 													'Could not unassign role.'
 												);
 												if (error) return;
-											}}>{Delete}</Button
-										>{/if}</RoleLink
-								></span
-							>
+											}}
+										>
+											{Delete}
+										</Button>{/if}
+								</RoleLink>
+							</span>
 						{/each}
 					</div>
 				</td>
@@ -256,8 +260,10 @@
 						<Button
 							tip="Remove this person from the organization."
 							action={() => mutate(db.removeProfile(profile.id), "Couldn't remove person.")}
-							active={!Organization.hasAdminProfile(profiles, profile.id)}>{Delete}</Button
+							active={!Organization.hasAdminProfile(profiles, profile.id)}
 						>
+							{Delete}
+						</Button>
 					</td>
 				{/if}
 			</tr>

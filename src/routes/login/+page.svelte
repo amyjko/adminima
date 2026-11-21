@@ -74,9 +74,9 @@
 			invalid={(text) =>
 				text.length === 0 || validEmail(email) ? undefined : 'Not yet a valid email'}
 		/>
-		<Button tip="Email the login code" active={emailActive} action={sendCode} submit
-			>Send code …</Button
-		>
+		<Button tip="Email the login code" active={emailActive} action={sendCode} submit>
+			Send code …
+		</Button>
 	</Form>
 {:else}
 	<Paragraph>We emailed you a code. It might take a minute to arrive.</Paragraph>

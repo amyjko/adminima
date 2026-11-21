@@ -56,7 +56,9 @@
 			submit
 			active={!submitting}
 			tip="Add a comment to this change."
-			action={() => submitComment()}>Submit</Button
+			action={() => submitComment()}
 		>
+			Submit
+		</Button>
 	</Form>
 {/if}

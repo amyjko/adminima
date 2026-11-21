@@ -195,8 +195,8 @@
 
 <Title title="Processes" kind="process" label={false} />
 
-<Tip member
-	><p>
+<Tip member>
+	<p>
 		These are all of the processes in this organization and which roles are involved in them. Select
 		one to see how it works, who's responsible for it, or to suggest a change. Change process
 		concerns in each process's page.
@@ -288,15 +288,15 @@
 </fieldset>
 
 {#snippet ConcernHeader(concern: string)}
-	<Header
-		><Concern
+	<Header>
+		<Concern
 			{concern}
 			edit={isAdmin
 				? (newConcern) =>
 						mutate(db.renameConcern(org.id, concern, newConcern), "Couldn't rename concern.")
 				: undefined}
-		/></Header
-	>
+		/>
+	</Header>
 {/snippet}
 
 {#if processes.length === 0}
@@ -325,8 +325,8 @@
 								<th style:width="6em">repeats</th>
 								<th style:width="20em">process</th>
 								{#each roles as role}
-									<th class="role" class:me={personRoles.includes(role.id)}
-										><RoleLink {role} />
+									<th class="role" class:me={personRoles.includes(role.id)}>
+										<RoleLink {role} />
 									</th>
 								{:else}
 									<th></th>
@@ -340,17 +340,17 @@
 								{@const processHows = Organization.getProcessHows(hows, process.id)}
 								<tr>
 									<td><Status status={process.state} /></td>
-									<td width="4em"
-										>{#if how}<Visibility
+									<td width="4em">
+										{#if how}<Visibility
 												tip="The visibility of tis process"
 												level={how.visibility}
-											/>{/if}</td
-									>
+											/>{/if}
+									</td>
 									<td><ProcessDate {process} /></td>
 									<td><ProcessLink wrap {process} /></td>
 									{#each roles as role}
-										<td class="level" class:me={personRoles.includes(role.id)}
-											><Level
+										<td class="level" class:me={personRoles.includes(role.id)}>
+											<Level
 												level={process?.accountable === role.id
 													? 'accountable'
 													: processHows.some((how) => how.responsible.includes(role.id))
@@ -360,8 +360,8 @@
 															: processHows.some((how) => how.informed.includes(role.id))
 																? 'informed'
 																: ''}
-											/></td
-										>{:else}<td><em>no roles</em></td>{/each}
+											/>
+										</td>{:else}<td><em>no roles</em></td>{/each}
 								</tr>
 							{/each}
 						</tbody>

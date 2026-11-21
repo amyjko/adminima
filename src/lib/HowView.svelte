@@ -235,23 +235,27 @@
 			{/if}
 			{#if editable}
 				<Button tip="Move up" action={() => moveVertically(-1)} active={index > 0}>⏶</Button>
-				<Button tip="Move down" action={() => moveVertically(1)} active={index + 1 < length}
-					>⏷</Button
-				>
+				<Button tip="Move down" action={() => moveVertically(1)} active={index + 1 < length}>
+					⏷
+				</Button>
 				<Button
 					tip="Unindent this step"
 					action={() => unindentHow(false)}
-					active={getUnindent() !== undefined}>⏴</Button
+					active={getUnindent() !== undefined}
 				>
+					⏴
+				</Button>
 				<Button
 					tip="Indent this step"
 					action={() => indentHow(false)}
-					active={getIndent() !== undefined}>⏵</Button
+					active={getIndent() !== undefined}
 				>
+					⏵
+				</Button>
 				<Button tip="Insert a new step after this step" action={insertHow}>+</Button>
-				<Button warning tip="Delete this step" action={deleteHow} active={canDelete()}
-					>{Delete}</Button
-				>
+				<Button warning tip="Delete this step" action={deleteHow} active={canDelete()}>
+					{Delete}
+				</Button>
 			{/if}
 		</div>
 	{/if}
